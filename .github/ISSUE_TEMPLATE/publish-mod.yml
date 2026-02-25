@@ -1,0 +1,109 @@
+name: Publish New Mod
+description: Submit a new mod to The Railyard registry.
+title: "[Publish Mod]: "
+labels: ["publish-mod"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Publish a New Mod
+
+        Fill out the form below to submit your mod. A pull request will be automatically created for review.
+
+  - type: input
+    id: mod-id
+    attributes:
+      label: Mod ID
+      description: >
+        A unique kebab-case identifier for your mod (e.g. `better-trains`).
+        This will be the directory name in the registry. Only lowercase letters, numbers, and hyphens.
+      placeholder: my-awesome-mod
+    validations:
+      required: true
+
+  - type: input
+    id: name
+    attributes:
+      label: Display Name
+      description: The human-readable name for your mod.
+      placeholder: My Awesome Mod
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A short description of what your mod does.
+      placeholder: Adds new train models with realistic sounds and animations.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: tags
+    attributes:
+      label: Tags
+      description: Select all tags that apply to your mod.
+      options:
+        - label: vehicles
+        - label: cosmetic
+        - label: gameplay
+        - label: ui
+        - label: audio
+        - label: maps
+        - label: tools
+        - label: library
+
+  - type: input
+    id: source
+    attributes:
+      label: Source URL
+      description: URL to your mod's source code repository or homepage.
+      placeholder: https://github.com/username/my-mod
+    validations:
+      required: true
+
+  - type: dropdown
+    id: update-type
+    attributes:
+      label: Update Type
+      description: How should the mod manager fetch updates?
+      options:
+        - GitHub Releases
+        - Custom URL
+    validations:
+      required: true
+
+  - type: input
+    id: github-repo
+    attributes:
+      label: GitHub Repository
+      description: >
+        If using GitHub Releases, provide the `owner/repo` path.
+        Leave blank if using Custom URL.
+      placeholder: username/my-mod
+
+  - type: input
+    id: custom-update-url
+    attributes:
+      label: Custom Update URL
+      description: >
+        If using Custom URL, provide the full URL to your update.json file.
+        Leave blank if using GitHub Releases.
+      placeholder: https://example.com/my-mod/update.json
+
+  - type: textarea
+    id: gallery
+    attributes:
+      label: Gallery Images
+      description: >
+        Drag and drop screenshot images here, or paste image URLs (one per line).
+        These will be displayed in the mod browser.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Terms
+      options:
+        - label: I confirm I am the author or have permission to publish this mod.
+          required: true

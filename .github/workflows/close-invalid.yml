@@ -1,0 +1,53 @@
+name: Close Invalid Issues
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  close-invalid:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for valid labels
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const validLabels = [
+              'publish-mod',
+              'publish-map',
+              'update-mod',
+              'update-map',
+              'report'
+            ];
+
+            const issueLabels = context.payload.issue.labels.map(l => l.name);
+            const hasValidLabel = issueLabels.some(l => validLabels.includes(l));
+
+            if (!hasValidLabel) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: [
+                  'This issue was not created using a valid issue template and has been automatically closed.',
+                  '',
+                  'Please use one of the available issue templates to submit your request:',
+                  '- **Publish New Mod** - Submit a new mod to the registry',
+                  '- **Publish New Map** - Submit a new custom map to the registry',
+                  '- **Update Existing Mod Metadata** - Update metadata for a mod you own',
+                  '- **Update Existing Map Metadata** - Update metadata for a map you own',
+                  '- **Report a Mod or Map** - Report an issue with a listing',
+                ].join('\n')
+              });
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                state: 'closed',
+                state_reason: 'not_planned'
+              });
+            }

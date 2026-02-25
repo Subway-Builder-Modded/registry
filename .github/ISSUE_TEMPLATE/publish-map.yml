@@ -1,0 +1,141 @@
+name: Publish New Map
+description: Submit a new custom map to The Railyard registry.
+title: "[Publish Map]: "
+labels: ["publish-map"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Publish a New Map
+
+        Fill out the form below to submit your custom map. A pull request will be automatically created for review.
+
+  - type: input
+    id: map-id
+    attributes:
+      label: Map ID
+      description: >
+        A unique kebab-case identifier for your map (e.g. `raleigh`).
+        This will be the directory name in the registry. Only lowercase letters, numbers, and hyphens.
+      placeholder: my-city
+    validations:
+      required: true
+
+  - type: input
+    id: name
+    attributes:
+      label: City Name
+      description: The human-readable name for your map.
+      placeholder: Raleigh
+    validations:
+      required: true
+
+  - type: input
+    id: city-code
+    attributes:
+      label: City Code
+      description: >
+        2-4 letter IATA/ICAO city code used by the game. Must not clash with vanilla city codes.
+      placeholder: RDU
+    validations:
+      required: true
+
+  - type: input
+    id: country
+    attributes:
+      label: Country Code
+      description: ISO 3166-1 alpha-2 country code (e.g. US, GB, CA, DE).
+      placeholder: US
+    validations:
+      required: true
+
+  - type: input
+    id: population
+    attributes:
+      label: Population
+      description: Metropolitan area population (number only, no commas).
+      placeholder: "1500000"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A short description of your map.
+      placeholder: Custom map of the Raleigh metropolitan area with good demand data quality.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: tags
+    attributes:
+      label: Tags
+      description: Select all tags that apply to your map.
+      options:
+        - label: north-america
+        - label: south-america
+        - label: europe
+        - label: asia
+        - label: africa
+        - label: oceania
+        - label: good-data
+        - label: ok-data
+        - label: limited-data
+        - label: universities
+        - label: airports
+        - label: entertainment
+
+  - type: input
+    id: source
+    attributes:
+      label: Source URL
+      description: URL to your map's source code repository or download page.
+      placeholder: https://github.com/username/my-map
+    validations:
+      required: true
+
+  - type: dropdown
+    id: update-type
+    attributes:
+      label: Update Type
+      description: How should the mod manager fetch updates?
+      options:
+        - GitHub Releases
+        - Custom URL
+    validations:
+      required: true
+
+  - type: input
+    id: github-repo
+    attributes:
+      label: GitHub Repository
+      description: >
+        If using GitHub Releases, provide the `owner/repo` path.
+        Leave blank if using Custom URL.
+      placeholder: username/my-map
+
+  - type: input
+    id: custom-update-url
+    attributes:
+      label: Custom Update URL
+      description: >
+        If using Custom URL, provide the full URL to your update.json file.
+        Leave blank if using GitHub Releases.
+      placeholder: https://example.com/my-map/update.json
+
+  - type: textarea
+    id: gallery
+    attributes:
+      label: Gallery Images
+      description: >
+        Drag and drop screenshot images here, or paste image URLs (one per line).
+        These will be displayed in the map browser.
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Terms
+      options:
+        - label: I confirm I am the author or have permission to publish this map.
+          required: true

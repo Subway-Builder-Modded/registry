@@ -1,0 +1,55 @@
+name: Report a Mod or Map
+description: Report a mod or map for policy violations, broken links, or other issues.
+title: "[Report]: "
+labels: ["report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Report a Mod or Map
+
+        Use this form to report mods or maps that have issues. A maintainer will review your report.
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      description: Is this a mod or a map?
+      options:
+        - Mod
+        - Map
+    validations:
+      required: true
+
+  - type: input
+    id: listing-id
+    attributes:
+      label: Mod / Map ID
+      description: The ID of the mod or map you are reporting.
+      placeholder: the-listing-id
+    validations:
+      required: true
+
+  - type: dropdown
+    id: reason
+    attributes:
+      label: Reason
+      description: Why are you reporting this listing?
+      options:
+        - Broken download link
+        - Incorrect metadata
+        - Malicious content
+        - Copyright violation
+        - Duplicate listing
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Provide additional context about your report.
+      placeholder: Explain the issue in detail...
+    validations:
+      required: true

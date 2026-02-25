@@ -1,0 +1,108 @@
+name: Update Existing Map Metadata
+description: Update metadata for a map you own in The Railyard registry.
+title: "[Update Map]: "
+labels: ["update-map"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Update Map Metadata
+
+        Only fill in the fields you want to change. Leave everything else blank.
+        Your GitHub account must match the original publisher of this map.
+
+  - type: input
+    id: map-id
+    attributes:
+      label: Map ID
+      description: The ID of the map you want to update (must already exist in the registry).
+      placeholder: my-city
+    validations:
+      required: true
+
+  - type: input
+    id: name
+    attributes:
+      label: City Name
+      description: New city name (leave blank to keep current).
+
+  - type: input
+    id: city-code
+    attributes:
+      label: City Code
+      description: New city code (leave blank to keep current).
+
+  - type: input
+    id: country
+    attributes:
+      label: Country Code
+      description: New country code (leave blank to keep current).
+
+  - type: input
+    id: population
+    attributes:
+      label: Population
+      description: New population (leave blank to keep current).
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: New description (leave blank to keep current).
+
+  - type: checkboxes
+    id: tags
+    attributes:
+      label: Tags
+      description: >
+        If you check any tags below, they will REPLACE the current tags.
+        Leave all unchecked to keep current tags.
+      options:
+        - label: north-america
+        - label: south-america
+        - label: europe
+        - label: asia
+        - label: africa
+        - label: oceania
+        - label: good-data
+        - label: ok-data
+        - label: limited-data
+        - label: universities
+        - label: airports
+        - label: entertainment
+
+  - type: input
+    id: source
+    attributes:
+      label: Source URL
+      description: New source URL (leave blank to keep current).
+
+  - type: dropdown
+    id: update-type
+    attributes:
+      label: Update Type
+      description: Change the update type (select "No change" to keep current).
+      options:
+        - No change
+        - GitHub Releases
+        - Custom URL
+
+  - type: input
+    id: github-repo
+    attributes:
+      label: GitHub Repository
+      description: New `owner/repo` path (leave blank to keep current).
+
+  - type: input
+    id: custom-update-url
+    attributes:
+      label: Custom Update URL
+      description: New custom update URL (leave blank to keep current).
+
+  - type: textarea
+    id: gallery
+    attributes:
+      label: Gallery Images
+      description: >
+        Drag and drop new screenshot images here, or paste image URLs (one per line).
+        If provided, these will REPLACE the current gallery.

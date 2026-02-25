@@ -1,0 +1,193 @@
+name: Publish Listing
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  publish-mod:
+    if: contains(github.event.issue.labels.*.name, 'publish-mod')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Parse issue body
+        id: parser
+        uses: stefanbuck/github-issue-parser@v3
+        with:
+          template-path: .github/ISSUE_TEMPLATE/publish-mod.yml
+          issue-body: ${{ github.event.issue.body }}
+
+      - name: Validate submission
+        env:
+          LISTING_TYPE: mod
+          ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm --dir scripts run validate-publish
+
+      - name: Create listing
+        env:
+          LISTING_TYPE: mod
+          ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
+          ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
+          ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
+        run: pnpm --dir scripts run create-listing
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat(mod): add ${{ fromJson(steps.parser.outputs.jsonString).mod-id }}"
+          title: "feat(mod): add `${{ fromJson(steps.parser.outputs.jsonString).mod-id }}`"
+          body: |
+            Fixes #${{ github.event.issue.number }}
+
+            Automated PR to add mod `${{ fromJson(steps.parser.outputs.jsonString).mod-id }}` to the registry.
+
+            Submitted by @${{ github.event.issue.user.login }}
+          branch: publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}
+          labels: automated-pr
+
+      - name: Comment on issue
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'A pull request has been created for your mod submission. A maintainer will review it shortly.'
+            });
+
+      - name: Handle validation failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let errorMsg = 'Your submission failed validation. Please check the workflow logs for details.';
+            try {
+              errorMsg = fs.readFileSync('validation-error.md', 'utf-8');
+            } catch {}
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: errorMsg
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed',
+              state_reason: 'not_planned'
+            });
+
+  publish-map:
+    if: contains(github.event.issue.labels.*.name, 'publish-map')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Parse issue body
+        id: parser
+        uses: stefanbuck/github-issue-parser@v3
+        with:
+          template-path: .github/ISSUE_TEMPLATE/publish-map.yml
+          issue-body: ${{ github.event.issue.body }}
+
+      - name: Validate submission
+        env:
+          LISTING_TYPE: map
+          ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm --dir scripts run validate-publish
+
+      - name: Create listing
+        env:
+          LISTING_TYPE: map
+          ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
+          ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
+          ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
+        run: pnpm --dir scripts run create-listing
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat(map): add ${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+          title: "feat(map): add `${{ fromJson(steps.parser.outputs.jsonString).map-id }}`"
+          body: |
+            Fixes #${{ github.event.issue.number }}
+
+            Automated PR to add map `${{ fromJson(steps.parser.outputs.jsonString).map-id }}` to the registry.
+
+            Submitted by @${{ github.event.issue.user.login }}
+          branch: publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}
+          labels: automated-pr
+
+      - name: Comment on issue
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'A pull request has been created for your map submission. A maintainer will review it shortly.'
+            });
+
+      - name: Handle validation failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let errorMsg = 'Your submission failed validation. Please check the workflow logs for details.';
+            try {
+              errorMsg = fs.readFileSync('validation-error.md', 'utf-8');
+            } catch {}
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: errorMsg
+            });
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed',
+              state_reason: 'not_planned'
+            });

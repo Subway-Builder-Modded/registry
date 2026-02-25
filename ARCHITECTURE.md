@@ -6,15 +6,39 @@ The Railyard is the central registry for **Subway Builder** community mods and c
 
 ```
 The-Railyard/
+├── .github/
+│   ├── ISSUE_TEMPLATE/         # Issue form templates
+│   │   ├── config.yml          # Disables blank issues
+│   │   ├── publish-mod.yml
+│   │   ├── publish-map.yml
+│   │   ├── update-mod.yml
+│   │   ├── update-map.yml
+│   │   └── report.yml
+│   └── workflows/              # CI automation
+│       ├── publish.yml         # Creates PRs from publish issues
+│       ├── update-metadata.yml # Creates PRs from update issues
+│       ├── regenerate-index.yml# Rebuilds index.json on merge
+│       ├── close-invalid.yml   # Auto-closes non-template issues
+│       └── report.yml          # Acknowledges reports
+├── scripts/                    # TypeScript CI scripts
+│   ├── lib/
+│   │   ├── custom-url.ts      # Custom update URL validation helpers
+│   │   └── github.ts          # GitHub API validation helpers
+│   ├── package.json
+│   ├── validate-publish.ts
+│   ├── validate-update.ts
+│   ├── create-listing.ts
+│   ├── update-listing.ts
+│   └── regenerate-indexes.ts
 ├── mods/
-│   ├── index.json              # Registry of all mod IDs
+│   ├── index.json              # Registry of all mod IDs (auto-generated)
 │   └── <mod-id>/
 │       ├── manifest.json       # Mod metadata + update pointer
 │       └── gallery/
 │           ├── screenshot1.png
 │           └── screenshot2.png
 ├── maps/
-│   ├── index.json              # Registry of all map IDs
+│   ├── index.json              # Registry of all map IDs (auto-generated)
 │   └── <map-id>/
 │       ├── manifest.json       # Map metadata + update pointer
 │       └── gallery/
@@ -47,6 +71,7 @@ Top-level registry listing every mod by ID.
   "id": "mod-id",
   "name": "Better Trains",
   "author": "SomeModder",
+  "github_id": 12345678,
   "description": "Adds realistic train models and sounds.",
   "tags": ["vehicles", "cosmetic"],
   "gallery": ["gallery/screenshot1.png", "gallery/screenshot2.png"],
@@ -64,6 +89,7 @@ Top-level registry listing every mod by ID.
 | `id`             | `string`   | Unique mod identifier. Must match the directory name.                |
 | `name`           | `string`   | Human-readable display name.                                         |
 | `author`         | `string`   | Mod author's name or handle.                                         |
+| `github_id`      | `number`   | Immutable GitHub user ID of the publisher. Used for ownership checks. |
 | `description`    | `string`   | Short description of what the mod does.                              |
 | `tags`           | `string[]` | Categorization tags (e.g. `"vehicles"`, `"cosmetic"`, `"gameplay"`). |
 | `gallery`        | `string[]` | Relative paths to gallery images within the mod directory.           |
@@ -74,7 +100,9 @@ Top-level registry listing every mod by ID.
 
 #### GitHub Releases
 
-The mod manager fetches directly from `https://api.github.com/repos/{repo}/releases`.
+The mod manager fetches directly from `https://api.github.com/repos/{repo}/releases` and picks the first `.zip` asset from the latest release. No filename convention is enforced -- any `.zip` asset will be used.
+
+Publish validation verifies the repo exists and has at least one release with a `.zip` asset.
 
 ```json
 "update": {
@@ -85,7 +113,7 @@ The mod manager fetches directly from `https://api.github.com/repos/{repo}/relea
 
 #### Custom URL
 
-Points to a self-hosted `update.json` file maintained by the mod author.
+Points to a self-hosted `update.json` file maintained by the mod author. Publish validation fetches the URL and verifies it returns valid JSON matching the `update.json` schema (has `schema_version`, a non-empty `versions` array, and required fields on the first entry).
 
 ```json
 "update": {
@@ -152,6 +180,7 @@ Top-level registry listing every map by ID.
   "id": "raleigh",
   "name": "Raleigh",
   "author": "muffintime",
+  "github_id": 87654321,
   "city_code": "RDU",
   "country": "US",
   "population": 1500000,
@@ -200,6 +229,48 @@ Suggested tag vocabulary:
 - **Size:** `small-city` (<500K), `medium-city` (500K-2M), `large-city` (2M+)
 - **Data quality:** `good-data`, `ok-data`, `limited-data`
 - **Features:** `universities`, `airports`, `entertainment`
+
+## Issue-Driven CI Workflow
+
+All submissions and updates are managed through GitHub Issues. Blank issues are disabled -- users must pick a template.
+
+### Submission Flow
+
+1. Author opens a **Publish New Mod/Map** issue using the structured form
+2. CI parses the issue body, validates the data, and creates the listing files
+3. A PR is automatically opened (e.g. `feat(mod): add \`better-trains\``)
+4. Human reviewers merge the PR
+5. Merging the PR auto-closes the issue (via `Fixes #N` in the PR body)
+6. A post-merge workflow regenerates `index.json` from the filesystem
+
+### Update Flow
+
+1. Author opens an **Update Existing Mod/Map Metadata** issue
+2. CI verifies the issue author's `github_id` matches the manifest's `github_id`
+3. If ownership check fails, the issue is auto-closed with an explanation
+4. Otherwise, a PR is created with the updated manifest fields
+
+### Ownership Verification
+
+Each manifest stores `github_id` -- the immutable numeric GitHub user ID of the original publisher. This is checked on update requests via `github.event.issue.user.id`. Usernames can change; IDs cannot.
+
+### Index Regeneration
+
+`mods/index.json` and `maps/index.json` are **never edited directly by PRs**. They are regenerated from the filesystem (scanning `*/manifest.json`) after merges to `main`. This eliminates merge conflicts when multiple PRs are open.
+
+### Scripts (`scripts/`)
+
+TypeScript scripts handle the complex logic, keeping workflow YAML thin:
+
+| Script | Purpose |
+|---|---|
+| `validate-publish.ts` | Validates new submissions (ID format, uniqueness, URLs, vanilla code clashes) |
+| `validate-update.ts` | Validates updates (existence check, ownership verification) |
+| `create-listing.ts` | Creates `manifest.json` and downloads gallery images |
+| `update-listing.ts` | Patches existing `manifest.json` with changed fields |
+| `regenerate-indexes.ts` | Scans filesystem and rebuilds `index.json` files |
+
+---
 
 ## Design Principles
 
