@@ -2,7 +2,9 @@ name: Update Listing Metadata
 
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened]
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: write
@@ -11,7 +13,13 @@ permissions:
 
 jobs:
   update-mod:
-    if: contains(github.event.issue.labels.*.name, 'update-mod')
+    if: >-
+      contains(github.event.issue.labels.*.name, 'update-mod') && (
+        github.event_name == 'issues' ||
+        (github.event_name == 'issue_comment' &&
+         github.event.comment.user.id == github.event.issue.user.id &&
+         contains(github.event.comment.body, 'revalidate'))
+      )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +35,18 @@ jobs:
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile
         working-directory: scripts
+
+      - name: Acknowledge revalidation
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
 
       - name: Parse issue body
         id: parser
@@ -64,11 +84,20 @@ jobs:
           branch: update/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}
           labels: automated-pr
 
-      - name: Comment on issue
+      - name: Handle success
         if: success()
         uses: actions/github-script@v7
         with:
           script: |
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'failed-validation'
+              });
+            } catch {}
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -89,22 +118,29 @@ jobs:
               errorMsg = 'Something went wrong while processing your update request. Please check the [workflow logs](' +
                 `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`;
             }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['failed-validation']
+            });
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: errorMsg
-            });
-            await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              state: 'closed',
-              state_reason: 'not_planned'
+              body: errorMsg + '\n\n---\nEdit your issue to fix the problems above, then comment **revalidate** to try again.'
             });
 
   update-map:
-    if: contains(github.event.issue.labels.*.name, 'update-map')
+    if: >-
+      contains(github.event.issue.labels.*.name, 'update-map') && (
+        github.event_name == 'issues' ||
+        (github.event_name == 'issue_comment' &&
+         github.event.comment.user.id == github.event.issue.user.id &&
+         contains(github.event.comment.body, 'revalidate'))
+      )
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -120,6 +156,18 @@ jobs:
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile
         working-directory: scripts
+
+      - name: Acknowledge revalidation
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
 
       - name: Parse issue body
         id: parser
@@ -157,11 +205,20 @@ jobs:
           branch: update/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}
           labels: automated-pr
 
-      - name: Comment on issue
+      - name: Handle success
         if: success()
         uses: actions/github-script@v7
         with:
           script: |
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'failed-validation'
+              });
+            } catch {}
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -182,16 +239,17 @@ jobs:
               errorMsg = 'Something went wrong while processing your update request. Please check the [workflow logs](' +
                 `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`;
             }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['failed-validation']
+            });
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: errorMsg
-            });
-            await github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              state: 'closed',
-              state_reason: 'not_planned'
+              body: errorMsg + '\n\n---\nEdit your issue to fix the problems above, then comment **revalidate** to try again.'
             });
