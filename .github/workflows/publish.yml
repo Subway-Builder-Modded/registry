@@ -71,6 +71,7 @@ jobs:
           ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
           ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
           ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
       - name: Create pull request
@@ -197,6 +198,7 @@ jobs:
           ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
           ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
           ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
       - name: Create pull request
