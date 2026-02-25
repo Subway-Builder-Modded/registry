@@ -22,13 +22,21 @@ interface MapManifest extends ModManifest {
   population: number;
 }
 
-function parseCheckedBoxes(raw: string | undefined): string[] {
+function parseTags(raw: unknown): string[] {
   if (!raw) return [];
-  return raw
-    .split("\n")
-    .filter((line) => line.startsWith("- [X]") || line.startsWith("- [x]"))
-    .map((line) => line.replace(/^- \[[Xx]\]\s*/, "").trim())
-    .filter(Boolean);
+  // Issue parser may return an array of strings or comma-separated string
+  if (Array.isArray(raw)) return raw.map((t) => String(t).trim()).filter(Boolean);
+  if (typeof raw !== "string") return [];
+  // Handle checkbox markdown format: "- [X] tag\n- [x] tag"
+  if (raw.includes("- [")) {
+    return raw
+      .split("\n")
+      .filter((line) => line.startsWith("- [X]") || line.startsWith("- [x]"))
+      .map((line) => line.replace(/^- \[[Xx]\]\s*/, "").trim())
+      .filter(Boolean);
+  }
+  // Handle comma-separated: "tag1, tag2, tag3"
+  return raw.split(",").map((t) => t.trim()).filter(Boolean);
 }
 
 function parseGalleryImages(raw: string | undefined): string[] {
@@ -63,6 +71,8 @@ function buildUpdate(data: Record<string, string>): ModManifest["update"] {
 
 async function downloadGalleryImages(urls: string[], galleryDir: string): Promise<string[]> {
   const paths: string[] = [];
+  const token = process.env.GITHUB_TOKEN;
+
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i];
     const ext = url.match(/\.(png|jpg|jpeg|gif|webp|svg)/i)?.[1] ?? "png";
@@ -70,7 +80,11 @@ async function downloadGalleryImages(urls: string[], galleryDir: string): Promis
     const filePath = resolve(galleryDir, filename);
 
     try {
-      const response = await fetch(url);
+      const headers: Record<string, string> = {};
+      if (token && url.includes("github.com")) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+      const response = await fetch(url, { headers });
       if (!response.ok) {
         console.warn(`Failed to download ${url}: ${response.status}`);
         continue;
@@ -108,7 +122,7 @@ async function main() {
   const imageUrls = parseGalleryImages(data.gallery);
   const galleryPaths = await downloadGalleryImages(imageUrls, galleryDir);
 
-  const tags = parseCheckedBoxes(data.tags);
+  const tags = parseTags(data.tags);
 
   const manifest: ModManifest | MapManifest = {
     schema_version: 1,
