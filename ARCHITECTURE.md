@@ -221,14 +221,28 @@ map-name.zip
 └── XXX.pmtiles              (XXX = city code)
 ```
 
-### Map Tags
+### Tags
 
-Suggested tag vocabulary:
+#### Shared Tags (Mods & Maps)
 
-- **Region:** `north-america`, `europe`, `asia`, `oceania`, `south-america`, `africa`
-- **Size:** `small-city` (<500K), `medium-city` (500K-2M), `large-city` (2M+)
-- **Data quality:** `good-data`, `ok-data`, `limited-data`
-- **Features:** `universities`, `airports`, `entertainment`
+**Region:**
+`caribbean`, `central-america`, `central-asia`, `east-africa`, `east-asia`, `europe`, `middle-east`, `north-africa`, `north-america`, `oceania`, `south-america`, `south-asia`, `southeast-asia`, `southern-africa`, `west-africa`
+
+#### Map-Only Tags
+
+**Size:**
+`small-city` (<500K), `medium-city` (500K-2M), `large-city` (2M+), `mega-city` (10M+)
+
+**Detail:**
+`full-detail`, `high-detail`, `medium-detail`, `low-detail`
+
+**Features:**
+`airports`, `entertainment`, `ferries`, `highways`, `universities`
+
+#### Mod-Only Tags
+
+**Category:**
+`cosmetic`, `gameplay`, `library`, `misc`, `qol`, `stations`, `tracks`, `trains`, `ui`
 
 ## Issue-Driven CI Workflow
 
