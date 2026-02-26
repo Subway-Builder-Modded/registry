@@ -69,53 +69,94 @@ function buildUpdate(data: Record<string, string>): ModManifest["update"] {
   return { type: "custom", url: data["custom-update-url"]! };
 }
 
-async function fetchWithAuth(url: string, token: string | undefined): Promise<Response> {
-  const isGitHub = url.includes("github.com") || url.includes("githubusercontent.com");
-  const headers: Record<string, string> = {};
-  if (token && isGitHub) {
-    headers["Authorization"] = `Bearer ${token}`;
+async function resolveGalleryUrls(markdownUrls: string[]): Promise<string[]> {
+  if (markdownUrls.length === 0) return [];
+
+  const token = process.env.GITHUB_TOKEN;
+  const repo = process.env.GITHUB_REPOSITORY;
+  const issueNumber = process.env.ISSUE_NUMBER;
+
+  if (!token || !repo || !issueNumber) {
+    console.warn("Missing GITHUB_TOKEN, GITHUB_REPOSITORY, or ISSUE_NUMBER — cannot resolve private image URLs");
+    return markdownUrls;
   }
 
-  // Use manual redirects for GitHub URLs — the Authorization header gets
-  // stripped on cross-origin redirects (github.com → githubusercontent.com),
-  // but the redirect URL contains a JWT in the query string so we can
-  // follow it without auth.
-  const response = await fetch(url, {
-    headers,
-    redirect: isGitHub ? "manual" : "follow",
-  });
+  try {
+    // Fetch the issue body as HTML — GitHub renders private repo images with
+    // JWT-signed URLs at private-user-images.githubusercontent.com that can
+    // be fetched without auth. The raw user-attachments/assets URLs 404 with
+    // API tokens (GitHub confirmed no API access for these).
+    const res = await fetch(
+      `https://api.github.com/repos/${repo}/issues/${issueNumber}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/vnd.github.full+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      }
+    );
 
-  if (response.status >= 300 && response.status < 400) {
-    const location = response.headers.get("location");
-    if (location) {
-      return fetch(location);
+    if (!res.ok) {
+      console.warn(`GitHub API returned ${res.status} when fetching issue HTML body`);
+      return markdownUrls;
     }
+
+    const data = await res.json();
+    const html: string = data.body_html || "";
+
+    // Extract image URLs from rendered HTML
+    const imgUrls: string[] = [];
+    const regex = /<img[^>]+src="([^"]+)"[^>]*>/gi;
+    let match;
+    while ((match = regex.exec(html)) !== null) {
+      imgUrls.push(match[1].replaceAll("&amp;", "&"));
+    }
+
+    if (imgUrls.length > 0) {
+      console.log(`Resolved ${imgUrls.length} image URL(s) from issue HTML body`);
+      return imgUrls;
+    }
+
+    console.warn("No image URLs found in issue HTML body, falling back to markdown URLs");
+  } catch (err) {
+    console.warn(`Failed to resolve gallery URLs via API: ${err}`);
   }
 
-  return response;
+  return markdownUrls;
 }
 
 async function downloadGalleryImages(urls: string[], galleryDir: string): Promise<string[]> {
   const paths: string[] = [];
-  const token = process.env.GITHUB_TOKEN;
 
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i];
-    const ext = url.match(/\.(png|jpg|jpeg|gif|webp|svg)/i)?.[1] ?? "png";
-    const filename = `screenshot${i + 1}.${ext}`;
-    const filePath = resolve(galleryDir, filename);
 
     try {
-      const response = await fetchWithAuth(url, token);
+      const response = await fetch(url);
       if (!response.ok) {
-        console.warn(`Failed to download ${url}: ${response.status}`);
+        console.warn(`Failed to download image ${i + 1}: ${response.status}`);
         continue;
       }
+
+      // Detect extension from Content-Type since JWT URLs lack file extensions
+      const contentType = response.headers.get("content-type") || "";
+      const extMap: Record<string, string> = {
+        "image/png": "png",
+        "image/jpeg": "jpg",
+        "image/gif": "gif",
+        "image/webp": "webp",
+        "image/svg+xml": "svg",
+      };
+      const ext = extMap[contentType] || url.match(/\.(png|jpg|jpeg|gif|webp|svg)/i)?.[1] || "png";
+      const filename = `screenshot${i + 1}.${ext}`;
+      const filePath = resolve(galleryDir, filename);
+
       const buffer = Buffer.from(await response.arrayBuffer());
       writeFileSync(filePath, buffer);
       paths.push(`gallery/${filename}`);
     } catch (err) {
-      console.warn(`Failed to download ${url}: ${err}`);
+      console.warn(`Failed to download image ${i + 1}: ${err}`);
     }
   }
   return paths;
@@ -140,9 +181,11 @@ async function main() {
 
   mkdirSync(galleryDir, { recursive: true });
 
-  // Download gallery images
+  // Download gallery images — resolve markdown URLs to JWT-signed URLs
+  // via the GitHub API HTML body (required for private repo attachments)
   const imageUrls = parseGalleryImages(data.gallery);
-  const galleryPaths = await downloadGalleryImages(imageUrls, galleryDir);
+  const resolvedUrls = await resolveGalleryUrls(imageUrls);
+  const galleryPaths = await downloadGalleryImages(resolvedUrls, galleryDir);
 
   const tags = parseTags(data.tags);
 

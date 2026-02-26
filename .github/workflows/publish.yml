@@ -74,6 +74,7 @@ jobs:
           ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
           ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
           ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
@@ -243,6 +244,7 @@ jobs:
           ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
           ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
           ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
