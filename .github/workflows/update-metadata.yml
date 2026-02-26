@@ -17,8 +17,11 @@ jobs:
       contains(github.event.issue.labels.*.name, 'update-mod') && (
         github.event_name == 'issues' ||
         (github.event_name == 'issue_comment' &&
-         github.event.comment.user.id == github.event.issue.user.id &&
-         contains(github.event.comment.body, 'revalidate'))
+         contains(github.event.comment.body, 'revalidate') &&
+         (github.event.comment.user.id == github.event.issue.user.id ||
+          github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'OWNER' ||
+          github.event.comment.author_association == 'COLLABORATOR'))
       )
     runs-on: ubuntu-latest
     steps:
@@ -179,8 +182,11 @@ jobs:
       contains(github.event.issue.labels.*.name, 'update-map') && (
         github.event_name == 'issues' ||
         (github.event_name == 'issue_comment' &&
-         github.event.comment.user.id == github.event.issue.user.id &&
-         contains(github.event.comment.body, 'revalidate'))
+         contains(github.event.comment.body, 'revalidate') &&
+         (github.event.comment.user.id == github.event.issue.user.id ||
+          github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'OWNER' ||
+          github.event.comment.author_association == 'COLLABORATOR'))
       )
     runs-on: ubuntu-latest
     steps:
