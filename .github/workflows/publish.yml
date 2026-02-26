@@ -74,20 +74,59 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+      - name: Close existing PR if present
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "feat(mod): add ${{ fromJson(steps.parser.outputs.jsonString).mod-id }}"
-          title: "feat(mod): add `${{ fromJson(steps.parser.outputs.jsonString).mod-id }}`"
-          body: |
-            Fixes #${{ github.event.issue.number }}
+          script: |
+            const branch = 'publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}';
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branch}`,
+              state: 'open'
+            });
+            for (const pr of prs) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                state: 'closed'
+              });
+            }
 
-            Automated PR to add mod `${{ fromJson(steps.parser.outputs.jsonString).mod-id }}` to the registry.
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}"
+          git add -A
+          git commit -m "feat(mod): add ${{ fromJson(steps.parser.outputs.jsonString).mod-id }}"
+          git push --force origin "publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}"
 
-            Submitted by @${{ github.event.issue.user.login }}
-          branch: publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}
-          labels: automated-pr
+      - name: Create pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'feat(mod): add `${{ fromJson(steps.parser.outputs.jsonString).mod-id }}`',
+              body: [
+                'Fixes #${{ github.event.issue.number }}',
+                '',
+                'Automated PR to add mod `${{ fromJson(steps.parser.outputs.jsonString).mod-id }}` to the registry.',
+                '',
+                'Submitted by @${{ github.event.issue.user.login }}'
+              ].join('\n'),
+              head: 'publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}',
+              base: 'main'
+            });
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: ['automated-pr']
+            });
 
       - name: Handle success
         if: success()
@@ -201,20 +240,59 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
-      - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+      - name: Close existing PR if present
+        uses: actions/github-script@v7
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "feat(map): add ${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
-          title: "feat(map): add `${{ fromJson(steps.parser.outputs.jsonString).map-id }}`"
-          body: |
-            Fixes #${{ github.event.issue.number }}
+          script: |
+            const branch = 'publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branch}`,
+              state: 'open'
+            });
+            for (const pr of prs) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                state: 'closed'
+              });
+            }
 
-            Automated PR to add map `${{ fromJson(steps.parser.outputs.jsonString).map-id }}` to the registry.
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+          git add -A
+          git commit -m "feat(map): add ${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+          git push --force origin "publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
 
-            Submitted by @${{ github.event.issue.user.login }}
-          branch: publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}
-          labels: automated-pr
+      - name: Create pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'feat(map): add `${{ fromJson(steps.parser.outputs.jsonString).map-id }}`',
+              body: [
+                'Fixes #${{ github.event.issue.number }}',
+                '',
+                'Automated PR to add map `${{ fromJson(steps.parser.outputs.jsonString).map-id }}` to the registry.',
+                '',
+                'Submitted by @${{ github.event.issue.user.login }}'
+              ].join('\n'),
+              head: 'publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}',
+              base: 'main'
+            });
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: ['automated-pr']
+            });
 
       - name: Handle success
         if: success()
