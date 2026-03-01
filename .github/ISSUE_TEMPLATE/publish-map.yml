@@ -114,6 +114,15 @@ body:
         - label: universities
 
   - type: input
+    id: data-source
+    attributes:
+      label: Data Source
+      description: Select the data source used to generate the demand data for your map.
+      placeholder: OSM, LODES, etc.
+    validations:
+      required: true
+      
+  - type: input
     id: source
     attributes:
       label: Source URL
