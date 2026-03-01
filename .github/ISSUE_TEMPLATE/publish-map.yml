@@ -114,6 +114,16 @@ body:
         - label: universities
 
   - type: input
+    id: data-source
+    attributes:
+      label: Data Source
+      description: Enter the data source used to generate the demand data for your map. The source name should use common abbreviations like LODES/INSEE/ONS etc.
+      placeholder: LODES, etc.
+      default: OSM
+    validations:
+      required: false
+
+  - type: input
     id: source
     attributes:
       label: Source URL
