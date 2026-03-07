@@ -111,7 +111,7 @@ Publish validation fetches the manifest and checks that `dependencies` is presen
 
 #### GitHub Releases
 
-The mod manager fetches directly from `https://api.github.com/repos/{repo}/releases` and picks the first `.zip` asset from the latest release. No filename convention is enforced -- any `.zip` asset will be used.
+Railyard fetches directly from `https://api.github.com/repos/{repo}/releases` and picks the first `.zip` asset from the latest release. No filename convention is enforced -- any `.zip` asset will be used.
 
 Publish validation verifies the repo exists and has at least one release with a `.zip` asset. **For mods**, it also verifies the latest release has a `manifest.json` asset and that it passes schema validation (see above).
 
@@ -163,14 +163,14 @@ Points to a self-hosted `update.json` file maintained by the mod author. Publish
 }
 ```
 
-| Field          | Type     | Description                                                              |
-| -------------- | -------- | ------------------------------------------------------------------------ |
-| `version`      | `string` | Semver version string.                                                   |
-| `game_version` | `string` | Semver range for game compatibility filtering.                           |
-| `date`         | `string` | Release date (ISO 8601).                                                 |
-| `changelog`    | `string` | Human-readable changelog entry.                                          |
-| `download`     | `string` | Direct download URL for the release ZIP.                                 |
-| `sha256`       | `string` | SHA-256 hash of the ZIP for integrity verification.                      |
+| Field          | Type     | Description                                                                |
+| -------------- | -------- | -------------------------------------------------------------------------- |
+| `version`      | `string` | Semver version string.                                                     |
+| `game_version` | `string` | Semver range for game compatibility filtering.                             |
+| `date`         | `string` | Release date (ISO 8601).                                                   |
+| `changelog`    | `string` | Human-readable changelog entry.                                            |
+| `download`     | `string` | Direct download URL for the release ZIP.                                   |
+| `sha256`       | `string` | SHA-256 hash of the ZIP for integrity verification.                        |
 | `manifest`     | `string` | Direct URL to the mod's `manifest.json` (mods only, see validation above). |
 
 ---
@@ -216,7 +216,7 @@ Maps share all fields from the mod manifest, plus three map-specific fields:
 | Field        | Type     | Description                                                                                         |
 | ------------ | -------- | --------------------------------------------------------------------------------------------------- |
 | `city_code`  | `string` | 2-4 letter IATA/ICAO city code used by the game internally. Must not clash with vanilla city codes. |
-| `country`    | `string` | ISO 3166-1 alpha-2 country code. Used to sort maps into country tabs in the mod manager UI.         |
+| `country`    | `string` | ISO 3166-1 alpha-2 country code. Used to sort maps into country tabs in Railyard's UI.              |
 | `population` | `number` | Metropolitan area population. Used for display and sorting without needing to download the map.     |
 
 ### Update Types
@@ -304,7 +304,7 @@ TypeScript scripts handle the complex logic, keeping workflow YAML thin:
 
 ## Dependencies
 
-Mods and maps can declare dependencies on other mods. Dependencies are specified **inside the mod's own `manifest.json` (or `config.json` for maps)** (the one shipped in the mod's download ZIP), not in this repository. The Railyard registry does not track dependencies -- they are resolved at install time by the mod manager.
+Mods and maps can declare dependencies on other mods. Dependencies are specified **inside the mod's own `manifest.json` (or `config.json` for maps)** (the one shipped in the mod's download ZIP), not in this repository. The Railyard registry does not track dependencies -- they are resolved at install time by Railyard.
 
 The `dependencies` field is an object mapping mod IDs to semver ranges. The `subway-builder` key is always required:
 
@@ -325,7 +325,7 @@ Each key is a mod ID from this registry (or `subway-builder` for the base game) 
 ## Design Principles
 
 - **Metadata only in this repo.** Actual mod/map binaries live on GitHub Releases, CDNs, or other file hosts. This keeps the repo lightweight.
-- **Unified schema.** Mods and maps share the same update mechanism (`github` or `custom`), so the mod manager uses one code path for fetching and updating both.
-- **Manifest = storefront, ZIP = runtime.** The manifest contains browsing/discovery metadata. The ZIP's internal `config.json` is the source of truth for game-facing configuration. Some fields (like `population`, `country`) are intentionally duplicated so the mod manager can display information before download.
-- **Integrity verification.** `sha256` hashes in custom update files allow the mod manager to verify downloads. GitHub releases rely on GitHub's own integrity guarantees.
-- **Compatibility filtering.** `game_version` semver ranges let the mod manager hide incompatible versions from users.
+- **Unified schema.** Mods and maps share the same update mechanism (`github` or `custom`), so Railyard uses one code path for fetching and updating both.
+- **Manifest = storefront, ZIP = runtime.** The manifest contains browsing/discovery metadata. The ZIP's internal `config.json` is the source of truth for game-facing configuration. Some fields (like `population`, `country`) are intentionally duplicated so Railyard can display information before download.
+- **Integrity verification.** `sha256` hashes in custom update files allow Railyard to verify downloads. GitHub releases rely on GitHub's own integrity guarantees.
+- **Compatibility filtering.** `game_version` semver ranges let Railyard hide incompatible versions from users.

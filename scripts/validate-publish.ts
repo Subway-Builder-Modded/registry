@@ -142,7 +142,6 @@ async function main() {
     const errorMessage = [
       "Validation failed with the following errors:\n",
       ...result.errors.map((e) => `- ${e}`),
-      "\nPlease open a new issue with the corrected information.",
     ].join("\n");
 
     // Write error for the workflow to pick up
