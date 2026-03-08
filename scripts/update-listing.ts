@@ -1,5 +1,10 @@
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  parseGalleryImages,
+  resolveGalleryUrls,
+  downloadGalleryImages,
+} from "./lib/gallery.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");
 
@@ -12,48 +17,6 @@ function parseCheckedBoxes(raw: string | undefined): string[] | null {
     .filter(Boolean);
   // Return null if nothing was checked (user wants to keep current tags)
   return checked.length > 0 ? checked : null;
-}
-
-function parseGalleryImages(raw: string | undefined): string[] | null {
-  if (!raw || raw === "_No response_") return null;
-  const urls: string[] = [];
-  for (const line of raw.split("\n")) {
-    const mdMatch = line.match(/!\[.*?\]\((.*?)\)/);
-    if (mdMatch) {
-      urls.push(mdMatch[1]);
-    } else {
-      const trimmed = line.trim();
-      if (trimmed.startsWith("http")) {
-        urls.push(trimmed);
-      }
-    }
-  }
-  return urls.length > 0 ? urls : null;
-}
-
-async function downloadGalleryImages(urls: string[], galleryDir: string): Promise<string[]> {
-  mkdirSync(galleryDir, { recursive: true });
-  const paths: string[] = [];
-  for (let i = 0; i < urls.length; i++) {
-    const url = urls[i];
-    const ext = url.match(/\.(png|jpg|jpeg|gif|webp|svg)/i)?.[1] ?? "png";
-    const filename = `screenshot${i + 1}.${ext}`;
-    const filePath = resolve(galleryDir, filename);
-
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        console.warn(`Failed to download ${url}: ${response.status}`);
-        continue;
-      }
-      const buffer = Buffer.from(await response.arrayBuffer());
-      writeFileSync(filePath, buffer);
-      paths.push(`gallery/${filename}`);
-    } catch (err) {
-      console.warn(`Failed to download ${url}: ${err}`);
-    }
-  }
-  return paths;
 }
 
 function isPresent(value: string | undefined): value is string {
@@ -108,11 +71,12 @@ async function main() {
     if (isPresent(data.population)) manifest.population = parseInt(data.population, 10);
   }
 
-  // Gallery images
+  // Gallery images — resolve URLs via GitHub API (same as create-listing)
   const galleryUrls = parseGalleryImages(data.gallery);
-  if (galleryUrls) {
+  if (galleryUrls.length > 0) {
     const galleryDir = resolve(REPO_ROOT, dir, id, "gallery");
-    manifest.gallery = await downloadGalleryImages(galleryUrls, galleryDir);
+    const resolvedUrls = await resolveGalleryUrls(galleryUrls);
+    manifest.gallery = await downloadGalleryImages(resolvedUrls, galleryDir);
   }
 
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
