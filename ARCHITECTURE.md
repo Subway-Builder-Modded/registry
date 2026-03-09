@@ -253,7 +253,7 @@ map-name.zip
 `high-detail`, `medium-detail`, `low-detail`
 
 **Features:**
-`airports`, `entertainment`, `ferries`, `highways`, `universities`,
+`airports`, `entertainment`, `ferries`, `highways`, `hospitals`, `parks`, `schools`, `universities`
 
 #### Mod-Only Tags
 
