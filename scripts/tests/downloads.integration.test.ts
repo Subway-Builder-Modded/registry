@@ -189,7 +189,7 @@ test("partial failures continue and emit warnings while preserving valid counts"
           versions: [
             {
               version: "1.0.0",
-              download: "https://github.com/owner/good/releases/download/v1/good.zip",
+              download: "https://github.com/owner/good/releases/download/v1.0.0/good.zip",
               sha256: "a",
             },
             {
@@ -199,7 +199,7 @@ test("partial failures continue and emit warnings while preserving valid counts"
             },
             {
               version: "1.2.0",
-              download: "https://github.com/owner/good/releases/download/v1/missing.zip",
+              download: "https://github.com/owner/good/releases/download/v1.0.0/missing.zip",
               sha256: "c",
             },
           ],
@@ -219,11 +219,20 @@ test("partial failures continue and emit warnings while preserving valid counts"
                 releases: {
                   nodes: [
                     {
-                      tagName: "v1",
+                      tagName: "v1.0.0",
                       releaseAssets: {
                         nodes: [
                           { name: "good.zip", downloadCount: 15 },
                           { name: "readme.txt", downloadCount: 200 },
+                        ],
+                        pageInfo: { hasNextPage: false, endCursor: null },
+                      },
+                    },
+                    {
+                      tagName: "latest",
+                      releaseAssets: {
+                        nodes: [
+                          { name: "good.zip", downloadCount: 999 },
                         ],
                         pageInfo: { hasNextPage: false, endCursor: null },
                       },
@@ -252,7 +261,7 @@ test("partial failures continue and emit warnings while preserving valid counts"
     });
 
     assert.deepEqual(Object.keys(downloads), ["a-github", "b-custom", "c-github-unavailable"]);
-    assert.deepEqual(downloads["a-github"], { v1: 15 });
+    assert.deepEqual(downloads["a-github"], { "v1.0.0": 15 });
     assert.deepEqual(downloads["b-custom"], { "1.0.0": 15 });
     assert.deepEqual(downloads["c-github-unavailable"], {});
     assert.ok(
@@ -266,6 +275,9 @@ test("partial failures continue and emit warnings while preserving valid counts"
     );
     assert.ok(
       warnings.some((warning) => warning.includes("GraphQL rate limit low: remaining=150")),
+    );
+    assert.ok(
+      warnings.some((warning) => warning.includes("a-github") && warning.includes("non-semver release tag 'latest'")),
     );
   });
 });

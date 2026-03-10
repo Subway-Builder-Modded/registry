@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   aggregateZipDownloadCountsByTag,
+  isSupportedReleaseTag,
   parseGitHubReleaseAssetDownloadUrl,
 } from "../lib/downloads.js";
 
@@ -28,6 +29,14 @@ test("parseGitHubReleaseAssetDownloadUrl rejects non-release URLs", () => {
     parseGitHubReleaseAssetDownloadUrl("https://example.com/file.zip"),
     null,
   );
+});
+
+test("isSupportedReleaseTag accepts only vX.Y.Z or X.Y.Z", () => {
+  assert.equal(isSupportedReleaseTag("v1.2.3"), true);
+  assert.equal(isSupportedReleaseTag("1.2.3"), true);
+  assert.equal(isSupportedReleaseTag("v1"), false);
+  assert.equal(isSupportedReleaseTag("1.2"), false);
+  assert.equal(isSupportedReleaseTag("v1.2.3-beta.1"), false);
 });
 
 test("aggregateZipDownloadCountsByTag includes zip totals and all asset lookup counts", () => {

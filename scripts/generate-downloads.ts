@@ -55,6 +55,18 @@ async function run(): Promise<void> {
     `[downloads] GraphQL usage: queries=${rateLimit.queries}, totalCost=${rateLimit.totalCost}, firstRemaining=${rateLimit.firstRemaining ?? "n/a"}, lastRemaining=${rateLimit.lastRemaining ?? "n/a"}, estimatedConsumed=${rateLimit.estimatedConsumed ?? "n/a"}, resetAt=${rateLimit.resetAt ?? "n/a"}`,
   );
 
+  const zeroValidSemverListings = Object.entries(downloads)
+    .filter(([, versions]) => Object.keys(versions).length === 0)
+    .map(([id]) => id)
+    .sort();
+  if (zeroValidSemverListings.length > 0) {
+    console.warn(
+      `[downloads] Listings with zero valid semver tags (${zeroValidSemverListings.length}): ${zeroValidSemverListings.join(", ")}`,
+    );
+  } else {
+    console.log("[downloads] Listings with zero valid semver tags: none");
+  }
+
   console.log(
     `Generated ${outputDir}/downloads.json for ${Object.keys(downloads).length} listings`,
   );

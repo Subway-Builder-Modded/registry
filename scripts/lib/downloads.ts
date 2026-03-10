@@ -1,21 +1,22 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ListingManifest, ManifestDirectory } from "./manifests.js";
-import * as Downloads from "./downloads-definitions.js";
+import * as D from "./download-definitions.js";
 
 export type {
   ParsedReleaseAssetUrl,
   DownloadsByListing,
   GenerateDownloadsOptions,
   GenerateDownloadsResult,
-} from "./downloads-definitions.js";
+} from "./download-definitions.js";
 
-const GRAPHQL_RATE_LIMIT_WARN_THRESHOLD = Downloads.GRAPHQL_RATE_LIMIT_WARN_THRESHOLD;
-const GRAPHQL_ENDPOINT = Downloads.GRAPHQL_ENDPOINT;
-const REPO_RELEASES_QUERY = Downloads.REPO_RELEASES_QUERY;
+const GRAPHQL_RATE_LIMIT_WARN_THRESHOLD = D.GRAPHQL_RATE_LIMIT_WARN_THRESHOLD;
+const GRAPHQL_ENDPOINT = D.GRAPHQL_ENDPOINT;
+const REPO_RELEASES_QUERY = D.REPO_RELEASES_QUERY;
+const SEMVER_RELEASE_TAG_REGEX = /^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
 
 function getDirectoryForType(
-  listingType: Downloads.GenerateDownloadsOptions["listingType"],
+  listingType: D.GenerateDownloadsOptions["listingType"],
 ): ManifestDirectory {
   return listingType === "map" ? "maps" : "mods";
 }
@@ -49,6 +50,10 @@ function warnListing(
   warn(warnings, `listing=${listingId}: ${message}`);
 }
 
+export function isSupportedReleaseTag(tag: string): boolean {
+  return SEMVER_RELEASE_TAG_REGEX.test(tag);
+}
+
 /**
  * Parses a GitHub release asset download URL of the form:
  * `https://github.com/<owner>/<repo>/releases/download/<tag>/<asset>`
@@ -58,7 +63,7 @@ function warnListing(
  */
 export function parseGitHubReleaseAssetDownloadUrl(
   url: string,
-): Downloads.ParsedReleaseAssetUrl | null {
+): D.ParsedReleaseAssetUrl | null {
   if (!isNonEmptyString(url)) return null;
   let parsed: URL;
   try {
@@ -101,8 +106,8 @@ export function parseGitHubReleaseAssetDownloadUrl(
 export function aggregateZipDownloadCountsByTag(releases: Array<{
   tagName: string;
   assets: Array<{ name: string; downloadCount: number }>;
-}>): Map<string, Downloads.RepoReleaseTagData> {
-  const byTag = new Map<string, Downloads.RepoReleaseTagData>();
+}>): Map<string, D.RepoReleaseTagData> {
+  const byTag = new Map<string, D.RepoReleaseTagData>();
   for (const release of releases) {
     if (!isNonEmptyString(release.tagName)) continue;
     const assets = new Map<string, number>();
@@ -138,8 +143,8 @@ function buildGraphqlHeaders(token: string | undefined): Record<string, string> 
 }
 
 function updateGraphqlUsage(
-  usageState: Downloads.GraphqlUsageState,
-  rateLimit: Downloads.GraphqlRateLimitInfo | undefined,
+  usageState: D.GraphqlUsageState,
+  rateLimit: D.GraphqlRateLimitInfo | undefined,
 ): void {
   if (!rateLimit) return;
   usageState.queries += 1;
@@ -157,8 +162,8 @@ function updateGraphqlUsage(
 
 function maybeWarnLowRateLimit(
   warnings: string[],
-  rateLimit: Downloads.GraphqlRateLimitInfo | undefined,
-  rateLimitWarningState: Downloads.RateLimitWarningState,
+  rateLimit: D.GraphqlRateLimitInfo | undefined,
+  rateLimitWarningState: D.RateLimitWarningState,
 ): void {
   if (
     rateLimit
@@ -181,7 +186,7 @@ async function requestRepoReleasesPage(
   cursor: string | null,
   fetchImpl: typeof fetch,
   token: string | undefined,
-): Promise<Downloads.RepoReleasesPageResult> {
+): Promise<D.RepoReleasesPageResult> {
   let response: Response;
   try {
     response = await fetchImpl(GRAPHQL_ENDPOINT, {
@@ -204,9 +209,9 @@ async function requestRepoReleasesPage(
     return { ok: false, error: `repo=${repo}: GraphQL returned HTTP ${response.status}` };
   }
 
-  let payload: Downloads.GraphqlReleasesResponse;
+  let payload: D.GraphqlReleasesResponse;
   try {
-    payload = await response.json() as Downloads.GraphqlReleasesResponse;
+    payload = await response.json() as D.GraphqlReleasesResponse;
   } catch {
     return { ok: false, error: `repo=${repo}: GraphQL returned non-JSON response` };
   }
@@ -244,16 +249,21 @@ async function fetchGraphqlReleaseIndexForRepo(
   fetchImpl: typeof fetch,
   token: string | undefined,
   warnings: string[],
-  rateLimitWarningState: Downloads.RateLimitWarningState,
-  usageState: Downloads.GraphqlUsageState,
-): Promise<Downloads.RepoReleaseIndex | null> {
+  rateLimitWarningState: D.RateLimitWarningState,
+  usageState: D.GraphqlUsageState,
+): Promise<D.RepoReleaseIndex | null> {
+  // TODO: Performance optimization for larger registries:
+  // Batch multiple repositories into a single GraphQL operation using aliases
+  // (e.g., r0: repository(...), r1: repository(...)) while tracking per-repo
+  // pagination cursors. This reduces HTTP round-trips but still requires
+  // iterative requests until each repo's releases.pageInfo.hasNextPage is false.
   const repoParts = splitRepo(repo);
   if (!repoParts) {
     warn(warnings, `repo=${repo}: invalid owner/repo format`);
     return null;
   }
 
-  const byTag = new Map<string, Downloads.RepoReleaseTagData>();
+  const byTag = new Map<string, D.RepoReleaseTagData>();
   let cursor: string | null = null;
 
   for (; ;) {
@@ -328,7 +338,7 @@ async function fetchCustomVersions(
   updateUrl: string,
   fetchImpl: typeof fetch,
   warnings: string[],
-): Promise<Downloads.CustomVersionRef[]> {
+): Promise<D.CustomVersionRef[]> {
   let response: Response;
   try {
     response = await fetchImpl(updateUrl, {
@@ -369,7 +379,7 @@ async function fetchCustomVersions(
     return [];
   }
 
-  const refs: Downloads.CustomVersionRef[] = [];
+  const refs: D.CustomVersionRef[] = [];
   for (const entry of versions) {
     if (typeof entry !== "object" || entry === null || Array.isArray(entry)) {
       warnListing(warnings, listingId, "skipped custom version entry (malformed object)");
@@ -389,6 +399,15 @@ async function fetchCustomVersions(
     const parsed = parseGitHubReleaseAssetDownloadUrl(rawDownload);
     if (!parsed) {
       warnListing(warnings, listingId, "skipped non-GitHub release download URL", rawVersion);
+      continue;
+    }
+    if (!isSupportedReleaseTag(parsed.tag)) {
+      warnListing(
+        warnings,
+        listingId,
+        `skipped non-semver release tag '${parsed.tag}'`,
+        rawVersion,
+      );
       continue;
     }
     if (!parsed.assetName.toLowerCase().endsWith(".zip")) {
@@ -435,8 +454,8 @@ function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
  * - partial failures are tolerated to keep output generation resilient
  */
 export async function generateDownloadsData(
-  options: Downloads.GenerateDownloadsOptions,
-): Promise<Downloads.GenerateDownloadsResult> {
+  options: D.GenerateDownloadsOptions,
+): Promise<D.GenerateDownloadsResult> {
   const repoRoot = options.repoRoot;
   const listingType = options.listingType;
   const fetchImpl = options.fetchImpl ?? fetch;
@@ -445,11 +464,11 @@ export async function generateDownloadsData(
   const dir = getDirectoryForType(listingType);
   const ids = getIndexIds(repoRoot, dir);
 
-  const downloadsByListing: Downloads.DownloadsByListing = {};
+  const downloadsByListing: D.DownloadsByListing = {};
   const githubListings: Array<{ id: string; repo: string }> = [];
-  const customVersionRefs: Downloads.CustomVersionRef[] = [];
-  const rateLimitWarningState: Downloads.RateLimitWarningState = { warned: false };
-  const usageState: Downloads.GraphqlUsageState = {
+  const customVersionRefs: D.CustomVersionRef[] = [];
+  const rateLimitWarningState: D.RateLimitWarningState = { warned: false };
+  const usageState: D.GraphqlUsageState = {
     queries: 0,
     totalCost: 0,
     firstRemaining: null,
@@ -488,7 +507,7 @@ export async function generateDownloadsData(
   for (const listing of githubListings) repoSet.add(listing.repo);
   for (const version of customVersionRefs) repoSet.add(version.repo);
 
-  const repoIndexes = new Map<string, Downloads.RepoReleaseIndex>();
+  const repoIndexes = new Map<string, D.RepoReleaseIndex>();
   for (const repo of Array.from(repoSet).sort()) {
     const index = await fetchGraphqlReleaseIndexForRepo(
       repo,
@@ -511,6 +530,10 @@ export async function generateDownloadsData(
     }
     const releaseCounts: Record<string, number> = {};
     for (const [tag, data] of index.byTag.entries()) {
+      if (!isSupportedReleaseTag(tag)) {
+        warnListing(warnings, listing.id, `skipped non-semver release tag '${tag}'`);
+        continue;
+      }
       if (data.zipTotal > 0) {
         releaseCounts[tag] = data.zipTotal;
       }
@@ -552,7 +575,7 @@ export async function generateDownloadsData(
     downloadsByListing[versionRef.listingId][versionRef.version] = count;
   }
 
-  const sortedDownloads: Downloads.DownloadsByListing = {};
+  const sortedDownloads: D.DownloadsByListing = {};
   for (const id of [...ids].sort()) {
     sortedDownloads[id] = sortObjectByKeys(downloadsByListing[id] ?? {});
   }
