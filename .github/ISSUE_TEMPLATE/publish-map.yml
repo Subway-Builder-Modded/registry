@@ -61,8 +61,8 @@
     "id": "population"
     "attributes":
       "label": "Population"
-      "description": "Number of commuters simulated within the map. Used for display and sorting
-        in Railyard - doesn't need to be exact."
+      "description": "Approximate metropolitan area population. Number only, no commas or
+        separators. Used for display and sorting in Railyard and does not need to be exact."
       "placeholder": "1500000"
     "validations":
       "required": true
@@ -145,6 +145,28 @@
         - "west-africa"
     "validations":
       "required": true
+  - "type": "markdown"
+    "attributes":
+      "value": "### Special Demand Tag Guide
+
+
+        Use these tags only when the map models a meaningful amount of demand related to the
+        feature.
+
+
+        - `airports`: passenger (non-worker) demand from major airports
+
+        - `entertainment`: leisure/tourist demand at stadiums/venues/nightlife
+
+        - `ferries`: passenger (non-worker) demand from ferry terminals
+
+        - `hospitals`: visitation demand for major medical centers
+
+        - `parks`: leisure/tourist demand from large local or national parks
+
+        - `schools`: demand from primary/secondary school students
+
+        - `universities`: demand from university school students"
   - "type": "checkboxes"
     "id": "special_demand"
     "attributes":
@@ -155,7 +177,6 @@
         - "label": "airports"
         - "label": "entertainment"
         - "label": "ferries"
-        - "label": "highways"
         - "label": "hospitals"
         - "label": "parks"
         - "label": "schools"

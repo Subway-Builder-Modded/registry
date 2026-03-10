@@ -253,7 +253,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   input(
     "population",
     "Population",
-    "Number of commuters simulated within the map. Used for display and sorting in Railyard - doesn't need to be exact.",
+    "Approximate metropolitan area population. Number only, no commas or separators. Used for display and sorting in Railyard and does not need to be exact.",
     { placeholder: "1500000", required: true },
   ),
   textarea(
@@ -296,6 +296,9 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
     "Select all tags that apply to your map. These help users find your map in the browser.",
     LOCATION_TAGS,
     true,
+  ),
+  markdown(
+    "### Special Demand Tag Guide\n\nUse these tags only when the map models a meaningful amount of demand related to the feature.\n\n- `airports`: passenger (non-worker) demand from major airports\n- `entertainment`: leisure/tourist demand at stadiums/venues/nightlife\n- `ferries`: passenger (non-worker) demand from ferry terminals\n- `hospitals`: visitation demand for major medical centers\n- `parks`: leisure/tourist demand from large local or national parks\n- `schools`: demand from primary/secondary school students\n- `universities`: demand from university school students",
   ),
   checkboxes(
     "special_demand",
@@ -468,4 +471,3 @@ function main(): void {
 }
 
 main();
-

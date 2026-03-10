@@ -57,7 +57,6 @@ export const SPECIAL_DEMAND_TAGS = [
   "airports",
   "entertainment",
   "ferries",
-  "highways",
   "hospitals",
   "parks",
   "schools",
