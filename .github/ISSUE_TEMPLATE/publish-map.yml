@@ -83,6 +83,36 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: data_source
+    attributes:
+      label: Data Source
+      description: Enter the data source used to generate the demand data for your map. The source name should use common abbreviations like LODES/INSEE/ONS etc.
+      placeholder: LODES, etc.
+      value: OSM
+    validations:
+      required: false
+
+  - type: input
+    id: source_quality
+    attributes:
+      label: Source Quality
+      description: >
+        Approximate quality of the data source used for your map. Official gov't sources are considered high-quality while raw open-source data is considered low-quality.
+      placeholder: "low-quality"
+    validations:
+      required: true
+
+  - type: input
+    id: level_of_detail
+    attributes:
+      label: Level of Detail
+      description: >
+        Approximate level of detail of your map. Demand resolution at the level of census blocks is considered high-detail, while neighborhood/city resolutions are considered low-detail.
+      placeholder: "low-detail"
+    validations:
+      required: true
+
   - type: checkboxes
     id: tags
     attributes:
@@ -104,9 +134,6 @@ body:
         - label: southeast-asia
         - label: southern-africa
         - label: west-africa
-        - label: high-detail
-        - label: medium-detail
-        - label: low-detail
         - label: airports
         - label: entertainment
         - label: ferries
@@ -115,16 +142,6 @@ body:
         - label: parks
         - label: schools
         - label: universities
-
-  - type: input
-    id: data-source
-    attributes:
-      label: Data Source
-      description: Enter the data source used to generate the demand data for your map. The source name should use common abbreviations like LODES/INSEE/ONS etc.
-      placeholder: LODES, etc.
-      value: OSM
-    validations:
-      required: false
 
   - type: input
     id: source
