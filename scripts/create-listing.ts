@@ -7,6 +7,7 @@ import {
 } from "./lib/gallery.js";
 import {
   getMapDataSource,
+  getOptionalIssueValue,
   getRequiredIssueValue,
   normalizeSourceQualityForDataSource,
 } from "./lib/map-field-utils.js";
@@ -94,6 +95,11 @@ async function main() {
   const { id, dir } = resolveListingIdAndDir(manifestType, data);
   const listingDir = resolve(REPO_ROOT, dir, id);
   const galleryDir = resolve(listingDir, "gallery");
+  const description = getOptionalIssueValue(data.description);
+
+  if (!description) {
+    throw new Error("description is required");
+  }
 
   mkdirSync(galleryDir, { recursive: true });
 
@@ -115,7 +121,7 @@ async function main() {
     name: String(data.name),
     author: issueAuthorLogin,
     github_id: parseInt(issueAuthorId, 10),
-    description: String(data.description),
+    description,
     tags,
     gallery: galleryPaths,
     source: String(data.source),

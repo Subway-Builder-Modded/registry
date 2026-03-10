@@ -321,9 +321,8 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   textarea(
     "description",
     "Description",
-    "A short description of what your map offers. Markdown is supported. This is shown in the map browser. Mention data quality, notable features, or coverage area.",
+    "A short description of what your map offers. This is shown in the map browser. Mention data quality, notable features, or coverage area.",
     {
-      render: "markdown",
       placeholder:
         "Custom map of the Raleigh-Durham metropolitan area with good demand data quality.",
       required: true,

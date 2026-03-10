@@ -13,7 +13,10 @@ import {
   VANILLA_CITY_CODE_SET,
   isOsmDataSource,
 } from "./lib/map-constants.js";
-import { isPresentIssueValue } from "./lib/map-field-utils.js";
+import {
+  getOptionalIssueValue,
+  isPresentIssueValue,
+} from "./lib/map-field-utils.js";
 
 
 const REPO_ROOT = process.env.RAILYARD_REPO_ROOT
@@ -76,6 +79,9 @@ async function validateMod(data: Record<string, string>): Promise<ValidationResu
   if (existsSync(modDir)) {
     errors.push(`**mod-id**: A mod with ID \`${id}\` already exists.`);
   }
+  if (!getOptionalIssueValue(parsed.data.description)) {
+    errors.push("**description**: Description is required.");
+  }
 
   if (parsed.data["update-type"] === "GitHub Releases") {
     if (!parsed.data["github-repo"] || !/^[^/]+\/[^/]+$/.test(parsed.data["github-repo"])) {
@@ -118,6 +124,9 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
   const mapDir = resolve(REPO_ROOT, "maps", id);
   if (existsSync(mapDir)) {
     errors.push(`**map-id**: A map with ID \`${id}\` already exists.`);
+  }
+  if (!getOptionalIssueValue(parsed.data.description)) {
+    errors.push("**description**: Description is required.");
   }
 
   if (VANILLA_CITY_CODE_SET.has(parsed.data["city-code"])) {

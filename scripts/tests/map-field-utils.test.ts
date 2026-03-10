@@ -29,10 +29,6 @@ test("getOptionalIssueValue trims valid values", () => {
   assert.equal(getOptionalIssueValue("  LODES "), "LODES");
 });
 
-test("getOptionalIssueValue ignores empty markdown code fence placeholders", () => {
-  assert.equal(getOptionalIssueValue("```markdown\n\n```"), undefined);
-});
-
 test("default map field values are applied when empty", () => {
   assert.equal(getMapDataSource(undefined), DEFAULT_MAP_DATA_SOURCE);
   assert.equal(getMapDataSource("_No response_"), DEFAULT_MAP_DATA_SOURCE);

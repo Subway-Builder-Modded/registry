@@ -8,15 +8,10 @@ import {
 
 const EMPTY_ISSUE_VALUES = new Set(["_No response_", "None", "No change"]);
 
-export function isEmptyMarkdownCodeFence(value: string): boolean {
-  const match = value.match(/^```[^\n]*\n([\s\S]*?)\n```$/);
-  return !!match && match[1].trim() === "";
-}
-
 export function getOptionalIssueValue(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
-  if (!trimmed || EMPTY_ISSUE_VALUES.has(trimmed) || isEmptyMarkdownCodeFence(trimmed)) {
+  if (!trimmed || EMPTY_ISSUE_VALUES.has(trimmed)) {
     return undefined;
   }
   return trimmed;
