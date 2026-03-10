@@ -11,7 +11,10 @@ import {
   resolveListingIdAndDir,
   resolveManifestType,
 } from "./lib/manifests.js";
-import { isPresentIssueValue } from "./lib/map-field-utils.js";
+import {
+  getOptionalIssueValue,
+  isPresentIssueValue,
+} from "./lib/map-field-utils.js";
 import { applyMapManifestUpdates } from "./lib/map-update-logic.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
 
@@ -37,8 +40,10 @@ function applyCommonMetadataUpdates(
   manifest: ModManifest,
   data: Record<string, unknown>,
 ): void {
+  const description = getOptionalIssueValue(data.description);
+
   if (isPresentIssueValue(data.name)) manifest.name = data.name;
-  if (isPresentIssueValue(data.description)) manifest.description = data.description;
+  if (description) manifest.description = description;
   if (isPresentIssueValue(data.source)) manifest.source = data.source;
 }
 
