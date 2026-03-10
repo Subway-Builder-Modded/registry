@@ -54,6 +54,16 @@ test("map update applies only provided fields", () => {
   assert.deepEqual(manifest.tags, before.tags);
 });
 
+test("map update ignores non-registry methodology field", () => {
+  const manifest = makeBaseManifest();
+
+  applyMapManifestUpdates(manifest, {
+    methodology: "Synthetic example methodology text",
+  });
+
+  assert.equal(Object.hasOwn(manifest, "methodology"), false);
+});
+
 test("map update validation fails when existing manifest is invalid", () => {
   const invalidManifest = {
     ...makeBaseManifest(),

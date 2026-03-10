@@ -15,8 +15,9 @@ type IssueTemplateField = {
   id?: string;
   type: string;
   attributes?: {
-    options?: Array<{ label: string }>;
+    options?: Array<{ label: string }> | string[];
     value?: string;
+    placeholder?: string;
   };
   validations?: {
     required?: boolean;
@@ -64,12 +65,24 @@ test("update-map.yml enforces expected map metadata fields/options", () => {
 
   const specialDemand = getField(parsed.body, "special_demand");
   assert.equal(specialDemand.type, "checkboxes");
+  const specialDemandLabels = specialDemand.attributes?.options?.map((entry) =>
+    typeof entry === "string" ? entry : entry.label
+  );
   assert.deepEqual(
-    specialDemand.attributes?.options?.map((entry) => entry.label),
+    specialDemandLabels,
     SPECIAL_DEMAND_TAGS,
   );
 
   const dataSource = getField(parsed.body, "data_source");
   assert.equal(dataSource.type, "input");
   assert.equal(dataSource.attributes?.value, DEFAULT_MAP_DATA_SOURCE);
+
+  const methodology = getField(parsed.body, "methodology");
+  assert.equal(methodology.type, "input");
+  assert.equal(methodology.validations?.required, true);
+  assert.ok(
+    typeof methodology.attributes?.placeholder === "string"
+      && methodology.attributes.placeholder.length > 0,
+    "Methodology field should provide a non-empty placeholder",
+  );
 });

@@ -232,6 +232,10 @@ function mapIdField(description: string): TemplateValue {
 }
 
 const SHARED_FIELDS_AFTER_MAP_ID = [
+  // ===== Data Validation ===== //
+  markdown(
+    "## Identifiers\n\nProvide details about the city/metropolitan area your map models. These data will be used to import your map into the game and to give Railyard users context abour your map",
+  ),
   input(
     "name",
     "City Name",
@@ -267,8 +271,9 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
       required: true,
     },
   ),
+  // ===== Data Validation ===== //
   markdown(
-    "## Data Metadata\n\nProvide details about your map's data source, quality, and level of detail. This helps the Subway-Builder-Modded team and users understand the reliability and granularity of your map. Be honest and transparent in your descriptions.",
+    "## Data Attestation\n\nProvide details about your map's data source, data source quality, and level of detail. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data.",
   ),
   input(
     "data_source",
@@ -290,6 +295,16 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
     LEVEL_OF_DETAIL_VALUES,
     true,
   ),
+  input(
+    "methodology",
+    "Methodology",
+    "Description of how demand data was generated for your map. Please include any details about overcoming data source limitations or any augmentations done with real-world data.",
+    { placeholder: "Transcribed raw OSM data", required: true },
+  ),
+  // ===== Map Tagging / Images  ===== //
+  markdown(
+    "## Tagging & Image Preview\n\nRailyard allows users to search for maps based on tags and presents a preview image for discovery. Please check whichever tags best represent your map. Note that `Location` is required.",
+  ),
   dropdown(
     "location",
     "Location",
@@ -305,6 +320,16 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
     "Special Demand",
     "Select all tags that apply to your map. These help users find your map in the browser.",
     SPECIAL_DEMAND_TAGS,
+  ),
+  textarea(
+    "gallery",
+    "Gallery Images",
+    "Drag and drop screenshots here, or paste image URLs (one per line). These will be displayed in the map browser. At least one image is required.",
+    { required: true },
+  ),
+  // ===== Source Code Validation ===== //
+  markdown(
+    "## Source Code Information\n\nProvide information on where your map is hosted so that Railyard will be able to check your repository for updates and allow users to install the map on demand.",
   ),
   input(
     "source",
@@ -330,12 +355,6 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
     "Custom Update URL",
     "Required ONLY if you selected Custom URL. The full URL to your self-hosted update.json file. The file must follow the Railyard update.json schema. Leave blank if using GitHub Releases.",
     { placeholder: "https://example.com/sb-raleigh/update.json" },
-  ),
-  textarea(
-    "gallery",
-    "Gallery Images",
-    "Drag and drop screenshots here, or paste image URLs (one per line). These will be displayed in the map browser. At least one image is required.",
-    { required: true },
   ),
   {
     type: "checkboxes",

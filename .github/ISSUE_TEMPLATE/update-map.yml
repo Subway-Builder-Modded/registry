@@ -24,6 +24,14 @@
       "placeholder": "raleigh"
     "validations":
       "required": true
+  - "type": "markdown"
+    "attributes":
+      "value": "## Identifiers
+
+
+        Provide details about the city/metropolitan area your map models. These data will be
+        used to import your map into the game and to give Railyard users context abour your
+        map"
   - "type": "input"
     "id": "name"
     "attributes":
@@ -75,12 +83,12 @@
       "required": true
   - "type": "markdown"
     "attributes":
-      "value": "## Data Metadata
+      "value": "## Data Attestation
 
 
-        Provide details about your map's data source, quality, and level of detail. This
-        helps the Subway-Builder-Modded team and users understand the reliability and
-        granularity of your map. Be honest and transparent in your descriptions."
+        Provide details about your map's data source, data source quality, and level of
+        detail. Be honest and transparent in your descriptions and please include the
+        methodology you used to generate the map's data."
   - "type": "input"
     "id": "data_source"
     "attributes":
@@ -118,6 +126,24 @@
         - "high-detail"
     "validations":
       "required": true
+  - "type": "input"
+    "id": "methodology"
+    "attributes":
+      "label": "Methodology"
+      "description": "Description of how demand data was generated for your map. Please include
+        any details about overcoming data source limitations or any augmentations done with
+        real-world data."
+      "placeholder": "Transcribed raw OSM data"
+    "validations":
+      "required": true
+  - "type": "markdown"
+    "attributes":
+      "value": "## Tagging & Image Preview
+
+
+        Railyard allows users to search for maps based on tags and presents a preview image
+        for discovery. Please check whichever tags best represent your map. Note that
+        `Location` is required."
   - "type": "dropdown"
     "id": "location"
     "attributes":
@@ -178,6 +204,21 @@
         - "label": "parks"
         - "label": "schools"
         - "label": "universities"
+  - "type": "textarea"
+    "id": "gallery"
+    "attributes":
+      "label": "Gallery Images"
+      "description": "Drag and drop screenshots here, or paste image URLs (one per line). These
+        will be displayed in the map browser. At least one image is required."
+    "validations":
+      "required": true
+  - "type": "markdown"
+    "attributes":
+      "value": "## Source Code Information
+
+
+        Provide information on where your map is hosted so that Railyard will be able to
+        check your repository for updates and allow users to install the map on demand."
   - "type": "input"
     "id": "source"
     "attributes":
@@ -213,14 +254,6 @@
         update.json file. The file must follow the Railyard update.json schema. Leave blank
         if using GitHub Releases."
       "placeholder": "https://example.com/sb-raleigh/update.json"
-  - "type": "textarea"
-    "id": "gallery"
-    "attributes":
-      "label": "Gallery Images"
-      "description": "Drag and drop screenshots here, or paste image URLs (one per line). These
-        will be displayed in the map browser. At least one image is required."
-    "validations":
-      "required": true
   - "type": "checkboxes"
     "id": "terms"
     "attributes":
