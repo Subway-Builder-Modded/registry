@@ -252,6 +252,25 @@ function isObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+function wrapWords(value, width) {
+  const words = value.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return [""];
+
+  const lines = [];
+  let current = words[0];
+  for (let i = 1; i < words.length; i += 1) {
+    const next = words[i];
+    if ((current + " " + next).length <= width) {
+      current += " " + next;
+    } else {
+      lines.push(current);
+      current = next;
+    }
+  }
+  lines.push(current);
+  return lines;
+}
+
 function renderObjectLines(value, indent, firstLinePrefix = "") {
   const isArrayItemObject = firstLinePrefix.length > 0;
   return Object.entries(value).flatMap(([key, entry], index) => {
@@ -265,6 +284,13 @@ function renderObjectLines(value, indent, firstLinePrefix = "") {
         .split("\n")
         .map((line) => `${" ".repeat(keyIndent + 2)}${line}`);
       return [`${keyPrefix}: |`, ...block];
+    }
+
+    if (key === "description" && typeof entry === "string") {
+      const wrapped = wrapWords(entry, 92 - (keyIndent + 2)).map(
+        (line) => `${" ".repeat(keyIndent + 2)}${line}`
+      );
+      return [`${keyPrefix}: >`, ...wrapped];
     }
 
     if (isObject(entry) || Array.isArray(entry)) {
