@@ -14,7 +14,7 @@ import {
   type MapManifest,
   type ModManifest,
   resolveListingIdAndDir,
-  resolveListingKind,
+  resolveManifestType,
 } from "./lib/manifests.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
 
@@ -80,7 +80,7 @@ function buildMapManifestData(data: Record<string, unknown>): {
 }
 
 async function main() {
-  const listingKind = resolveListingKind(process.env.LISTING_TYPE);
+  const manifestType = resolveManifestType(process.env.LISTING_TYPE);
   const issueJson = process.env.ISSUE_JSON;
   const issueAuthorId = process.env.ISSUE_AUTHOR_ID;
   const issueAuthorLogin = process.env.ISSUE_AUTHOR_LOGIN;
@@ -91,7 +91,7 @@ async function main() {
   }
 
   const data = JSON.parse(issueJson) as Record<string, unknown>;
-  const { id, dir } = resolveListingIdAndDir(listingKind, data);
+  const { id, dir } = resolveListingIdAndDir(manifestType, data);
   const listingDir = resolve(REPO_ROOT, dir, id);
   const galleryDir = resolve(listingDir, "gallery");
 
@@ -106,7 +106,7 @@ async function main() {
   const galleryPaths = await downloadGalleryImages(resolvedUrls, galleryDir);
 
   const rawTags = parseTags(data.tags);
-  const mapData = listingKind === "map" ? buildMapManifestData(data) : undefined;
+  const mapData = manifestType === "map" ? buildMapManifestData(data) : undefined;
   const tags = mapData ? mapData.tags : rawTags;
 
   const manifest: ModManifest | MapManifest = {

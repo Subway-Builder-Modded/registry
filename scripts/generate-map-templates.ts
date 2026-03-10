@@ -253,7 +253,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   input(
     "population",
     "Population",
-    "Approximate metropolitan area population. Number only, no commas or separators. Used for display and sorting in Railyard - doesn't need to be exact.",
+    "Number of commuters simulated within the map. Used for display and sorting in Railyard - doesn't need to be exact.",
     { placeholder: "1500000", required: true },
   ),
   textarea(

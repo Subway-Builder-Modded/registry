@@ -31,7 +31,7 @@ export interface MapManifest extends ModManifest {
 
 export type ListingManifest = ModManifest | MapManifest;
 
-export function resolveListingKind(value: string | undefined): ManifestType {
+export function resolveManifestType(value: string | undefined): ManifestType {
   return value === "map" ? "map" : "mod";
 }
 
