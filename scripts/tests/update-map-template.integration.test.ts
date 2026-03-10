@@ -155,4 +155,30 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
   const firstOption = terms.attributes?.options?.[0];
   const termsRequired = typeof firstOption === "string" ? undefined : firstOption?.required;
   assert.equal(termsRequired, true);
+
+  const updateFieldsWithoutInheritedHints = [
+    "name",
+    "city-code",
+    "country",
+    "population",
+    "description",
+    "data_source",
+    "methodology",
+    "source",
+    "github-repo",
+    "custom-update-url",
+  ];
+  for (const id of updateFieldsWithoutInheritedHints) {
+    const field = getField(parsed.body, id);
+    assert.equal(
+      field.attributes?.placeholder,
+      undefined,
+      `Expected '${id}' to have no inherited placeholder in update-map.yml`,
+    );
+    assert.equal(
+      field.attributes?.value,
+      undefined,
+      `Expected '${id}' to have no inherited default value in update-map.yml`,
+    );
+  }
 });

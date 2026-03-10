@@ -10,14 +10,7 @@ import {
   SPECIAL_DEMAND_TAG_SET,
   isOsmDataSource,
 } from "./map-constants.js";
-
-function isPresent(value: unknown): value is string {
-  return typeof value === "string"
-    && value !== ""
-    && value !== "_No response_"
-    && value !== "None"
-    && value !== "No change";
-}
+import { isPresentIssueValue } from "./map-field-utils.js";
 
 function parseCheckedBoxes(raw: unknown): string[] {
   if (Array.isArray(raw)) {
@@ -68,29 +61,29 @@ export function applyMapManifestUpdates(
     : [];
   manifest.special_demand = existingSpecialDemand;
 
-  if (isPresent(data["city-code"])) manifest.city_code = data["city-code"];
-  if (isPresent(data.country)) manifest.country = data.country;
-  if (isPresent(data.population)) manifest.population = parseInt(data.population, 10);
+  if (isPresentIssueValue(data["city-code"])) manifest.city_code = data["city-code"];
+  if (isPresentIssueValue(data.country)) manifest.country = data.country;
+  if (isPresentIssueValue(data.population)) manifest.population = parseInt(data.population, 10);
 
-  if (isPresent(data.level_of_detail)) {
+  if (isPresentIssueValue(data.level_of_detail)) {
     manifest.level_of_detail = data.level_of_detail;
-  } else if (!isPresent(manifest.level_of_detail)) {
+  } else if (!isPresentIssueValue(manifest.level_of_detail)) {
     manifest.level_of_detail = DEFAULT_LEVEL_OF_DETAIL;
   }
 
-  if (isPresent(data.source_quality)) {
+  if (isPresentIssueValue(data.source_quality)) {
     manifest.source_quality = data.source_quality;
-  } else if (!isPresent(manifest.source_quality)) {
+  } else if (!isPresentIssueValue(manifest.source_quality)) {
     manifest.source_quality = DEFAULT_SOURCE_QUALITY;
   }
 
-  if (isPresent(data.data_source)) {
+  if (isPresentIssueValue(data.data_source)) {
     manifest.data_source = data.data_source;
-  } else if (!isPresent(manifest.data_source)) {
+  } else if (!isPresentIssueValue(manifest.data_source)) {
     manifest.data_source = DEFAULT_MAP_DATA_SOURCE;
   }
 
-  if (isPresent(data.location)) {
+  if (isPresentIssueValue(data.location)) {
     manifest.location = data.location;
   }
   if (
@@ -109,7 +102,7 @@ export function applyMapManifestUpdates(
     manifest.source_quality = MAX_OSM_SOURCE_QUALITY;
   }
 
-  if (isPresent(manifest.location)) {
+  if (isPresentIssueValue(manifest.location)) {
     const specialDemand = (Array.isArray(manifest.special_demand)
       ? manifest.special_demand
       : []).filter((tag: unknown): tag is string => typeof tag === "string");
@@ -159,14 +152,14 @@ export function validateMapUpdateFields(
     return;
   }
 
-  const nextDataSource = isPresent(data.data_source) ? data.data_source : currentDataSource;
-  const nextSourceQuality = isPresent(data.source_quality)
+  const nextDataSource = isPresentIssueValue(data.data_source) ? data.data_source : currentDataSource;
+  const nextSourceQuality = isPresentIssueValue(data.source_quality)
     ? data.source_quality
     : currentSourceQuality;
-  const nextLevelOfDetail = isPresent(data.level_of_detail)
+  const nextLevelOfDetail = isPresentIssueValue(data.level_of_detail)
     ? data.level_of_detail
     : currentLevelOfDetail;
-  const nextLocation = isPresent(data.location) ? data.location : currentLocation;
+  const nextLocation = isPresentIssueValue(data.location) ? data.location : currentLocation;
   const nextSpecialDemand =
     data.special_demand !== undefined && data.special_demand !== "_No response_" && data.special_demand !== "None"
       ? parseCheckedBoxes(data.special_demand)

@@ -11,6 +11,7 @@ import {
   resolveListingIdAndDir,
   resolveManifestType,
 } from "./lib/manifests.js";
+import { isPresentIssueValue } from "./lib/map-field-utils.js";
 import { applyMapManifestUpdates } from "./lib/map-update-logic.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
 
@@ -32,21 +33,13 @@ function parseCheckedBoxes(raw: unknown): string[] | null {
   return checked.length > 0 ? checked : null;
 }
 
-function isPresent(value: unknown): value is string {
-  return typeof value === "string"
-    && value !== ""
-    && value !== "_No response_"
-    && value !== "None"
-    && value !== "No change";
-}
-
 function applyCommonMetadataUpdates(
   manifest: ModManifest,
   data: Record<string, unknown>,
 ): void {
-  if (isPresent(data.name)) manifest.name = data.name;
-  if (isPresent(data.description)) manifest.description = data.description;
-  if (isPresent(data.source)) manifest.source = data.source;
+  if (isPresentIssueValue(data.name)) manifest.name = data.name;
+  if (isPresentIssueValue(data.description)) manifest.description = data.description;
+  if (isPresentIssueValue(data.source)) manifest.source = data.source;
 }
 
 function applyModTagUpdates(
@@ -63,20 +56,20 @@ function applyUpdateTypeChanges(
 ): void {
   const update = manifest.update;
 
-  if (isPresent(data["update-type"])) {
-    if (data["update-type"] === "GitHub Releases" && isPresent(data["github-repo"])) {
+  if (isPresentIssueValue(data["update-type"])) {
+    if (data["update-type"] === "GitHub Releases" && isPresentIssueValue(data["github-repo"])) {
       manifest.update = { type: "github", repo: data["github-repo"] };
-    } else if (data["update-type"] === "Custom URL" && isPresent(data["custom-update-url"])) {
+    } else if (data["update-type"] === "Custom URL" && isPresentIssueValue(data["custom-update-url"])) {
       manifest.update = { type: "custom", url: data["custom-update-url"] };
     }
     return;
   }
 
   // Update type not changing, but repo/url might be updated
-  if (update.type === "github" && isPresent(data["github-repo"])) {
+  if (update.type === "github" && isPresentIssueValue(data["github-repo"])) {
     update.repo = data["github-repo"];
   }
-  if (update.type === "custom" && isPresent(data["custom-update-url"])) {
+  if (update.type === "custom" && isPresentIssueValue(data["custom-update-url"])) {
     update.url = data["custom-update-url"];
   }
 }

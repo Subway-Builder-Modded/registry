@@ -13,6 +13,7 @@ import {
   VANILLA_CITY_CODE_SET,
   isOsmDataSource,
 } from "./lib/map-constants.js";
+import { isPresentIssueValue } from "./lib/map-field-utils.js";
 
 
 const REPO_ROOT = process.env.RAILYARD_REPO_ROOT
@@ -45,10 +46,6 @@ const PublishMapInput = PublishModInput.omit({ "mod-id": true }).extend({
 interface ValidationResult {
   success: boolean;
   errors: string[];
-}
-
-function isPresent(value: string | undefined): value is string {
-  return !!value && value !== "_No response_" && value !== "None" && value !== "No change";
 }
 
 function parseCheckedBoxes(raw: unknown): string[] {
@@ -136,7 +133,9 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
     errors.push(`**special_demand**: Invalid tag(s): ${invalidSpecialDemand.join(", ")}`);
   }
 
-  const dataSource = isPresent(parsed.data.data_source) ? parsed.data.data_source : DEFAULT_MAP_DATA_SOURCE;
+  const dataSource = isPresentIssueValue(parsed.data.data_source)
+    ? parsed.data.data_source
+    : DEFAULT_MAP_DATA_SOURCE;
   if (isOsmDataSource(dataSource) && parsed.data.source_quality === "high-quality") {
     errors.push("**source_quality**: OSM-based data sources cannot be marked `high-quality`.");
   }

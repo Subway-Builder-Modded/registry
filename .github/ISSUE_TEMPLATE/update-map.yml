@@ -32,7 +32,6 @@
     "attributes":
       "label": "Map ID"
       "description": "The ID of the map you want to update. Must already exist in the registry."
-      "placeholder": "raleigh"
     "validations":
       "required": true
   - "type": "input"
@@ -41,7 +40,6 @@
       "label": "City Name"
       "description": "The human-readable city name shown in Railyard. This is the title of the map
         that people will see when downloading it."
-      "placeholder": "Raleigh"
     "validations":
       "required": false
   - "type": "input"
@@ -51,7 +49,6 @@
       "description": "2-4 letter IATA/ICAO-style city code used by the game internally. Must be
         uppercase letters/numbers. Must not clash with vanilla city codes or other
         registered maps. Check existing maps before choosing a code."
-      "placeholder": "RDU"
     "validations":
       "required": false
   - "type": "input"
@@ -62,7 +59,6 @@
         DE, JP). Used to group maps by country in Railyard. It is REQUIRED that you use ISO
         codes according to this list:
         https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes."
-      "placeholder": "US"
     "validations":
       "required": false
   - "type": "input"
@@ -71,7 +67,6 @@
       "label": "Population"
       "description": "Approximate metropolitan area population. Number only, no commas or
         separators. Used for display and sorting in Railyard and does not need to be exact."
-      "placeholder": "1500000"
     "validations":
       "required": false
   - "type": "textarea"
@@ -81,7 +76,6 @@
       "description": "A short description of what your map offers. Markdown is supported. This is
         shown in the map browser. Mention data quality, notable features, or coverage area."
       "render": "markdown"
-      "placeholder": "Custom map of the Raleigh-Durham metropolitan area with good demand data quality."
     "validations":
       "required": false
   - "type": "markdown"
@@ -101,8 +95,6 @@
       "label": "Data Source"
       "description": "Enter the data source used to generate the demand data for your map. The
         source name should use common abbreviations like LODES/INSEE/ONS etc."
-      "placeholder": "LODES, etc."
-      "value": "OSM"
     "validations":
       "required": false
   - "type": "dropdown"
@@ -141,7 +133,6 @@
       "description": "Description of how demand data was generated for your map. Please include
         any details about overcoming data source limitations or any augmentations done with
         real-world data."
-      "placeholder": "Transcribed raw OSM data"
     "validations":
       "required": false
   - "type": "markdown"
@@ -242,7 +233,6 @@
     "attributes":
       "label": "Source URL"
       "description": "URL to your map's source code repository or download page."
-      "placeholder": "https://github.com/username/sb-raleigh"
     "validations":
       "required": false
   - "type": "dropdown"
@@ -264,7 +254,6 @@
       "description": "Required ONLY if you selected GitHub Releases. The `owner/repo` path (e.g.
         `username/sb-raleigh`). The repo must exist, have at least one release, and the
         latest release must contain a .zip asset. Leave blank if using Custom URL."
-      "placeholder": "username/sb-raleigh"
   - "type": "input"
     "id": "custom-update-url"
     "attributes":
@@ -272,7 +261,6 @@
       "description": "Required ONLY if you selected Custom URL. The full URL to your self-hosted
         update.json file. The file must follow the Railyard update.json schema. Leave blank
         if using GitHub Releases."
-      "placeholder": "https://example.com/sb-raleigh/update.json"
   - "type": "markdown"
     "attributes":
       "value": "<br>"

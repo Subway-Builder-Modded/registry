@@ -238,7 +238,6 @@ function dropdown(
 
 function mapIdField(description: string): TemplateValue {
   return input("map-id", "Map ID", description, {
-    placeholder: "raleigh",
     required: true,
   });
 }
@@ -266,6 +265,11 @@ function withTemplatePolicy(baseDoc: TemplateDoc, mode: TemplateMode): TemplateD
       if (attributes && Array.isArray(attributes.options) && attributes.options[0] !== "") {
         attributes.options = ["", ...attributes.options];
       }
+    }
+
+    if (mode === "update" && type !== "markdown" && id !== "map-id" && field.attributes) {
+      delete field.attributes.placeholder;
+      delete field.attributes.value;
     }
 
     if (mode === "update" && type !== "markdown" && id !== "map-id") {

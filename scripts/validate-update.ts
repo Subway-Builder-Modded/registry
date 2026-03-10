@@ -9,19 +9,12 @@ import {
   resolveListingIdAndDir,
   resolveManifestType as resolveManifestType,
 } from "./lib/manifests.js";
+import { isPresentIssueValue } from "./lib/map-field-utils.js";
 import { validateMapUpdateFields } from "./lib/map-update-logic.js";
 
 const REPO_ROOT = process.env.RAILYARD_REPO_ROOT
   ? resolve(process.env.RAILYARD_REPO_ROOT)
   : resolve(import.meta.dirname, "..");
-
-function isPresent(value: unknown): value is string {
-  return typeof value === "string"
-    && value !== ""
-    && value !== "_No response_"
-    && value !== "None"
-    && value !== "No change";
-}
 
 function getString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
@@ -31,8 +24,8 @@ function resolveSourceUrl(
   data: Record<string, unknown>,
   existingManifest: ModManifest | MapManifest | null,
 ): string | undefined {
-  if (isPresent(data.source)) return data.source;
-  if (existingManifest && isPresent(existingManifest.source)) return existingManifest.source;
+  if (isPresentIssueValue(data.source)) return data.source;
+  if (existingManifest && isPresentIssueValue(existingManifest.source)) return existingManifest.source;
   return undefined;
 }
 
@@ -43,7 +36,7 @@ async function validateGitHubUpdate(
   manifestType: ManifestType,
   errors: string[],
 ): Promise<void> {
-  if (updateType === "GitHub Releases" && isPresent(githubRepo)) {
+  if (updateType === "GitHub Releases" && isPresentIssueValue(githubRepo)) {
     if (!/^[^/]+\/[^/]+$/.test(githubRepo)) {
       errors.push("**github-repo**: Must provide a valid `owner/repo` when using GitHub Releases.");
       return;
@@ -53,7 +46,7 @@ async function validateGitHubUpdate(
     return;
   }
 
-  if (!updateType && isPresent(githubRepo)) {
+  if (!updateType && isPresentIssueValue(githubRepo)) {
     if (!/^[^/]+\/[^/]+$/.test(githubRepo)) {
       errors.push("**github-repo**: Must provide a valid `owner/repo` when using GitHub Releases.");
       return;
@@ -69,7 +62,7 @@ async function validateCustomUrlUpdate(
   manifestType: ManifestType,
   errors: string[],
 ): Promise<void> {
-  if (updateType === "Custom URL" && isPresent(customUpdateUrl)) {
+  if (updateType === "Custom URL" && isPresentIssueValue(customUpdateUrl)) {
     try {
       new URL(customUpdateUrl);
       const urlErrors = await validateCustomUpdateUrl(customUpdateUrl, manifestType);
@@ -80,7 +73,7 @@ async function validateCustomUrlUpdate(
     return;
   }
 
-  if (!updateType && isPresent(customUpdateUrl)) {
+  if (!updateType && isPresentIssueValue(customUpdateUrl)) {
     try {
       new URL(customUpdateUrl);
       const urlErrors = await validateCustomUpdateUrl(customUpdateUrl, manifestType);
