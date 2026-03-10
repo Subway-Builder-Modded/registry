@@ -42,7 +42,13 @@ async function run(): Promise<void> {
     getArgValue("type") ?? process.env.LISTING_TYPE,
   );
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
-  const token = getNonEmptyEnv("GH_DOWNLOADS_TOKEN") ?? getNonEmptyEnv("GITHUB_TOKEN");
+  const ghDownloadsToken = getNonEmptyEnv("GH_DOWNLOADS_TOKEN");
+  const githubToken = getNonEmptyEnv("GITHUB_TOKEN");
+  const token = ghDownloadsToken ?? githubToken;
+  const tokenSource = ghDownloadsToken
+    ? "GH_DOWNLOADS_TOKEN"
+    : (githubToken ? "GITHUB_TOKEN" : "none");
+  console.log(`[downloads] Auth token source: ${tokenSource}`);
   if (!token) {
     console.warn(
       "[downloads] No non-empty GitHub token configured (GH_DOWNLOADS_TOKEN/GITHUB_TOKEN). GraphQL requests are likely to fail with 401.",
