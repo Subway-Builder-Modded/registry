@@ -25,6 +25,9 @@ interface MapManifest extends ModManifest {
   city_code: string;
   country: string;
   population: number;
+  data_source: string;
+  source_quality: string;
+  level_of_detail: string;
 }
 
 function parseTags(raw: unknown): string[] {
@@ -49,6 +52,15 @@ function buildUpdate(data: Record<string, string>): ModManifest["update"] {
     return { type: "github", repo: data["github-repo"]! };
   }
   return { type: "custom", url: data["custom-update-url"]! };
+}
+
+function getIssueValue(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "_No response_" || trimmed === "None" || trimmed === "No change") {
+    return undefined;
+  }
+  return trimmed;
 }
 
 async function main() {
@@ -77,6 +89,20 @@ async function main() {
   const galleryPaths = await downloadGalleryImages(resolvedUrls, galleryDir);
 
   const tags = parseTags(data.tags);
+  const detailTag = tags.find((tag) =>
+    tag === "high-detail" || tag === "medium-detail" || tag === "low-detail"
+  );
+  const normalizedTags = type === "map"
+    ? tags.filter((tag) => tag !== "high-detail" && tag !== "medium-detail" && tag !== "low-detail")
+    : tags;
+  const levelOfDetail = getIssueValue(data.level_of_detail) ?? detailTag ?? "low-detail";
+  const sourceQualityRaw = getIssueValue(data.source_quality) ??
+    (detailTag ? detailTag.replace("-detail", "-quality") : "low-quality");
+  const dataSource = getIssueValue(data.data_source) ?? "OSM";
+  const sourceQuality =
+    /osm/i.test(dataSource) && sourceQualityRaw === "high-quality"
+      ? "medium-quality"
+      : sourceQualityRaw;
 
   const manifest: ModManifest | MapManifest = {
     schema_version: 1,
@@ -85,7 +111,7 @@ async function main() {
     author: issueAuthorLogin,
     github_id: parseInt(issueAuthorId, 10),
     description: data.description,
-    tags,
+    tags: normalizedTags,
     gallery: galleryPaths,
     source: data.source,
     update: buildUpdate(data),
@@ -94,6 +120,9 @@ async function main() {
           city_code: data["city-code"],
           country: data.country,
           population: parseInt(data.population, 10),
+          data_source: dataSource,
+          source_quality: sourceQuality,
+          level_of_detail: levelOfDetail,
         }
       : {}),
   };

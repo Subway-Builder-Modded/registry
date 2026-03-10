@@ -29,11 +29,26 @@ const PublishMapInput = PublishModInput.omit({ "mod-id": true }).extend({
   "city-code": z.string().min(2).max(4).regex(/^[A-Z0-9]+$/, "City code must be 2-4 uppercase letters/numbers"),
   country: z.string().length(2).regex(/^[A-Z]{2}$/, "Country must be a 2-letter ISO 3166-1 alpha-2 code"),
   population: z.string().regex(/^\d+$/, "Population must be a number"),
+  data_source: z.string().optional(),
+  source_quality: z.string()
+    .min(1, "Source Quality is required")
+    .refine((value: string) => value !== "_No response_", "Source Quality is required"),
+  level_of_detail: z.string()
+    .min(1, "Level of Detail is required")
+    .refine((value: string) => value !== "_No response_", "Level of Detail is required"),
 });
 
 interface ValidationResult {
   success: boolean;
   errors: string[];
+}
+
+function isPresent(value: string | undefined): value is string {
+  return !!value && value !== "_No response_" && value !== "None" && value !== "No change";
+}
+
+function isOsmDataSource(value: string): boolean {
+  return /osm/i.test(value);
 }
 
 async function validateMod(data: Record<string, string>): Promise<ValidationResult> {
@@ -98,6 +113,11 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
 
   if (VANILLA_CITY_CODES.has(parsed.data["city-code"])) {
     errors.push(`**city-code**: \`${parsed.data["city-code"]}\` clashes with a vanilla city code.`);
+  }
+
+  const dataSource = isPresent(parsed.data.data_source) ? parsed.data.data_source : "OSM";
+  if (isOsmDataSource(dataSource) && parsed.data.source_quality === "high-quality") {
+    errors.push("**source_quality**: OSM-based data sources cannot be marked `high-quality`.");
   }
 
   if (parsed.data["update-type"] === "GitHub Releases") {

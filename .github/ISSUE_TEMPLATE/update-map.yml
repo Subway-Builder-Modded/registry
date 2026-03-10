@@ -48,6 +48,31 @@ body:
       label: Population
       description: New metropolitan area population, number only (leave blank to keep current).
 
+  - type: markdown
+    attributes:
+      value: |
+        ## Data Metadata
+
+        Provide details about your map's data source, quality, and level of detail. This helps the Subway-Builder-Modded team and users understand the reliability and granularity of your map. Be honest and transparent in your descriptions.
+
+  - type: input
+    id: data_source
+    attributes:
+      label: Data Source
+      description: New demand data source (leave blank to keep current).
+
+  - type: input
+    id: source_quality
+    attributes:
+      label: Source Quality
+      description: New source quality (for example low-quality, medium-quality, high-quality). If Data Source is OSM, this must not be high-quality. Leave blank to keep current.
+
+  - type: input
+    id: level_of_detail
+    attributes:
+      label: Level of Detail
+      description: New level of detail (for example low-detail, medium-detail, high-detail). Leave blank to keep current.
+
   - type: textarea
     id: description
     attributes:
@@ -78,9 +103,6 @@ body:
         - label: southeast-asia
         - label: southern-africa
         - label: west-africa
-        - label: high-detail
-        - label: medium-detail
-        - label: low-detail
         - label: airports
         - label: entertainment
         - label: ferries

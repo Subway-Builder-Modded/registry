@@ -5,6 +5,14 @@ import { validateGitHubRepo } from "./lib/github.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");
 
+function isPresent(value: string | undefined): value is string {
+  return !!value && value !== "_No response_" && value !== "None" && value !== "No change";
+}
+
+function isOsmDataSource(value: string): boolean {
+  return /osm/i.test(value);
+}
+
 async function main() {
   const type = process.env.LISTING_TYPE; // "mod" or "map"
   const issueJson = process.env.ISSUE_JSON;
@@ -18,6 +26,7 @@ async function main() {
   const data = JSON.parse(issueJson);
   const id = type === "map" ? data["map-id"] : data["mod-id"];
   const errors: string[] = [];
+  let existingManifest: Record<string, unknown> | null = null;
 
   if (!id || typeof id !== "string") {
     errors.push(`**${type}-id**: Must provide a valid ${type} ID.`);
@@ -28,8 +37,8 @@ async function main() {
     if (!existsSync(manifestPath)) {
       errors.push(`**${type}-id**: No ${type} with ID \`${id}\` exists in the registry.`);
     } else {
-      const manifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
-      const ownerId = String(manifest.github_id);
+      existingManifest = JSON.parse(readFileSync(manifestPath, "utf-8"));
+      const ownerId = String(existingManifest.github_id);
       const authorId = String(issueAuthorId);
 
       if (ownerId !== authorId) {
@@ -37,6 +46,19 @@ async function main() {
           `**Ownership check failed**: Your GitHub account does not match the original publisher of \`${id}\`. ` +
           `Only the original publisher can update this listing.`
         );
+      }
+
+      if (type === "map") {
+        const currentDataSource = String(existingManifest.data_source ?? "OSM");
+        const currentSourceQuality = String(existingManifest.source_quality ?? "");
+        const nextDataSource = isPresent(data.data_source) ? data.data_source : currentDataSource;
+        const nextSourceQuality = isPresent(data.source_quality)
+          ? data.source_quality
+          : currentSourceQuality;
+
+        if (isOsmDataSource(nextDataSource) && nextSourceQuality === "high-quality") {
+          errors.push("**source_quality**: OSM-based data sources cannot be marked `high-quality`.");
+        }
       }
     }
   }

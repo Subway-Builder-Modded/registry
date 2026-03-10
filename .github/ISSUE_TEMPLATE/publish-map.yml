@@ -83,6 +83,13 @@ body:
     validations:
       required: true
 
+  - type: markdown
+    attributes:
+      value: |
+        ## Data Metadata
+
+        Provide details about your map's data source, quality, and level of detail. This helps the Subway-Builder-Modded team and users understand the reliability and granularity of your map. Be honest and transparent in your descriptions.
+
   - type: input
     id: data_source
     attributes:
@@ -99,6 +106,7 @@ body:
       label: Source Quality
       description: >
         Approximate quality of the data source used for your map. Official gov't sources are considered high-quality while raw open-source data is considered low-quality.
+        If your data source is OSM, this must not be high-quality.
       placeholder: "low-quality"
     validations:
       required: true
