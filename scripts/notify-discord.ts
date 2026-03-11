@@ -6,6 +6,8 @@ interface ParsedNotificationPayload {
   status: string;
   lines: string[];
   runUrl?: string;
+  warnings: string[];
+  errors: string[];
 }
 
 function parseLines(raw: string | undefined): string[] {
@@ -21,12 +23,32 @@ function parseLines(raw: string | undefined): string[] {
   }
 }
 
+function parseStringArray(raw: string | undefined): string[] {
+  if (!raw || raw.trim() === "") return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter((entry): entry is string => typeof entry === "string" && entry.trim() !== "")
+      .map((entry) => entry.trim());
+  } catch {
+    return [];
+  }
+}
+
 function readPayloadFromEnv(): ParsedNotificationPayload {
+  const status = process.env.DISCORD_STATUS?.trim() || "unknown";
+  const errors = parseStringArray(process.env.DISCORD_ERRORS_JSON);
+  if (errors.length === 0 && status.toLowerCase() !== "success") {
+    errors.push("Workflow finished with a non-success status. Check run logs.");
+  }
   return {
     title: process.env.DISCORD_TITLE?.trim() || "Workflow Notification",
-    status: process.env.DISCORD_STATUS?.trim() || "unknown",
+    status,
     runUrl: process.env.DISCORD_RUN_URL?.trim() || undefined,
     lines: parseLines(process.env.DISCORD_LINES_JSON),
+    warnings: parseStringArray(process.env.DISCORD_WARNINGS_JSON),
+    errors,
   };
 }
 
@@ -44,6 +66,8 @@ async function run(): Promise<void> {
     status: payload.status,
     lines: payload.lines,
     runUrl: payload.runUrl,
+    warnings: payload.warnings,
+    errors: payload.errors,
   });
 }
 

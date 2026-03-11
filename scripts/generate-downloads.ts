@@ -39,6 +39,19 @@ function resolveListingType(rawValue: string | undefined): ManifestType {
   throw new Error("Missing or invalid --type. Expected one of: map, mod");
 }
 
+function toWarningsOutputJson(listingType: ManifestType, warnings: string[]): string {
+  const MAX_WARNINGS = 30;
+  const normalized = warnings
+    .map((warning) => warning.trim())
+    .filter((warning) => warning !== "")
+    .map((warning) => `${listingType}: ${warning}`);
+  const displayed = normalized.slice(0, MAX_WARNINGS);
+  if (normalized.length > displayed.length) {
+    displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
+  }
+  return JSON.stringify(displayed);
+}
+
 async function run(): Promise<void> {
   const listingType = resolveListingType(
     getArgValue("type") ?? process.env.LISTING_TYPE,
@@ -90,6 +103,15 @@ async function run(): Promise<void> {
   console.log(
     `Generated ${outputDir}/downloads.json for ${Object.keys(downloads).length} listings`,
   );
+
+  if (process.env.GITHUB_OUTPUT) {
+    const { appendFileSync } = await import("node:fs");
+    const outputLines = [
+      `warning_count=${warnings.length}`,
+      `warnings_json=${toWarningsOutputJson(listingType, warnings)}`,
+    ];
+    appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);
+  }
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

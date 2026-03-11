@@ -66,6 +66,9 @@ Local command:
 
 Automation:
 
-- `regenerate-map-demand-stats.yml` runs daily and can also be triggered manually.
+- `regenerate-map-demand-stats.yml` runs every 8 hours and can also be triggered manually.
+- Skip behavior:
+  - `sha256:*` source fingerprints skip regardless of age.
+  - Non-`sha256` fingerprints skip only if checked within the last 9 hours (periodic recheck guards against mutable assets behind unchanged tag/URL metadata).
 
 For technical details, see [ARCHITECTURE.md](ARCHITECTURE.md).

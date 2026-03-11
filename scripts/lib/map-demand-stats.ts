@@ -55,7 +55,9 @@ interface ResolvedInstallTarget {
 }
 
 const CACHE_FILE_NAME = "demand-stats-cache.json";
-const UNCHANGED_SKIP_WINDOW_MS = 25 * 60 * 60 * 1000;
+// For non-sha fingerprints (e.g. tag+asset name), recheck periodically because
+// upstream ZIP content may change without a fingerprint change.
+const UNCHANGED_SKIP_WINDOW_MS = 9 * 60 * 60 * 1000;
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf-8")) as T;

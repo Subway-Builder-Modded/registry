@@ -249,9 +249,13 @@ map-name.zip
 - `regenerate-downloads.yml` runs hourly and on manual dispatch.
 - It runs map and mod download generation in separate jobs and then commits updated `downloads.json` files if changed.
 - Uses GitHub GraphQL `ReleaseAsset.downloadCount` with `GITHUB_TOKEN` by default (`GH_DOWNLOADS_TOKEN` optional override).
-- `regenerate-map-demand-stats.yml` runs daily and on manual dispatch.
+- `regenerate-map-demand-stats.yml` runs every 8 hours and on manual dispatch.
 - It refreshes map demand-derived metadata in manifests and updates `maps/demand-stats-cache.json`.
-- Skips ZIP extraction for unchanged source fingerprints within 25 hours.
+- Skips ZIP extraction when source fingerprints are unchanged:
+- For `sha256:*` fingerprints, skip regardless of age.
+- For other fingerprints, skip when last checked within 9 hours.
+- Reason for non-`sha256` fallback:
+- Tag/asset-name or URL-based fingerprints can remain unchanged while upstream ZIP content is replaced, so periodic rechecks prevent stale derived stats.
 
 ## Script Responsibilities
 

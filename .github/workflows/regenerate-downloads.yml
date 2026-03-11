@@ -15,6 +15,9 @@ concurrency:
 jobs:
   generate-maps:
     runs-on: ubuntu-latest
+    outputs:
+      warnings_json: ${{ steps.generate_map_downloads.outputs.warnings_json }}
+      warning_count: ${{ steps.generate_map_downloads.outputs.warning_count }}
     steps:
       - uses: actions/checkout@v4
 
@@ -33,6 +36,7 @@ jobs:
         working-directory: scripts
 
       - name: Generate map download counts
+        id: generate_map_downloads
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run generate-downloads:maps
@@ -46,6 +50,9 @@ jobs:
 
   generate-mods:
     runs-on: ubuntu-latest
+    outputs:
+      warnings_json: ${{ steps.generate_mod_downloads.outputs.warnings_json }}
+      warning_count: ${{ steps.generate_mod_downloads.outputs.warning_count }}
     steps:
       - uses: actions/checkout@v4
 
@@ -64,6 +71,7 @@ jobs:
         working-directory: scripts
 
       - name: Generate mod download counts
+        id: generate_mod_downloads
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run generate-downloads:mods
@@ -286,6 +294,8 @@ jobs:
           TRACKED_VERSIONS_TOTAL: ${{ steps.download_stats.outputs.tracked_versions_total }}
           TRACKED_VERSIONS_MAPS: ${{ steps.download_stats.outputs.tracked_versions_maps }}
           TRACKED_VERSIONS_MODS: ${{ steps.download_stats.outputs.tracked_versions_mods }}
+          MAP_WARNINGS_JSON: ${{ needs.generate-maps.outputs.warnings_json }}
+          MOD_WARNINGS_JSON: ${{ needs.generate-mods.outputs.warnings_json }}
           COMMITTED: ${{ steps.commit_changes.outputs.committed }}
           COMMIT_SHA: ${{ steps.commit_changes.outputs.commit_sha }}
         run: |
@@ -298,6 +308,13 @@ jobs:
           if [ "${COMMITTED}" = "true" ] && [ -n "${COMMIT_SHA}" ]; then
             COMMIT_DISPLAY="\`${COMMIT_SHA}\`"
           fi
+
+          MAP_WARNINGS_JSON_SAFE="${MAP_WARNINGS_JSON:-[]}"
+          MOD_WARNINGS_JSON_SAFE="${MOD_WARNINGS_JSON:-[]}"
+          export DISCORD_WARNINGS_JSON="$(jq -nc \
+            --arg maps "${MAP_WARNINGS_JSON_SAFE}" \
+            --arg mods "${MOD_WARNINGS_JSON_SAFE}" \
+            '($maps | fromjson) + ($mods | fromjson)')"
 
           export DISCORD_LINES_JSON="$(jq -nc \
             --arg updated_records_total "${UPDATED_RECORDS_TOTAL}" \

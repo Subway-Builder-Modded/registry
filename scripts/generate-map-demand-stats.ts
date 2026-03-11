@@ -46,6 +46,19 @@ function parseCliArgs(argv: string[]): { force: boolean; mapId?: string } {
   return { force, mapId };
 }
 
+function toWarningsOutputJson(prefix: string, warnings: string[]): string {
+  const MAX_WARNINGS = 30;
+  const normalized = warnings
+    .map((warning) => warning.trim())
+    .filter((warning) => warning !== "")
+    .map((warning) => `${prefix}${warning}`);
+  const displayed = normalized.slice(0, MAX_WARNINGS);
+  if (normalized.length > displayed.length) {
+    displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
+  }
+  return JSON.stringify(displayed);
+}
+
 async function run(): Promise<void> {
   const cli = parseCliArgs(process.argv.slice(2));
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
@@ -93,6 +106,8 @@ async function run(): Promise<void> {
       `residents_delta_total=${result.residentsDeltaTotal}`,
       `graphql_queries=${result.rateLimit.queries}`,
       `graphql_total_cost=${result.rateLimit.totalCost}`,
+      `warning_count=${result.warnings.length}`,
+      `warnings_json=${toWarningsOutputJson("map-demand-stats: ", result.warnings)}`,
     ];
     const { appendFileSync } = await import("node:fs");
     appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);

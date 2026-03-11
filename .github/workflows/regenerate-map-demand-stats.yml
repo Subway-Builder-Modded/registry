@@ -2,7 +2,7 @@ name: Regenerate Map Demand Stats
 
 on:
   schedule:
-    - cron: "0 3 * * *"
+    - cron: "0 */8 * * *"
   workflow_dispatch:
 
 permissions:
@@ -70,6 +70,7 @@ jobs:
           RESIDENTS_DELTA_TOTAL: ${{ steps.regenerate_stats.outputs.residents_delta_total }}
           GRAPHQL_QUERIES: ${{ steps.regenerate_stats.outputs.graphql_queries }}
           GRAPHQL_TOTAL_COST: ${{ steps.regenerate_stats.outputs.graphql_total_cost }}
+          WARNINGS_JSON: ${{ steps.regenerate_stats.outputs.warnings_json }}
           COMMITTED: ${{ steps.commit_changes.outputs.committed }}
           COMMIT_SHA: ${{ steps.commit_changes.outputs.commit_sha }}
         run: |
@@ -82,6 +83,8 @@ jobs:
           if [ "${COMMITTED}" = "true" ] && [ -n "${COMMIT_SHA}" ]; then
             COMMIT_DISPLAY="\`${COMMIT_SHA}\`"
           fi
+
+          export DISCORD_WARNINGS_JSON="${WARNINGS_JSON:-[]}"
 
           export DISCORD_LINES_JSON="$(jq -nc \
             --arg processed_maps "${PROCESSED_MAPS}" \
@@ -97,7 +100,7 @@ jobs:
               "- **Processed maps:** \($processed_maps)",
               "- **Manifests updated:** \($updated_maps)",
               "- **Skipped maps:** \($skipped_maps)",
-              "- **Skipped unchanged (<25h):** \($skipped_unchanged)",
+              "- **Skipped unchanged (sha match or <9h):** \($skipped_unchanged)",
               "- **Extraction failures:** \($extraction_failures)",
               "- **Residents total delta:** \($residents_delta_total)",
               "- **GraphQL usage:** queries=\($graphql_queries), totalCost=\($graphql_total_cost)",
