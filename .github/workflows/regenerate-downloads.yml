@@ -99,13 +99,36 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: maps-downloads
-          path: .
+          path: /tmp/download-artifacts/maps
 
       - name: Download mod downloads artifact
         uses: actions/download-artifact@v4
         with:
           name: mods-downloads
-          path: .
+          path: /tmp/download-artifacts/mods
+
+      - name: Restore downloads files from artifacts
+        run: |
+          set -euo pipefail
+          mkdir -p maps mods
+
+          MAP_ARTIFACT_FILE="$(find /tmp/download-artifacts/maps -type f -name downloads.json | head -n 1 || true)"
+          MOD_ARTIFACT_FILE="$(find /tmp/download-artifacts/mods -type f -name downloads.json | head -n 1 || true)"
+
+          if [ -z "${MAP_ARTIFACT_FILE}" ]; then
+            echo "Failed to locate map downloads.json in downloaded artifact."
+            exit 1
+          fi
+          if [ -z "${MOD_ARTIFACT_FILE}" ]; then
+            echo "Failed to locate mod downloads.json in downloaded artifact."
+            exit 1
+          fi
+
+          cp "${MAP_ARTIFACT_FILE}" maps/downloads.json
+          cp "${MOD_ARTIFACT_FILE}" mods/downloads.json
+
+          echo "Restored map artifact from: ${MAP_ARTIFACT_FILE}"
+          echo "Restored mod artifact from: ${MOD_ARTIFACT_FILE}"
 
       - name: Compute download change stats
         id: download_stats
