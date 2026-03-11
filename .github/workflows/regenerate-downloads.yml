@@ -98,5 +98,28 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add maps/downloads.json mods/downloads.json 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "chore: regenerate download counts"
+          if git diff --cached --quiet; then
+            echo "No download count changes detected; skipping commit."
+            exit 0
+          fi
+          git commit -m "chore: regenerate download counts"
           git push
+
+      - name: Notify Discord
+        if: always()
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
+            echo "DISCORD_WEBHOOK_URL not set; skipping Discord notification."
+            exit 0
+          fi
+
+          STATUS="${{ job.status }}"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          CONTENT="Regenerate Download Counts: ${STATUS}\n${RUN_URL}"
+
+          jq -n --arg content "$CONTENT" '{content: $content}' \
+            | curl -sS -X POST "$DISCORD_WEBHOOK_URL" \
+                -H "Content-Type: application/json" \
+                -d @-
