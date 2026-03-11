@@ -44,4 +44,22 @@ Local commands:
 - Generate mods only:
   - `pnpm --dir scripts run generate-downloads:mods`
 
+## Map Demand Stats
+
+Map manifests now support auto-derived demand metrics from map ZIPs:
+
+- `population` (auto-derived from residents total, kept for backwards compatibility)
+- `residents_total`
+- `points_count`
+- `population_count`
+
+Local command:
+
+- Generate/refresh map demand stats:
+  - `pnpm --dir scripts run generate-map-demand-stats`
+  - Force refresh all maps (ignore SHA/cache skip):
+    - `pnpm --dir scripts run generate-map-demand-stats -- --force`
+  - Refresh one map by id:
+    - `pnpm --dir scripts run generate-map-demand-stats -- --id <map-id>`
+
 For technical details, see [ARCHITECTURE.md](ARCHITECTURE.md).

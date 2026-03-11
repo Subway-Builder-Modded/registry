@@ -1,10 +1,12 @@
 import { writeFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateDownloadsData } from "./lib/downloads.js";
 import type { ManifestType } from "./lib/manifests.js";
 
-const FALLBACK_REPO_ROOT = resolve(import.meta.dirname, "..");
+const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
+  ? resolve(import.meta.dirname, "..", "..")
+  : resolve(import.meta.dirname, "..");
 
 function getNonEmptyEnv(name: string): string | undefined {
   const value = process.env[name];
@@ -35,6 +37,19 @@ function resolveListingType(rawValue: string | undefined): ManifestType {
     return rawValue;
   }
   throw new Error("Missing or invalid --type. Expected one of: map, mod");
+}
+
+function toWarningsOutputJson(listingType: ManifestType, warnings: string[]): string {
+  const MAX_WARNINGS = 30;
+  const normalized = warnings
+    .map((warning) => warning.trim())
+    .filter((warning) => warning !== "")
+    .map((warning) => `${listingType}: ${warning}`);
+  const displayed = normalized.slice(0, MAX_WARNINGS);
+  if (normalized.length > displayed.length) {
+    displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
+  }
+  return JSON.stringify(displayed);
 }
 
 async function run(): Promise<void> {
@@ -88,6 +103,15 @@ async function run(): Promise<void> {
   console.log(
     `Generated ${outputDir}/downloads.json for ${Object.keys(downloads).length} listings`,
   );
+
+  if (process.env.GITHUB_OUTPUT) {
+    const { appendFileSync } = await import("node:fs");
+    const outputLines = [
+      `warning_count=${warnings.length}`,
+      `warnings_json=${toWarningsOutputJson(listingType, warnings)}`,
+    ];
+    appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);
+  }
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
