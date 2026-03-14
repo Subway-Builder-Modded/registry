@@ -136,6 +136,7 @@ async function parseConfigCityCode(zip: JSZip): Promise<{
 
 function inspectMapZip(
   files: Set<string>,
+  registryCityCode: string | null,
   configCityCode: string | null,
   parseError: string | null,
   cityCodeMismatchWarning: string | null,
@@ -189,14 +190,26 @@ function inspectMapZip(
   if (!configCityCode) {
     requiredChecks.city_pmtiles = false;
     matchedFiles.city_pmtiles = null;
-    errors.push("missing city_code in config.json for PMTiles validation");
+    if (registryCityCode) {
+      errors.push(
+        `missing city_code in config.json for PMTiles validation (registry city_code '${registryCityCode}')`,
+      );
+    } else {
+      errors.push("missing city_code in config.json for PMTiles validation");
+    }
   } else {
     const pmtilesName = `${configCityCode}.pmtiles`;
     const pmtiles = firstMatch(files, [pmtilesName]);
     requiredChecks.city_pmtiles = pmtiles !== null;
     matchedFiles.city_pmtiles = pmtiles;
     if (!pmtiles) {
-      errors.push(`missing top-level ${pmtilesName}`);
+      if (registryCityCode) {
+        errors.push(
+          `missing top-level ${pmtilesName} (config city_code '${configCityCode}', registry city_code '${registryCityCode}')`,
+        );
+      } else {
+        errors.push(`missing top-level ${pmtilesName} (config city_code '${configCityCode}')`);
+      }
     }
   }
 
@@ -273,6 +286,7 @@ export async function inspectZipCompleteness(
 
     return inspectMapZip(
       topLevelFiles,
+      registryCityCode,
       configCityCode,
       configCityCodeResult.parseError,
       mismatchWarning,

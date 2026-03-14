@@ -78,6 +78,8 @@ test("map integrity enforces pmtiles using config city_code when present", async
   const result = await inspectZipCompleteness("map", zipBuffer, { cityCode: "REG" });
   assert.equal(result.isComplete, false);
   assert.ok(result.errors.some((error) => error.includes("CFG.pmtiles")));
+  assert.ok(result.errors.some((error) => error.includes("config city_code 'CFG'")));
+  assert.ok(result.errors.some((error) => error.includes("registry city_code 'REG'")));
 });
 
 test("map integrity does not fall back to registry city_code when config city_code is missing", async () => {
