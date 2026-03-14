@@ -25,6 +25,9 @@ export async function generateDownloadsDataDownloadOnly(
   const dir = getDirectoryForType(listingType);
   const ids = getIndexIds(repoRoot, dir);
   const nowIso = new Date().toISOString();
+  const loadedIntegrity = loadIntegritySnapshot(repoRoot, dir);
+  const integrity = loadedIntegrity ?? emptyIntegrity(nowIso);
+  const hasIntegritySnapshot = loadedIntegrity !== null && Object.keys(loadedIntegrity.listings).length > 0;
 
   const downloadsByListing: D.DownloadsByListing = {};
   const listingContexts = new Map<string, ListingContext>();
@@ -150,12 +153,30 @@ export async function generateDownloadsDataDownloadOnly(
     }
   }
 
+  let filteredVersions = 0;
+  if (hasIntegritySnapshot) {
+    for (const id of [...ids].sort()) {
+      const byVersion = downloadsByListing[id] ?? {};
+      for (const version of Object.keys(byVersion)) {
+        const versionIntegrity = integrity.listings[id]?.versions?.[version];
+        if (versionIntegrity?.is_complete === true) {
+          continue;
+        }
+        delete byVersion[version];
+        filteredVersions += 1;
+        const reason = versionIntegrity?.errors?.join("; ") || "missing integrity result in snapshot";
+        warnListing(warnings, id, `excluded by integrity snapshot (${reason})`, version);
+      }
+    }
+  } else {
+    warnings.push("download-only mode: integrity snapshot missing; skipping integrity scrub");
+  }
+
   const sortedDownloads: D.DownloadsByListing = {};
   for (const id of [...ids].sort()) {
     sortedDownloads[id] = sortObjectByKeys(downloadsByListing[id] ?? {});
   }
 
-  const integrity = loadIntegritySnapshot(repoRoot, dir) ?? emptyIntegrity(nowIso);
   let completeVersions = 0;
   let incompleteVersions = 0;
   for (const listing of Object.values(integrity.listings)) {
@@ -177,7 +198,7 @@ export async function generateDownloadsDataDownloadOnly(
       versions_checked: versionsChecked,
       complete_versions: completeVersions,
       incomplete_versions: incompleteVersions,
-      filtered_versions: 0,
+      filtered_versions: filteredVersions,
       cache_hits: 0,
     },
     warnings,

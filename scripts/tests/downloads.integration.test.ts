@@ -406,3 +406,108 @@ test("download-only mode skips ZIP inspection and keeps semver zip counts", asyn
     assert.equal(zipFetchCount, 0);
   });
 });
+
+test("download-only mode scrubs versions that are not complete in integrity snapshot", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["hourly-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "hourly-mod", {
+      ...makeBaseModManifest("hourly-mod"),
+      update: { type: "github", repo: "owner/hourly" },
+    });
+    writeJson(join(repoRoot, "mods", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-14T00:00:00Z",
+      listings: {
+        "hourly-mod": {
+          has_complete_version: true,
+          latest_semver_version: "v1.0.1",
+          latest_semver_complete: true,
+          complete_versions: ["v1.0.1"],
+          incomplete_versions: ["v1.0.0"],
+          versions: {
+            "v1.0.0": {
+              is_complete: false,
+              errors: ["missing top-level manifest.json in ZIP"],
+              required_checks: {},
+              matched_files: {},
+              source: { update_type: "github", repo: "owner/hourly", tag: "v1.0.0" },
+              fingerprint: "github:owner/hourly:v1.0.0:hourly-v1.0.0.zip",
+              checked_at: "2026-03-14T00:00:00Z",
+            },
+            "v1.0.1": {
+              is_complete: true,
+              errors: [],
+              required_checks: {
+                release_manifest_asset: true,
+                zip_manifest_json: true,
+              },
+              matched_files: {
+                release_manifest_asset: "manifest.json",
+                zip_manifest_json: "manifest.json",
+              },
+              source: {
+                update_type: "github",
+                repo: "owner/hourly",
+                tag: "v1.0.1",
+                asset_name: "hourly-v1.0.1.zip",
+                download_url: "https://downloads.example.com/hourly-v1.0.1.zip",
+              },
+              fingerprint: "github:owner/hourly:v1.0.1:hourly-v1.0.1.zip",
+              checked_at: "2026-03-14T00:00:00Z",
+            },
+          },
+        },
+      },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.1",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "hourly-v1.0.1.zip", downloadCount: 9, downloadUrl: "https://downloads.example.com/hourly-v1.0.1.zip" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "hourly-v1.0.0.zip", downloadCount: 7, downloadUrl: "https://downloads.example.com/hourly-v1.0.0.zip" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      mode: "download-only",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.deepEqual(result.downloads, { "hourly-mod": { "v1.0.1": 9 } });
+    assert.equal(result.stats.filtered_versions, 1);
+    assert.ok(
+      result.warnings.some((warning) => warning.includes("v1.0.0") && warning.includes("excluded by integrity snapshot")),
+    );
+  });
+});
