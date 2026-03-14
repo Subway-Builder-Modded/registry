@@ -186,6 +186,9 @@ export async function generateDownloadsDataFull(
               cityCode: context.cityCode,
               releaseHasManifestAsset: hasReleaseManifestAsset,
             });
+            for (const warning of check.warnings) {
+              warnListing(warnings, id, `integrity warning (${warning})`, tag);
+            }
             selectedResult = withCheckResult(
               check,
               { ...sourceBase, asset_name: assetName, download_url: asset.downloadUrl },
@@ -380,6 +383,9 @@ export async function generateDownloadsDataFull(
                     cityCode: context.cityCode,
                     releaseHasManifestAsset: release.assets.has("manifest.json"),
                   });
+                  for (const warning of check.warnings) {
+                    warnListing(warnings, id, `integrity warning (${warning})`, versionKey);
+                  }
                   const result = withCheckResult(
                     check,
                     {

@@ -48,6 +48,7 @@ export interface IntegrityCache {
 export interface ZipCompletenessResult {
   isComplete: boolean;
   errors: string[];
+  warnings: string[];
   requiredChecks: Record<string, boolean>;
   matchedFiles: Record<string, string | null>;
 }
@@ -76,16 +77,81 @@ function firstMatch(files: Set<string>, names: string[]): string | null {
   return null;
 }
 
-function inspectMapZip(files: Set<string>, cityCode: string): ZipCompletenessResult {
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function findCityCodeInConfig(value: unknown): string | null {
+  const queue: unknown[] = [value];
+  const visited = new Set<unknown>();
+
+  while (queue.length > 0) {
+    const current = queue.shift();
+    if (!isObject(current) || visited.has(current)) continue;
+    visited.add(current);
+
+    const direct = current.city_code ?? current.cityCode;
+    if (typeof direct === "string" && direct.trim() !== "") {
+      return direct.trim();
+    }
+
+    for (const nestedValue of Object.values(current)) {
+      if (isObject(nestedValue)) {
+        queue.push(nestedValue);
+      }
+    }
+  }
+
+  return null;
+}
+
+async function parseConfigCityCode(zip: JSZip): Promise<{
+  cityCode: string | null;
+  parseError: string | null;
+}> {
+  const configEntry = zip.files["config.json"];
+  if (!configEntry || configEntry.dir) {
+    return { cityCode: null, parseError: null };
+  }
+
+  let rawConfig: string;
+  try {
+    rawConfig = await configEntry.async("string");
+  } catch {
+    return { cityCode: null, parseError: "failed to read top-level config.json" };
+  }
+
+  let parsedConfig: unknown;
+  try {
+    parsedConfig = JSON.parse(rawConfig);
+  } catch {
+    return { cityCode: null, parseError: "top-level config.json is not valid JSON" };
+  }
+
+  return {
+    cityCode: findCityCodeInConfig(parsedConfig),
+    parseError: null,
+  };
+}
+
+function inspectMapZip(
+  files: Set<string>,
+  configCityCode: string | null,
+  parseError: string | null,
+  cityCodeMismatchWarning: string | null,
+): ZipCompletenessResult {
   const requiredChecks: Record<string, boolean> = {};
   const matchedFiles: Record<string, string | null> = {};
   const errors: string[] = [];
+  const warnings: string[] = [];
 
   const configFile = firstMatch(files, ["config.json"]);
   requiredChecks.config_json = configFile !== null;
   matchedFiles.config_json = configFile;
   if (!configFile) {
     errors.push("missing top-level config.json");
+  } else if (parseError) {
+    errors.push(parseError);
   }
 
   const demandData = firstMatch(files, ["demand_data.json", "demand_data.json.gz"]);
@@ -116,17 +182,28 @@ function inspectMapZip(files: Set<string>, cityCode: string): ZipCompletenessRes
     errors.push("missing top-level runways_taxiways.geojson or runways_taxiways.geojson.gz");
   }
 
-  const pmtilesName = `${cityCode}.pmtiles`;
-  const pmtiles = firstMatch(files, [pmtilesName]);
-  requiredChecks.city_pmtiles = pmtiles !== null;
-  matchedFiles.city_pmtiles = pmtiles;
-  if (!pmtiles) {
-    errors.push(`missing top-level ${pmtilesName}`);
+  if (cityCodeMismatchWarning) {
+    warnings.push(cityCodeMismatchWarning);
+  }
+
+  if (!configCityCode) {
+    requiredChecks.city_pmtiles = false;
+    matchedFiles.city_pmtiles = null;
+    errors.push("missing city_code in config.json for PMTiles validation");
+  } else {
+    const pmtilesName = `${configCityCode}.pmtiles`;
+    const pmtiles = firstMatch(files, [pmtilesName]);
+    requiredChecks.city_pmtiles = pmtiles !== null;
+    matchedFiles.city_pmtiles = pmtiles;
+    if (!pmtiles) {
+      errors.push(`missing top-level ${pmtilesName}`);
+    }
   }
 
   return {
     isComplete: errors.length === 0,
     errors,
+    warnings,
     requiredChecks,
     matchedFiles,
   };
@@ -136,6 +213,7 @@ function inspectModZip(files: Set<string>, releaseHasManifestAsset: boolean): Zi
   const requiredChecks: Record<string, boolean> = {};
   const matchedFiles: Record<string, string | null> = {};
   const errors: string[] = [];
+  const warnings: string[] = [];
 
   requiredChecks.release_manifest_asset = releaseHasManifestAsset;
   matchedFiles.release_manifest_asset = releaseHasManifestAsset ? "manifest.json" : null;
@@ -153,6 +231,7 @@ function inspectModZip(files: Set<string>, releaseHasManifestAsset: boolean): Zi
   return {
     isComplete: errors.length === 0,
     errors,
+    warnings,
     requiredChecks,
     matchedFiles,
   };
@@ -170,6 +249,7 @@ export async function inspectZipCompleteness(
     return {
       isComplete: false,
       errors: ["ZIP could not be opened"],
+      warnings: [],
       requiredChecks: {},
       matchedFiles: {},
     };
@@ -177,16 +257,23 @@ export async function inspectZipCompleteness(
 
   const topLevelFiles = listTopLevelFileNames(zip);
   if (listingType === "map") {
-    const cityCode = options.cityCode;
-    if (!cityCode) {
-      return {
-        isComplete: false,
-        errors: ["missing city_code for map integrity validation"],
-        requiredChecks: {},
-        matchedFiles: {},
-      };
-    }
-    return inspectMapZip(topLevelFiles, cityCode);
+    const registryCityCode = options.cityCode?.trim() || null;
+    const configCityCodeResult = await parseConfigCityCode(zip);
+    const configCityCode = configCityCodeResult.cityCode;
+    const mismatchWarning = (
+      registryCityCode
+      && configCityCode
+      && registryCityCode !== configCityCode
+    )
+      ? `registry city_code '${registryCityCode}' differs from config city_code '${configCityCode}'`
+      : null;
+
+    return inspectMapZip(
+      topLevelFiles,
+      configCityCode,
+      configCityCodeResult.parseError,
+      mismatchWarning,
+    );
   }
 
   return inspectModZip(topLevelFiles, options.releaseHasManifestAsset === true);
