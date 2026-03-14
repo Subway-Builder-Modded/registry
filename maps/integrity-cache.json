@@ -524,6 +524,41 @@
         }
       }
     },
+    "greater-los-angeles": {
+      "1.0.1": {
+        "fingerprint": "sha256:c50d68b569eb0edade342fd17d96f6e636be93e0697dee8de39601836a67719a",
+        "last_checked_at": "2026-03-14T02:01:19.963Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "LAX.pmtiles"
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.0",
+            "asset_name": "LAX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/LAX.zip"
+          },
+          "fingerprint": "sha256:c50d68b569eb0edade342fd17d96f6e636be93e0697dee8de39601836a67719a",
+          "checked_at": "2026-03-14T02:01:19.963Z"
+        }
+      }
+    },
     "jacksonville": {
       "1.0.0": {
         "fingerprint": "sha256:a2dcc37a08f5a857ed92f45f8e45332d7c30e052cead007299cc2b8ddca83795",
@@ -664,6 +699,43 @@
           },
           "fingerprint": "sha256:31d89963dfb04413e548b493ff0fb4a326215071832077e7c2cb96d8978ef59c",
           "checked_at": "2026-03-13T23:54:03.975Z"
+        }
+      }
+    },
+    "los-angeles-county": {
+      "1.0.0": {
+        "fingerprint": "sha256:d09cfce8d8757496ae1c334979fc47d4ec9e4873795c58cab7101cb002ed98d6",
+        "last_checked_at": "2026-03-14T02:01:19.963Z",
+        "result": {
+          "is_complete": false,
+          "errors": [
+            "missing top-level LAMX.pmtiles"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": null
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.0",
+            "asset_name": "LAXM.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/LAXM.zip"
+          },
+          "fingerprint": "sha256:d09cfce8d8757496ae1c334979fc47d4ec9e4873795c58cab7101cb002ed98d6",
+          "checked_at": "2026-03-14T02:01:19.963Z"
         }
       }
     },
@@ -856,6 +928,41 @@
           },
           "fingerprint": "github:crumpetime/sb-maps-hkg:railyard:HKG.zip",
           "checked_at": "2026-03-13T23:54:03.975Z"
+        }
+      }
+    },
+    "mfn-madisonwi": {
+      "3.0.0": {
+        "fingerprint": "github:crumpetime/sb-maps-msn:3.0.0:MSN.zip",
+        "last_checked_at": "2026-03-14T02:01:19.963Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "MSN.pmtiles"
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "crumpetime/sb-maps-msn",
+            "tag": "3.0.0",
+            "asset_name": "MSN.zip",
+            "download_url": "https://github.com/crumpetime/sb-maps-msn/releases/download/3.0.0/MSN.zip"
+          },
+          "fingerprint": "github:crumpetime/sb-maps-msn:3.0.0:MSN.zip",
+          "checked_at": "2026-03-14T02:01:19.963Z"
         }
       }
     },
