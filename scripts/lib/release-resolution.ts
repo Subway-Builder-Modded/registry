@@ -1,9 +1,12 @@
 import * as D from "./download-definitions.js";
+import { fetchWithTimeout, resolveTimeoutMsFromEnv } from "./http.js";
 
 const GRAPHQL_RATE_LIMIT_WARN_THRESHOLD = D.GRAPHQL_RATE_LIMIT_WARN_THRESHOLD;
 const GRAPHQL_ENDPOINT = D.GRAPHQL_ENDPOINT;
 const REPO_RELEASES_QUERY = D.REPO_RELEASES_QUERY;
 const SEMVER_RELEASE_TAG_REGEX = /^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/;
+const GRAPHQL_HEARTBEAT_PREFIX = "[graphql]";
+const GRAPHQL_REQUEST_TIMEOUT_MS = resolveTimeoutMsFromEnv("GRAPHQL_REQUEST_TIMEOUT_MS", 45_000);
 
 export interface ParsedReleaseAssetUrl extends D.ParsedReleaseAssetUrl {}
 
@@ -84,22 +87,34 @@ async function requestRepoReleasesPage(
   fetchImpl: typeof fetch,
   token: string | undefined,
 ): Promise<D.RepoReleasesPageResult> {
+  const cursorLabel = cursor ?? "start";
+
   let response: Response;
   try {
-    response = await fetchImpl(GRAPHQL_ENDPOINT, {
-      method: "POST",
-      headers: buildGraphqlHeaders(token),
-      body: JSON.stringify({
-        query: REPO_RELEASES_QUERY,
-        variables: {
-          owner,
-          name,
-          cursor,
-        },
-      }),
-    });
+    response = await fetchWithTimeout(
+      fetchImpl,
+      GRAPHQL_ENDPOINT,
+      {
+        method: "POST",
+        headers: buildGraphqlHeaders(token),
+        body: JSON.stringify({
+          query: REPO_RELEASES_QUERY,
+          variables: {
+            owner,
+            name,
+            cursor,
+          },
+        }),
+      },
+      {
+        timeoutMs: GRAPHQL_REQUEST_TIMEOUT_MS,
+        heartbeatPrefix: GRAPHQL_HEARTBEAT_PREFIX,
+        heartbeatLabel: `repo=${repo} cursor=${cursorLabel}`,
+      },
+    );
   } catch (error) {
-    return { ok: false, error: `repo=${repo}: GraphQL request failed (${(error as Error).message})` };
+    const errorMessage = (error as Error).message;
+    return { ok: false, error: `repo=${repo}: GraphQL request failed (${errorMessage})` };
   }
 
   if (!response.ok) {
