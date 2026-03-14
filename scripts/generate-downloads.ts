@@ -105,11 +105,9 @@ function parseListingWarning(warning: string): ParsedListingWarning | null {
 }
 
 function filterWarningsForGitHub(
-  mode: "full" | "download-only",
   warnings: string[],
   integrity: IntegrityOutput,
 ): string[] {
-  if (mode !== "full") return warnings;
   if (Object.keys(integrity.listings).length === 0) return warnings;
 
   return warnings.filter((warning) => {
@@ -210,7 +208,7 @@ async function run(): Promise<void> {
   );
 
   if (process.env.GITHUB_OUTPUT) {
-    const warningsForGitHub = filterWarningsForGitHub(mode, warnings, integrity);
+    const warningsForGitHub = filterWarningsForGitHub(warnings, integrity);
     const suppressedWarnings = warnings.length - warningsForGitHub.length;
     if (suppressedWarnings > 0) {
       console.log(
