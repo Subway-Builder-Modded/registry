@@ -265,7 +265,10 @@ export async function inspectZipCompleteness(
       && configCityCode
       && registryCityCode !== configCityCode
     )
-      ? `registry city_code '${registryCityCode}' differs from config city_code '${configCityCode}'`
+      ? (
+        `registry city_code '${registryCityCode}' differs from config city_code '${configCityCode}' `
+        + `(registry expects '${registryCityCode}.pmtiles', config expects '${configCityCode}.pmtiles')`
+      )
       : null;
 
     return inspectMapZip(

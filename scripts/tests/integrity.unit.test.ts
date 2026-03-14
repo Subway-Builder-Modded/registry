@@ -61,6 +61,8 @@ test("map integrity uses config city_code for pmtiles and warns on registry mism
   assert.equal(result.isComplete, true);
   assert.ok(result.warnings.some((warning) => warning.includes("registry city_code 'REG'")));
   assert.ok(result.warnings.some((warning) => warning.includes("config city_code 'CFG'")));
+  assert.ok(result.warnings.some((warning) => warning.includes("REG.pmtiles")));
+  assert.ok(result.warnings.some((warning) => warning.includes("CFG.pmtiles")));
 });
 
 test("map integrity enforces pmtiles using config city_code when present", async () => {
