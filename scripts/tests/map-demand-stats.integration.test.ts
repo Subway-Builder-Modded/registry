@@ -31,7 +31,7 @@ async function makeDemandZip(residents: number[]): Promise<Buffer> {
   const popsMap: Record<string, { size: number }> = {};
   residents.forEach((value, index) => {
     points[`pt${index + 1}`] = { residents: value };
-    popsMap[`pop${index + 1}`] = { size: 1 };
+    popsMap[`pop${index + 1}`] = { size: value };
   });
   const payload = { points, pops_map: popsMap };
   const zip = new JSZip();

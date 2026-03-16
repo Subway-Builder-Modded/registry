@@ -16,6 +16,11 @@ export interface DemandStats {
   points_count: number;
   population_count: number;
 }
+interface ParsedDemandDataPayloadResult {
+  stats: DemandStats;
+  residentsTotalByPoint: number;
+  residentsTotalByPop: number;
+}
 
 export interface GenerateMapDemandStatsOptions {
   repoRoot: string;
@@ -310,7 +315,7 @@ function getDemandPointRef(pointValue: unknown, fallbackRef: string): string {
   return fallbackRef;
 }
 
-function parseDemandDataPayload(payload: unknown): DemandStats {
+function parseDemandDataPayload(payload: unknown): ParsedDemandDataPayloadResult {
   if (!isObject(payload)) {
     throw new Error("demand data payload must be an object");
   }
@@ -327,6 +332,7 @@ function parseDemandDataPayload(payload: unknown): DemandStats {
   }
 
   const popSizeById = new Map<string, number>();
+  let residentsTotalByPop = 0;
   const popEntries = Array.isArray(popsMap)
     ? popsMap.map((popValue, index) => [String(index), popValue] as const)
     : Object.entries(popsMap);
@@ -342,11 +348,14 @@ function parseDemandDataPayload(payload: unknown): DemandStats {
     if (size !== undefined && size < 0) {
       throw new Error(`population entry '${popRef}' has negative size value`);
     }
+    if (size !== undefined) {
+      residentsTotalByPop += size;
+    }
     if (!popId || size === undefined) continue;
     popSizeById.set(popId, size);
   }
 
-  let residentsTotal = 0;
+  let residentsTotalByPoint = 0;
   const pointEntries = Array.isArray(points)
     ? points.map((pointValue, index) => [`index ${index}`, pointValue] as const)
     : Object.entries(points);
@@ -383,13 +392,19 @@ function parseDemandDataPayload(payload: unknown): DemandStats {
     if (residents < 0) {
       throw new Error(`demand point '${pointRef}' has negative residents value`);
     }
-    residentsTotal += residents;
+    residentsTotalByPoint += residents;
   }
 
+  const residentsTotal = Math.min(residentsTotalByPoint, residentsTotalByPop);
+
   return {
-    residents_total: residentsTotal,
-    points_count: Array.isArray(points) ? points.length : Object.keys(points).length,
-    population_count: Array.isArray(popsMap) ? popsMap.length : Object.keys(popsMap).length,
+    stats: {
+      residents_total: residentsTotal,
+      points_count: Array.isArray(points) ? points.length : Object.keys(points).length,
+      population_count: Array.isArray(popsMap) ? popsMap.length : Object.keys(popsMap).length,
+    },
+    residentsTotalByPoint,
+    residentsTotalByPop,
   };
 }
 
@@ -496,6 +511,7 @@ function shouldSkipUnchanged(
 export async function extractDemandStatsFromZipBuffer(
   listingId: string,
   zipBuffer: Buffer,
+  warnings?: string[],
 ): Promise<DemandStats> {
   let zip: JSZip;
   try {
@@ -528,7 +544,16 @@ export async function extractDemandStatsFromZipBuffer(
     throw new Error(`listing=${listingId}: demand data file is not valid JSON`);
   }
 
-  return parseDemandDataPayload(payload);
+  const parsed = parseDemandDataPayload(payload);
+  if (parsed.residentsTotalByPoint !== parsed.residentsTotalByPop && warnings) {
+    warnListing(
+      warnings,
+      listingId,
+      `resident totals differ (points=${parsed.residentsTotalByPoint}, pops=${parsed.residentsTotalByPop}, delta=${parsed.residentsTotalByPoint - parsed.residentsTotalByPop}); using minimum=${parsed.stats.residents_total}`,
+    );
+  }
+
+  return parsed.stats;
 }
 
 async function resolveZipUrlForMapSource(
@@ -578,7 +603,11 @@ export async function resolveAndExtractDemandStatsForMapSource(
     throw new Error(warnings[0] ?? `listing=${listingId}: failed to fetch map ZIP`);
   }
 
-  return extractDemandStatsFromZipBuffer(listingId, zipBuffer);
+  const stats = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, warnings);
+  for (const warning of warnings) {
+    console.warn(`[map-demand-stats] ${warning}`);
+  }
+  return stats;
 }
 
 export async function generateMapDemandStats(
@@ -708,7 +737,7 @@ export async function generateMapDemandStats(
 
     let stats: DemandStats;
     try {
-      stats = await extractDemandStatsFromZipBuffer(id, zipBuffer);
+      stats = await extractDemandStatsFromZipBuffer(id, zipBuffer, warnings);
     } catch (error) {
       warnListing(warnings, id, String((error as Error).message));
       skippedMaps += 1;

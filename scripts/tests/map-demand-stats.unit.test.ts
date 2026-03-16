@@ -15,11 +15,12 @@ test("extractDemandStatsFromZipBuffer parses demand_data.json", async () => {
     points: {
       a: { residents: 10, jobs: 1 },
       b: { residents: 15, jobs: 2 },
+      c: { residents: 5, jobs: 0 },
     },
     pops_map: {
-      p1: { size: 1 },
-      p2: { size: 1 },
-      p3: { size: 1 },
+      p1: { size: 10 },
+      p2: { size: 15 },
+      p3: { size: 5 },
     },
   };
 
@@ -27,8 +28,8 @@ test("extractDemandStatsFromZipBuffer parses demand_data.json", async () => {
   const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
 
   assert.deepEqual(stats, {
-    residents_total: 25,
-    points_count: 2,
+    residents_total: 30,
+    points_count: 3,
     population_count: 3,
   });
 });
@@ -41,7 +42,9 @@ test("extractDemandStatsFromZipBuffer parses demand_data.json.gz", async () => {
       c: { residents: 9 },
     },
     pops_map: {
-      p1: { size: 1 },
+      p1: { size: 7 },
+      p2: { size: 8 },
+      p3: { size: 9 },
     },
   };
 
@@ -52,8 +55,34 @@ test("extractDemandStatsFromZipBuffer parses demand_data.json.gz", async () => {
   assert.deepEqual(stats, {
     residents_total: 24,
     points_count: 3,
-    population_count: 1,
+    population_count: 3,
   });
+});
+
+test("extractDemandStatsFromZipBuffer warns and uses minimum when point/pop totals differ", async () => {
+  const payload = {
+    points: {
+      a: { residents: 100 },
+      b: { residents: 50 },
+    },
+    pops_map: {
+      p1: { size: 40 },
+      p2: { size: 30 },
+    },
+  };
+
+  const warnings: string[] = [];
+  const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
+  const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer, warnings);
+
+  assert.deepEqual(stats, {
+    residents_total: 70,
+    points_count: 2,
+    population_count: 2,
+  });
+  assert.equal(warnings.length, 1);
+  assert.match(warnings[0], /resident totals differ/);
+  assert.match(warnings[0], /using minimum=70/);
 });
 
 test("extractDemandStatsFromZipBuffer derives residents from popIds when residents is missing", async () => {
