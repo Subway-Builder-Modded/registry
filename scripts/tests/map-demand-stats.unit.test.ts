@@ -73,7 +73,7 @@ test("extractDemandStatsFromZipBuffer warns and uses minimum when point/pop tota
 
   const warnings: string[] = [];
   const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
-  const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer, warnings);
+  const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer, { warnings });
 
   assert.deepEqual(stats, {
     residents_total: 70,
@@ -83,6 +83,25 @@ test("extractDemandStatsFromZipBuffer warns and uses minimum when point/pop tota
   assert.equal(warnings.length, 1);
   assert.match(warnings[0], /resident totals differ/);
   assert.match(warnings[0], /using minimum=70/);
+});
+
+test("extractDemandStatsFromZipBuffer rejects mismatched residents totals when strict mode is enabled", async () => {
+  const payload = {
+    points: {
+      a: { residents: 100 },
+      b: { residents: 50 },
+    },
+    pops_map: {
+      p1: { size: 40 },
+      p2: { size: 30 },
+    },
+  };
+
+  const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
+  await assert.rejects(
+    extractDemandStatsFromZipBuffer("sample-map", zipBuffer, { requireResidentTotalsMatch: true }),
+    /resident totals mismatch/,
+  );
 });
 
 test("extractDemandStatsFromZipBuffer derives residents from popIds when residents is missing", async () => {

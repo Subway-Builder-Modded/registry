@@ -182,7 +182,10 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
         parsed.data["update-type"] === "GitHub Releases"
           ? { type: "github", repo: parsed.data["github-repo"] as string }
           : { type: "custom", url: parsed.data["custom-update-url"] as string },
-        { token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN },
+        {
+          token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
+          requireResidentTotalsMatch: true,
+        },
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);

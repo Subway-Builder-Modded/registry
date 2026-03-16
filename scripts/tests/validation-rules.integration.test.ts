@@ -141,3 +141,37 @@ test("publish validation rejects map demand data with negative population size",
   const output = readValidationError();
   assert.match(output, /\*\*demand_data\*\*: population entry 'pop-1329' has negative size value/);
 });
+
+test("publish validation rejects map demand data when point/pop resident totals mismatch", async () => {
+  const zipUrl = await makeZipDataUrl({
+    points: [{ id: "p1", residents: 10 }, { id: "p2", residents: 15 }],
+    pops: [{ id: "pop-1", size: 8 }, { id: "pop-2", size: 9 }],
+  });
+  const customUpdateJson = {
+    schema_version: 1,
+    versions: [
+      {
+        version: "1.0.0",
+        game_version: "1.0.0",
+        date: "2026-03-12",
+        download: zipUrl,
+        sha256: "deadbeef",
+      },
+    ],
+  };
+  const customUpdateUrl = `data:application/json,${encodeURIComponent(JSON.stringify(customUpdateJson))}`;
+  const issue = basePublishMapIssue({
+    "update-type": "Custom URL",
+    "custom-update-url": customUpdateUrl,
+  });
+  delete issue["github-repo"];
+
+  const result = runScript("validate-publish", {
+    LISTING_TYPE: "map",
+    ISSUE_JSON: JSON.stringify(issue),
+  });
+
+  assert.notEqual(result.status, 0, "Validation should fail when residents totals mismatch");
+  const output = readValidationError();
+  assert.match(output, /\*\*demand_data\*\*: listing=.*resident totals mismatch/);
+});

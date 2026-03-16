@@ -16,6 +16,11 @@ export interface DemandStats {
   points_count: number;
   population_count: number;
 }
+
+interface ExtractDemandStatsOptions {
+  warnings?: string[];
+  requireResidentTotalsMatch?: boolean;
+}
 interface ParsedDemandDataPayloadResult {
   stats: DemandStats;
   residentsTotalByPoint: number;
@@ -511,8 +516,10 @@ function shouldSkipUnchanged(
 export async function extractDemandStatsFromZipBuffer(
   listingId: string,
   zipBuffer: Buffer,
-  warnings?: string[],
+  options: ExtractDemandStatsOptions = {},
 ): Promise<DemandStats> {
+  const warnings = options.warnings;
+  const requireResidentTotalsMatch = options.requireResidentTotalsMatch === true;
   let zip: JSZip;
   try {
     zip = await JSZip.loadAsync(zipBuffer);
@@ -545,12 +552,20 @@ export async function extractDemandStatsFromZipBuffer(
   }
 
   const parsed = parseDemandDataPayload(payload);
-  if (parsed.residentsTotalByPoint !== parsed.residentsTotalByPop && warnings) {
-    warnListing(
-      warnings,
-      listingId,
-      `resident totals differ (points=${parsed.residentsTotalByPoint}, pops=${parsed.residentsTotalByPop}, delta=${parsed.residentsTotalByPoint - parsed.residentsTotalByPop}); using minimum=${parsed.stats.residents_total}`,
-    );
+  if (parsed.residentsTotalByPoint !== parsed.residentsTotalByPop) {
+    const delta = parsed.residentsTotalByPoint - parsed.residentsTotalByPop;
+    if (requireResidentTotalsMatch) {
+      throw new Error(
+        `listing=${listingId}: resident totals mismatch (points=${parsed.residentsTotalByPoint}, pops=${parsed.residentsTotalByPop}, delta=${delta})`,
+      );
+    }
+    if (warnings) {
+      warnListing(
+        warnings,
+        listingId,
+        `resident totals differ (points=${parsed.residentsTotalByPoint}, pops=${parsed.residentsTotalByPop}, delta=${delta}); using minimum=${parsed.stats.residents_total}`,
+      );
+    }
   }
 
   return parsed.stats;
@@ -583,6 +598,7 @@ export async function resolveAndExtractDemandStatsForMapSource(
   options: {
     fetchImpl?: typeof fetch;
     token?: string;
+    requireResidentTotalsMatch?: boolean;
   } = {},
 ): Promise<DemandStats> {
   const warnings: string[] = [];
@@ -603,7 +619,10 @@ export async function resolveAndExtractDemandStatsForMapSource(
     throw new Error(warnings[0] ?? `listing=${listingId}: failed to fetch map ZIP`);
   }
 
-  const stats = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, warnings);
+  const stats = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, {
+    warnings,
+    requireResidentTotalsMatch: options.requireResidentTotalsMatch,
+  });
   for (const warning of warnings) {
     console.warn(`[map-demand-stats] ${warning}`);
   }
@@ -737,7 +756,7 @@ export async function generateMapDemandStats(
 
     let stats: DemandStats;
     try {
-      stats = await extractDemandStatsFromZipBuffer(id, zipBuffer, warnings);
+      stats = await extractDemandStatsFromZipBuffer(id, zipBuffer, { warnings });
     } catch (error) {
       warnListing(warnings, id, String((error as Error).message));
       skippedMaps += 1;

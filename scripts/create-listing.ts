@@ -69,7 +69,10 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
   const demandStats = await resolveAndExtractDemandStatsForMapSource(
     String(data["map-id"]),
     update,
-    { token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN },
+    {
+      token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
+      requireResidentTotalsMatch: true,
+    },
   );
 
   return {
