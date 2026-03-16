@@ -187,6 +187,168 @@ test("generateMapDemandStats updates manifests for github/custom install targets
   }
 });
 
+test("generateMapDemandStats chooses latest semver custom version (not versions[0])", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-custom-latest-"));
+  mkdirSync(join(repoRoot, "maps"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "custom-latest-map"), { recursive: true });
+
+  writeJson(join(repoRoot, "maps", "index.json"), {
+    schema_version: 1,
+    maps: ["custom-latest-map"],
+  });
+
+  writeJson(join(repoRoot, "maps", "custom-latest-map", "manifest.json"), {
+    schema_version: 1,
+    id: "custom-latest-map",
+    name: "Custom Latest",
+    author: "test",
+    github_id: 1,
+    description: "desc",
+    tags: ["europe"],
+    gallery: ["gallery/a.png"],
+    source: "https://example.com/source",
+    update: { type: "custom", url: "https://example.com/custom-latest-update.json" },
+    city_code: "CLAT",
+    country: "US",
+    population: 0,
+    residents_total: 0,
+    points_count: 0,
+    population_count: 0,
+    data_source: "LODES",
+    source_quality: "medium-quality",
+    level_of_detail: "medium-detail",
+    location: "europe",
+    special_demand: [],
+  });
+
+  const latestZip = await makeDemandZip([10, 20, 30]);
+  let oldZipFetchCount = 0;
+
+  const fetchMock = makeFetchRouter([
+    {
+      match: (url) => url === "https://example.com/custom-latest-update.json",
+      handle: () => new Response(JSON.stringify({
+        schema_version: 1,
+        versions: [
+          {
+            version: "0.1.0",
+            download: "https://downloads.example.com/custom-latest-old.zip",
+          },
+          {
+            version: "1.2.0",
+            download: "https://downloads.example.com/custom-latest-new.zip",
+          },
+        ],
+      })),
+    },
+    {
+      match: (url) => url === "https://downloads.example.com/custom-latest-old.zip",
+      handle: () => {
+        oldZipFetchCount += 1;
+        return new Response("not-a-zip");
+      },
+    },
+    {
+      match: (url) => url === "https://downloads.example.com/custom-latest-new.zip",
+      handle: () => new Response(new Uint8Array(latestZip)),
+    },
+  ]);
+
+  try {
+    const result = await generateMapDemandStats({
+      repoRoot,
+      fetchImpl: fetchMock,
+    });
+
+    assert.equal(result.processedMaps, 1);
+    assert.equal(result.updatedMaps, 1);
+    assert.equal(result.skippedMaps, 0);
+    assert.equal(result.extractionFailures, 0);
+    assert.equal(oldZipFetchCount, 0);
+
+    const manifest = JSON.parse(readFileSync(join(repoRoot, "maps", "custom-latest-map", "manifest.json"), "utf-8"));
+    assert.equal(manifest.population, 60);
+    assert.equal(manifest.residents_total, 60);
+    assert.equal(manifest.points_count, 3);
+    assert.equal(manifest.population_count, 3);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("generateMapDemandStats warns when fetched custom payload is not a ZIP", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-nonzip-"));
+  mkdirSync(join(repoRoot, "maps"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "nonzip-map"), { recursive: true });
+
+  writeJson(join(repoRoot, "maps", "index.json"), {
+    schema_version: 1,
+    maps: ["nonzip-map"],
+  });
+
+  writeJson(join(repoRoot, "maps", "nonzip-map", "manifest.json"), {
+    schema_version: 1,
+    id: "nonzip-map",
+    name: "Nonzip",
+    author: "test",
+    github_id: 1,
+    description: "desc",
+    tags: ["europe"],
+    gallery: ["gallery/a.png"],
+    source: "https://example.com/source",
+    update: { type: "custom", url: "https://example.com/nonzip-update.json" },
+    city_code: "NZIP",
+    country: "US",
+    population: 9,
+    residents_total: 9,
+    points_count: 1,
+    population_count: 9,
+    data_source: "LODES",
+    source_quality: "medium-quality",
+    level_of_detail: "medium-detail",
+    location: "europe",
+    special_demand: [],
+  });
+
+  const fetchMock = makeFetchRouter([
+    {
+      match: (url) => url === "https://example.com/nonzip-update.json",
+      handle: () => new Response(JSON.stringify({
+        schema_version: 1,
+        versions: [
+          {
+            version: "1.0.0",
+            download: "https://downloads.example.com/nonzip-map.zip",
+          },
+        ],
+      })),
+    },
+    {
+      match: (url) => url === "https://downloads.example.com/nonzip-map.zip",
+      handle: () => new Response("not-a-zip", {
+        headers: { "content-type": "text/plain" },
+      }),
+    },
+  ]);
+
+  try {
+    const result = await generateMapDemandStats({
+      repoRoot,
+      fetchImpl: fetchMock,
+    });
+
+    assert.equal(result.processedMaps, 1);
+    assert.equal(result.updatedMaps, 0);
+    assert.equal(result.skippedMaps, 1);
+    assert.equal(result.extractionFailures, 1);
+    assert.ok(
+      result.warnings.some((warning) => warning.includes("nonzip-map") && warning.includes("not a ZIP")),
+    );
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
 test("generateMapDemandStats skips failed maps and keeps existing manifests", async () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-skip-"));
   mkdirSync(join(repoRoot, "maps"), { recursive: true });

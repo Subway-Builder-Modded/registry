@@ -3,7 +3,12 @@ import { gunzipSync } from "node:zlib";
 import { resolve } from "node:path";
 import JSZip from "jszip";
 import type { MapManifest } from "./manifests.js";
-import { createGraphqlUsageState, fetchRepoReleaseIndexes, graphqlUsageSnapshot } from "./release-resolution.js";
+import {
+  createGraphqlUsageState,
+  fetchRepoReleaseIndexes,
+  graphqlUsageSnapshot,
+  isSupportedReleaseTag,
+} from "./release-resolution.js";
 import { fetchWithTimeout, resolveTimeoutMsFromEnv } from "./http.js";
 
 export interface DemandStats {
@@ -61,6 +66,22 @@ const CACHE_FILE_NAME = "demand-stats-cache.json";
 // upstream ZIP content may change without a fingerprint change.
 const UNCHANGED_SKIP_WINDOW_MS = 9 * 60 * 60 * 1000;
 const MAP_DEMAND_FETCH_TIMEOUT_MS = resolveTimeoutMsFromEnv("REGISTRY_FETCH_TIMEOUT_MS", 45_000);
+
+function semverParts(value: string): [number, number, number] | null {
+  const match = value.match(/^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
+  if (!match) return null;
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+function compareSemverDescending(a: string, b: string): number {
+  const pa = semverParts(a);
+  const pb = semverParts(b);
+  if (!pa || !pb) return b.localeCompare(a);
+  if (pa[0] !== pb[0]) return pb[0] - pa[0];
+  if (pa[1] !== pb[1]) return pb[1] - pa[1];
+  if (pa[2] !== pb[2]) return pb[2] - pa[2];
+  return b.localeCompare(a);
+}
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf-8")) as T;
@@ -138,17 +159,32 @@ async function fetchCustomInstallTargetZipUrl(
     return null;
   }
 
-  const firstVersion = versions[0];
-  if (!isObject(firstVersion) || typeof firstVersion.download !== "string" || firstVersion.download.trim() === "") {
-    warnListing(warnings, listingId, "custom update JSON first version missing download URL");
+  const candidates = versions
+    .filter((entry): entry is JsonObject => isObject(entry))
+    .map((entry) => {
+      const download = typeof entry.download === "string" ? entry.download.trim() : "";
+      const version = typeof entry.version === "string" ? entry.version.trim() : "";
+      const sha256 = typeof entry.sha256 === "string" ? entry.sha256.trim() : "";
+      return {
+        download,
+        version,
+        sha256,
+      };
+    })
+    .filter((entry) => entry.download !== "");
+
+  if (candidates.length === 0) {
+    warnListing(warnings, listingId, "custom update JSON has no version entry with download URL");
     return null;
   }
 
-  const download = firstVersion.download.trim();
-  const sha256 = typeof firstVersion.sha256 === "string" && firstVersion.sha256.trim() !== ""
-    ? firstVersion.sha256.trim()
-    : null;
-  const version = typeof firstVersion.version === "string" ? firstVersion.version.trim() : "";
+  const semverCandidates = candidates
+    .filter((candidate) => candidate.version !== "" && isSupportedReleaseTag(candidate.version))
+    .sort((a, b) => compareSemverDescending(a.version, b.version));
+  const chosen = semverCandidates.length > 0 ? semverCandidates[0] : candidates[0];
+  const download = chosen.download;
+  const version = chosen.version;
+  const sha256 = chosen.sha256 !== "" ? chosen.sha256 : null;
 
   return {
     zipUrl: download,
@@ -223,7 +259,23 @@ async function fetchZipBuffer(
 
   try {
     const bytes = await response.arrayBuffer();
-    return Buffer.from(bytes);
+    const buffer = Buffer.from(bytes);
+    const signature = buffer.subarray(0, 4).toString("hex");
+    const looksLikeZip = (
+      signature === "504b0304"
+      || signature === "504b0506"
+      || signature === "504b0708"
+    );
+    if (!looksLikeZip) {
+      const contentType = response.headers.get("content-type") ?? "unknown";
+      warnListing(
+        warnings,
+        listingId,
+        `fetched payload is not a ZIP (content-type '${contentType}', first-bytes '${signature}', url '${response.url || zipUrl}')`,
+      );
+      return null;
+    }
+    return buffer;
   } catch {
     warnListing(warnings, listingId, "failed to read map ZIP response body");
     return null;
