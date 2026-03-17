@@ -59,8 +59,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh pr review "${{ steps.create_pr.outputs.pull-request-number }}" --approve \
-            || echo "Could not auto-approve (ensure 'Allow GitHub Actions to create and approve pull requests' is enabled)."
           gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}" --auto --squash \
             || echo "Could not enable auto-merge (auto-merge may be disabled or blocked by branch rules)."
 
