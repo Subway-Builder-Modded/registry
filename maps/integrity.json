@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-17T01:46:53.711Z",
+  "generated_at": "2026-03-17T04:48:23.269Z",
   "listings": {
     "amsterdam": {
       "has_complete_version": true,
       "latest_semver_version": "1.2.0",
-      "latest_semver_complete": false,
+      "latest_semver_complete": true,
       "complete_versions": [
+        "1.2.0",
         "1.0.0"
       ],
       "incomplete_versions": [
-        "1.2.0",
         "1.1.0"
       ],
       "versions": {
@@ -75,17 +75,15 @@
           "checked_at": "2026-03-16T21:09:38.716Z"
         },
         "1.2.0": {
-          "is_complete": false,
-          "errors": [
-            "missing top-level AMS.pmtiles (config code 'AMS', registry city_code 'AMS')"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
-            "city_pmtiles": false
+            "city_pmtiles": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -93,17 +91,17 @@
             "buildings_index": "buildings_index.json",
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
-            "city_pmtiles": null
+            "city_pmtiles": "AMS.pmtiles"
           },
           "source": {
             "update_type": "custom",
             "repo": "ryandicicco/subway-builder-maps",
             "tag": "v1.2.0",
-            "asset_name": "AMS_v120.zip",
-            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.2.0/AMS_v120.zip"
+            "asset_name": "AMS_v120_full.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.2.0/AMS_v120_full.zip"
           },
-          "fingerprint": "rules:v2:sha256:8de5a34bd3d70bf5564f172ff48a4fd9cdbf416630df15fd08a850637e604900",
-          "checked_at": "2026-03-17T00:38:35.656Z"
+          "fingerprint": "rules:v2:sha256:c9fd2cca033d35a5617fe2a41543cb2a9cddaea464908545de83ec7fcc308aaf",
+          "checked_at": "2026-03-17T04:48:23.269Z"
         }
       }
     },
@@ -223,7 +221,7 @@
             "download_url": "https://github.com/Valdotorium/Railyard-Maps-2/releases/download/v0.1.1/BER.zip"
           },
           "fingerprint": "rules:v2:sha256:fbd63062283da4b746b79798e6909818abe776fb2be7b6aac96289970f9fa68c",
-          "checked_at": "2026-03-16T18:01:15.011Z"
+          "checked_at": "2026-03-17T04:48:23.269Z"
         }
       }
     },
@@ -2056,7 +2054,7 @@
             "download_url": "https://github.com/Valdotorium/Railyard-Maps-2/releases/download/v0.1.1/SIN.zip"
           },
           "fingerprint": "rules:v2:sha256:12878f405a49d47e51726d0a80144fa89fa41d92707b94557e8141ab2f94d88a",
-          "checked_at": "2026-03-16T18:01:15.011Z"
+          "checked_at": "2026-03-17T04:48:23.269Z"
         }
       }
     },
@@ -2306,7 +2304,7 @@
             "download_url": "https://github.com/Valdotorium/Railyard-Maps-2/releases/download/v0.1.1/TRD.zip"
           },
           "fingerprint": "rules:v2:sha256:465a6d00ac0e3744606b2f9131427aa28f5e403f7bf1f68427d1e335528d1343",
-          "checked_at": "2026-03-16T18:56:00.059Z"
+          "checked_at": "2026-03-17T04:48:23.269Z"
         }
       }
     },
@@ -2456,7 +2454,7 @@
             "download_url": "https://github.com/Valdotorium/Railyard-Maps-2/releases/download/v0.1.1/WAW.zip"
           },
           "fingerprint": "rules:v2:sha256:a59ed8bfabc4a1e789e4a254f09e3a43d54d951ced98c6a3980b0df98cae5dea",
-          "checked_at": "2026-03-16T18:56:00.059Z"
+          "checked_at": "2026-03-17T04:48:23.269Z"
         }
       }
     },
