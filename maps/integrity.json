@@ -1,30 +1,44 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-17T17:39:52.288Z",
+  "generated_at": "2026-03-17T18:55:55.179Z",
   "listings": {
     "albany": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "1.0.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
+      "latest_semver_complete": true,
+      "complete_versions": [
         "1.0.0"
       ],
+      "incomplete_versions": [],
       "versions": {
         "1.0.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'Albany-Railyard.zip': missing top-level BNA.pmtiles (config code 'BNA', registry city_code 'ALB')"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ALB.pmtiles"
+          },
           "source": {
             "update_type": "github",
             "repo": "soccerjonj/albany",
-            "tag": "1.0.0"
+            "tag": "1.0.0",
+            "asset_name": "Albany-Railway.zip",
+            "download_url": "https://github.com/soccerjonj/Albany/releases/download/1.0.0/Albany-Railway.zip"
           },
-          "fingerprint": "rules:v2:github:soccerjonj/albany:1.0.0:Albany-Railyard.zip",
-          "checked_at": "2026-03-17T17:39:52.288Z"
+          "fingerprint": "rules:v2:github:soccerjonj/albany:1.0.0:Albany-Railway.zip",
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -67,7 +81,7 @@
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.0/AMS.zip"
           },
           "fingerprint": "rules:v2:sha256:f3ce3c41fa2e1e3c4d02f7f53a07362ae0f3a85b968782a989cddb1cc0fc0f96",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.0": {
           "is_complete": false,
@@ -167,7 +181,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/DCA.zip"
           },
           "fingerprint": "rules:v2:sha256:d153a2fd8469ec820082f13a4891030872e3656dd6f5b4bbaa0d30e6874632aa",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -207,7 +221,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.1.0/BAR.zip"
           },
           "fingerprint": "rules:v2:sha256:fbe628e9901eb82cfb0a97c595e00ef02631951e2d9cb1d19947ab23a20a69c9",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -287,7 +301,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.0.0/BOL.zip"
           },
           "fingerprint": "rules:v2:sha256:01780884c4c890ebfbaee6bd1395baa93bc35553c65ee1c0c002c9f740d010b1",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -328,7 +342,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/CGY.zip"
           },
           "fingerprint": "rules:v2:sha256:e7e99a91478887748b873cf4b2a5780b076e6dff136883dbbc1224fd2bf124df",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.3": {
           "is_complete": true,
@@ -357,7 +371,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YYC.zip"
           },
           "fingerprint": "rules:v2:sha256:147f4a279196a0b4d325335fa17644ca4a5612c581e7ccacb6ba1f33d0209cde",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -397,7 +411,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.1.0/CAT.zip"
           },
           "fingerprint": "rules:v2:sha256:1225725bebdbd10d01fe58ec72c7ab734f576d2df5da7753789ed8d386bfadf1",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -437,7 +451,7 @@
             "download_url": "https://github.com/soccerjonj/Colorado-Ski-Country/releases/download/1.0.0/Colorado-Ski-Country-Railway.zip"
           },
           "fingerprint": "rules:v2:github:soccerjonj/colorado-ski-country:1.0.0:Colorado-Ski-Country-Railway.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -478,7 +492,7 @@
             "download_url": "https://github.com/Kronifer/sb-dublin-map/releases/download/v1.0.0/dublin.zip"
           },
           "fingerprint": "rules:v2:github:kronifer/sb-dublin-map:v1.0.0:dublin.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "v1.1.0": {
           "is_complete": true,
@@ -507,7 +521,7 @@
             "download_url": "https://github.com/Kronifer/sb-dublin-map/releases/download/v1.1.0/DUB.zip"
           },
           "fingerprint": "rules:v2:github:kronifer/sb-dublin-map:v1.1.0:DUB.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -548,7 +562,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/EDM.zip"
           },
           "fingerprint": "rules:v2:sha256:149b449642ecd453598be4cf9bbe7268e09545d58ab025de08bbac42c9e5d8c3",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.3": {
           "is_complete": true,
@@ -577,7 +591,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YEG.zip"
           },
           "fingerprint": "rules:v2:sha256:eb0f18d3e3241f40a99bb2d26e5bcb5ea2d4ac43c86a0dd91f237b53658085f2",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -617,7 +631,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.0.0/FIR.zip"
           },
           "fingerprint": "rules:v2:sha256:158a6bd6aa81804632bddaf1e9a50b82d4ab4bb62bab724bb6a306e2f4c82871",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -697,7 +711,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.1.0/GEN.zip"
           },
           "fingerprint": "rules:v2:sha256:326e921c811647ae6bce1c7a6aefef2a1e7f1df4ebb56b5eb568a5eefca0b951",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -737,7 +751,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/BWI.zip"
           },
           "fingerprint": "rules:v2:sha256:83309c193d6a7782a38a280d51aab996bfecd9665fe1d358c80e1b0e3d8ad5e2",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -777,7 +791,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/LAX.zip"
           },
           "fingerprint": "rules:v2:sha256:c50d68b569eb0edade342fd17d96f6e636be93e0697dee8de39601836a67719a",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -817,7 +831,7 @@
             "download_url": "https://github.com/DanielD1909/improvedTwinCities/releases/download/v1.0.0/KMSP.zip"
           },
           "fingerprint": "rules:v2:github:danield1909/improvedtwincities:v1.0.0:KMSP.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -857,7 +871,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/JAX.zip"
           },
           "fingerprint": "rules:v2:sha256:a2dcc37a08f5a857ed92f45f8e45332d7c30e052cead007299cc2b8ddca83795",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -886,7 +900,7 @@
             "tag": "v0.2.0"
           },
           "fingerprint": "rules:v2:github:barkuperman/jerusalem-sb-map:v0.2.0:JLM.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "v0.3.0": {
           "is_complete": false,
@@ -901,7 +915,7 @@
             "tag": "v0.3.0"
           },
           "fingerprint": "rules:v2:github:barkuperman/jerusalem-sb-map:v0.3.0:JLM.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "v0.3.1": {
           "is_complete": true,
@@ -930,7 +944,7 @@
             "download_url": "https://github.com/BarKuperman/jerusalem-sb-map/releases/download/v0.3.1/JER.zip"
           },
           "fingerprint": "rules:v2:github:barkuperman/jerusalem-sb-map:v0.3.1:JER.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -970,7 +984,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/KNOX.zip"
           },
           "fingerprint": "rules:v2:sha256:31d89963dfb04413e548b493ff0fb4a326215071832077e7c2cb96d8978ef59c",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1010,7 +1024,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/LAXM.zip"
           },
           "fingerprint": "rules:v2:sha256:d09cfce8d8757496ae1c334979fc47d4ec9e4873795c58cab7101cb002ed98d6",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1050,7 +1064,7 @@
             "download_url": "https://github.com/soccerjonj/Louisville/releases/download/1.0.0/Louisville-Railyard.zip"
           },
           "fingerprint": "rules:v2:github:soccerjonj/louisville:1.0.0:Louisville-Railyard.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1090,7 +1104,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/MEM.zip"
           },
           "fingerprint": "rules:v2:sha256:87d8f1440c45def305cb017f6c7f4875d15f00014c5bb4700f16ede557162bed",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1130,7 +1144,7 @@
             "download_url": "https://github.com/crumpetime/sb-maps-orf/releases/download/1.0.0/ORF.zip"
           },
           "fingerprint": "rules:v2:github:crumpetime/sb-maps-orf:1.0.0:ORF.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1171,7 +1185,7 @@
             "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/0.3.0/HKG.zip"
           },
           "fingerprint": "rules:v2:github:crumpetime/sb-maps-hkg:0.3.0:HKG.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.4.0": {
           "is_complete": true,
@@ -1200,7 +1214,7 @@
             "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/0.4.0/HKG.zip"
           },
           "fingerprint": "rules:v2:github:crumpetime/sb-maps-hkg:0.4.0:HKG.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "railyard": {
           "is_complete": false,
@@ -1215,7 +1229,7 @@
             "tag": "railyard"
           },
           "fingerprint": "rules:v2:github:crumpetime/sb-maps-hkg:railyard:HKG.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1255,7 +1269,7 @@
             "download_url": "https://github.com/crumpetime/sb-maps-msn/releases/download/3.0.0/MSN.zip"
           },
           "fingerprint": "rules:v2:github:crumpetime/sb-maps-msn:3.0.0:MSN.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1295,7 +1309,7 @@
             "download_url": "https://github.com/crumpetime/sb-maps-xna/releases/download/1.0.0/XNA.zip"
           },
           "fingerprint": "rules:v2:github:crumpetime/sb-maps-xna:1.0.0:XNA.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1376,7 +1390,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/MON.zip"
           },
           "fingerprint": "rules:v2:sha256:86c47eb58306f8fe7eb5a55198ca7f8e2e69a20b61e441d18e93a2ec15b0979c",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.3": {
           "is_complete": true,
@@ -1405,7 +1419,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YUL.zip"
           },
           "fingerprint": "rules:v2:sha256:97a0f08ea48b9c1109b59a736212217593117c21486627bf997fc4575b9aac05",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1445,7 +1459,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.1.0/NAP.zip"
           },
           "fingerprint": "rules:v2:sha256:ba32780d4a528a87132ea8b8f7d0dcb8ff495b10e12a7398cfcaad6088358518",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1471,7 +1485,7 @@
             "tag": "1.0"
           },
           "fingerprint": "rules:v2:github:soccerjonj/nashville:1.0:no-zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "2.0.0": {
           "is_complete": true,
@@ -1500,7 +1514,7 @@
             "download_url": "https://github.com/soccerjonj/Nashville/releases/download/2.0.0/Nashville-Railway.zip"
           },
           "fingerprint": "rules:v2:github:soccerjonj/nashville:2.0.0:Nashville-Railway.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1540,7 +1554,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/OC.zip"
           },
           "fingerprint": "rules:v2:sha256:a0a71a638c41799b47f58471cbf6b2571bccda2d84ffd79f5ed55d2bedff63d5",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1580,7 +1594,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/MCO.zip"
           },
           "fingerprint": "rules:v2:sha256:a3e6897d1d89a1ef38a7d71b9e373bac3ee9a3f0c6f9e2e19bc6067c227d2275",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1621,7 +1635,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/OTT.zip"
           },
           "fingerprint": "rules:v2:sha256:58860a472fd840be1edb8aea229955e04f71a807fa7f15fc43b356c2a37da60d",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.3": {
           "is_complete": true,
@@ -1650,7 +1664,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YOW.zip"
           },
           "fingerprint": "rules:v2:sha256:1ad349318afe26e27eefcec044e4376cc6e72411730805781f08f5c8ea7180c5",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1690,7 +1704,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.0.0/PAL.zip"
           },
           "fingerprint": "rules:v2:sha256:802eb96c23ec0b7de0dd6a1e6f0172c38d075ddac462592465a8e7ac2757d397",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1730,7 +1744,7 @@
             "download_url": "https://github.com/soccerjonj/Providence/releases/download/1.0.0/Providence-Railyard.zip"
           },
           "fingerprint": "rules:v2:github:soccerjonj/providence:1.0.0:Providence-Railyard.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1771,7 +1785,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/QC.zip"
           },
           "fingerprint": "rules:v2:sha256:99653d4ae692af49a0761a37a535c39da02745739847975bf14faeeabd8f8673",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.3": {
           "is_complete": true,
@@ -1800,7 +1814,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YQB.zip"
           },
           "fingerprint": "rules:v2:sha256:5da6b99b25f7c33abc130963f89441b5b6c60d2a75a4e7552b0fe9759efac2fc",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1840,7 +1854,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/RIC.zip"
           },
           "fingerprint": "rules:v2:sha256:740281654ca081db1b326d2d7335c4069ed428d81e796db7fe3adaba3b9128ce",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1920,7 +1934,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/ROC.zip"
           },
           "fingerprint": "rules:v2:sha256:09f0d2f40418f60af2eea9c26935d83e9403f35d32fd99a22de49cab8d913ba2",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -1960,7 +1974,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.0.0/ROM.zip"
           },
           "fingerprint": "rules:v2:sha256:f31ea397cc04e9104e6331a10e8a396e75a6f5f9ef87f1dd018f796d4087e7f4",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2000,7 +2014,7 @@
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.1/RTM.zip"
           },
           "fingerprint": "rules:v2:sha256:881b595ea72c64aa42316aadb08f1d432b99af7c222eadb7e8fa92e7ad302333",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2040,7 +2054,7 @@
             "download_url": "https://github.com/soccerjonj/Sacramento/releases/download/1.0.0/Sacramento-Railyard.zip"
           },
           "fingerprint": "rules:v2:github:soccerjonj/sacramento:1.0.0:Sacramento-Railyard.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2080,7 +2094,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/SAT.zip"
           },
           "fingerprint": "rules:v2:sha256:78aeb78a801abaf5c9d6fcd7851d911539f946e82472bc3aee438be63e3b4b3e",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2120,7 +2134,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/SBA.zip"
           },
           "fingerprint": "rules:v2:sha256:8c7e15c5fa31e73dd3e9b40585fe41ae125d106bba0860a16039425ac7f3383e",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2200,7 +2214,7 @@
             "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/TPA.zip"
           },
           "fingerprint": "rules:v2:sha256:c5bdc340edfa2f4127d5911951c61e0d8a1bbeb365bec161c9ca0edf11608fcc",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2242,7 +2256,7 @@
             "download_url": "https://github.com/BarKuperman/TLV-mod/releases/download/v1.2.0/TLV.v1.2.zip"
           },
           "fingerprint": "rules:v2:github:barkuperman/tlv-mod:v1.2.0:TLV.v1.2.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "v1.3.0": {
           "is_complete": true,
@@ -2271,7 +2285,7 @@
             "download_url": "https://github.com/BarKuperman/TLV-mod/releases/download/v1.3.0/TLV.zip"
           },
           "fingerprint": "rules:v2:github:barkuperman/tlv-mod:v1.3.0:TLV.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "v2.0.0": {
           "is_complete": true,
@@ -2300,7 +2314,7 @@
             "download_url": "https://github.com/BarKuperman/TLV-mod/releases/download/v2.0.0/TLV.zip"
           },
           "fingerprint": "rules:v2:github:barkuperman/tlv-mod:v2.0.0:TLV.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2341,7 +2355,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/TOR.zip"
           },
           "fingerprint": "rules:v2:sha256:b05ec954c41305a78984b7ab89ea5eb4b8e7303f3e00330ed772b3ec77c36341",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.3": {
           "is_complete": true,
@@ -2370,7 +2384,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YYZ.zip"
           },
           "fingerprint": "rules:v2:sha256:3d5c457b599b4ee0565fdadb94ffe2ee4116eb6373159c15cc77d2add77a11a2",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2450,7 +2464,7 @@
             "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.0.0/TOR.zip"
           },
           "fingerprint": "rules:v2:sha256:22560682f5ae014c05dc26c33d38092eb39c49c19aa09c09aed3f1a271761b95",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2491,7 +2505,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/VAN.zip"
           },
           "fingerprint": "rules:v2:sha256:845ce1b80e4c4c18a68337e801752017518eeb08d235c92be19ff1f65961ee0a",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.3": {
           "is_complete": true,
@@ -2520,7 +2534,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YVR.zip"
           },
           "fingerprint": "rules:v2:sha256:47b36073c8dee7bca75d90358e17579db4664a33bd7928b4c3b5bd1abdfd0a1c",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2601,7 +2615,7 @@
             "download_url": "https://github.com/Kronifer/sb-waterloo-map/releases/download/1.0.0/YKF.zip"
           },
           "fingerprint": "rules:v2:github:kronifer/sb-waterloo-map:1.0.0:YKF.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.0.1": {
           "is_complete": true,
@@ -2630,7 +2644,7 @@
             "download_url": "https://github.com/Kronifer/sb-waterloo-map/releases/download/1.0.1/YKF.zip"
           },
           "fingerprint": "rules:v2:github:kronifer/sb-waterloo-map:1.0.1:YKF.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2671,7 +2685,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/WPG.zip"
           },
           "fingerprint": "rules:v2:sha256:e82dcc9b83ba529175f8810d0caa3c110a49debc2981613638e4a7ac614836d0",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "1.1.3": {
           "is_complete": true,
@@ -2700,7 +2714,7 @@
             "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YWG.zip"
           },
           "fingerprint": "rules:v2:sha256:aac872d7cd8a65ab69687e446b2be911e388e8fe89faf7a9601631eff19a0b29",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2741,7 +2755,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/FUK.zip"
           },
           "fingerprint": "rules:v2:sha256:67e9e47cb35100e00659c66ddba6b7fef86edf750f33ceaa5f7a1e21b7ddd717",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -2770,7 +2784,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/FUK.zip"
           },
           "fingerprint": "rules:v2:sha256:19dbe5fcf3d52d2dd9058fcafda108f1a191b2677c58416cd38914fca528729e",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2810,7 +2824,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/HKD.zip"
           },
           "fingerprint": "rules:v2:sha256:11109f43789f4a723f4d5b9452faf621bd3740401fe4a0ee54dd1a519278ec06",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2851,7 +2865,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/HIJ.zip"
           },
           "fingerprint": "rules:v2:sha256:108d0672fc073ec9fe070df48797ad76589ca5482e1ca8e5d40f246b4c72c9aa",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -2880,7 +2894,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/HIJ.zip"
           },
           "fingerprint": "rules:v2:sha256:11eadf4fb9cab9135c37328d6ddf8a78de1ed7989ea6feb81469cd6aaaf2bb8b",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2921,7 +2935,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/KOJ.zip"
           },
           "fingerprint": "rules:v2:sha256:718b1ce8fef18dfff9536fff34aaee2e35d63352644fdc176e9c300316172a29",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -2950,7 +2964,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/KOJ.zip"
           },
           "fingerprint": "rules:v2:sha256:2928c040d23ae7f749559f732a83e6340e1c8d446198eb58c393e425c3e9f58a",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -2991,7 +3005,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/KKJ.zip"
           },
           "fingerprint": "rules:v2:sha256:9bf190c32dee18a46ec201a0bb06a75a7b81faaa5909572747dd544551770bac",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3020,7 +3034,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/KKJ.zip"
           },
           "fingerprint": "rules:v2:sha256:d9337220ebf38dcfa07fb4e9f48521199d5c9a4fce49c6588d11901c76a10c34",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3061,7 +3075,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/UKB.zip"
           },
           "fingerprint": "rules:v2:sha256:12e4453bbe40190125dab98375bf9818609175b232c0e1a9e7f428aeb3a4d862",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3090,7 +3104,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/UKB.zip"
           },
           "fingerprint": "rules:v2:sha256:ad55da1e043182e3ef8f5ebee2e3a6a4c0df921c26bd7054c39e090b22061b70",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3131,7 +3145,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/KCZ.zip"
           },
           "fingerprint": "rules:v2:sha256:ee3397e2e3bf21419646f8a85f04e057f9351a7f9a9c0bb8ff5615d21d0e5dac",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3160,7 +3174,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/KCZ.zip"
           },
           "fingerprint": "rules:v2:sha256:0ef4f53487848c0d0e4be827207ca5a4195084f77d799142d271d0524c2b630a",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3201,7 +3215,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/UKY.zip"
           },
           "fingerprint": "rules:v2:sha256:9830c63800f79e518257275e7f0a35e8f09f406b36a73a5afe367751bbc18a3f",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3230,7 +3244,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/UKY.zip"
           },
           "fingerprint": "rules:v2:sha256:05ba9e7083d7e333b01453cd285b997f6480608fae570063927209431314b8b2",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3271,7 +3285,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/MYJ.zip"
           },
           "fingerprint": "rules:v2:sha256:d847f0d09982da320b2f61e737d85ad7ea8110ac36fe5cb1e42a0a463e2b79fe",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3300,7 +3314,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/MYJ.zip"
           },
           "fingerprint": "rules:v2:sha256:fd59a16efcca4478bdbb76b9e0068c8d7045f5be8dff8606d3521fe0680ed579",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3340,7 +3354,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/NGS.zip"
           },
           "fingerprint": "rules:v2:sha256:d360bd84af65d690af6911f52f5e73e50502f00d1f09808f0448ca3e1deae8bb",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3380,7 +3394,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/IZO.zip"
           },
           "fingerprint": "rules:v2:sha256:bfb2e32212e23cbe329dd0c5b28934a2f688ff54ec8fa99c7cbf79eb325ecf3c",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3421,7 +3435,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/KIJ.zip"
           },
           "fingerprint": "rules:v2:sha256:e537364b616ab7c3a4d8036956362dd5ac876173d33e9b2d6f61e1d9687e387b",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3450,7 +3464,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/KIJ.zip"
           },
           "fingerprint": "rules:v2:sha256:58fb5d62686173fda5b35f843cc56712f43c5a1623f4900c14d8919f5cb352d0",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3491,7 +3505,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/OKA.zip"
           },
           "fingerprint": "rules:v2:sha256:35e465e6ed9554625402695093b9d26b90a656704043d9fdedca430f4956bb8e",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3520,7 +3534,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/OKA.zip"
           },
           "fingerprint": "rules:v2:sha256:e94d7db5ed41c8a9ee18d10bd8bf4fcd8e69cdc2c2237ccbbb2e9049a92a5af8",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3561,7 +3575,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/SPK.zip"
           },
           "fingerprint": "rules:v2:sha256:be3813fa292cfd15df7f31fde978dca42cae7ce2e2401b440606e9e553dad0c3",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3590,7 +3604,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/SPK.zip"
           },
           "fingerprint": "rules:v2:sha256:30f1534400c12f52c8314a8632f44528e535062311f99abac7948c4d643eb6e4",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3631,7 +3645,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/SDJ.zip"
           },
           "fingerprint": "rules:v2:sha256:8010b55827ec67a977cf283c9f0b72ab8a3ec7ea66c5505f4e216e3883f5b64c",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3660,7 +3674,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/SDJ.zip"
           },
           "fingerprint": "rules:v2:sha256:c566c3f74e1dfc7d25bec3cbbc3992dd948eebd9306598232ec48542c6c1977c",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3700,7 +3714,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/TAK.zip"
           },
           "fingerprint": "rules:v2:sha256:6602f94702738c8dc4c5f49b9047997411bb02cb7ce3da5c0364cf2495e03393",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3740,7 +3754,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/TOY.zip"
           },
           "fingerprint": "rules:v2:sha256:5fe70d4cea44709298389404b4037055655288d15d786a58089dee262f40d701",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3781,7 +3795,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.1.3/GAJ.zip"
           },
           "fingerprint": "rules:v2:sha256:2fab1ca359670027c891f4da32bed938c8e2e928f25a7d83c5cec10788d2a728",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "0.3.0": {
           "is_complete": true,
@@ -3810,7 +3824,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.2.0/GAJ.zip"
           },
           "fingerprint": "rules:v2:sha256:3b7a191f1412166e05ba546bfe82f24969b55f9eeff47d5f7dacbd34a89adadc",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     },
@@ -3851,7 +3865,7 @@
             "download_url": "https://github.com/Kronifer/sb-zurich-map/releases/download/v1.0.0/ZRH.zip"
           },
           "fingerprint": "rules:v2:github:kronifer/sb-zurich-map:v1.0.0:ZRH.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         },
         "v1.1.0": {
           "is_complete": true,
@@ -3880,7 +3894,7 @@
             "download_url": "https://github.com/Kronifer/sb-zurich-map/releases/download/v1.1.0/ZRH.zip"
           },
           "fingerprint": "rules:v2:github:kronifer/sb-zurich-map:v1.1.0:ZRH.zip",
-          "checked_at": "2026-03-17T09:52:38.105Z"
+          "checked_at": "2026-03-17T18:55:55.179Z"
         }
       }
     }
