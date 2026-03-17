@@ -54,6 +54,17 @@ jobs:
           body: "Automated update from regenerate-index workflow."
           labels: automation
 
+      - name: Request approval bot review
+        if: ${{ steps.create_pr.outputs.pull-request-number != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/dispatches \
+            -f event_type='auto-approve-actions-bot-pr' \
+            -f client_payload[pull_request_number]="${{ steps.create_pr.outputs.pull-request-number }}" \
+            -f client_payload[source_workflow]="${{ github.workflow }}" \
+            -f client_payload[source_run_id]="${{ github.run_id }}"
+
       - name: Enable PR auto-merge
         if: ${{ steps.create_pr.outputs.pull-request-number != '' }}
         env:
