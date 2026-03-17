@@ -1,7 +1,33 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-17T16:02:52.489Z",
+  "generated_at": "2026-03-17T17:39:52.288Z",
   "listings": {
+    "albany": {
+      "has_complete_version": false,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": false,
+      "complete_versions": [],
+      "incomplete_versions": [
+        "1.0.0"
+      ],
+      "versions": {
+        "1.0.0": {
+          "is_complete": false,
+          "errors": [
+            "asset 'Albany-Railyard.zip': missing top-level BNA.pmtiles (config code 'BNA', registry city_code 'ALB')"
+          ],
+          "required_checks": {},
+          "matched_files": {},
+          "source": {
+            "update_type": "github",
+            "repo": "soccerjonj/albany",
+            "tag": "1.0.0"
+          },
+          "fingerprint": "rules:v2:github:soccerjonj/albany:1.0.0:Albany-Railyard.zip",
+          "checked_at": "2026-03-17T17:39:52.288Z"
+        }
+      }
+    },
     "amsterdam": {
       "has_complete_version": true,
       "latest_semver_version": "1.2.0",
@@ -592,6 +618,46 @@
           },
           "fingerprint": "rules:v2:sha256:158a6bd6aa81804632bddaf1e9a50b82d4ab4bb62bab724bb6a306e2f4c82871",
           "checked_at": "2026-03-17T09:52:38.105Z"
+        }
+      }
+    },
+    "garda-lake": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "GRD.pmtiles"
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "maximilian284/subwaybuilder-it-maps",
+            "tag": "1.2.0",
+            "asset_name": "GRD.zip",
+            "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.2.0/GRD.zip"
+          },
+          "fingerprint": "rules:v2:sha256:9982da87e4007ecb6b2f12efb4485b86251a9fb182cd7946de8b61db7d8cd126",
+          "checked_at": "2026-03-17T17:39:52.288Z"
         }
       }
     },
@@ -1775,6 +1841,46 @@
           },
           "fingerprint": "rules:v2:sha256:740281654ca081db1b326d2d7335c4069ed428d81e796db7fe3adaba3b9128ce",
           "checked_at": "2026-03-17T09:52:38.105Z"
+        }
+      }
+    },
+    "riviera-romagnola": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "RIV.pmtiles"
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "maximilian284/subwaybuilder-it-maps",
+            "tag": "1.2.0",
+            "asset_name": "RIV.zip",
+            "download_url": "https://github.com/Maximilian284/subwaybuilder-it-maps/releases/download/1.2.0/RIV.zip"
+          },
+          "fingerprint": "rules:v2:sha256:1864560931cc79a68eb874d7632db02bcfca928f73463e4b47b7491ed5b519db",
+          "checked_at": "2026-03-17T17:39:52.288Z"
         }
       }
     },
