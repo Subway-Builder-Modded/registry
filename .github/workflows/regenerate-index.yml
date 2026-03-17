@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   regenerate:
@@ -30,13 +31,36 @@ jobs:
       - name: Regenerate index files
         run: pnpm --dir scripts run regenerate-indexes
 
-      - name: Commit changes
+      - name: Stage index changes
+        id: stage_changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add mods/index.json maps/index.json 2>/dev/null || true
-          git diff --cached --quiet || git commit -m "chore: regenerate index files"
-          git push
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update bot PR
+        id: create_pr
+        if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: regenerate index files"
+          branch: bot/regenerate-indexes
+          delete-branch: true
+          title: "chore: regenerate index files"
+          body: "Automated update from regenerate-index workflow."
+          labels: automation
+
+      - name: Enable PR auto-merge
+        if: ${{ steps.create_pr.outputs.pull-request-number != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}" --auto --squash \
+            || echo "Could not enable auto-merge (auto-merge may be disabled or blocked by branch rules)."
 
       - name: Delete stale branches
         uses: actions/github-script@v7

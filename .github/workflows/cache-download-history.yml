@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 concurrency:
   group: cache-download-history
@@ -36,22 +37,53 @@ jobs:
         id: generate_history
         run: pnpm --dir scripts run generate-download-history
 
-      - name: Commit snapshot
+      - name: Stage snapshot changes
         id: commit_changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
           git add history/snapshot_*.json 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "No history snapshot changes detected; skipping commit."
+            echo "No history snapshot changes detected; skipping PR update."
             echo "committed=false" >> "$GITHUB_OUTPUT"
             echo "commit_sha=" >> "$GITHUB_OUTPUT"
+            echo "pull_request_url=" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          git commit -m "chore: cache download history snapshot"
-          git push
           echo "committed=true" >> "$GITHUB_OUTPUT"
-          echo "commit_sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update bot PR
+        id: create_pr
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: cache download history snapshot"
+          branch: bot/cache-download-history
+          delete-branch: true
+          title: "chore: cache download history snapshot"
+          body: "Automated update from cache-download-history workflow."
+          labels: automation
+
+      - name: Enable PR auto-merge
+        if: ${{ steps.create_pr.outputs.pull-request-number != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr merge "${{ steps.create_pr.outputs.pull-request-number }}" --auto --squash \
+            || echo "Could not enable auto-merge (auto-merge may be disabled or blocked by branch rules)."
+
+      - name: Finalize change outputs
+        id: finalize_changes
+        run: |
+          if [ "${{ steps.commit_changes.outputs.committed }}" != "true" ]; then
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            echo "commit_sha=" >> "$GITHUB_OUTPUT"
+            echo "pull_request_url=" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          HEAD_SHA="${{ steps.create_pr.outputs.pull-request-head-sha }}"
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+          echo "commit_sha=${HEAD_SHA:0:7}" >> "$GITHUB_OUTPUT"
+          echo "pull_request_url=${{ steps.create_pr.outputs.pull-request-url }}" >> "$GITHUB_OUTPUT"
 
       - name: Notify Discord
         if: always()
@@ -69,8 +101,9 @@ jobs:
           MODS_NET_DOWNLOADS: ${{ steps.generate_history.outputs.mods_net_downloads }}
           MODS_ENTRIES: ${{ steps.generate_history.outputs.mods_entries }}
           WARNINGS_JSON: ${{ steps.generate_history.outputs.warnings_json }}
-          COMMITTED: ${{ steps.commit_changes.outputs.committed }}
-          COMMIT_SHA: ${{ steps.commit_changes.outputs.commit_sha }}
+          COMMITTED: ${{ steps.finalize_changes.outputs.committed }}
+          COMMIT_SHA: ${{ steps.finalize_changes.outputs.commit_sha }}
+          PULL_REQUEST_URL: ${{ steps.finalize_changes.outputs.pull_request_url }}
         run: |
           if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
             echo "DISCORD_WEBHOOK_URL not set; skipping Discord notification."
@@ -78,8 +111,12 @@ jobs:
           fi
 
           COMMIT_DISPLAY="none (no file changes)"
-          if [ "${COMMITTED}" = "true" ] && [ -n "${COMMIT_SHA}" ]; then
-            COMMIT_DISPLAY="\`${COMMIT_SHA}\`"
+          if [ "${COMMITTED}" = "true" ]; then
+            if [ -n "${PULL_REQUEST_URL}" ]; then
+              COMMIT_DISPLAY="[bot PR](${PULL_REQUEST_URL})"
+            elif [ -n "${COMMIT_SHA}" ]; then
+              COMMIT_DISPLAY="\`${COMMIT_SHA}\`"
+            fi
           fi
           PREVIOUS_DISPLAY="${PREVIOUS_SNAPSHOT_FILE:-none}"
 
