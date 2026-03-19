@@ -5,6 +5,13 @@ export type UpdateType =
   | { type: "github"; repo: string }
   | { type: "custom"; url: string };
 
+export interface InitialViewState {
+  latitude: number;
+  longitude: number;
+  zoom: number;
+  bearing: number;
+}
+
 export interface ModManifest {
   schema_version: number;
   id: string;
@@ -25,6 +32,7 @@ export interface MapManifest extends ModManifest {
   residents_total: number;
   points_count: number;
   population_count: number;
+  initial_view_state: InitialViewState;
   data_source: string;
   source_quality: string;
   level_of_detail: string;

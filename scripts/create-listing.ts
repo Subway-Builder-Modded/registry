@@ -84,6 +84,7 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
       residents_total: demandStats.residents_total,
       points_count: demandStats.points_count,
       population_count: demandStats.population_count,
+      initial_view_state: demandStats.initial_view_state,
       data_source: dataSource,
       source_quality: sourceQuality,
       level_of_detail: levelOfDetail,

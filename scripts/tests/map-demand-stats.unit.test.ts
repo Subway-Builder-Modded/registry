@@ -4,9 +4,23 @@ import { gzipSync } from "node:zlib";
 import JSZip from "jszip";
 import { extractDemandStatsFromZipBuffer } from "../lib/map-demand-stats.js";
 
+const DEFAULT_INITIAL_VIEW_STATE = {
+  latitude: 38.312462,
+  longitude: 140.325418,
+  zoom: 12,
+  bearing: 0,
+};
+
 async function makeZipBuffer(fileName: string, content: Buffer | string): Promise<Buffer> {
   const zip = new JSZip();
   zip.file(fileName, content);
+  zip.file(
+    "config.json",
+    JSON.stringify({
+      code: "TST",
+      initialViewState: DEFAULT_INITIAL_VIEW_STATE,
+    }),
+  );
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
@@ -31,6 +45,7 @@ test("extractDemandStatsFromZipBuffer parses demand_data.json", async () => {
     residents_total: 30,
     points_count: 3,
     population_count: 3,
+    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
   });
 });
 
@@ -56,6 +71,7 @@ test("extractDemandStatsFromZipBuffer parses demand_data.json.gz", async () => {
     residents_total: 24,
     points_count: 3,
     population_count: 3,
+    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
   });
 });
 
@@ -79,6 +95,7 @@ test("extractDemandStatsFromZipBuffer warns and uses minimum when point/pop tota
     residents_total: 70,
     points_count: 2,
     population_count: 2,
+    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
   });
   assert.equal(warnings.length, 1);
   assert.match(warnings[0], /resident totals differ/);
@@ -124,6 +141,7 @@ test("extractDemandStatsFromZipBuffer derives residents from popIds when residen
     residents_total: 12,
     points_count: 2,
     population_count: 3,
+    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
   });
 });
 
@@ -146,6 +164,7 @@ test("extractDemandStatsFromZipBuffer does not mix residents fallback with expli
     residents_total: 10,
     points_count: 2,
     population_count: 2,
+    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
   });
 });
 
@@ -192,5 +211,23 @@ test("extractDemandStatsFromZipBuffer rejects malformed payloads", async () => {
   await assert.rejects(
     extractDemandStatsFromZipBuffer("sample-map", zipBuffer),
     /missing collection field 'points'/,
+  );
+});
+
+test("extractDemandStatsFromZipBuffer rejects missing initialViewState in config.json", async () => {
+  const zip = new JSZip();
+  zip.file(
+    "demand_data.json",
+    JSON.stringify({
+      points: [{ residents: 1 }],
+      pops_map: [{ size: 1 }],
+    }),
+  );
+  zip.file("config.json", JSON.stringify({ code: "TST" }));
+  const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
+
+  await assert.rejects(
+    extractDemandStatsFromZipBuffer("sample-map", zipBuffer),
+    /config\.json missing valid initialViewState/,
   );
 });

@@ -2,7 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { resolve } from "node:path";
 import JSZip from "jszip";
-import type { MapManifest } from "./manifests.js";
+import type { InitialViewState, MapManifest } from "./manifests.js";
 import {
   createGraphqlUsageState,
   fetchRepoReleaseIndexes,
@@ -15,6 +15,7 @@ export interface DemandStats {
   residents_total: number;
   points_count: number;
   population_count: number;
+  initial_view_state: InitialViewState;
 }
 
 interface ExtractDemandStatsOptions {
@@ -22,7 +23,7 @@ interface ExtractDemandStatsOptions {
   requireResidentTotalsMatch?: boolean;
 }
 interface ParsedDemandDataPayloadResult {
-  stats: DemandStats;
+  stats: Omit<DemandStats, "initial_view_state">;
   residentsTotalByPoint: number;
   residentsTotalByPop: number;
 }
@@ -107,6 +108,35 @@ function warnListing(warnings: string[], listingId: string, message: string): vo
 
 function isObject(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function toFiniteNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function parseInitialViewState(value: unknown): InitialViewState | null {
+  if (!isObject(value)) return null;
+  const latitude = toFiniteNumber(value.latitude);
+  const longitude = toFiniteNumber(value.longitude);
+  const zoom = toFiniteNumber(value.zoom);
+  const bearing = toFiniteNumber(value.bearing);
+  if (latitude === null || longitude === null || zoom === null || bearing === null) {
+    return null;
+  }
+  return { latitude, longitude, zoom, bearing };
+}
+
+function initialViewStateEquals(
+  a: InitialViewState | null | undefined,
+  b: InitialViewState | null | undefined,
+): boolean {
+  if (!a || !b) return false;
+  return (
+    a.latitude === b.latitude
+    && a.longitude === b.longitude
+    && a.zoom === b.zoom
+    && a.bearing === b.bearing
+  );
 }
 
 function getMapIds(repoRoot: string): string[] {
@@ -307,6 +337,14 @@ function findDemandDataEntry(zip: JSZip): JSZip.JSZipObject | null {
   return null;
 }
 
+function findConfigEntry(zip: JSZip): JSZip.JSZipObject | null {
+  const allEntries = Object.values(zip.files).filter((entry) => !entry.dir);
+  const exactConfig = allEntries.find((entry) => entry.name === "config.json");
+  if (exactConfig) return exactConfig;
+  const byBasename = allEntries.find((entry) => entry.name.toLowerCase().endsWith("/config.json"));
+  return byBasename ?? null;
+}
+
 function getDemandPointRef(pointValue: unknown, fallbackRef: string): string {
   if (isObject(pointValue)) {
     const idValue = pointValue.id;
@@ -434,6 +472,9 @@ function loadDemandStatsCache(repoRoot: string): DemandStatsCache {
       const lastCheckedAt = typeof entry.last_checked_at === "string"
         ? entry.last_checked_at
         : undefined;
+      const cachedInitialViewState = isObject(entry.stats)
+        ? parseInitialViewState(entry.stats.initial_view_state)
+        : null;
       const stats = isObject(entry.stats)
         && typeof entry.stats.residents_total === "number"
         && Number.isFinite(entry.stats.residents_total)
@@ -444,10 +485,12 @@ function loadDemandStatsCache(repoRoot: string): DemandStatsCache {
         && typeof entry.stats.population_count === "number"
         && Number.isFinite(entry.stats.population_count)
         && entry.stats.population_count >= 0
+        && cachedInitialViewState !== null
         ? {
           residents_total: entry.stats.residents_total,
           points_count: entry.stats.points_count,
           population_count: entry.stats.population_count,
+          initial_view_state: cachedInitialViewState,
         }
         : undefined;
       if (!sourceFingerprint || !lastCheckedAt) continue;
@@ -551,6 +594,36 @@ export async function extractDemandStatsFromZipBuffer(
     throw new Error(`listing=${listingId}: demand data file is not valid JSON`);
   }
 
+  const configEntry = findConfigEntry(zip);
+  if (!configEntry) {
+    throw new Error(`listing=${listingId}: config.json not found in ZIP`);
+  }
+
+  let configRawText: string;
+  try {
+    configRawText = await configEntry.async("string");
+  } catch {
+    throw new Error(`listing=${listingId}: failed to read config entry '${configEntry.name}'`);
+  }
+
+  let configPayload: unknown;
+  try {
+    configPayload = JSON.parse(configRawText);
+  } catch {
+    throw new Error(`listing=${listingId}: config.json is not valid JSON`);
+  }
+
+  const initialViewState = parseInitialViewState(
+    isObject(configPayload)
+      ? (configPayload.initialViewState ?? configPayload.initial_view_state)
+      : null,
+  );
+  if (!initialViewState) {
+    throw new Error(
+      `listing=${listingId}: config.json missing valid initialViewState with numeric latitude/longitude/zoom/bearing`,
+    );
+  }
+
   const parsed = parseDemandDataPayload(payload);
   if (parsed.residentsTotalByPoint !== parsed.residentsTotalByPop) {
     const delta = parsed.residentsTotalByPoint - parsed.residentsTotalByPop;
@@ -568,7 +641,10 @@ export async function extractDemandStatsFromZipBuffer(
     }
   }
 
-  return parsed.stats;
+  return {
+    ...parsed.stats,
+    initial_view_state: initialViewState,
+  };
 }
 
 async function resolveZipUrlForMapSource(
@@ -721,12 +797,14 @@ export async function generateMapDemandStats(
           || manifest.residents_total !== cachedStats.residents_total
           || manifest.points_count !== cachedStats.points_count
           || manifest.population_count !== cachedStats.population_count
+          || !initialViewStateEquals(manifest.initial_view_state, cachedStats.initial_view_state)
         );
         if (changed) {
           manifest.population = cachedStats.residents_total;
           manifest.residents_total = cachedStats.residents_total;
           manifest.points_count = cachedStats.points_count;
           manifest.population_count = cachedStats.population_count;
+          manifest.initial_view_state = cachedStats.initial_view_state;
           writeFileSync(
             resolve(repoRoot, "maps", id, "manifest.json"),
             `${JSON.stringify(manifest, null, 2)}\n`,
@@ -781,12 +859,14 @@ export async function generateMapDemandStats(
       || manifest.residents_total !== stats.residents_total
       || manifest.points_count !== stats.points_count
       || manifest.population_count !== stats.population_count
+      || !initialViewStateEquals(manifest.initial_view_state, stats.initial_view_state)
     );
 
     manifest.population = stats.residents_total;
     manifest.residents_total = stats.residents_total;
     manifest.points_count = stats.points_count;
     manifest.population_count = stats.population_count;
+    manifest.initial_view_state = stats.initial_view_state;
     cache[id] = {
       source_fingerprint: resolvedSource.sourceFingerprint,
       last_checked_at: now.toISOString(),

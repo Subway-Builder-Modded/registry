@@ -65,6 +65,15 @@ function basePublishMapIssue(overrides: Record<string, string>): Record<string, 
 async function makeZipDataUrl(payload: unknown): Promise<string> {
   const zip = new JSZip();
   zip.file("demand_data.json", JSON.stringify(payload));
+  zip.file("config.json", JSON.stringify({
+    code: "TST",
+    initialViewState: {
+      latitude: 38.312462,
+      longitude: 140.325418,
+      zoom: 12,
+      bearing: 0,
+    },
+  }));
   const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
   return `data:application/zip;base64,${zipBuffer.toString("base64")}`;
 }
