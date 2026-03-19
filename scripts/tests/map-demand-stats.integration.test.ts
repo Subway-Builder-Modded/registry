@@ -26,6 +26,13 @@ function writeJson(path: string, value: unknown): void {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, "utf-8");
 }
 
+const DEFAULT_INITIAL_VIEW_STATE = {
+  latitude: 38.312462,
+  longitude: 140.325418,
+  zoom: 12,
+  bearing: 0,
+};
+
 async function makeDemandZip(residents: number[]): Promise<Buffer> {
   const points: Record<string, { residents: number }> = {};
   const popsMap: Record<string, { size: number }> = {};
@@ -36,6 +43,13 @@ async function makeDemandZip(residents: number[]): Promise<Buffer> {
   const payload = { points, pops_map: popsMap };
   const zip = new JSZip();
   zip.file("demand_data.json", JSON.stringify(payload));
+  zip.file(
+    "config.json",
+    JSON.stringify({
+      code: "TST",
+      initialViewState: DEFAULT_INITIAL_VIEW_STATE,
+    }),
+  );
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
@@ -375,6 +389,7 @@ test("generateMapDemandStats skips failed maps and keeps existing manifests", as
     residents_total: 12,
     points_count: 3,
     population_count: 12,
+    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
@@ -440,6 +455,7 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
     residents_total: 12,
     points_count: 3,
     population_count: 12,
+    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
@@ -454,6 +470,7 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
         residents_total: 12,
         points_count: 3,
         population_count: 12,
+        initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
       },
     },
   });

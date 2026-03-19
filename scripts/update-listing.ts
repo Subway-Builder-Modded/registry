@@ -117,6 +117,7 @@ async function main() {
     mapManifest.residents_total = demandStats.residents_total;
     mapManifest.points_count = demandStats.points_count;
     mapManifest.population_count = demandStats.population_count;
+    mapManifest.initial_view_state = demandStats.initial_view_state;
   }
 
   // Gallery images — resolve URLs via GitHub API (same as create-listing)

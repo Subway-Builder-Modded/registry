@@ -24,6 +24,12 @@ function makeBaseManifest(): MapManifest {
     residents_total: 1000000,
     points_count: 1000,
     population_count: 1000000,
+    initial_view_state: {
+      latitude: 40.7128,
+      longitude: -74.006,
+      zoom: 11,
+      bearing: 0,
+    },
     data_source: "Census",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",

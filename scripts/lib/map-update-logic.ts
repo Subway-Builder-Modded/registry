@@ -52,6 +52,26 @@ function requireManifestStringArray(
   return value.filter((item): item is string => typeof item === "string");
 }
 
+function requireManifestInitialViewState(
+  value: unknown,
+  errors: string[],
+): { latitude: number; longitude: number; zoom: number; bearing: number } | null {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    errors.push("**manifest.initial_view_state**: Missing required map field.");
+    return null;
+  }
+  const view = value as Record<string, unknown>;
+  const latitude = typeof view.latitude === "number" && Number.isFinite(view.latitude) ? view.latitude : null;
+  const longitude = typeof view.longitude === "number" && Number.isFinite(view.longitude) ? view.longitude : null;
+  const zoom = typeof view.zoom === "number" && Number.isFinite(view.zoom) ? view.zoom : null;
+  const bearing = typeof view.bearing === "number" && Number.isFinite(view.bearing) ? view.bearing : null;
+  if (latitude === null || longitude === null || zoom === null || bearing === null) {
+    errors.push("**manifest.initial_view_state**: Must include numeric latitude/longitude/zoom/bearing.");
+    return null;
+  }
+  return { latitude, longitude, zoom, bearing };
+}
+
 export function applyMapManifestUpdates(
   manifest: MapManifest,
   data: Record<string, unknown>,
@@ -143,6 +163,10 @@ export function validateMapUpdateFields(
     manifest.special_demand,
     errors,
   );
+  const currentInitialViewState = requireManifestInitialViewState(
+    manifest.initial_view_state,
+    errors,
+  );
 
   if (
     currentDataSource === null
@@ -150,6 +174,7 @@ export function validateMapUpdateFields(
     || currentLevelOfDetail === null
     || currentLocation === null
     || currentSpecialDemand === null
+    || currentInitialViewState === null
   ) {
     return;
   }
