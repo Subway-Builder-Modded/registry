@@ -1,4 +1,5 @@
 # The Railyard
+![image0](https://github.com/user-attachments/assets/b0659a85-ac6a-40cf-9cd3-bb9dcb99f6a4)
 
 The central registry for **Subway Builder** community mods and custom maps.
 
