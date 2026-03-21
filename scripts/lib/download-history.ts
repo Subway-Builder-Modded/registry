@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import type { DownloadsByListing } from "./download-definitions.js";
 
 type ListingKind = "maps" | "mods";
+type ValidVersionsByListing = Record<string, Set<string>>;
 
 interface IndexFile {
   schema_version?: number;
@@ -17,6 +18,19 @@ interface DownloadHistorySection {
   net_downloads: number;
   index: IndexFile;
   entries: number;
+}
+
+interface IntegrityVersionLike {
+  is_complete?: unknown;
+}
+
+interface IntegrityListingLike {
+  versions?: unknown;
+  complete_versions?: unknown;
+}
+
+interface IntegrityOutputLike {
+  listings?: unknown;
 }
 
 export interface DownloadHistorySnapshot {
@@ -62,33 +76,35 @@ function asFiniteNumber(value: unknown): number | null {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
 function normalizeDownloads(
   raw: unknown,
   listingKind: ListingKind,
   warnings: string[],
   sourceLabel: string,
 ): DownloadsByListing {
-  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
+  if (!isObject(raw)) {
     throw new Error(`${sourceLabel} must be a JSON object`);
   }
 
-  const input = raw as Record<string, unknown>;
   const result: DownloadsByListing = {};
-  for (const listingId of Object.keys(input).sort()) {
-    const versionsRaw = input[listingId];
-    if (typeof versionsRaw !== "object" || versionsRaw === null || Array.isArray(versionsRaw)) {
-      warnings.push(`${listingKind}: listing='${listingId}' has non-object versions payload; treating as empty`);
+  for (const listingId of Object.keys(raw).sort()) {
+    const versionsRaw = raw[listingId];
+    if (!isObject(versionsRaw)) {
+      warnings.push(`${sourceLabel}: listing='${listingId}' has non-object versions payload; treating as empty`);
       result[listingId] = {};
       continue;
     }
 
-    const versionsInput = versionsRaw as Record<string, unknown>;
     const versionsResult: Record<string, number> = {};
-    for (const version of Object.keys(versionsInput).sort()) {
-      const parsed = asFiniteNumber(versionsInput[version]);
+    for (const version of Object.keys(versionsRaw).sort()) {
+      const parsed = asFiniteNumber(versionsRaw[version]);
       if (parsed === null) {
         warnings.push(
-          `${listingKind}: listing='${listingId}' version='${version}' has non-numeric download count; skipping version`,
+          `${sourceLabel}: listing='${listingId}' version='${version}' has non-numeric download count; skipping version`,
         );
         continue;
       }
@@ -96,7 +112,104 @@ function normalizeDownloads(
     }
     result[listingId] = versionsResult;
   }
+
   return result;
+}
+
+function normalizeValidVersionsFromIntegrity(
+  raw: unknown,
+  listingKind: ListingKind,
+  warnings: string[],
+): ValidVersionsByListing {
+  if (!isObject(raw)) {
+    throw new Error(`${listingKind}/integrity.json must be a JSON object`);
+  }
+
+  const listings = (raw as IntegrityOutputLike).listings;
+  if (!isObject(listings)) {
+    throw new Error(`${listingKind}/integrity.json must include an object 'listings' field`);
+  }
+
+  const validVersionsByListing: ValidVersionsByListing = {};
+  for (const listingId of Object.keys(listings).sort()) {
+    const listingRaw = listings[listingId];
+    if (!isObject(listingRaw)) {
+      warnings.push(`${listingKind}/integrity.json: listing='${listingId}' has non-object payload; treating as empty`);
+      validVersionsByListing[listingId] = new Set<string>();
+      continue;
+    }
+
+    const listing = listingRaw as IntegrityListingLike;
+    const validVersions = new Set<string>();
+    if (isObject(listing.versions)) {
+      for (const version of Object.keys(listing.versions)) {
+        const versionRaw = listing.versions[version];
+        if (!isObject(versionRaw)) continue;
+        if ((versionRaw as IntegrityVersionLike).is_complete === true) {
+          validVersions.add(version);
+        }
+      }
+    }
+
+    if (Array.isArray(listing.complete_versions)) {
+      for (const version of listing.complete_versions) {
+        if (typeof version === "string" && version.trim() !== "") {
+          validVersions.add(version);
+        }
+      }
+    }
+
+    validVersionsByListing[listingId] = validVersions;
+  }
+
+  return validVersionsByListing;
+}
+
+function readValidVersionsFromIntegrity(
+  repoRoot: string,
+  listingKind: ListingKind,
+  warnings: string[],
+): ValidVersionsByListing {
+  const integrityPath = resolve(repoRoot, listingKind, "integrity.json");
+  if (!existsSync(integrityPath)) {
+    throw new Error(`${listingKind}/integrity.json is required to generate download history`);
+  }
+
+  return normalizeValidVersionsFromIntegrity(
+    readJsonFile<unknown>(integrityPath),
+    listingKind,
+    warnings,
+  );
+}
+
+function filterDownloadsByIntegrity(
+  downloads: DownloadsByListing,
+  validVersionsByListing: ValidVersionsByListing,
+  sourceLabel: string,
+  warnings: string[],
+): DownloadsByListing {
+  const filtered: DownloadsByListing = {};
+  for (const listingId of Object.keys(downloads).sort()) {
+    const versions = downloads[listingId] ?? {};
+    const validVersions = validVersionsByListing[listingId];
+    if (!validVersions) {
+      warnings.push(`${sourceLabel}: listing='${listingId}' not found in integrity.json; treating as empty`);
+      filtered[listingId] = {};
+      continue;
+    }
+
+    const filteredVersions: Record<string, number> = {};
+    for (const version of Object.keys(versions).sort()) {
+      if (!validVersions.has(version)) {
+        warnings.push(`${sourceLabel}: listing='${listingId}' version='${version}' is not complete; skipping version`);
+        continue;
+      }
+      filteredVersions[version] = versions[version]!;
+    }
+    filtered[listingId] = filteredVersions;
+  }
+
+  return filtered;
 }
 
 function computeTotalDownloads(downloads: DownloadsByListing): number {
@@ -113,11 +226,23 @@ function readListingData(
   repoRoot: string,
   listingKind: ListingKind,
   warnings: string[],
+  validVersionsByListing: ValidVersionsByListing,
 ): { downloads: DownloadsByListing; totalDownloads: number; index: IndexFile; entries: number } {
   const downloadsPath = resolve(repoRoot, listingKind, "downloads.json");
   const indexPath = resolve(repoRoot, listingKind, "index.json");
   const downloadsRaw = readJsonFile<unknown>(downloadsPath);
-  const downloads = normalizeDownloads(downloadsRaw, listingKind, warnings, `${listingKind}/downloads.json`);
+  const normalizedDownloads = normalizeDownloads(
+    downloadsRaw,
+    listingKind,
+    warnings,
+    `${listingKind}/downloads.json`,
+  );
+  const downloads = filterDownloadsByIntegrity(
+    normalizedDownloads,
+    validVersionsByListing,
+    `${listingKind}/downloads.json`,
+    warnings,
+  );
   const totalDownloads = computeTotalDownloads(downloads);
   const index = readJsonFile<IndexFile>(indexPath);
 
@@ -143,6 +268,7 @@ function listSnapshotFileNames(historyDir: string): string[] {
   if (!existsSync(historyDir)) {
     return [];
   }
+
   return readdirSync(historyDir)
     .filter((name) => SNAPSHOT_PATTERN.test(name))
     .sort();
@@ -170,99 +296,25 @@ function readPreviousSnapshot(
   }
 }
 
-function resolvePreviousDownloads(
-  previousSnapshot: DownloadHistorySnapshot | null,
-  listingKind: ListingKind,
-  warnings: string[],
-  sourceLabel: string,
-): DownloadsByListing {
-  if (!previousSnapshot) {
-    return {};
-  }
-
-  try {
-    return normalizeDownloads(previousSnapshot[listingKind].downloads, listingKind, warnings, sourceLabel);
-  } catch {
-    warnings.push(`history: previous snapshot has invalid ${listingKind}.downloads payload; treating as empty`);
-    return {};
-  }
-}
-
-function mergeDownloadsWithPrevious(
-  currentDownloads: DownloadsByListing,
-  previousDownloads: DownloadsByListing,
-): DownloadsByListing {
-  const listingIds = new Set<string>([
-    ...Object.keys(previousDownloads),
-    ...Object.keys(currentDownloads),
-  ]);
-
-  const merged: DownloadsByListing = {};
-  for (const listingId of Array.from(listingIds).sort()) {
-    const currentVersions = currentDownloads[listingId] ?? {};
-    const previousVersions = previousDownloads[listingId] ?? {};
-    const versions = new Set<string>([
-      ...Object.keys(previousVersions),
-      ...Object.keys(currentVersions),
-    ]);
-
-    const mergedVersions: Record<string, number> = {};
-    for (const version of Array.from(versions).sort()) {
-      const currentCount = currentVersions[version];
-      const previousCount = previousVersions[version];
-      if (typeof currentCount === "number" && typeof previousCount === "number") {
-        mergedVersions[version] = Math.max(currentCount, previousCount);
-        continue;
-      }
-      if (typeof currentCount === "number") {
-        mergedVersions[version] = currentCount;
-        continue;
-      }
-      if (typeof previousCount === "number") {
-        mergedVersions[version] = previousCount;
-      }
-    }
-
-    merged[listingId] = mergedVersions;
-  }
-
-  return merged;
-}
-
 function resolvePreviousTotal(
   previousSnapshot: DownloadHistorySnapshot | null,
   listingKind: ListingKind,
-  previousDownloads: DownloadsByListing,
   warnings: string[],
 ): number | null {
   if (!previousSnapshot) return null;
   const section = previousSnapshot[listingKind];
   const total = section?.total_downloads;
   if (typeof total !== "number" || !Number.isFinite(total)) {
-    const fallbackTotal = computeTotalDownloads(previousDownloads);
-    warnings.push(`history: previous snapshot missing finite ${listingKind}.total_downloads; using ${listingKind}.downloads sum=${fallbackTotal}`);
-    return fallbackTotal;
+    warnings.push(
+      `history: previous snapshot missing finite ${listingKind}.total_downloads; using first-run net calculation`,
+    );
+    return null;
   }
   return total;
 }
 
-function computeNetDownloads(
-  currentTotal: number,
-  previousTotal: number | null,
-  listingKind: ListingKind,
-  warnings: string[],
-): number {
-  if (previousTotal === null) {
-    return currentTotal;
-  }
-  const netDownloads = currentTotal - previousTotal;
-  if (netDownloads < 0) {
-    warnings.push(
-      `history: computed negative ${listingKind}.net_downloads=${netDownloads}; clamping to 0 to preserve monotonic totals`,
-    );
-    return 0;
-  }
-  return netDownloads;
+function computeNetDownloads(currentTotal: number, previousTotal: number | null): number {
+  return previousTotal === null ? currentTotal : currentTotal - previousTotal;
 }
 
 function toIndexFallback(listingKind: ListingKind): IndexFile {
@@ -278,7 +330,7 @@ function asIndexFileOrFallback(
   warnings: string[],
   sourceLabel: string,
 ): IndexFile {
-  if (typeof raw === "object" && raw !== null && !Array.isArray(raw)) {
+  if (isObject(raw)) {
     return raw as IndexFile;
   }
   warnings.push(`${sourceLabel} has non-object index payload; using fallback index`);
@@ -296,14 +348,28 @@ function asEntriesOrFallback(
     return raw;
   }
 
-  const candidates = index[listingKind];
-  if (Array.isArray(candidates)) {
+  const listingEntries = index[listingKind];
+  if (Array.isArray(listingEntries)) {
     warnings.push(`${sourceLabel} has invalid entries value; using '${listingKind}' array length from index`);
-    return candidates.length;
+    return listingEntries.length;
   }
 
   warnings.push(`${sourceLabel} has invalid entries value; using fallback 0`);
   return 0;
+}
+
+function normalizeSnapshotDownloadsOrEmpty(
+  raw: unknown,
+  listingKind: ListingKind,
+  warnings: string[],
+  sourceLabel: string,
+): DownloadsByListing {
+  try {
+    return normalizeDownloads(raw, listingKind, warnings, sourceLabel);
+  } catch {
+    warnings.push(`${sourceLabel} has invalid downloads payload; treating as empty`);
+    return {};
+  }
 }
 
 export function generateDownloadHistorySnapshot(
@@ -314,46 +380,30 @@ export function generateDownloadHistorySnapshot(
   const snapshotDate = toSnapshotDate(now);
   const snapshotFileName = `snapshot_${snapshotDate}.json`;
   const previous = readPreviousSnapshot(options.repoRoot, snapshotFileName, warnings);
+  const mapsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "maps", warnings);
+  const modsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "mods", warnings);
 
-  const mapsData = readListingData(options.repoRoot, "maps", warnings);
-  const modsData = readListingData(options.repoRoot, "mods", warnings);
+  const mapsData = readListingData(options.repoRoot, "maps", warnings, mapsValidVersions);
+  const modsData = readListingData(options.repoRoot, "mods", warnings, modsValidVersions);
 
-  const previousMapsDownloads = resolvePreviousDownloads(
-    previous?.snapshot ?? null,
-    "maps",
-    warnings,
-    "history/previous/maps.downloads",
-  );
-  const previousModsDownloads = resolvePreviousDownloads(
-    previous?.snapshot ?? null,
-    "mods",
-    warnings,
-    "history/previous/mods.downloads",
-  );
-  const mergedMapsDownloads = mergeDownloadsWithPrevious(mapsData.downloads, previousMapsDownloads);
-  const mergedModsDownloads = mergeDownloadsWithPrevious(modsData.downloads, previousModsDownloads);
-
-  const mapsTotalDownloads = computeTotalDownloads(mergedMapsDownloads);
-  const modsTotalDownloads = computeTotalDownloads(mergedModsDownloads);
-
-  const previousMapsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "maps", previousMapsDownloads, warnings);
-  const previousModsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "mods", previousModsDownloads, warnings);
+  const previousMapsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "maps", warnings);
+  const previousModsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "mods", warnings);
 
   const snapshot: DownloadHistorySnapshot = {
     schema_version: 1,
     snapshot_date: snapshotDate,
     generated_at: now.toISOString(),
     maps: {
-      downloads: mergedMapsDownloads,
-      total_downloads: mapsTotalDownloads,
-      net_downloads: computeNetDownloads(mapsTotalDownloads, previousMapsTotal, "maps", warnings),
+      downloads: mapsData.downloads,
+      total_downloads: mapsData.totalDownloads,
+      net_downloads: computeNetDownloads(mapsData.totalDownloads, previousMapsTotal),
       index: mapsData.index,
       entries: mapsData.entries,
     },
     mods: {
-      downloads: mergedModsDownloads,
-      total_downloads: modsTotalDownloads,
-      net_downloads: computeNetDownloads(modsTotalDownloads, previousModsTotal, "mods", warnings),
+      downloads: modsData.downloads,
+      total_downloads: modsData.totalDownloads,
+      net_downloads: computeNetDownloads(modsData.totalDownloads, previousModsTotal),
       index: modsData.index,
       entries: modsData.entries,
     },
@@ -378,6 +428,8 @@ export function backfillDownloadHistorySnapshots(
   const warnings: string[] = [];
   const historyDir = getHistoryDir(options.repoRoot);
   const snapshotFiles = listSnapshotFileNames(historyDir);
+  const mapsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "maps", warnings);
+  const modsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "mods", warnings);
   const updatedFiles: string[] = [];
   let previousSnapshot: DownloadHistorySnapshot | null = null;
 
@@ -391,25 +443,34 @@ export function backfillDownloadHistorySnapshots(
       continue;
     }
 
-    const sourceMapsDownloads = resolvePreviousDownloads(
-      snapshot,
+    const mapsRawDownloads = normalizeSnapshotDownloadsOrEmpty(
+      snapshot.maps?.downloads,
       "maps",
       warnings,
       `history/${fileName}:maps.downloads`,
     );
-    const sourceModsDownloads = resolvePreviousDownloads(
-      snapshot,
+    const modsRawDownloads = normalizeSnapshotDownloadsOrEmpty(
+      snapshot.mods?.downloads,
       "mods",
       warnings,
       `history/${fileName}:mods.downloads`,
     );
-    const previousMapsDownloads = previousSnapshot?.maps.downloads ?? {};
-    const previousModsDownloads = previousSnapshot?.mods.downloads ?? {};
 
-    const mergedMapsDownloads = mergeDownloadsWithPrevious(sourceMapsDownloads, previousMapsDownloads);
-    const mergedModsDownloads = mergeDownloadsWithPrevious(sourceModsDownloads, previousModsDownloads);
-    const mapsTotalDownloads = computeTotalDownloads(mergedMapsDownloads);
-    const modsTotalDownloads = computeTotalDownloads(mergedModsDownloads);
+    const mapsDownloads = filterDownloadsByIntegrity(
+      mapsRawDownloads,
+      mapsValidVersions,
+      `history/${fileName}:maps.downloads`,
+      warnings,
+    );
+    const modsDownloads = filterDownloadsByIntegrity(
+      modsRawDownloads,
+      modsValidVersions,
+      `history/${fileName}:mods.downloads`,
+      warnings,
+    );
+
+    const mapsTotalDownloads = computeTotalDownloads(mapsDownloads);
+    const modsTotalDownloads = computeTotalDownloads(modsDownloads);
 
     const mapsIndex = asIndexFileOrFallback(
       snapshot.maps?.index,
@@ -423,7 +484,6 @@ export function backfillDownloadHistorySnapshots(
       warnings,
       `history/${fileName}:mods.index`,
     );
-
     const mapsEntries = asEntriesOrFallback(
       snapshot.maps?.entries,
       "maps",
@@ -444,26 +504,16 @@ export function backfillDownloadHistorySnapshots(
       snapshot_date: snapshot.snapshot_date,
       generated_at: snapshot.generated_at,
       maps: {
-        downloads: mergedMapsDownloads,
+        downloads: mapsDownloads,
         total_downloads: mapsTotalDownloads,
-        net_downloads: computeNetDownloads(
-          mapsTotalDownloads,
-          previousSnapshot?.maps.total_downloads ?? null,
-          "maps",
-          warnings,
-        ),
+        net_downloads: computeNetDownloads(mapsTotalDownloads, previousSnapshot?.maps.total_downloads ?? null),
         index: mapsIndex,
         entries: mapsEntries,
       },
       mods: {
-        downloads: mergedModsDownloads,
+        downloads: modsDownloads,
         total_downloads: modsTotalDownloads,
-        net_downloads: computeNetDownloads(
-          modsTotalDownloads,
-          previousSnapshot?.mods.total_downloads ?? null,
-          "mods",
-          warnings,
-        ),
+        net_downloads: computeNetDownloads(modsTotalDownloads, previousSnapshot?.mods.total_downloads ?? null),
         index: modsIndex,
         entries: modsEntries,
       },
