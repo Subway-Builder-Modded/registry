@@ -39,6 +39,15 @@ export interface GenerateDownloadHistoryResult {
   warnings: string[];
 }
 
+export interface BackfillDownloadHistoryOptions {
+  repoRoot: string;
+}
+
+export interface BackfillDownloadHistoryResult {
+  updatedFiles: string[];
+  warnings: string[];
+}
+
 const SNAPSHOT_PATTERN = /^snapshot_(\d{4}_\d{2}_\d{2})\.json$/;
 
 function readJsonFile<T>(path: string): T {
@@ -57,9 +66,10 @@ function normalizeDownloads(
   raw: unknown,
   listingKind: ListingKind,
   warnings: string[],
+  sourceLabel: string,
 ): DownloadsByListing {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
-    throw new Error(`${listingKind}/downloads.json must be a JSON object`);
+    throw new Error(`${sourceLabel} must be a JSON object`);
   }
 
   const input = raw as Record<string, unknown>;
@@ -107,7 +117,7 @@ function readListingData(
   const downloadsPath = resolve(repoRoot, listingKind, "downloads.json");
   const indexPath = resolve(repoRoot, listingKind, "index.json");
   const downloadsRaw = readJsonFile<unknown>(downloadsPath);
-  const downloads = normalizeDownloads(downloadsRaw, listingKind, warnings);
+  const downloads = normalizeDownloads(downloadsRaw, listingKind, warnings, `${listingKind}/downloads.json`);
   const totalDownloads = computeTotalDownloads(downloads);
   const index = readJsonFile<IndexFile>(indexPath);
 
@@ -129,20 +139,23 @@ function getHistoryDir(repoRoot: string): string {
   return resolve(repoRoot, "history");
 }
 
+function listSnapshotFileNames(historyDir: string): string[] {
+  if (!existsSync(historyDir)) {
+    return [];
+  }
+  return readdirSync(historyDir)
+    .filter((name) => SNAPSHOT_PATTERN.test(name))
+    .sort();
+}
+
 function readPreviousSnapshot(
   repoRoot: string,
   currentSnapshotFileName: string,
   warnings: string[],
 ): { fileName: string; snapshot: DownloadHistorySnapshot } | null {
   const historyDir = getHistoryDir(repoRoot);
-  if (!existsSync(historyDir)) {
-    return null;
-  }
-
-  const previousFiles = readdirSync(historyDir)
-    .filter((name) => SNAPSHOT_PATTERN.test(name))
-    .filter((name) => name < currentSnapshotFileName)
-    .sort();
+  const previousFiles = listSnapshotFileNames(historyDir)
+    .filter((name) => name < currentSnapshotFileName);
   if (previousFiles.length === 0) {
     return null;
   }
@@ -157,19 +170,140 @@ function readPreviousSnapshot(
   }
 }
 
+function resolvePreviousDownloads(
+  previousSnapshot: DownloadHistorySnapshot | null,
+  listingKind: ListingKind,
+  warnings: string[],
+  sourceLabel: string,
+): DownloadsByListing {
+  if (!previousSnapshot) {
+    return {};
+  }
+
+  try {
+    return normalizeDownloads(previousSnapshot[listingKind].downloads, listingKind, warnings, sourceLabel);
+  } catch {
+    warnings.push(`history: previous snapshot has invalid ${listingKind}.downloads payload; treating as empty`);
+    return {};
+  }
+}
+
+function mergeDownloadsWithPrevious(
+  currentDownloads: DownloadsByListing,
+  previousDownloads: DownloadsByListing,
+): DownloadsByListing {
+  const listingIds = new Set<string>([
+    ...Object.keys(previousDownloads),
+    ...Object.keys(currentDownloads),
+  ]);
+
+  const merged: DownloadsByListing = {};
+  for (const listingId of Array.from(listingIds).sort()) {
+    const currentVersions = currentDownloads[listingId] ?? {};
+    const previousVersions = previousDownloads[listingId] ?? {};
+    const versions = new Set<string>([
+      ...Object.keys(previousVersions),
+      ...Object.keys(currentVersions),
+    ]);
+
+    const mergedVersions: Record<string, number> = {};
+    for (const version of Array.from(versions).sort()) {
+      const currentCount = currentVersions[version];
+      const previousCount = previousVersions[version];
+      if (typeof currentCount === "number" && typeof previousCount === "number") {
+        mergedVersions[version] = Math.max(currentCount, previousCount);
+        continue;
+      }
+      if (typeof currentCount === "number") {
+        mergedVersions[version] = currentCount;
+        continue;
+      }
+      if (typeof previousCount === "number") {
+        mergedVersions[version] = previousCount;
+      }
+    }
+
+    merged[listingId] = mergedVersions;
+  }
+
+  return merged;
+}
+
 function resolvePreviousTotal(
   previousSnapshot: DownloadHistorySnapshot | null,
   listingKind: ListingKind,
+  previousDownloads: DownloadsByListing,
   warnings: string[],
 ): number | null {
   if (!previousSnapshot) return null;
   const section = previousSnapshot[listingKind];
   const total = section?.total_downloads;
   if (typeof total !== "number" || !Number.isFinite(total)) {
-    warnings.push(`history: previous snapshot missing finite ${listingKind}.total_downloads; using first-run net calculation`);
-    return null;
+    const fallbackTotal = computeTotalDownloads(previousDownloads);
+    warnings.push(`history: previous snapshot missing finite ${listingKind}.total_downloads; using ${listingKind}.downloads sum=${fallbackTotal}`);
+    return fallbackTotal;
   }
   return total;
+}
+
+function computeNetDownloads(
+  currentTotal: number,
+  previousTotal: number | null,
+  listingKind: ListingKind,
+  warnings: string[],
+): number {
+  if (previousTotal === null) {
+    return currentTotal;
+  }
+  const netDownloads = currentTotal - previousTotal;
+  if (netDownloads < 0) {
+    warnings.push(
+      `history: computed negative ${listingKind}.net_downloads=${netDownloads}; clamping to 0 to preserve monotonic totals`,
+    );
+    return 0;
+  }
+  return netDownloads;
+}
+
+function toIndexFallback(listingKind: ListingKind): IndexFile {
+  return {
+    schema_version: 1,
+    [listingKind]: [],
+  };
+}
+
+function asIndexFileOrFallback(
+  raw: unknown,
+  listingKind: ListingKind,
+  warnings: string[],
+  sourceLabel: string,
+): IndexFile {
+  if (typeof raw === "object" && raw !== null && !Array.isArray(raw)) {
+    return raw as IndexFile;
+  }
+  warnings.push(`${sourceLabel} has non-object index payload; using fallback index`);
+  return toIndexFallback(listingKind);
+}
+
+function asEntriesOrFallback(
+  raw: unknown,
+  listingKind: ListingKind,
+  index: IndexFile,
+  warnings: string[],
+  sourceLabel: string,
+): number {
+  if (typeof raw === "number" && Number.isFinite(raw) && raw >= 0) {
+    return raw;
+  }
+
+  const candidates = index[listingKind];
+  if (Array.isArray(candidates)) {
+    warnings.push(`${sourceLabel} has invalid entries value; using '${listingKind}' array length from index`);
+    return candidates.length;
+  }
+
+  warnings.push(`${sourceLabel} has invalid entries value; using fallback 0`);
+  return 0;
 }
 
 export function generateDownloadHistorySnapshot(
@@ -184,28 +318,42 @@ export function generateDownloadHistorySnapshot(
   const mapsData = readListingData(options.repoRoot, "maps", warnings);
   const modsData = readListingData(options.repoRoot, "mods", warnings);
 
-  const previousMapsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "maps", warnings);
-  const previousModsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "mods", warnings);
+  const previousMapsDownloads = resolvePreviousDownloads(
+    previous?.snapshot ?? null,
+    "maps",
+    warnings,
+    "history/previous/maps.downloads",
+  );
+  const previousModsDownloads = resolvePreviousDownloads(
+    previous?.snapshot ?? null,
+    "mods",
+    warnings,
+    "history/previous/mods.downloads",
+  );
+  const mergedMapsDownloads = mergeDownloadsWithPrevious(mapsData.downloads, previousMapsDownloads);
+  const mergedModsDownloads = mergeDownloadsWithPrevious(modsData.downloads, previousModsDownloads);
+
+  const mapsTotalDownloads = computeTotalDownloads(mergedMapsDownloads);
+  const modsTotalDownloads = computeTotalDownloads(mergedModsDownloads);
+
+  const previousMapsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "maps", previousMapsDownloads, warnings);
+  const previousModsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "mods", previousModsDownloads, warnings);
 
   const snapshot: DownloadHistorySnapshot = {
     schema_version: 1,
     snapshot_date: snapshotDate,
     generated_at: now.toISOString(),
     maps: {
-      downloads: mapsData.downloads,
-      total_downloads: mapsData.totalDownloads,
-      net_downloads: previousMapsTotal === null
-        ? mapsData.totalDownloads
-        : mapsData.totalDownloads - previousMapsTotal,
+      downloads: mergedMapsDownloads,
+      total_downloads: mapsTotalDownloads,
+      net_downloads: computeNetDownloads(mapsTotalDownloads, previousMapsTotal, "maps", warnings),
       index: mapsData.index,
       entries: mapsData.entries,
     },
     mods: {
-      downloads: modsData.downloads,
-      total_downloads: modsData.totalDownloads,
-      net_downloads: previousModsTotal === null
-        ? modsData.totalDownloads
-        : modsData.totalDownloads - previousModsTotal,
+      downloads: mergedModsDownloads,
+      total_downloads: modsTotalDownloads,
+      net_downloads: computeNetDownloads(modsTotalDownloads, previousModsTotal, "mods", warnings),
       index: modsData.index,
       entries: modsData.entries,
     },
@@ -220,6 +368,119 @@ export function generateDownloadHistorySnapshot(
     snapshotFile: `history/${snapshotFileName}`,
     previousSnapshotFile: previous ? `history/${previous.fileName}` : null,
     snapshot,
+    warnings,
+  };
+}
+
+export function backfillDownloadHistorySnapshots(
+  options: BackfillDownloadHistoryOptions,
+): BackfillDownloadHistoryResult {
+  const warnings: string[] = [];
+  const historyDir = getHistoryDir(options.repoRoot);
+  const snapshotFiles = listSnapshotFileNames(historyDir);
+  const updatedFiles: string[] = [];
+  let previousSnapshot: DownloadHistorySnapshot | null = null;
+
+  for (const fileName of snapshotFiles) {
+    const snapshotPath = resolve(historyDir, fileName);
+    let snapshot: DownloadHistorySnapshot;
+    try {
+      snapshot = readJsonFile<DownloadHistorySnapshot>(snapshotPath);
+    } catch {
+      warnings.push(`history: failed to parse '${fileName}'; skipping backfill for this file`);
+      continue;
+    }
+
+    const sourceMapsDownloads = resolvePreviousDownloads(
+      snapshot,
+      "maps",
+      warnings,
+      `history/${fileName}:maps.downloads`,
+    );
+    const sourceModsDownloads = resolvePreviousDownloads(
+      snapshot,
+      "mods",
+      warnings,
+      `history/${fileName}:mods.downloads`,
+    );
+    const previousMapsDownloads = previousSnapshot?.maps.downloads ?? {};
+    const previousModsDownloads = previousSnapshot?.mods.downloads ?? {};
+
+    const mergedMapsDownloads = mergeDownloadsWithPrevious(sourceMapsDownloads, previousMapsDownloads);
+    const mergedModsDownloads = mergeDownloadsWithPrevious(sourceModsDownloads, previousModsDownloads);
+    const mapsTotalDownloads = computeTotalDownloads(mergedMapsDownloads);
+    const modsTotalDownloads = computeTotalDownloads(mergedModsDownloads);
+
+    const mapsIndex = asIndexFileOrFallback(
+      snapshot.maps?.index,
+      "maps",
+      warnings,
+      `history/${fileName}:maps.index`,
+    );
+    const modsIndex = asIndexFileOrFallback(
+      snapshot.mods?.index,
+      "mods",
+      warnings,
+      `history/${fileName}:mods.index`,
+    );
+
+    const mapsEntries = asEntriesOrFallback(
+      snapshot.maps?.entries,
+      "maps",
+      mapsIndex,
+      warnings,
+      `history/${fileName}:maps.entries`,
+    );
+    const modsEntries = asEntriesOrFallback(
+      snapshot.mods?.entries,
+      "mods",
+      modsIndex,
+      warnings,
+      `history/${fileName}:mods.entries`,
+    );
+
+    const normalizedSnapshot: DownloadHistorySnapshot = {
+      schema_version: 1,
+      snapshot_date: snapshot.snapshot_date,
+      generated_at: snapshot.generated_at,
+      maps: {
+        downloads: mergedMapsDownloads,
+        total_downloads: mapsTotalDownloads,
+        net_downloads: computeNetDownloads(
+          mapsTotalDownloads,
+          previousSnapshot?.maps.total_downloads ?? null,
+          "maps",
+          warnings,
+        ),
+        index: mapsIndex,
+        entries: mapsEntries,
+      },
+      mods: {
+        downloads: mergedModsDownloads,
+        total_downloads: modsTotalDownloads,
+        net_downloads: computeNetDownloads(
+          modsTotalDownloads,
+          previousSnapshot?.mods.total_downloads ?? null,
+          "mods",
+          warnings,
+        ),
+        index: modsIndex,
+        entries: modsEntries,
+      },
+    };
+
+    const normalizedRaw = `${JSON.stringify(normalizedSnapshot, null, 2)}\n`;
+    const existingRaw = readFileSync(snapshotPath, "utf-8");
+    if (existingRaw !== normalizedRaw) {
+      writeFileSync(snapshotPath, normalizedRaw, "utf-8");
+      updatedFiles.push(`history/${fileName}`);
+    }
+
+    previousSnapshot = normalizedSnapshot;
+  }
+
+  return {
+    updatedFiles,
     warnings,
   };
 }
