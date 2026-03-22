@@ -35,6 +35,7 @@ function makeBaseManifest(): MapManifest {
     level_of_detail: "medium-detail",
     location: "north-america",
     special_demand: ["airports"],
+    file_sizes: {},
   };
 }
 
