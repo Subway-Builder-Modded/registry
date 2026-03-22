@@ -108,6 +108,9 @@ async function main() {
   if (manifestType === "map") {
     applyMapManifestUpdates(manifest as MapManifest, data);
     const mapManifest = manifest as MapManifest;
+    if (!mapManifest.file_sizes || typeof mapManifest.file_sizes !== "object" || Array.isArray(mapManifest.file_sizes)) {
+      mapManifest.file_sizes = {};
+    }
     const demandStats = await resolveAndExtractDemandStatsForMapSource(
       mapManifest.id,
       mapManifest.update,
