@@ -120,6 +120,7 @@ Each file includes:
 - `versions.<version>` entries containing:
 - `is_complete`, `errors`
 - `required_checks`, `matched_files`
+- `file_sizes` (maps only, complete versions only; ZIP entry path => uncompressed MiB rounded to 2 decimals)
 - `source`, `fingerprint`, `checked_at`
 
 Integrity cache files:
@@ -186,6 +187,10 @@ Maps include all mod fields plus map-specific metadata:
   "residents_total": 1500000,
   "points_count": 4242,
   "population_count": 1500000,
+  "file_sizes": {
+    "RDU.pmtiles": 22.41,
+    "config.json": 0.01
+  },
   "data_source": "LODES",
   "source_quality": "high-quality",
   "level_of_detail": "medium-detail",
@@ -207,6 +212,7 @@ Map-specific fields:
 - `level_of_detail`: `low-detail | medium-detail | high-detail`
 - `location`: exactly one location tag
 - `special_demand`: array of feature tags
+- `file_sizes`: object of ZIP entry path to uncompressed MiB (`>= 0`)
 
 Backward compatibility rule:
 
@@ -294,8 +300,9 @@ map-name.zip
 
 - `regenerate-downloads-hourly.yml` runs hourly and on manual dispatch.
 - It runs map/mod generation in download-only mode (no ZIP integrity pass) and commits updated `downloads.json` files if changed.
-- `regenerate-registry-analytics.yml` runs every 8 hours and on manual dispatch.
+- `regenerate-registry-analytics.yml` runs every 3 hours and on manual dispatch.
 - It runs map/mod generation in full mode and map demand stats generation, then commits updated `downloads.json` + `integrity.json` (+ integrity cache files), map manifests, and `maps/demand-stats-cache.json` if changed.
+- It also runs `sync-map-file-sizes` in commit stage so map manifests mirror latest complete integrity `file_sizes`.
 - It emits two Discord summaries in a single run (downloads/integrity and map demand stats).
 - Uses GitHub GraphQL `ReleaseAsset.downloadCount` with `GITHUB_TOKEN` by default (`GH_DOWNLOADS_TOKEN` optional override).
 - `cache-download-history.yml` runs daily and on manual dispatch.
@@ -318,6 +325,7 @@ map-name.zip
 - `generate-downloads.ts`: generates downloads in `full` or `download-only` mode.
 - `generate-download-history.ts`: caches daily combined download snapshots in `history/`.
 - `generate-map-demand-stats.ts`: updates map `population`/`residents_total`/`points_count`/`population_count`.
+- `sync-map-file-sizes.ts`: syncs map manifest `file_sizes` from `maps/integrity.json` latest complete semver entries.
 - `generate-map-templates.ts`: generates and verifies map issue templates.
 - `notify-discord.ts`: shared Discord webhook notifier for workflow summaries.
 

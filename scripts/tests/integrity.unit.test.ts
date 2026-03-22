@@ -29,6 +29,9 @@ test("map integrity requires exact top-level files including city pmtiles", asyn
   assert.equal(result.requiredChecks.roads_geojson, true);
   assert.equal(result.requiredChecks.runways_taxiways_geojson, true);
   assert.equal(result.requiredChecks.city_pmtiles, true);
+  assert.ok(result.fileSizes);
+  assert.equal(typeof result.fileSizes?.["config.json"], "number");
+  assert.equal(typeof result.fileSizes?.["ABC.pmtiles"], "number");
 });
 
 test("map integrity rejects nested paths and missing top-level city pmtiles", async () => {
@@ -45,6 +48,7 @@ test("map integrity rejects nested paths and missing top-level city pmtiles", as
   assert.equal(result.isComplete, false);
   assert.ok(result.errors.some((error) => error.includes("config.json")));
   assert.ok(result.errors.some((error) => error.includes("missing code in config.json")));
+  assert.ok(result.fileSizes);
 });
 
 test("map integrity uses config code for pmtiles and warns on registry mismatch", async () => {
@@ -108,9 +112,11 @@ test("mod integrity requires both release manifest asset and top-level zip manif
   });
   assert.equal(missingReleaseAsset.isComplete, false);
   assert.ok(missingReleaseAsset.errors.some((error) => error.includes("release asset manifest.json")));
+  assert.equal(missingReleaseAsset.fileSizes, undefined);
 
   const valid = await inspectZipCompleteness("mod", zipBuffer, {
     releaseHasManifestAsset: true,
   });
   assert.equal(valid.isComplete, true);
+  assert.equal(valid.fileSizes, undefined);
 });
