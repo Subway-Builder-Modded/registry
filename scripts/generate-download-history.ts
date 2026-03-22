@@ -1,7 +1,7 @@
 import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { appendFileSync } from "node:fs";
-import { generateDownloadHistorySnapshot } from "./lib/download-history.js";
+import { backfillDownloadHistorySnapshots, generateDownloadHistorySnapshot } from "./lib/download-history.js";
 
 const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
   ? resolve(import.meta.dirname, "..", "..")
@@ -33,6 +33,10 @@ function getDateArg(argv: string[]): string | undefined {
   return undefined;
 }
 
+function hasFlag(argv: string[], flag: string): boolean {
+  return argv.includes(flag);
+}
+
 function parseDateOrThrow(value: string | undefined): Date | undefined {
   if (!value) return undefined;
   const parsed = new Date(value);
@@ -43,8 +47,43 @@ function parseDateOrThrow(value: string | undefined): Date | undefined {
 }
 
 async function run(): Promise<void> {
+  const argv = process.argv.slice(2);
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
-  const forcedNow = parseDateOrThrow(getDateArg(process.argv.slice(2)));
+  const isBackfill = hasFlag(argv, "--backfill") || hasFlag(argv, "--backfill-existing");
+
+  if (isBackfill) {
+    const result = backfillDownloadHistorySnapshots({ repoRoot });
+    for (const warning of result.warnings) {
+      console.warn(`[download-history] ${warning}`);
+    }
+    console.log(
+      `[download-history] Backfill complete: updated_files=${result.updatedFiles.length}`,
+    );
+    if (result.updatedFiles.length > 0) {
+      for (const file of result.updatedFiles) {
+        console.log(`[download-history] updated ${file}`);
+      }
+    }
+
+    if (process.env.GITHUB_OUTPUT) {
+      const outputLines = [
+        "snapshot_file=",
+        "previous_snapshot_file=",
+        "maps_total_downloads=",
+        "maps_net_downloads=",
+        "maps_entries=",
+        "mods_total_downloads=",
+        "mods_net_downloads=",
+        "mods_entries=",
+        `warning_count=${result.warnings.length}`,
+        `warnings_json=${toWarningsOutputJson(result.warnings)}`,
+      ];
+      appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);
+    }
+    return;
+  }
+
+  const forcedNow = parseDateOrThrow(getDateArg(argv));
   const result = generateDownloadHistorySnapshot({
     repoRoot,
     now: forcedNow,
