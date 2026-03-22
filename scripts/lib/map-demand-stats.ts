@@ -527,16 +527,27 @@ function applyDerivedFieldDefaults(manifest: MapManifest): boolean {
   const nextPopulationCount = Number.isFinite(manifest.population_count)
     ? manifest.population_count
     : 0;
+  const rawFileSizes = manifest.file_sizes;
+  const nextFileSizes: Record<string, number> = {};
+  if (rawFileSizes && typeof rawFileSizes === "object" && !Array.isArray(rawFileSizes)) {
+    for (const [key, value] of Object.entries(rawFileSizes)) {
+      if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+        nextFileSizes[key] = value;
+      }
+    }
+  }
 
   const changed = (
     manifest.residents_total !== nextResidentsTotal
     || manifest.points_count !== nextPointsCount
     || manifest.population_count !== nextPopulationCount
+    || JSON.stringify(manifest.file_sizes ?? {}) !== JSON.stringify(nextFileSizes)
   );
 
   manifest.residents_total = nextResidentsTotal;
   manifest.points_count = nextPointsCount;
   manifest.population_count = nextPopulationCount;
+  manifest.file_sizes = nextFileSizes;
   return changed;
 }
 

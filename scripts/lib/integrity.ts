@@ -14,6 +14,7 @@ export interface IntegrityVersionEntry {
   errors: string[];
   required_checks: Record<string, boolean>;
   matched_files: Record<string, string | null>;
+  file_sizes?: Record<string, number>;
   source: IntegritySource;
   fingerprint: string;
   checked_at: string;
@@ -51,6 +52,7 @@ export interface ZipCompletenessResult {
   warnings: string[];
   requiredChecks: Record<string, boolean>;
   matchedFiles: Record<string, string | null>;
+  fileSizes?: Record<string, number>;
 }
 
 interface InspectZipOptions {
@@ -66,6 +68,41 @@ function listTopLevelFileNames(zip: JSZip): Set<string> {
     names.add(entry.name);
   }
   return names;
+}
+
+function bytesToMebibytesRounded(value: number): number {
+  return Math.round((value / (1024 * 1024)) * 100) / 100;
+}
+
+function getEntryUncompressedSize(entry: JSZip.JSZipObject): number {
+  const rawData = entry as unknown as {
+    _data?: { uncompressedSize?: unknown };
+    options?: { uncompressedSize?: unknown };
+  };
+  const fromInternalData = rawData._data?.uncompressedSize;
+  if (typeof fromInternalData === "number" && Number.isFinite(fromInternalData) && fromInternalData >= 0) {
+    return fromInternalData;
+  }
+
+  const fromOptions = rawData.options?.uncompressedSize;
+  if (typeof fromOptions === "number" && Number.isFinite(fromOptions) && fromOptions >= 0) {
+    return fromOptions;
+  }
+
+  return 0;
+}
+
+function collectZipFileSizes(zip: JSZip): Record<string, number> {
+  const fileSizes: Record<string, number> = {};
+  const fileEntries = Object.values(zip.files)
+    .filter((entry) => !entry.dir)
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  for (const entry of fileEntries) {
+    fileSizes[entry.name] = bytesToMebibytesRounded(getEntryUncompressedSize(entry));
+  }
+
+  return fileSizes;
 }
 
 function firstMatch(files: Set<string>, names: string[]): string | null {
@@ -136,6 +173,7 @@ async function parseConfigCode(zip: JSZip): Promise<{
 
 function inspectMapZip(
   files: Set<string>,
+  fileSizes: Record<string, number>,
   registryCityCode: string | null,
   configCode: string | null,
   parseError: string | null,
@@ -219,6 +257,7 @@ function inspectMapZip(
     warnings,
     requiredChecks,
     matchedFiles,
+    fileSizes,
   };
 }
 
@@ -247,6 +286,7 @@ function inspectModZip(files: Set<string>, releaseHasManifestAsset: boolean): Zi
     warnings,
     requiredChecks,
     matchedFiles,
+    fileSizes: undefined,
   };
 }
 
@@ -269,6 +309,7 @@ export async function inspectZipCompleteness(
   }
 
   const topLevelFiles = listTopLevelFileNames(zip);
+  const zipFileSizes = collectZipFileSizes(zip);
   if (listingType === "map") {
     const registryCityCode = options.cityCode?.trim() || null;
     const configCodeResult = await parseConfigCode(zip);
@@ -286,6 +327,7 @@ export async function inspectZipCompleteness(
 
     return inspectMapZip(
       topLevelFiles,
+      zipFileSizes,
       registryCityCode,
       configCode,
       configCodeResult.parseError,

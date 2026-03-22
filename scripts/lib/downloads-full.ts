@@ -25,6 +25,16 @@ function versionedFingerprint(base: string): string {
   return `rules:${INTEGRITY_RULES_VERSION}:${base}`;
 }
 
+function isLegacyMapCacheMissingFileSizes(
+  listingType: D.GenerateDownloadsOptions["listingType"],
+  cacheEntry: IntegrityCacheEntry | undefined,
+): boolean {
+  if (listingType !== "map" || !cacheEntry) return false;
+  if (cacheEntry.result.is_complete !== true) return false;
+  const fileSizes = cacheEntry.result.file_sizes;
+  return !fileSizes || Object.keys(fileSizes).length === 0;
+}
+
 export async function generateDownloadsDataFull(
   options: D.GenerateDownloadsOptions,
 ): Promise<D.GenerateDownloadsResult> {
@@ -143,8 +153,10 @@ export async function generateDownloadsDataFull(
           repo,
           tag,
         };
+        const shouldReuseCached = shouldUseCachedIntegrity(cached, fingerprint, now)
+          && !isLegacyMapCacheMissingFileSizes(listingType, cached);
 
-        if (shouldUseCachedIntegrity(cached, fingerprint, now)) {
+        if (shouldReuseCached) {
           cacheHits += 1;
           versionEntries[tag] = cached.result;
           nextListingCacheEntries[tag] = cached;
@@ -262,8 +274,10 @@ export async function generateDownloadsDataFull(
           download_url: candidate.downloadUrl ?? undefined,
         };
         const cached = listingCacheEntries[versionKey];
+        const shouldReuseCached = shouldUseCachedIntegrity(cached, fingerprint, now)
+          && !isLegacyMapCacheMissingFileSizes(listingType, cached);
 
-        if (shouldUseCachedIntegrity(cached, fingerprint, now)) {
+        if (shouldReuseCached) {
           cacheHits += 1;
           versionEntries[versionKey] = cached.result;
           nextListingCacheEntries[versionKey] = cached;

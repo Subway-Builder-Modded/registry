@@ -94,6 +94,13 @@ const MAP_MANIFEST_PROPERTIES = {
     items: { enum: SPECIAL_DEMAND_TAGS },
     uniqueItems: true,
   },
+  file_sizes: {
+    type: "object",
+    additionalProperties: {
+      type: "number",
+      minimum: 0,
+    },
+  },
 } as const;
 
 const MAP_REQUIRED_FIELDS = [
@@ -110,6 +117,7 @@ const MAP_REQUIRED_FIELDS = [
   "level_of_detail",
   "location",
   "special_demand",
+  "file_sizes",
 ] as const;
 
 const REGISTRY_MANIFEST_SCHEMA = {

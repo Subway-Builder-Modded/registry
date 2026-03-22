@@ -254,11 +254,20 @@ export function withCheckResult(
   fingerprint: string,
   checkedAt: string,
 ): IntegrityVersionEntry {
+  const normalizedFileSizes = (
+    result.isComplete
+    && result.fileSizes
+    && Object.keys(result.fileSizes).length > 0
+  )
+    ? sortObjectByKeys(result.fileSizes)
+    : undefined;
+
   return {
     is_complete: result.isComplete,
     errors: result.errors,
     required_checks: result.requiredChecks,
     matched_files: result.matchedFiles,
+    file_sizes: normalizedFileSizes,
     source,
     fingerprint,
     checked_at: checkedAt,

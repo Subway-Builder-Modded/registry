@@ -90,6 +90,7 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
       level_of_detail: levelOfDetail,
       location,
       special_demand: specialDemand,
+      file_sizes: {},
     },
   };
 }

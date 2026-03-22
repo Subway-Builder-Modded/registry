@@ -38,6 +38,7 @@ export interface MapManifest extends ModManifest {
   level_of_detail: string;
   location: string;
   special_demand: string[];
+  file_sizes: Record<string, number>;
 }
 
 export type ListingManifest = ModManifest | MapManifest;
