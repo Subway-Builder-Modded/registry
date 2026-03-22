@@ -52,6 +52,8 @@ Local commands:
   - `pnpm --dir scripts run generate-downloads:mods:download-only`
 - Generate map demand stats only:
   - `pnpm --dir scripts run generate-registry-demand-stats`
+- Sync map manifest `file_sizes` from latest complete integrity versions:
+  - `pnpm --dir scripts run sync-map-file-sizes`
 
 Integrity behavior:
 
@@ -62,7 +64,7 @@ Integrity behavior:
 Automation:
 
 - `regenerate-downloads-hourly.yml` runs hourly in download-only mode (updates downloads only; no ZIP integrity pass).
-- `regenerate-registry-analytics.yml` runs every 8 hours in full mode (refreshes downloads + integrity + integrity cache, and map demand stats).
+- `regenerate-registry-analytics.yml` runs every 3 hours in full mode (refreshes downloads + integrity + integrity cache, map demand stats, and syncs map manifest `file_sizes` from integrity).
 - Full mode posts two Discord summaries (downloads/integrity and map demand stats) to the same webhook secret: `DISCORD_WEBHOOK_URL`.
 
 ## Download History
@@ -96,6 +98,7 @@ Map manifests now support auto-derived demand metrics from map ZIPs:
 - `residents_total`
 - `points_count`
 - `population_count`
+- `file_sizes` (synced from integrity for the latest complete semver version)
 
 Local command:
 

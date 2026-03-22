@@ -24,12 +24,55 @@ function makeBaseModManifest(id: string): Record<string, unknown> {
   };
 }
 
+function makeBaseMapManifest(id: string): Record<string, unknown> {
+  return {
+    schema_version: 1,
+    id,
+    name: id,
+    author: "test",
+    github_id: 1,
+    description: "desc",
+    tags: ["north-america"],
+    gallery: ["gallery/1.webp"],
+    source: "https://github.com/example/example",
+    city_code: "ABC",
+    country: "US",
+    population: 0,
+    residents_total: 0,
+    points_count: 0,
+    population_count: 0,
+    initial_view_state: {
+      latitude: 0,
+      longitude: 0,
+      zoom: 10,
+      bearing: 0,
+    },
+    data_source: "OSM",
+    source_quality: "low-quality",
+    level_of_detail: "low-detail",
+    location: "north-america",
+    special_demand: [],
+    file_sizes: {},
+  };
+}
+
 async function makeModZip(includeTopLevelManifest: boolean): Promise<Buffer> {
   const zip = new JSZip();
   if (includeTopLevelManifest) {
     zip.file("manifest.json", "{\"schema_version\":1}");
   }
   zip.file("mod.dll", "binary");
+  return zip.generateAsync({ type: "nodebuffer" });
+}
+
+async function makeMapZip(cityCode: string): Promise<Buffer> {
+  const zip = new JSZip();
+  zip.file("config.json", JSON.stringify({ code: cityCode }));
+  zip.file("demand_data.json", "{}");
+  zip.file("buildings_index.json", "{}");
+  zip.file("roads.geojson", "{}");
+  zip.file("runways_taxiways.geojson", "{}");
+  zip.file(`${cityCode}.pmtiles`, "stub");
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
@@ -509,5 +552,84 @@ test("download-only mode scrubs versions that are not complete in integrity snap
     assert.ok(
       result.warnings.some((warning) => warning.includes("v1.0.0") && warning.includes("excluded by integrity snapshot")),
     );
+  });
+});
+
+test("map complete versions include file_sizes and legacy cache entries without file_sizes are recomputed", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("maps", ["cache-map"]);
+    writeIndex("mods", []);
+    writeManifest("maps", "cache-map", {
+      ...makeBaseMapManifest("cache-map"),
+      update: { type: "github", repo: "owner/maprepo" },
+    });
+
+    const mapZip = await makeMapZip("ABC");
+    let zipFetchCount = 0;
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/map-v1.zip",
+        handle: () => {
+          zipFetchCount += 1;
+          return new Response(new Uint8Array(mapZip));
+        },
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "map-v1.zip", downloadCount: 11, downloadUrl: "https://downloads.example.com/map-v1.zip" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const first = await generateDownloadsData({
+      repoRoot,
+      listingType: "map",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.equal(zipFetchCount, 1);
+    assert.deepEqual(first.downloads, { "cache-map": { "v1.0.0": 11 } });
+    const firstVersion = first.integrity.listings["cache-map"]?.versions["v1.0.0"];
+    assert.equal(firstVersion?.is_complete, true);
+    assert.equal(typeof firstVersion?.file_sizes?.["config.json"], "number");
+    assert.equal(typeof firstVersion?.file_sizes?.["ABC.pmtiles"], "number");
+
+    const legacyCache = JSON.parse(JSON.stringify(first.integrityCache)) as {
+      entries: Record<string, Record<string, { result?: { file_sizes?: unknown } }>>;
+    };
+    if (legacyCache.entries["cache-map"]?.["v1.0.0"]?.result) {
+      delete legacyCache.entries["cache-map"]["v1.0.0"].result.file_sizes;
+    }
+    writeJson(join(repoRoot, "maps", "integrity-cache.json"), legacyCache);
+
+    const second = await generateDownloadsData({
+      repoRoot,
+      listingType: "map",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.equal(zipFetchCount, 2);
+    const secondVersion = second.integrity.listings["cache-map"]?.versions["v1.0.0"];
+    assert.equal(secondVersion?.is_complete, true);
+    assert.equal(typeof secondVersion?.file_sizes?.["config.json"], "number");
+    assert.equal(typeof secondVersion?.file_sizes?.["ABC.pmtiles"], "number");
   });
 });

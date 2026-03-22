@@ -262,6 +262,9 @@ jobs:
           cp "${MOD_INTEGRITY_CACHE_FILE}" mods/integrity-cache.json
           tar -xf "${DEMAND_ARTIFACT_FILE}" -C .
 
+      - name: Sync map manifest file sizes from integrity
+        run: pnpm --dir scripts run sync-map-file-sizes
+
       - name: Compute download change stats
         id: download_stats
         run: |
