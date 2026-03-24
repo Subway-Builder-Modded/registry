@@ -18,7 +18,7 @@ export async function makeAnnouncement(filename: string) {
     const modDescription = manifest.description?.trim();
     const modType = filename.includes("maps") ? "Map" : "Mod";
     const images = manifest.gallery;
-    const webhookUrl = process.env.DISCORD_WEBHOOK_URL?.trim();
+    const webhookUrl = process.env.DISCORD_ANNOUNCEMENT_WEBHOOK_URL?.trim();
 
     if (!modId || !modAuthor || !modDescription || !modType || !webhookUrl) {
         throw new Error('Missing required environment variables. Please set MOD_ID, MOD_AUTHOR, MOD_DESCRIPTION, MOD_TYPE, and DISCORD_WEBHOOK_URL.');

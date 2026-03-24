@@ -1,6 +1,7 @@
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { makeAnnouncement } from "./make-announcement.js";
 import { generateDownloadsData } from "./lib/downloads.js";
 import type { IntegrityOutput } from "./lib/integrity.js";
 import type { ManifestType } from "./lib/manifests.js";
@@ -14,6 +15,20 @@ function getNonEmptyEnv(name: string): string | undefined {
   if (typeof value !== "string") return undefined;
   const trimmed = value.trim();
   return trimmed === "" ? undefined : trimmed;
+}
+
+async function announceNewAssets(newIntegrity: IntegrityOutput, integrityPath: string): Promise<void> {
+  const previousIntegrityContent = readFileSync(integrityPath, "utf8");
+  const previousIntegrity: IntegrityOutput = JSON.parse(previousIntegrityContent);
+
+  const newListings = Object.entries(newIntegrity.listings)
+    .filter(([id]) => !previousIntegrity.listings[id])
+    .map(([id]) => id);
+  for (const listingId of newListings) {
+    const [listingType] = listingId.split("/");
+    const manifestPath = resolve(FALLBACK_REPO_ROOT, listingType === "maps" ? "maps" : "mods", listingId, "manifest.json");
+    await makeAnnouncement(manifestPath);
+  }
 }
 
 function getArgValue(name: string): string | undefined {
@@ -171,6 +186,7 @@ async function run(): Promise<void> {
   const integrityCachePath = resolve(repoRoot, outputDir, "integrity-cache.json");
   writeFileSync(outputPath, `${JSON.stringify(downloads, null, 2)}\n`, "utf-8");
   if (mode === "full") {
+    await announceNewAssets(integrity, integrityPath);
     writeFileSync(integrityPath, `${JSON.stringify(integrity, null, 2)}\n`, "utf-8");
     writeFileSync(integrityCachePath, `${JSON.stringify(integrityCache, null, 2)}\n`, "utf-8");
   }
