@@ -10,7 +10,7 @@ const BASE_ANNOUNCEMENT = `# New $TYPE! 🎉🎉
 See more [here](https://subwaybuildermodded.com/railyard/$TYPE_LOWER/$NAME_LOWER).`
 
 export async function makeAnnouncement(filename: string) {
-    const manifestContent = fs.readFileSync(`../${filename}`, 'utf-8');
+    const manifestContent = fs.readFileSync(filename, 'utf-8');
     const manifest = JSON.parse(manifestContent);
     const modName = manifest.name?.trim();
     const modId = manifest.id?.trim();
