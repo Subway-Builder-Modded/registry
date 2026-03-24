@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-24T21:33:45.569Z",
+  "generated_at": "2026-03-24T22:41:05.796Z",
   "listings": {
     "advanced-analytics": {
       "has_complete_version": true,
@@ -614,78 +614,70 @@
       }
     },
     "dep-test-mod": {
-      "has_complete_version": true,
-      "latest_semver_version": "v0.1.2",
-      "latest_semver_complete": true,
-      "complete_versions": [
-        "v0.1.2",
-        "v0.1.1",
-        "v0.1.0"
+      "has_complete_version": false,
+      "latest_semver_version": "0.1.3",
+      "latest_semver_complete": false,
+      "complete_versions": [],
+      "incomplete_versions": [
+        "0.1.3"
       ],
-      "incomplete_versions": [],
       "versions": {
-        "v0.1.0": {
-          "is_complete": true,
-          "errors": [],
+        "0.1.3": {
+          "is_complete": false,
+          "errors": [
+            "release asset manifest.json is missing"
+          ],
           "required_checks": {
-            "release_manifest_asset": true,
+            "release_manifest_asset": false,
             "zip_manifest_json": true
           },
           "matched_files": {
-            "release_manifest_asset": "manifest.json",
+            "release_manifest_asset": null,
             "zip_manifest_json": "manifest.json"
           },
           "source": {
-            "update_type": "github",
+            "update_type": "custom",
             "repo": "subway-builder-modded/dependency-test-mod",
-            "tag": "v0.1.0",
-            "asset_name": "mod.zip",
-            "download_url": "https://github.com/Subway-Builder-Modded/Dependency-Test-Mod/releases/download/v0.1.0/mod.zip"
+            "tag": "v0.1.3",
+            "asset_name": "mod-base.zip",
+            "download_url": "https://github.com/Subway-Builder-Modded/Dependency-Test-Mod/releases/download/v0.1.3/mod-base.zip"
           },
-          "fingerprint": "rules:v2:github:subway-builder-modded/dependency-test-mod:v0.1.0:mod.zip",
-          "checked_at": "2026-03-24T19:21:08.978Z"
-        },
-        "v0.1.1": {
-          "is_complete": true,
-          "errors": [],
+          "fingerprint": "rules:v2:sha256:f2ef5d8c5d1c20428ca43dbe33c15a56545e1b6487b57ed590132c91eb068581",
+          "checked_at": "2026-03-24T22:41:05.796Z"
+        }
+      }
+    },
+    "dep-test-mod-nested": {
+      "has_complete_version": false,
+      "latest_semver_version": "0.1.0",
+      "latest_semver_complete": false,
+      "complete_versions": [],
+      "incomplete_versions": [
+        "0.1.0"
+      ],
+      "versions": {
+        "0.1.0": {
+          "is_complete": false,
+          "errors": [
+            "release asset manifest.json is missing"
+          ],
           "required_checks": {
-            "release_manifest_asset": true,
+            "release_manifest_asset": false,
             "zip_manifest_json": true
           },
           "matched_files": {
-            "release_manifest_asset": "manifest.json",
+            "release_manifest_asset": null,
             "zip_manifest_json": "manifest.json"
           },
           "source": {
-            "update_type": "github",
+            "update_type": "custom",
             "repo": "subway-builder-modded/dependency-test-mod",
-            "tag": "v0.1.1",
-            "asset_name": "mod.zip",
-            "download_url": "https://github.com/Subway-Builder-Modded/Dependency-Test-Mod/releases/download/v0.1.1/mod.zip"
+            "tag": "v0.1.3",
+            "asset_name": "mod-nested.zip",
+            "download_url": "https://github.com/Subway-Builder-Modded/Dependency-Test-Mod/releases/download/v0.1.3/mod-nested.zip"
           },
-          "fingerprint": "rules:v2:github:subway-builder-modded/dependency-test-mod:v0.1.1:mod.zip",
-          "checked_at": "2026-03-24T19:21:08.978Z"
-        },
-        "v0.1.2": {
-          "is_complete": true,
-          "errors": [],
-          "required_checks": {
-            "release_manifest_asset": true,
-            "zip_manifest_json": true
-          },
-          "matched_files": {
-            "release_manifest_asset": "manifest.json",
-            "zip_manifest_json": "manifest.json"
-          },
-          "source": {
-            "update_type": "github",
-            "repo": "subway-builder-modded/dependency-test-mod",
-            "tag": "v0.1.2",
-            "asset_name": "mod.zip",
-            "download_url": "https://github.com/Subway-Builder-Modded/Dependency-Test-Mod/releases/download/v0.1.2/mod.zip"
-          },
-          "fingerprint": "rules:v2:github:subway-builder-modded/dependency-test-mod:v0.1.2:mod.zip",
-          "checked_at": "2026-03-24T19:21:08.978Z"
+          "fingerprint": "rules:v2:sha256:b349979441e85edd710d3ecd25f916a2a0a170f022e0583fd7663d36c1533fd2",
+          "checked_at": "2026-03-24T22:41:05.796Z"
         }
       }
     },
