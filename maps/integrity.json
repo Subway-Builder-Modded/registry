@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-24T01:44:50.537Z",
+  "generated_at": "2026-03-24T03:21:02.787Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -366,161 +366,15 @@
     },
     "cairo": {
       "has_complete_version": true,
-      "latest_semver_version": "v2.0.1",
+      "latest_semver_version": "2.0.1",
       "latest_semver_complete": true,
       "complete_versions": [
-        "v2.0.1",
-        "v2.0.0",
-        "v1.2.0",
-        "v1.0.1",
-        "v1.0.0"
+        "2.0.1",
+        "2.0.0"
       ],
-      "incomplete_versions": [
-        "v1.1.0"
-      ],
+      "incomplete_versions": [],
       "versions": {
-        "rtm-v1.0.0": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'rtm-v1.0.0'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
-          "source": {
-            "update_type": "github",
-            "repo": "ryandicicco/subway-builder-maps",
-            "tag": "rtm-v1.0.0"
-          },
-          "fingerprint": "rules:v2:github:ryandicicco/subway-builder-maps:rtm-v1.0.0:RTM.zip",
-          "checked_at": "2026-03-24T01:44:50.537Z"
-        },
-        "v1.0.0": {
-          "is_complete": true,
-          "errors": [],
-          "required_checks": {
-            "config_json": true,
-            "demand_data": true,
-            "buildings_index": true,
-            "roads_geojson": true,
-            "runways_taxiways_geojson": true,
-            "city_pmtiles": true
-          },
-          "matched_files": {
-            "config_json": "config.json",
-            "demand_data": "demand_data.json",
-            "buildings_index": "buildings_index.json",
-            "roads_geojson": "roads.geojson",
-            "runways_taxiways_geojson": "runways_taxiways.geojson",
-            "city_pmtiles": "AMS.pmtiles"
-          },
-          "file_sizes": {
-            "AMS.pmtiles": 96.47,
-            "buildings_index.json": 158.74,
-            "config.json": 0,
-            "demand_data.json": 0.94,
-            "roads.geojson": 21.38,
-            "runways_taxiways.geojson": 1.19
-          },
-          "source": {
-            "update_type": "github",
-            "repo": "ryandicicco/subway-builder-maps",
-            "tag": "v1.0.0",
-            "asset_name": "AMS.zip",
-            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.0/AMS.zip"
-          },
-          "fingerprint": "rules:v2:github:ryandicicco/subway-builder-maps:v1.0.0:AMS.zip",
-          "checked_at": "2026-03-24T01:44:50.537Z"
-        },
-        "v1.0.1": {
-          "is_complete": true,
-          "errors": [],
-          "required_checks": {
-            "config_json": true,
-            "demand_data": true,
-            "buildings_index": true,
-            "roads_geojson": true,
-            "runways_taxiways_geojson": true,
-            "city_pmtiles": true
-          },
-          "matched_files": {
-            "config_json": "config.json",
-            "demand_data": "demand_data.json",
-            "buildings_index": "buildings_index.json",
-            "roads_geojson": "roads.geojson",
-            "runways_taxiways_geojson": "runways_taxiways.geojson",
-            "city_pmtiles": "RTM.pmtiles"
-          },
-          "file_sizes": {
-            "RTM.pmtiles": 86.94,
-            "buildings_index.json": 262.53,
-            "config.json": 0,
-            "demand_data.json": 0.91,
-            "roads.geojson": 21.27,
-            "runways_taxiways.geojson": 0.1
-          },
-          "source": {
-            "update_type": "github",
-            "repo": "ryandicicco/subway-builder-maps",
-            "tag": "v1.0.1",
-            "asset_name": "RTM.zip",
-            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.1/RTM.zip"
-          },
-          "fingerprint": "rules:v2:github:ryandicicco/subway-builder-maps:v1.0.1:RTM.zip",
-          "checked_at": "2026-03-24T01:44:50.537Z"
-        },
-        "v1.1.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'AMS_v101.zip': missing top-level AMS.pmtiles (config code 'AMS', registry city_code 'CAI')"
-          ],
-          "required_checks": {},
-          "matched_files": {},
-          "source": {
-            "update_type": "github",
-            "repo": "ryandicicco/subway-builder-maps",
-            "tag": "v1.1.0"
-          },
-          "fingerprint": "rules:v2:github:ryandicicco/subway-builder-maps:v1.1.0:AMS_v101.zip",
-          "checked_at": "2026-03-24T01:44:50.537Z"
-        },
-        "v1.2.0": {
-          "is_complete": true,
-          "errors": [],
-          "required_checks": {
-            "config_json": true,
-            "demand_data": true,
-            "buildings_index": true,
-            "roads_geojson": true,
-            "runways_taxiways_geojson": true,
-            "city_pmtiles": true
-          },
-          "matched_files": {
-            "config_json": "config.json",
-            "demand_data": "demand_data.json",
-            "buildings_index": "buildings_index.json",
-            "roads_geojson": "roads.geojson",
-            "runways_taxiways_geojson": "runways_taxiways.geojson",
-            "city_pmtiles": "AMS.pmtiles"
-          },
-          "file_sizes": {
-            "AMS.pmtiles": 96.47,
-            "buildings_index.json": 158.74,
-            "config.json": 0,
-            "demand_data.json": 0.86,
-            "roads.geojson": 21.38,
-            "runways_taxiways.geojson": 1.19
-          },
-          "source": {
-            "update_type": "github",
-            "repo": "ryandicicco/subway-builder-maps",
-            "tag": "v1.2.0",
-            "asset_name": "AMS_v120_full.zip",
-            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.2.0/AMS_v120_full.zip"
-          },
-          "fingerprint": "rules:v2:github:ryandicicco/subway-builder-maps:v1.2.0:AMS_v120_full.zip",
-          "checked_at": "2026-03-24T01:44:50.537Z"
-        },
-        "v2.0.0": {
+        "2.0.0": {
           "is_complete": true,
           "errors": [],
           "required_checks": {
@@ -548,16 +402,16 @@
             "runways_taxiways.geojson": 1.47
           },
           "source": {
-            "update_type": "github",
+            "update_type": "custom",
             "repo": "ryandicicco/subway-builder-maps",
             "tag": "v2.0.0",
             "asset_name": "CAI.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.0.0/CAI.zip"
           },
-          "fingerprint": "rules:v2:github:ryandicicco/subway-builder-maps:v2.0.0:CAI.zip",
-          "checked_at": "2026-03-24T01:44:50.537Z"
+          "fingerprint": "rules:v2:sha256:5685812a9561acdc58e0b6317049790dee375227aad10ef42012e03c04ee1201",
+          "checked_at": "2026-03-24T03:21:02.787Z"
         },
-        "v2.0.1": {
+        "2.0.1": {
           "is_complete": true,
           "errors": [],
           "required_checks": {
@@ -585,14 +439,14 @@
             "runways_taxiways.geojson": 1.47
           },
           "source": {
-            "update_type": "github",
+            "update_type": "custom",
             "repo": "ryandicicco/subway-builder-maps",
             "tag": "v2.0.1",
             "asset_name": "CAI.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.0.1/CAI.zip"
           },
-          "fingerprint": "rules:v2:github:ryandicicco/subway-builder-maps:v2.0.1:CAI.zip",
-          "checked_at": "2026-03-24T01:44:50.537Z"
+          "fingerprint": "rules:v2:sha256:eb5f6f280e7d6ace4047627fe19d801e159c596f4b9758a2ec38123a842ad077",
+          "checked_at": "2026-03-24T03:21:02.787Z"
         }
       }
     },
