@@ -25,6 +25,9 @@ async function announceNewAssets(newIntegrity: IntegrityOutput, integrityPath: s
     .filter(([id]) => !previousIntegrity.listings[id])
     .map(([id]) => id);
   for (const listingId of newListings) {
+    if(!newIntegrity.listings[listingId]?.has_complete_version) {
+      continue;
+    }
     const [listingType] = listingId.split("/");
     const manifestPath = resolve(FALLBACK_REPO_ROOT, listingType === "maps" ? "maps" : "mods", listingId, "manifest.json");
     await makeAnnouncement(manifestPath);
