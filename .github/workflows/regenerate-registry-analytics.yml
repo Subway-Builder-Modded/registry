@@ -51,6 +51,7 @@ jobs:
       - name: Generate map registry analytics
         id: generate_map_analytics
         env:
+          DISCORD_ANNOUNCEMENT_WEBHOOK_URL: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run generate-registry-analytics:maps
 
@@ -96,6 +97,7 @@ jobs:
         id: generate_mod_analytics
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_ANNOUNCEMENT_WEBHOOK_URL: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK_URL }}
         run: pnpm --dir scripts run generate-registry-analytics:mods
 
       - name: Upload mod downloads artifact

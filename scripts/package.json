@@ -4,6 +4,7 @@
   "type": "module",
   "packageManager": "pnpm@10.19.0",
   "scripts": {
+    "make-announcement": "tsx make-announcement.ts --filename",
     "test": "pnpm run test:build && pnpm run test:run",
     "test:build": "tsc -p tsconfig.test.json",
     "test:run": "node --test .test-dist/tests/*.test.js",
