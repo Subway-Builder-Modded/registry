@@ -12,6 +12,9 @@ jobs:
   announce:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed to compare with previous commit
       - uses: pnpm/action-setup@v4
         with:
           version: 10
@@ -25,9 +28,6 @@ jobs:
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile
         working-directory: scripts
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Needed to compare with previous commit
 
       - name: Check if file was created
         id: check_file
