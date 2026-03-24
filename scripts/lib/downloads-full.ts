@@ -20,7 +20,7 @@ import {
   withCheckResult,
 } from "./downloads-support.js";
 
-const INTEGRITY_RULES_VERSION = "v2";
+const INTEGRITY_RULES_VERSION = "v3";
 
 function versionedFingerprint(base: string): string {
   return `rules:${INTEGRITY_RULES_VERSION}:${base}`;
