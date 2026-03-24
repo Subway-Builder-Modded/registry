@@ -21,6 +21,8 @@ export interface CustomVersionCandidate {
   downloadUrl: string | null;
   sha256: string | null;
   parsed: D.ParsedReleaseAssetUrl | null;
+  manifestUrl: string | null;
+  parsedManifest: D.ParsedReleaseAssetUrl | null;
   errors: string[];
 }
 
@@ -387,11 +389,14 @@ export async function fetchCustomVersions(
     const semver = isSupportedReleaseTag(version);
     const rawDownload = (entry as { download?: unknown }).download;
     const downloadUrl = isNonEmptyString(rawDownload) ? normalizeWhitespace(rawDownload) : null;
+    const rawManifest = (entry as { manifest?: unknown }).manifest;
+    const manifestUrl = isNonEmptyString(rawManifest) ? normalizeWhitespace(rawManifest) : null;
     const sha256 = isNonEmptyString((entry as { sha256?: unknown }).sha256)
       ? normalizeWhitespace((entry as { sha256: string }).sha256)
       : null;
 
     const parsed = downloadUrl ? parseGitHubReleaseAssetDownloadUrl(downloadUrl) : null;
+    const parsedManifest = manifestUrl ? parseGitHubReleaseAssetDownloadUrl(manifestUrl) : null;
     const errors: string[] = [];
     if (!semver) {
       errors.push(`non-semver version '${version}'`);
@@ -408,6 +413,8 @@ export async function fetchCustomVersions(
       downloadUrl,
       sha256,
       parsed,
+      manifestUrl,
+      parsedManifest,
       errors,
     });
   }

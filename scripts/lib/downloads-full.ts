@@ -4,6 +4,7 @@ import { createGraphqlUsageState, fetchRepoReleaseIndexes, isSupportedReleaseTag
 import type { IntegrityCache, IntegrityCacheEntry, IntegritySource, IntegrityVersionEntry, ListingIntegrityEntry } from "./integrity.js";
 import { inspectZipCompleteness } from "./integrity.js";
 import {
+  type CustomVersionCandidate,
   type ListingContext,
   buildIncompleteVersionEntry,
   createListingIntegrityEntry,
@@ -33,6 +34,33 @@ function isLegacyMapCacheMissingFileSizes(
   if (cacheEntry.result.is_complete !== true) return false;
   const fileSizes = cacheEntry.result.file_sizes;
   return !fileSizes || Object.keys(fileSizes).length === 0;
+}
+
+function resolveExpectedCustomReleaseManifestAssetName(
+  candidate: CustomVersionCandidate,
+  warnings: string[],
+  listingId: string,
+): string {
+  if (!candidate.parsedManifest) {
+    return "manifest.json";
+  }
+  if (!candidate.parsed) {
+    return "manifest.json";
+  }
+
+  const manifestRepo = candidate.parsedManifest.repo;
+  const manifestTag = candidate.parsedManifest.tag;
+  if (manifestRepo !== candidate.parsed.repo || manifestTag !== candidate.parsed.tag) {
+    warnListing(
+      warnings,
+      listingId,
+      `manifest URL targets ${manifestRepo}@${manifestTag} but download URL targets ${candidate.parsed.repo}@${candidate.parsed.tag}; falling back to manifest.json release-asset check`,
+      candidate.version,
+    );
+    return "manifest.json";
+  }
+
+  return candidate.parsedManifest.assetName;
 }
 
 export async function generateDownloadsDataFull(
@@ -254,15 +282,20 @@ export async function generateDownloadsDataFull(
       for (const candidate of context.update.versions) {
         const versionKey = candidate.version;
         versionsChecked += 1;
+        const expectedReleaseManifestAssetName = resolveExpectedCustomReleaseManifestAssetName(
+          candidate,
+          warnings,
+          id,
+        );
 
         const fallbackFingerprintBase = candidate.sha256
           ? `sha256:${candidate.sha256}`
-          : `custom:${versionKey}:${candidate.downloadUrl ?? "missing-download"}`;
+          : `custom:${versionKey}:${candidate.downloadUrl ?? "missing-download"}:${expectedReleaseManifestAssetName}`;
         const fingerprintBase = candidate.sha256
           ? `sha256:${candidate.sha256}`
           : (
             candidate.parsed
-              ? `custom:${candidate.parsed.repo}:${candidate.parsed.tag}:${candidate.parsed.assetName}:${candidate.downloadUrl ?? "missing-download"}`
+              ? `custom:${candidate.parsed.repo}:${candidate.parsed.tag}:${candidate.parsed.assetName}:${expectedReleaseManifestAssetName}:${candidate.downloadUrl ?? "missing-download"}`
               : fallbackFingerprintBase
           );
         const fingerprint = versionedFingerprint(fingerprintBase);
@@ -403,7 +436,8 @@ export async function generateDownloadsDataFull(
                 } else {
                   const check = await inspectZipCompleteness(listingType, zipBuffer, {
                     cityCode: context.cityCode,
-                    releaseHasManifestAsset: release.assets.has("manifest.json"),
+                    releaseHasManifestAsset: release.assets.has(expectedReleaseManifestAssetName),
+                    expectedReleaseManifestAssetName,
                   });
                   for (const warning of check.warnings) {
                     warnListing(warnings, id, `integrity warning (${warning})`, versionKey);

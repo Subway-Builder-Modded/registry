@@ -58,6 +58,7 @@ export interface ZipCompletenessResult {
 interface InspectZipOptions {
   cityCode?: string;
   releaseHasManifestAsset?: boolean;
+  expectedReleaseManifestAssetName?: string;
 }
 
 function listTopLevelFileNames(zip: JSZip): Set<string> {
@@ -261,16 +262,20 @@ function inspectMapZip(
   };
 }
 
-function inspectModZip(files: Set<string>, releaseHasManifestAsset: boolean): ZipCompletenessResult {
+function inspectModZip(
+  files: Set<string>,
+  releaseHasManifestAsset: boolean,
+  expectedReleaseManifestAssetName: string,
+): ZipCompletenessResult {
   const requiredChecks: Record<string, boolean> = {};
   const matchedFiles: Record<string, string | null> = {};
   const errors: string[] = [];
   const warnings: string[] = [];
 
   requiredChecks.release_manifest_asset = releaseHasManifestAsset;
-  matchedFiles.release_manifest_asset = releaseHasManifestAsset ? "manifest.json" : null;
+  matchedFiles.release_manifest_asset = releaseHasManifestAsset ? expectedReleaseManifestAssetName : null;
   if (!releaseHasManifestAsset) {
-    errors.push("release asset manifest.json is missing");
+    errors.push(`release asset ${expectedReleaseManifestAssetName} is missing`);
   }
 
   const manifestInZip = firstMatch(files, ["manifest.json"]);
@@ -335,5 +340,16 @@ export async function inspectZipCompleteness(
     );
   }
 
-  return inspectModZip(topLevelFiles, options.releaseHasManifestAsset === true);
+  const expectedReleaseManifestAssetName = (
+    typeof options.expectedReleaseManifestAssetName === "string"
+    && options.expectedReleaseManifestAssetName.trim() !== ""
+  )
+    ? options.expectedReleaseManifestAssetName.trim()
+    : "manifest.json";
+
+  return inspectModZip(
+    topLevelFiles,
+    options.releaseHasManifestAsset === true,
+    expectedReleaseManifestAssetName,
+  );
 }

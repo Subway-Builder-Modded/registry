@@ -326,6 +326,78 @@ test("custom mixed versions produce explicit invalid integrity entries and hard-
   });
 });
 
+test("custom mod integrity honors versions[].manifest asset name when checking release assets", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["custom-manifest-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "custom-manifest-mod", {
+      ...makeBaseModManifest("custom-manifest-mod"),
+      update: { type: "custom", url: "https://example.com/custom-update-manifest.json" },
+    });
+
+    const validZip = await makeModZip(true);
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://example.com/custom-update-manifest.json",
+        handle: () => jsonResponse({
+          schema_version: 1,
+          versions: [
+            {
+              version: "0.1.0",
+              download: "https://github.com/Owner/ManifestMod/releases/download/v0.1.3/mod-nested.zip",
+              manifest: "https://github.com/Owner/ManifestMod/releases/download/v0.1.3/manifest-nested.json",
+              sha256: "sha-manifest",
+            },
+          ],
+        }),
+      },
+      {
+        match: (url) => url === "https://downloads.example.com/mod-nested.zip",
+        handle: () => new Response(new Uint8Array(validZip)),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v0.1.3",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "mod-nested.zip", downloadCount: 13, downloadUrl: "https://downloads.example.com/mod-nested.zip" },
+                        { name: "manifest-nested.json", downloadCount: 13, downloadUrl: "https://downloads.example.com/manifest-nested.json" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.deepEqual(result.downloads, {
+      "custom-manifest-mod": {
+        "0.1.0": 13,
+      },
+    });
+    assert.equal(result.integrity.listings["custom-manifest-mod"]?.versions["0.1.0"]?.is_complete, true);
+    assert.equal(result.stats.filtered_versions, 0);
+  });
+});
+
 test("non-sha integrity cache reuses recent entries without refetching ZIPs", async () => {
   await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
     writeIndex("mods", ["cache-mod"]);
