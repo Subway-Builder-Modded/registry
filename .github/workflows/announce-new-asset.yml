@@ -32,9 +32,9 @@ jobs:
       - name: Check if file was created
         id: check_file
         run: |
-          if git diff --name-status HEAD^ HEAD | grep "A^" | cut -f2 | grep -E '^(mods|maps)/[^/]+/manifest\.json$'; then
+          if git diff --name-status HEAD^ HEAD | grep "A" | cut -f2 | grep "manifest.json"; then
             echo "file_created=true" >> $GITHUB_OUTPUT
-            echo "file_name=$(git diff --name-status HEAD^ HEAD | grep "A" | cut -f2 | grep "manifest.json" >> $GITHUB_OUTPUT
+            echo "file_name=$(git diff --name-status HEAD^ HEAD | grep "A" | cut -f2 | grep "manifest.json") >> $GITHUB_OUTPUT
           else
             echo "file_created=false" >> $GITHUB_OUTPUT
           fi
