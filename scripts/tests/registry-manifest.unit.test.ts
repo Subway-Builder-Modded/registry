@@ -12,6 +12,7 @@ function makeMapManifest(fileSizes: unknown): Record<string, unknown> {
     description: "desc",
     tags: ["north-america"],
     gallery: ["gallery/1.webp"],
+    is_test: false,
     source: "https://example.com",
     update: { type: "github", repo: "owner/repo" },
     city_code: "AAA",

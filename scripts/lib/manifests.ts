@@ -21,6 +21,7 @@ export interface ModManifest {
   description: string;
   tags: string[];
   gallery: string[];
+  is_test: boolean;
   source: string;
   update: UpdateType;
 }

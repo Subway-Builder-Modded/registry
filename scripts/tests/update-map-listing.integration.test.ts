@@ -16,6 +16,7 @@ function makeBaseManifest(): MapManifest {
     description: "Sample description",
     tags: ["north-america", "airports"],
     gallery: ["gallery/1.webp"],
+    is_test: false,
     source: "https://example.com",
     update: { type: "github", repo: "owner/repo" },
     city_code: "NYC",

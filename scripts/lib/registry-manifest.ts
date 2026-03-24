@@ -23,6 +23,7 @@ const BASE_MANIFEST_PROPERTIES = {
     type: "array",
     items: { type: "string", minLength: 1 },
   },
+  is_test: { type: "boolean" },
   source: { type: "string", format: "uri" },
   update: {
     oneOf: [
@@ -57,6 +58,7 @@ const BASE_REQUIRED_FIELDS = [
   "description",
   "tags",
   "gallery",
+  "is_test",
   "source",
   "update",
 ] as const;

@@ -139,6 +139,7 @@ async function main() {
     description,
     tags,
     gallery: galleryPaths,
+    is_test: false,
     source: String(data.source),
     update: buildUpdate(data),
     ...(mapData ? mapData.mapFields : {}),

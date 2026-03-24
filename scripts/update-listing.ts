@@ -98,6 +98,9 @@ async function main() {
     | MapManifest;
 
   applyCommonMetadataUpdates(manifest, data);
+  if (typeof manifest.is_test !== "boolean") {
+    manifest.is_test = false;
+  }
 
   if (manifestType === "mod") {
     applyModTagUpdates(manifest as ModManifest, data);
