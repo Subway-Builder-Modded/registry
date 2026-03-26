@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-25T21:34:35.848Z",
+  "generated_at": "2026-03-26T00:02:01.227Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -5432,9 +5432,10 @@
     },
     "yukina-osaka": {
       "has_complete_version": true,
-      "latest_semver_version": "0.1.0",
+      "latest_semver_version": "0.1.1",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.1.1",
         "0.1.0"
       ],
       "incomplete_versions": [],
@@ -5476,6 +5477,44 @@
           },
           "fingerprint": "rules:v3:sha256:79265f09c8c0a855e22e17d40487d3f59c14b247ecdef530b835871c7b9c9a33",
           "checked_at": "2026-03-25T18:51:04.350Z"
+        },
+        "0.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ITM.pmtiles"
+          },
+          "file_sizes": {
+            "ITM.pmtiles": 106.2,
+            "buildings_index.json": 248.2,
+            "config.json": 0.01,
+            "demand_data.json": 348.04,
+            "roads.geojson": 59.48,
+            "runways_taxiways.geojson": 1.93,
+            "water.geojson": 8.83
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-jp-maps",
+            "tag": "0.3.1",
+            "asset_name": "ITM.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.3.1/ITM.zip"
+          },
+          "fingerprint": "rules:v3:sha256:896ec40f84f60bffb626fab97ac6e715617c543f934823189377cb60743f83a9",
+          "checked_at": "2026-03-26T00:02:01.227Z"
         }
       }
     },
