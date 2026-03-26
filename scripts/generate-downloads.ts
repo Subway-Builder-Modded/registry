@@ -17,20 +17,44 @@ function getNonEmptyEnv(name: string): string | undefined {
   return trimmed === "" ? undefined : trimmed;
 }
 
-async function announceNewAssets(newIntegrity: IntegrityOutput, integrityPath: string): Promise<void> {
-  const previousIntegrityContent = readFileSync(integrityPath, "utf8");
-  const previousIntegrity: IntegrityOutput = JSON.parse(previousIntegrityContent);
+async function announceNewAssets(
+  newIntegrity: IntegrityOutput,
+  integrityPath: string,
+  listingType: ManifestType,
+  repoRoot: string,
+): Promise<void> {
+  let previousIntegrity: IntegrityOutput = {
+    schema_version: 1,
+    generated_at: "",
+    listings: {},
+  };
+  try {
+    const previousIntegrityContent = readFileSync(integrityPath, "utf8");
+    previousIntegrity = JSON.parse(previousIntegrityContent) as IntegrityOutput;
+  } catch {
+    // No prior integrity file is acceptable on first run.
+  }
 
   const newListings = Object.entries(newIntegrity.listings)
     .filter(([id]) => !previousIntegrity.listings[id])
     .map(([id]) => id);
   for (const listingId of newListings) {
-    if(!newIntegrity.listings[listingId]?.has_complete_version) {
+    if (!newIntegrity.listings[listingId]?.has_complete_version) {
       continue;
     }
-    const [listingType] = listingId.split("/");
-    const manifestPath = resolve(FALLBACK_REPO_ROOT, listingType === "maps" ? "maps" : "mods", listingId, "manifest.json");
-    await makeAnnouncement(manifestPath);
+    const manifestPath = resolve(
+      repoRoot,
+      listingType === "map" ? "maps" : "mods",
+      listingId,
+      "manifest.json",
+    );
+    try {
+      await makeAnnouncement(manifestPath);
+    } catch (error) {
+      console.warn(
+        `[downloads] announcement skipped for ${listingId} (${(error as Error).message})`,
+      );
+    }
   }
 }
 
@@ -189,7 +213,7 @@ async function run(): Promise<void> {
   const integrityCachePath = resolve(repoRoot, outputDir, "integrity-cache.json");
   writeFileSync(outputPath, `${JSON.stringify(downloads, null, 2)}\n`, "utf-8");
   if (mode === "full") {
-    await announceNewAssets(integrity, integrityPath);
+    await announceNewAssets(integrity, integrityPath, listingType, repoRoot);
     writeFileSync(integrityPath, `${JSON.stringify(integrity, null, 2)}\n`, "utf-8");
     writeFileSync(integrityCachePath, `${JSON.stringify(integrityCache, null, 2)}\n`, "utf-8");
   }
