@@ -63,9 +63,9 @@ interface AuthorTotalDownloadsRow {
 
 type ListingKey = `${"maps" | "mods"}:${string}`;
 
-const TOP_LISTINGS = 25;
-const TOP_AUTHORS = 10;
-const WINDOWS = [1, 3, 7] as const;
+const TOP_LISTINGS = 30;
+const TOP_AUTHORS = 20;
+const WINDOWS = [1, 3, 7, 14] as const;
 
 const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
   ? resolve(import.meta.dirname, "..", "..")
