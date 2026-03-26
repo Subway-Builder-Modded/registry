@@ -157,12 +157,12 @@ async function requestRepoReleasesPage(
 
 function aggregateReleaseDataByTag(releases: Array<{
   tagName: string;
-  assets: Array<{ name: string; downloadCount: number; downloadUrl: string | null }>;
+  assets: Array<{ name: string; downloadCount: number; downloadUrl: string | null; sizeBytes: number | null }>;
 }>): Map<string, D.RepoReleaseTagData> {
   const byTag = new Map<string, D.RepoReleaseTagData>();
   for (const release of releases) {
     if (!isNonEmptyString(release.tagName)) continue;
-    const assets = new Map<string, { downloadCount: number; downloadUrl: string | null }>();
+    const assets = new Map<string, { downloadCount: number; downloadUrl: string | null; sizeBytes: number | null }>();
     let zipTotal = 0;
 
     for (const asset of release.assets) {
@@ -170,6 +170,7 @@ function aggregateReleaseDataByTag(releases: Array<{
       assets.set(asset.name, {
         downloadCount: asset.downloadCount,
         downloadUrl: asset.downloadUrl,
+        sizeBytes: Number.isFinite(asset.sizeBytes) ? asset.sizeBytes : null,
       });
       if (asset.name.toLowerCase().endsWith(".zip")) {
         zipTotal += asset.downloadCount;
@@ -227,6 +228,7 @@ async function fetchGraphqlReleaseIndexForRepo(
         name: asset.name,
         downloadCount: asset.downloadCount,
         downloadUrl: asset.downloadUrl,
+        sizeBytes: typeof asset.size === "number" && Number.isFinite(asset.size) ? asset.size : null,
       }));
       if (release.releaseAssets.pageInfo.hasNextPage) {
         warn(

@@ -75,6 +75,17 @@ function getArgValue(name: string): string | undefined {
   return undefined;
 }
 
+function hasArgFlag(name: string): boolean {
+  const target = `--${name}`;
+  return process.argv.slice(2).includes(target);
+}
+
+function isTruthyEnv(value: string | undefined): boolean {
+  if (!value) return false;
+  const normalized = value.trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
+}
+
 function resolveListingType(rawValue: string | undefined): ManifestType {
   if (rawValue === "map" || rawValue === "mod") {
     return rawValue;
@@ -179,6 +190,11 @@ async function run(): Promise<void> {
     getArgValue("type") ?? process.env.LISTING_TYPE,
   );
   const mode = resolveMode(getArgValue("mode") ?? process.env.DOWNLOADS_MODE);
+  const strictFingerprintCache = (
+    hasArgFlag("strict-fingerprint-cache")
+    || isTruthyEnv(process.env.STRICT_FINGERPRINT_CACHE)
+    || isTruthyEnv(process.env.REGISTRY_STRICT_FINGERPRINT_CACHE)
+  );
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
   const ghDownloadsToken = getNonEmptyEnv("GH_DOWNLOADS_TOKEN");
   const githubToken = getNonEmptyEnv("GITHUB_TOKEN");
@@ -204,6 +220,7 @@ async function run(): Promise<void> {
     repoRoot,
     listingType,
     mode,
+    strictFingerprintCache,
     token,
   });
 
@@ -224,6 +241,9 @@ async function run(): Promise<void> {
 
   console.log(
     `[downloads] Mode: ${mode}`,
+  );
+  console.log(
+    `[downloads] Strict fingerprint cache: ${strictFingerprintCache ? "enabled" : "disabled"}`,
   );
   console.log(
     `[downloads] GraphQL usage: queries=${rateLimit.queries}, totalCost=${rateLimit.totalCost}, firstRemaining=${rateLimit.firstRemaining ?? "n/a"}, lastRemaining=${rateLimit.lastRemaining ?? "n/a"}, estimatedConsumed=${rateLimit.estimatedConsumed ?? "n/a"}, resetAt=${rateLimit.resetAt ?? "n/a"}`,

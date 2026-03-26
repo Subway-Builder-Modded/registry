@@ -13,9 +13,10 @@ function getNonEmptyEnv(name: string): string | undefined {
   return trimmed === "" ? undefined : trimmed;
 }
 
-function parseCliArgs(argv: string[]): { force: boolean; mapId?: string } {
+function parseCliArgs(argv: string[]): { force: boolean; mapId?: string; strictFingerprintCache: boolean } {
   let force = false;
   let mapId: string | undefined;
+  let strictFingerprintCache = false;
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -24,6 +25,10 @@ function parseCliArgs(argv: string[]): { force: boolean; mapId?: string } {
     }
     if (arg === "--force") {
       force = true;
+      continue;
+    }
+    if (arg === "--strict-fingerprint-cache") {
+      strictFingerprintCache = true;
       continue;
     }
     if (arg === "--id" || arg === "-id") {
@@ -43,10 +48,18 @@ function parseCliArgs(argv: string[]): { force: boolean; mapId?: string } {
       mapId = value;
       continue;
     }
-    throw new Error(`Unknown argument '${arg}'. Supported flags: --force, --id <map-id>, -id <map-id>.`);
+    throw new Error(
+      `Unknown argument '${arg}'. Supported flags: --force, --strict-fingerprint-cache, --id <map-id>, -id <map-id>.`,
+    );
   }
 
-  return { force, mapId };
+  return { force, mapId, strictFingerprintCache };
+}
+
+function isTruthyEnv(value: string | undefined): boolean {
+  if (!value) return false;
+  const normalized = value.trim().toLowerCase();
+  return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
 }
 
 function toWarningsOutputJson(prefix: string, warnings: string[]): string {
@@ -66,6 +79,11 @@ async function run(): Promise<void> {
   const cli = parseCliArgs(process.argv.slice(2));
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
   const token = getNonEmptyEnv("GH_DOWNLOADS_TOKEN") ?? getNonEmptyEnv("GITHUB_TOKEN");
+  const strictFingerprintCache = (
+    cli.strictFingerprintCache
+    || isTruthyEnv(process.env.STRICT_FINGERPRINT_CACHE)
+    || isTruthyEnv(process.env.REGISTRY_STRICT_FINGERPRINT_CACHE)
+  );
   const tokenSource = getNonEmptyEnv("GH_DOWNLOADS_TOKEN")
     ? "GH_DOWNLOADS_TOKEN"
     : (getNonEmptyEnv("GITHUB_TOKEN") ? "GITHUB_TOKEN" : "none");
@@ -78,7 +96,7 @@ async function run(): Promise<void> {
   }
 
   console.log(
-    `[map-demand-stats] Run mode: ${cli.force ? "force" : "cached"}${cli.mapId ? `, mapId=${cli.mapId}` : ", mapId=all"}`,
+    `[map-demand-stats] Run mode: ${cli.force ? "force" : "cached"}${cli.mapId ? `, mapId=${cli.mapId}` : ", mapId=all"}, strictFingerprintCache=${strictFingerprintCache ? "enabled" : "disabled"}`,
   );
 
   const result = await generateMapDemandStats({
@@ -86,6 +104,7 @@ async function run(): Promise<void> {
     token,
     force: cli.force,
     mapId: cli.mapId,
+    strictFingerprintCache,
   });
 
   for (const warning of result.warnings) {

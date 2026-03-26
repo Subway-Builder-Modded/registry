@@ -2,6 +2,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 import { resolve } from "node:path";
 import JSZip from "jszip";
+import type * as D from "./download-definitions.js";
 import type { InitialViewState, MapManifest } from "./manifests.js";
 import {
   createGraphqlUsageState,
@@ -34,6 +35,7 @@ export interface GenerateMapDemandStatsOptions {
   fetchImpl?: typeof fetch;
   force?: boolean;
   mapId?: string;
+  strictFingerprintCache?: boolean;
 }
 
 export interface GenerateMapDemandStatsResult {
@@ -75,7 +77,7 @@ interface ResolvedInstallTarget {
 const CACHE_FILE_NAME = "demand-stats-cache.json";
 // For non-sha fingerprints (e.g. tag+asset name), recheck periodically because
 // upstream ZIP content may change without a fingerprint change.
-const UNCHANGED_SKIP_WINDOW_MS = 9 * 60 * 60 * 1000;
+const UNCHANGED_SKIP_WINDOW_MS = 12 * 60 * 60 * 1000;
 const MAP_DEMAND_FETCH_TIMEOUT_MS = resolveTimeoutMsFromEnv("REGISTRY_FETCH_TIMEOUT_MS", 45_000);
 
 function semverParts(value: string): [number, number, number] | null {
@@ -237,7 +239,7 @@ async function fetchCustomInstallTargetZipUrl(
 function getLatestGithubZipUrl(
   listingId: string,
   repo: string,
-  repoIndexes: Map<string, { byTag: Map<string, { assets: Map<string, { downloadCount: number; downloadUrl: string | null }> }> }>,
+  repoIndexes: Map<string, D.RepoReleaseIndex>,
   warnings: string[],
 ): ResolvedInstallTarget | null {
   const index = repoIndexes.get(repo.toLowerCase());
@@ -555,11 +557,12 @@ function shouldSkipUnchanged(
   cacheEntry: DemandStatsCacheEntry | undefined,
   resolvedSource: ResolvedInstallTarget,
   now: Date,
+  strictFingerprintCache: boolean,
 ): boolean {
   if (!cacheEntry) return false;
   if (!cacheEntry.stats) return false;
   if (cacheEntry.source_fingerprint !== resolvedSource.sourceFingerprint) return false;
-  if (resolvedSource.sourceFingerprint.startsWith("sha256:")) {
+  if (strictFingerprintCache || resolvedSource.sourceFingerprint.startsWith("sha256:")) {
     return true;
   }
   const lastChecked = Date.parse(cacheEntry.last_checked_at);
@@ -723,6 +726,7 @@ export async function generateMapDemandStats(
   const fetchImpl = options.fetchImpl ?? fetch;
   const token = options.token;
   const force = options.force === true;
+  const strictFingerprintCache = options.strictFingerprintCache === true;
   const mapId = typeof options.mapId === "string" && options.mapId.trim() !== ""
     ? options.mapId.trim()
     : undefined;
@@ -795,7 +799,7 @@ export async function generateMapDemandStats(
       continue;
     }
 
-    if (!force && shouldSkipUnchanged(cache[id], resolvedSource, now)) {
+    if (!force && shouldSkipUnchanged(cache[id], resolvedSource, now, strictFingerprintCache)) {
       skippedMaps += 1;
       skippedUnchanged += 1;
       const cachedStats = cache[id]?.stats;

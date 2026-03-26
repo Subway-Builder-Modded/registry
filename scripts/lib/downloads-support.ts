@@ -35,7 +35,7 @@ export interface ListingContext {
     | { type: "custom"; url: string; versions: CustomVersionCandidate[] };
 }
 
-const NON_SHA_RECHECK_WINDOW_MS = 9 * 60 * 60 * 1000;
+const NON_SHA_RECHECK_WINDOW_MS = 12 * 60 * 60 * 1000;
 const REMOTE_REQUEST_TIMEOUT_MS = resolveTimeoutMsFromEnv("REGISTRY_FETCH_TIMEOUT_MS", 45_000);
 
 function readJsonFile<T>(path: string): T {
@@ -206,10 +206,14 @@ export function shouldUseCachedIntegrity(
   cacheEntry: IntegrityCacheEntry | undefined,
   fingerprint: string,
   now: Date,
+  strictFingerprintCache = false,
 ): boolean {
   if (!cacheEntry) return false;
   if (cacheEntry.fingerprint !== fingerprint) return false;
-  if (fingerprint.startsWith("sha256:")) return true;
+  if (strictFingerprintCache) return true;
+  // Fingerprints are versioned (e.g. rules:v3:sha256:<hash>), so detect sha256
+  // in either legacy unversioned or current versioned formats.
+  if (fingerprint.startsWith("sha256:") || fingerprint.includes(":sha256:")) return true;
   const lastChecked = Date.parse(cacheEntry.last_checked_at);
   if (!Number.isFinite(lastChecked)) return false;
   return now.getTime() - lastChecked <= NON_SHA_RECHECK_WINDOW_MS;
@@ -238,12 +242,14 @@ export function buildIncompleteVersionEntry(
   errors: string[],
   requiredChecks: Record<string, boolean> = {},
   matchedFiles: Record<string, string | null> = {},
+  releaseSizeMiB?: number,
 ): IntegrityVersionEntry {
   return {
     is_complete: false,
     errors,
     required_checks: requiredChecks,
     matched_files: matchedFiles,
+    release_size: typeof releaseSizeMiB === "number" && Number.isFinite(releaseSizeMiB) ? releaseSizeMiB : undefined,
     source,
     fingerprint,
     checked_at: checkedAt,
@@ -255,6 +261,7 @@ export function withCheckResult(
   source: IntegritySource,
   fingerprint: string,
   checkedAt: string,
+  releaseSizeMiB?: number,
 ): IntegrityVersionEntry {
   const normalizedFileSizes = (
     result.isComplete
@@ -269,11 +276,16 @@ export function withCheckResult(
     errors: result.errors,
     required_checks: result.requiredChecks,
     matched_files: result.matchedFiles,
+    release_size: typeof releaseSizeMiB === "number" && Number.isFinite(releaseSizeMiB) ? releaseSizeMiB : undefined,
     file_sizes: normalizedFileSizes,
     source,
     fingerprint,
     checked_at: checkedAt,
   };
+}
+
+export function bytesToMebibytesRounded(value: number): number {
+  return Math.round((value / (1024 * 1024)) * 100) / 100;
 }
 
 export async function fetchZipBuffer(
@@ -424,12 +436,12 @@ export async function fetchCustomVersions(
 
 export function aggregateZipDownloadCountsByTag(releases: Array<{
   tagName: string;
-  assets: Array<{ name: string; downloadCount: number; downloadUrl?: string | null }>;
+  assets: Array<{ name: string; downloadCount: number; downloadUrl?: string | null; sizeBytes?: number | null }>;
 }>): Map<string, D.RepoReleaseTagData> {
   const byTag = new Map<string, D.RepoReleaseTagData>();
   for (const release of releases) {
     if (!isNonEmptyString(release.tagName)) continue;
-    const assets = new Map<string, { downloadCount: number; downloadUrl: string | null }>();
+    const assets = new Map<string, { downloadCount: number; downloadUrl: string | null; sizeBytes: number | null }>();
     let zipTotal = 0;
 
     for (const asset of release.assets) {
@@ -437,6 +449,9 @@ export function aggregateZipDownloadCountsByTag(releases: Array<{
       assets.set(asset.name, {
         downloadCount: asset.downloadCount,
         downloadUrl: asset.downloadUrl ?? null,
+        sizeBytes: typeof asset.sizeBytes === "number" && Number.isFinite(asset.sizeBytes)
+          ? asset.sizeBytes
+          : null,
       });
       if (asset.name.toLowerCase().endsWith(".zip")) {
         zipTotal += asset.downloadCount;

@@ -223,6 +223,8 @@ test("github releases are integrity-validated and filtered before download aggre
     assert.equal(stats.incomplete_versions, 2);
     assert.equal(integrity.listings["github-mod"]?.has_complete_version, true);
     assert.equal(integrity.listings["github-mod"]?.versions["latest"]?.is_complete, false);
+    assert.equal(typeof integrity.listings["github-mod"]?.versions["v2.0.0"]?.release_size, "number");
+    assert.equal(typeof integrity.listings["github-mod"]?.versions["v1.0.0"]?.release_size, "number");
     assert.ok(
       warnings.some((warning) => warning.includes("v1.0.0") && warning.includes("excluded by integrity validation")),
     );
@@ -317,12 +319,97 @@ test("custom mixed versions produce explicit invalid integrity entries and hard-
     });
     assert.equal(stats.filtered_versions, 2);
     assert.equal(integrity.listings["custom-mod"]?.versions["1.0.0"]?.is_complete, true);
+    assert.equal(typeof integrity.listings["custom-mod"]?.versions["1.0.0"]?.release_size, "number");
     assert.equal(integrity.listings["custom-mod"]?.versions["1.1.0"]?.is_complete, false);
     assert.equal(integrity.listings["custom-mod"]?.versions["1.2.0"]?.is_complete, false);
     assert.equal(integrity.listings["custom-mod"]?.versions["beta"]?.is_complete, false);
     assert.ok(
       (integrity.listings["custom-mod"]?.versions["beta"]?.errors ?? []).some((error) => error.includes("non-semver")),
     );
+  });
+});
+
+test("sha256-based custom versions reuse cache regardless of age with versioned fingerprints", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["sha-cache-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "sha-cache-mod", {
+      ...makeBaseModManifest("sha-cache-mod"),
+      update: { type: "custom", url: "https://example.com/sha-cache-update.json" },
+    });
+
+    const validZip = await makeModZip(true);
+    let zipFetchCount = 0;
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://example.com/sha-cache-update.json",
+        handle: () => jsonResponse({
+          schema_version: 1,
+          versions: [
+            {
+              version: "1.0.0",
+              download: "https://github.com/Owner/ShaCache/releases/download/v1.0.0/mod.zip",
+              sha256: "sha-cache-hash-1",
+            },
+          ],
+        }),
+      },
+      {
+        match: (url) => url === "https://downloads.example.com/sha-cache-mod.zip",
+        handle: () => {
+          zipFetchCount += 1;
+          return new Response(new Uint8Array(validZip));
+        },
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "mod.zip", downloadCount: 7, downloadUrl: "https://downloads.example.com/sha-cache-mod.zip" },
+                        { name: "manifest.json", downloadCount: 7, downloadUrl: "https://downloads.example.com/sha-cache-manifest.json" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const first = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.equal(zipFetchCount, 1);
+
+    const agedCache = JSON.parse(JSON.stringify(first.integrityCache)) as {
+      entries: Record<string, Record<string, { last_checked_at: string }>>;
+    };
+    agedCache.entries["sha-cache-mod"]["1.0.0"].last_checked_at = "2001-01-01T00:00:00.000Z";
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), agedCache);
+
+    const second = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.equal(second.stats.cache_hits, 1);
+    assert.equal(zipFetchCount, 1);
+    assert.deepEqual(second.downloads, first.downloads);
   });
 });
 
@@ -681,6 +768,7 @@ test("map complete versions include file_sizes and legacy cache entries without 
     assert.deepEqual(first.downloads, { "cache-map": { "v1.0.0": 11 } });
     const firstVersion = first.integrity.listings["cache-map"]?.versions["v1.0.0"];
     assert.equal(firstVersion?.is_complete, true);
+    assert.equal(typeof firstVersion?.release_size, "number");
     assert.equal(typeof firstVersion?.file_sizes?.["config.json"], "number");
     assert.equal(typeof firstVersion?.file_sizes?.["ABC.pmtiles"], "number");
 
@@ -701,6 +789,7 @@ test("map complete versions include file_sizes and legacy cache entries without 
     assert.equal(zipFetchCount, 2);
     const secondVersion = second.integrity.listings["cache-map"]?.versions["v1.0.0"];
     assert.equal(secondVersion?.is_complete, true);
+    assert.equal(typeof secondVersion?.release_size, "number");
     assert.equal(typeof secondVersion?.file_sizes?.["config.json"], "number");
     assert.equal(typeof secondVersion?.file_sizes?.["ABC.pmtiles"], "number");
   });

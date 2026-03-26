@@ -13,6 +13,7 @@ export interface GraphqlReleaseAssetNode {
   name: string;
   downloadCount: number;
   downloadUrl: string;
+  size?: number | null;
 }
 
 export interface GraphqlReleaseNode {
@@ -53,6 +54,7 @@ export interface RepoReleaseTagData {
   assets: Map<string, {
     downloadCount: number;
     downloadUrl: string | null;
+    sizeBytes: number | null;
   }>;
 }
 
@@ -90,6 +92,7 @@ export interface GenerateDownloadsOptions {
   repoRoot: string;
   listingType: ManifestType;
   mode?: "full" | "download-only";
+  strictFingerprintCache?: boolean;
   token?: string;
   fetchImpl?: typeof fetch;
 }
@@ -146,6 +149,7 @@ export const REPO_RELEASES_QUERY = `
               name
               downloadCount
               downloadUrl
+              size
             }
             pageInfo {
               hasNextPage
