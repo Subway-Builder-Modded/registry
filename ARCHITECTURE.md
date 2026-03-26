@@ -311,7 +311,7 @@ map-name.zip
 - Map demand stats subflow (inside `regenerate-registry-analytics.yml`) refreshes demand-derived metadata in manifests and updates `maps/demand-stats-cache.json`.
 - It skips ZIP extraction when source fingerprints are unchanged:
 - For `sha256:*` fingerprints, skip regardless of age.
-- For other fingerprints, skip when last checked within 9 hours.
+- For other fingerprints, skip when last checked within 12 hours.
 - Reason for non-`sha256` fallback:
 - Tag/asset-name or URL-based fingerprints can remain unchanged while upstream ZIP content is replaced, so periodic rechecks prevent stale derived stats.
 

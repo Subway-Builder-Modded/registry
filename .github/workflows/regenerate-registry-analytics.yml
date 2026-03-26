@@ -53,7 +53,7 @@ jobs:
         env:
           DISCORD_ANNOUNCEMENT_WEBHOOK_URL: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm --dir scripts run generate-registry-analytics:maps
+        run: pnpm --dir scripts run generate-registry-analytics:maps -- --strict-fingerprint-cache
 
       - name: Upload map downloads artifact
         uses: actions/upload-artifact@v4
@@ -98,7 +98,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DISCORD_ANNOUNCEMENT_WEBHOOK_URL: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK_URL }}
-        run: pnpm --dir scripts run generate-registry-analytics:mods
+        run: pnpm --dir scripts run generate-registry-analytics:mods -- --strict-fingerprint-cache
 
       - name: Upload mod downloads artifact
         uses: actions/upload-artifact@v4
@@ -145,9 +145,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_demand_stats }}" = "true" ]; then
-            pnpm --dir scripts run generate-registry-demand-stats -- --force
+            pnpm --dir scripts run generate-registry-demand-stats -- --force --strict-fingerprint-cache
           else
-            pnpm --dir scripts run generate-registry-demand-stats
+            pnpm --dir scripts run generate-registry-demand-stats -- --strict-fingerprint-cache
           fi
 
       - name: Build map demand stats artifact

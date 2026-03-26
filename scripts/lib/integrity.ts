@@ -14,6 +14,7 @@ export interface IntegrityVersionEntry {
   errors: string[];
   required_checks: Record<string, boolean>;
   matched_files: Record<string, string | null>;
+  release_size?: number;
   file_sizes?: Record<string, number>;
   source: IntegritySource;
   fingerprint: string;

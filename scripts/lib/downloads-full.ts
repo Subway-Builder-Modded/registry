@@ -4,6 +4,7 @@ import { createGraphqlUsageState, fetchRepoReleaseIndexes, isSupportedReleaseTag
 import type { IntegrityCache, IntegrityCacheEntry, IntegritySource, IntegrityVersionEntry, ListingIntegrityEntry } from "./integrity.js";
 import { inspectZipCompleteness } from "./integrity.js";
 import {
+  bytesToMebibytesRounded,
   type CustomVersionCandidate,
   type ListingContext,
   buildIncompleteVersionEntry,
@@ -34,6 +35,22 @@ function isLegacyMapCacheMissingFileSizes(
   if (cacheEntry.result.is_complete !== true) return false;
   const fileSizes = cacheEntry.result.file_sizes;
   return !fileSizes || Object.keys(fileSizes).length === 0;
+}
+
+function releaseSizeFromBytes(sizeBytes: number | null | undefined): number | undefined {
+  if (typeof sizeBytes !== "number" || !Number.isFinite(sizeBytes) || sizeBytes < 0) return undefined;
+  return bytesToMebibytesRounded(sizeBytes);
+}
+
+function withReleaseSizeIfMissing(
+  result: IntegrityVersionEntry,
+  releaseSize: number | undefined,
+): IntegrityVersionEntry {
+  if (result.release_size !== undefined || releaseSize === undefined) return result;
+  return {
+    ...result,
+    release_size: releaseSize,
+  };
 }
 
 function resolveExpectedCustomReleaseManifestAssetName(
@@ -70,6 +87,7 @@ export async function generateDownloadsDataFull(
   const listingType = options.listingType;
   const fetchImpl = options.fetchImpl ?? fetch;
   const token = options.token;
+  const strictFingerprintCache = options.strictFingerprintCache === true;
   const warnings: string[] = [];
   const dir = getDirectoryForType(listingType);
   const ids = getIndexIds(repoRoot, dir);
@@ -181,13 +199,32 @@ export async function generateDownloadsDataFull(
           repo,
           tag,
         };
-        const shouldReuseCached = shouldUseCachedIntegrity(cached, fingerprint, now)
+        const shouldReuseCached = shouldUseCachedIntegrity(
+          cached,
+          fingerprint,
+          now,
+          strictFingerprintCache,
+        )
           && !isLegacyMapCacheMissingFileSizes(listingType, cached);
 
         if (shouldReuseCached) {
           cacheHits += 1;
-          versionEntries[tag] = cached.result;
-          nextListingCacheEntries[tag] = cached;
+          const cachedAssetName = cached.result.source.asset_name;
+          const matchedAsset = (
+            typeof cachedAssetName === "string"
+              ? releaseData.assets.get(cachedAssetName)
+              : undefined
+          );
+          const representativeAsset = matchedAsset ?? (zipAssets.length === 1 ? zipAssets[0][1] : undefined);
+          const result = withReleaseSizeIfMissing(
+            cached.result,
+            releaseSizeFromBytes(representativeAsset?.sizeBytes),
+          );
+          versionEntries[tag] = result;
+          nextListingCacheEntries[tag] = {
+            ...cached,
+            result,
+          };
         } else if (!isSupportedReleaseTag(tag)) {
           const result = buildIncompleteVersionEntry(
             sourceBase,
@@ -218,6 +255,7 @@ export async function generateDownloadsDataFull(
           const hasReleaseManifestAsset = releaseData.assets.has("manifest.json");
           let selectedResult: IntegrityVersionEntry | null = null;
           const attemptedErrors: string[] = [];
+          let attemptedReleaseSizeMiB: number | undefined;
 
           for (const [assetName, asset] of zipAssets.sort(([a], [b]) => a.localeCompare(b))) {
             if (!asset.downloadUrl) {
@@ -229,6 +267,7 @@ export async function generateDownloadsDataFull(
               attemptedErrors.push(`zip asset '${assetName}' could not be fetched`);
               continue;
             }
+            attemptedReleaseSizeMiB = bytesToMebibytesRounded(zipBuffer.byteLength);
             const check = await inspectZipCompleteness(listingType, zipBuffer, {
               cityCode: context.cityCode,
               releaseHasManifestAsset: hasReleaseManifestAsset,
@@ -241,6 +280,7 @@ export async function generateDownloadsDataFull(
               { ...sourceBase, asset_name: assetName, download_url: asset.downloadUrl },
               fingerprint,
               nowIso,
+              attemptedReleaseSizeMiB,
             );
             if (check.isComplete) {
               break;
@@ -254,6 +294,9 @@ export async function generateDownloadsDataFull(
             fingerprint,
             nowIso,
             attemptedErrors.length > 0 ? attemptedErrors : ["all zip assets failed integrity checks"],
+            {},
+            {},
+            attemptedReleaseSizeMiB,
           );
           versionEntries[tag] = result;
           nextListingCacheEntries[tag] = {
@@ -307,13 +350,35 @@ export async function generateDownloadsDataFull(
           download_url: candidate.downloadUrl ?? undefined,
         };
         const cached = listingCacheEntries[versionKey];
-        const shouldReuseCached = shouldUseCachedIntegrity(cached, fingerprint, now)
+        const shouldReuseCached = shouldUseCachedIntegrity(
+          cached,
+          fingerprint,
+          now,
+          strictFingerprintCache,
+        )
           && !isLegacyMapCacheMissingFileSizes(listingType, cached);
 
         if (shouldReuseCached) {
           cacheHits += 1;
-          versionEntries[versionKey] = cached.result;
-          nextListingCacheEntries[versionKey] = cached;
+          const sizeFromMetadata = (
+            candidate.parsed
+              ? releaseSizeFromBytes(
+                repoIndexes
+                  .get(candidate.parsed.repo)
+                  ?.byTag
+                  .get(candidate.parsed.tag)
+                  ?.assets
+                  .get(candidate.parsed.assetName)
+                  ?.sizeBytes,
+              )
+              : undefined
+          );
+          const result = withReleaseSizeIfMissing(cached.result, sizeFromMetadata);
+          versionEntries[versionKey] = result;
+          nextListingCacheEntries[versionKey] = {
+            ...cached,
+            result,
+          };
         } else if (candidate.errors.length > 0) {
           const result = buildIncompleteVersionEntry(
             sourceBase,
@@ -434,6 +499,7 @@ export async function generateDownloadsDataFull(
                     result,
                   };
                 } else {
+                  const releaseSizeMiB = bytesToMebibytesRounded(zipBuffer.byteLength);
                   const check = await inspectZipCompleteness(listingType, zipBuffer, {
                     cityCode: context.cityCode,
                     releaseHasManifestAsset: release.assets.has(expectedReleaseManifestAssetName),
@@ -451,6 +517,7 @@ export async function generateDownloadsDataFull(
                     },
                     fingerprint,
                     nowIso,
+                    releaseSizeMiB,
                   );
                   versionEntries[versionKey] = result;
                   nextListingCacheEntries[versionKey] = {
