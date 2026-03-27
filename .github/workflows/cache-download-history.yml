@@ -37,12 +37,15 @@ jobs:
         id: generate_history
         run: pnpm --dir scripts run generate-download-history
 
+      - name: Generate analytics CSVs
+        run: pnpm --dir scripts run analytics
+
       - name: Stage snapshot changes
         id: commit_changes
         run: |
-          git add history/snapshot_*.json 2>/dev/null || true
+          git add history/snapshot_*.json analytics/*.csv 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "No history snapshot changes detected; skipping PR update."
+            echo "No history snapshot/analytics changes detected; skipping PR update."
             echo "committed=false" >> "$GITHUB_OUTPUT"
             echo "commit_sha=" >> "$GITHUB_OUTPUT"
             echo "pull_request_url=" >> "$GITHUB_OUTPUT"

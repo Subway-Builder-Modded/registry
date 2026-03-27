@@ -61,6 +61,18 @@ interface AuthorTotalDownloadsRow {
   mod_count: number;
 }
 
+interface MapPopulationRow {
+  rank: number;
+  id: string;
+  name: string;
+  author: string;
+  city_code: string;
+  country: string;
+  population: number;
+  population_count: number;
+  points_count: number;
+}
+
 type ListingKey = `${"maps" | "mods"}:${string}`;
 
 const TOP_LISTINGS = 30;
@@ -156,6 +168,62 @@ function loadManifestMeta(repoRoot: string, listingType: "maps" | "mods", id: st
   }
 }
 
+function toNonEmptyString(value: unknown, fallback: string): string {
+  return typeof value === "string" && value.trim() !== "" ? value : fallback;
+}
+
+function toNonNegativeNumber(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
+function loadMapPopulationRows(repoRoot: string): MapPopulationRow[] {
+  const indexPath = join(repoRoot, "maps", "index.json");
+  const index = loadJsonFile<{ maps?: unknown }>(indexPath);
+  const mapIds = Array.isArray(index.maps)
+    ? index.maps.filter((value): value is string => typeof value === "string")
+    : [];
+
+  const rows: Omit<MapPopulationRow, "rank">[] = [];
+  for (const id of mapIds) {
+    const manifestPath = join(repoRoot, "maps", id, "manifest.json");
+    try {
+      const manifest = loadJsonFile<Record<string, unknown>>(manifestPath);
+      rows.push({
+        id,
+        name: toNonEmptyString(manifest.name, id),
+        author: toNonEmptyString(manifest.author, "UNKNOWN"),
+        city_code: toNonEmptyString(manifest.city_code, ""),
+        country: toNonEmptyString(manifest.country, ""),
+        population: toNonNegativeNumber(manifest.population),
+        population_count: toNonNegativeNumber(manifest.population_count),
+        points_count: toNonNegativeNumber(manifest.points_count),
+      });
+    } catch {
+      rows.push({
+        id,
+        name: id,
+        author: "UNKNOWN",
+        city_code: "",
+        country: "",
+        population: 0,
+        population_count: 0,
+        points_count: 0,
+      });
+    }
+  }
+
+  rows.sort((a, b) =>
+    b.population - a.population
+    || b.population_count - a.population_count
+    || b.points_count - a.points_count
+    || a.id.localeCompare(b.id));
+
+  return rows.map((row, index) => ({
+    rank: index + 1,
+    ...row,
+  }));
+}
+
 function escapeCsv(value: unknown): string {
   const text = String(value ?? "");
   if (/[",\n\r]/.test(text)) {
@@ -164,14 +232,14 @@ function escapeCsv(value: unknown): string {
   return text;
 }
 
-function writeCsv<T extends Record<string, unknown>>(
+function writeCsv<T extends object>(
   path: string,
   headers: (keyof T)[],
   rows: T[],
 ): void {
   const lines = [headers.join(",")];
   for (const row of rows) {
-    lines.push(headers.map((key) => escapeCsv(row[key])).join(","));
+    lines.push(headers.map((key) => escapeCsv(row[key as keyof T])).join(","));
   }
   writeFileSync(path, `${lines.join("\n")}\n`, "utf-8");
 }
@@ -383,6 +451,23 @@ function main(): void {
       "mod_count",
     ],
     authorRowsByTotalDownloads,
+  );
+
+  const mapPopulationRows = loadMapPopulationRows(repoRoot);
+  writeCsv<MapPopulationRow>(
+    join(analyticsDir, "maps_by_population.csv"),
+    [
+      "rank",
+      "id",
+      "name",
+      "author",
+      "city_code",
+      "country",
+      "population",
+      "population_count",
+      "points_count",
+    ],
+    mapPopulationRows,
   );
 
   console.log(`Generated analytics CSVs in ${analyticsDir}`);
