@@ -1,0 +1,187 @@
+name: Bot PR Automation
+description: Resolve bot PR, apply label, dispatch auto-approval, and enable auto-merge with retries.
+
+inputs:
+  github_token:
+    description: Token used for gh API and PR operations.
+    required: true
+  repo:
+    description: owner/repo full name.
+    required: true
+  bot_branch:
+    description: Bot branch name used to resolve PR fallback.
+    required: true
+  source_workflow:
+    description: Workflow name for repository_dispatch payload.
+    required: true
+  source_run_id:
+    description: Workflow run id for repository_dispatch payload.
+    required: true
+  pr_number:
+    description: PR number from create-pull-request output.
+    required: false
+    default: ""
+  pr_url:
+    description: PR URL from create-pull-request output.
+    required: false
+    default: ""
+  pr_head_sha:
+    description: PR head SHA from create-pull-request output.
+    required: false
+    default: ""
+  max_attempts:
+    description: Maximum retry attempts for retryable operations.
+    required: false
+    default: "5"
+  label:
+    description: Label to apply on the resolved PR.
+    required: false
+    default: "automation"
+  apply_label:
+    description: Whether to apply label.
+    required: false
+    default: "true"
+  dispatch_event_type:
+    description: repository_dispatch event type.
+    required: false
+    default: "auto-approve-actions-bot-pr"
+  dispatch_enabled:
+    description: Whether to call repository_dispatch.
+    required: false
+    default: "true"
+  enable_auto_merge:
+    description: Whether to enable PR auto-merge.
+    required: false
+    default: "true"
+
+outputs:
+  pr_number:
+    description: Resolved PR number.
+    value: ${{ steps.run.outputs.pr_number }}
+  pr_url:
+    description: Resolved PR URL.
+    value: ${{ steps.run.outputs.pr_url }}
+  pr_head_sha:
+    description: Resolved PR head SHA.
+    value: ${{ steps.run.outputs.pr_head_sha }}
+
+runs:
+  using: composite
+  steps:
+    - id: run
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.github_token }}
+        INPUT_REPO: ${{ inputs.repo }}
+        INPUT_BOT_BRANCH: ${{ inputs.bot_branch }}
+        INPUT_SOURCE_WORKFLOW: ${{ inputs.source_workflow }}
+        INPUT_SOURCE_RUN_ID: ${{ inputs.source_run_id }}
+        INPUT_PR_NUMBER: ${{ inputs.pr_number }}
+        INPUT_PR_URL: ${{ inputs.pr_url }}
+        INPUT_PR_HEAD_SHA: ${{ inputs.pr_head_sha }}
+        INPUT_MAX_ATTEMPTS: ${{ inputs.max_attempts }}
+        INPUT_LABEL: ${{ inputs.label }}
+        INPUT_APPLY_LABEL: ${{ inputs.apply_label }}
+        INPUT_DISPATCH_EVENT_TYPE: ${{ inputs.dispatch_event_type }}
+        INPUT_DISPATCH_ENABLED: ${{ inputs.dispatch_enabled }}
+        INPUT_ENABLE_AUTO_MERGE: ${{ inputs.enable_auto_merge }}
+      run: |
+        set -euo pipefail
+
+        MAX_ATTEMPTS="${INPUT_MAX_ATTEMPTS}"
+        REPO="${INPUT_REPO}"
+        BOT_BRANCH="${INPUT_BOT_BRANCH}"
+
+        bool_true() {
+          case "${1,,}" in
+            1|true|yes|on) return 0 ;;
+            *) return 1 ;;
+          esac
+        }
+
+        retry_cmd() {
+          local max_attempts="$1"
+          shift
+          local delay=5
+          local attempt=1
+          local output=""
+          while true; do
+            if output="$("$@" 2>&1)"; then
+              printf '%s' "$output"
+              return 0
+            fi
+            local status=$?
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              echo "$output" >&2
+              return "$status"
+            fi
+            echo "Attempt ${attempt}/${max_attempts} failed for: $*" >&2
+            echo "$output" >&2
+            sleep "$delay"
+            attempt=$((attempt + 1))
+            delay=$((delay * 2))
+          done
+        }
+
+        retry_run() {
+          local max_attempts="$1"
+          shift
+          local delay=5
+          local attempt=1
+          while true; do
+            if "$@"; then
+              return 0
+            fi
+            local status=$?
+            if [ "$attempt" -ge "$max_attempts" ]; then
+              return "$status"
+            fi
+            echo "Attempt ${attempt}/${max_attempts} failed for: $*" >&2
+            sleep "$delay"
+            attempt=$((attempt + 1))
+            delay=$((delay * 2))
+          done
+        }
+
+        PR_NUMBER="${INPUT_PR_NUMBER}"
+        PR_URL="${INPUT_PR_URL}"
+        PR_HEAD_SHA="${INPUT_PR_HEAD_SHA}"
+
+        if [ -z "${PR_NUMBER}" ]; then
+          PR_LIST_JSON="$(retry_cmd "${MAX_ATTEMPTS}" gh pr list --repo "${REPO}" --head "${BOT_BRANCH}" --state open --json number,url,headRefOid --limit 1)"
+          PR_NUMBER="$(echo "${PR_LIST_JSON}" | jq -r '.[0].number // empty')"
+          PR_URL="$(echo "${PR_LIST_JSON}" | jq -r '.[0].url // empty')"
+          PR_HEAD_SHA="$(echo "${PR_LIST_JSON}" | jq -r '.[0].headRefOid // empty')"
+        fi
+
+        if [ -z "${PR_NUMBER}" ]; then
+          echo "Unable to resolve PR number for branch '${BOT_BRANCH}'." >&2
+          exit 1
+        fi
+
+        if [ -z "${PR_URL}" ] || [ -z "${PR_HEAD_SHA}" ]; then
+          PR_VIEW_JSON="$(retry_cmd "${MAX_ATTEMPTS}" gh pr view "${PR_NUMBER}" --repo "${REPO}" --json url,headRefOid)"
+          PR_URL="${PR_URL:-$(echo "${PR_VIEW_JSON}" | jq -r '.url // empty')}"
+          PR_HEAD_SHA="${PR_HEAD_SHA:-$(echo "${PR_VIEW_JSON}" | jq -r '.headRefOid // empty')}"
+        fi
+
+        if bool_true "${INPUT_APPLY_LABEL}"; then
+          retry_run "${MAX_ATTEMPTS}" gh pr edit "${PR_NUMBER}" --repo "${REPO}" --add-label "${INPUT_LABEL}"
+        fi
+
+        if bool_true "${INPUT_DISPATCH_ENABLED}"; then
+          retry_run "${MAX_ATTEMPTS}" gh api "repos/${REPO}/dispatches" \
+            -f event_type="${INPUT_DISPATCH_EVENT_TYPE}" \
+            -f client_payload[pull_request_number]="${PR_NUMBER}" \
+            -f client_payload[source_workflow]="${INPUT_SOURCE_WORKFLOW}" \
+            -f client_payload[source_run_id]="${INPUT_SOURCE_RUN_ID}"
+        fi
+
+        if bool_true "${INPUT_ENABLE_AUTO_MERGE}"; then
+          retry_run "${MAX_ATTEMPTS}" gh pr merge "${PR_NUMBER}" --repo "${REPO}" --auto --squash \
+            || echo "Could not enable auto-merge after retries (auto-merge may be disabled or blocked by branch rules)."
+        fi
+
+        echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
+        echo "pr_url=${PR_URL}" >> "$GITHUB_OUTPUT"
+        echo "pr_head_sha=${PR_HEAD_SHA}" >> "$GITHUB_OUTPUT"
