@@ -243,6 +243,7 @@ export function buildIncompleteVersionEntry(
   requiredChecks: Record<string, boolean> = {},
   matchedFiles: Record<string, string | null> = {},
   releaseSizeMiB?: number,
+  securityIssue?: IntegrityVersionEntry["security_issue"],
 ): IntegrityVersionEntry {
   return {
     is_complete: false,
@@ -250,6 +251,7 @@ export function buildIncompleteVersionEntry(
     required_checks: requiredChecks,
     matched_files: matchedFiles,
     release_size: typeof releaseSizeMiB === "number" && Number.isFinite(releaseSizeMiB) ? releaseSizeMiB : undefined,
+    security_issue: securityIssue,
     source,
     fingerprint,
     checked_at: checkedAt,
@@ -278,6 +280,7 @@ export function withCheckResult(
     matched_files: result.matchedFiles,
     release_size: typeof releaseSizeMiB === "number" && Number.isFinite(releaseSizeMiB) ? releaseSizeMiB : undefined,
     file_sizes: normalizedFileSizes,
+    security_issue: result.securityIssue,
     source,
     fingerprint,
     checked_at: checkedAt,

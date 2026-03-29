@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import JSZip from "jszip";
 import { inspectZipCompleteness } from "../lib/integrity.js";
+import type { CompiledSecurityRule } from "../lib/mod-security.js";
 
 async function makeZip(entries: Record<string, string>): Promise<Buffer> {
   const zip = new JSZip();
@@ -119,4 +120,55 @@ test("mod integrity requires both release manifest asset and top-level zip manif
   });
   assert.equal(valid.isComplete, true);
   assert.equal(valid.fileSizes, undefined);
+});
+
+test("mod integrity blocks completion when security ERROR rule matches", async () => {
+  const zipBuffer = await makeZip({
+    "manifest.json": "{}",
+    "index.js": "const x = customSavesDirectory;",
+  });
+  const modSecurityRules: CompiledSecurityRule[] = [
+    {
+      id: "forbidden-customSavesDirectory",
+      severity: "ERROR",
+      type: "literal",
+      pattern: "customSavesDirectory",
+      enabled: true,
+    },
+  ];
+
+  const result = await inspectZipCompleteness("mod", zipBuffer, {
+    releaseHasManifestAsset: true,
+    modSecurityRules,
+  });
+  assert.equal(result.isComplete, false);
+  assert.equal(result.requiredChecks.security_scan_passed, false);
+  assert.ok(result.errors.some((error) => error.includes("security scan detected")));
+  assert.equal(result.securityIssue?.findings[0]?.rule_id, "forbidden-customSavesDirectory");
+});
+
+test("mod integrity records security WARNING rule without blocking completion", async () => {
+  const zipBuffer = await makeZip({
+    "manifest.json": "{}",
+    "main.ts": "const x = eval(atob('Zm9v'));",
+  });
+  const modSecurityRules: CompiledSecurityRule[] = [
+    {
+      id: "suspicious-eval-atob",
+      severity: "WARNING",
+      type: "regex",
+      pattern: "eval\\s*\\(\\s*atob\\s*\\(",
+      enabled: true,
+      compiledPattern: new RegExp("eval\\s*\\(\\s*atob\\s*\\("),
+    },
+  ];
+
+  const result = await inspectZipCompleteness("mod", zipBuffer, {
+    releaseHasManifestAsset: true,
+    modSecurityRules,
+  });
+  assert.equal(result.isComplete, true);
+  assert.equal(result.requiredChecks.security_scan_passed, true);
+  assert.ok(result.warnings.some((warning) => warning.includes("security scan detected")));
+  assert.equal(result.securityIssue?.findings[0]?.severity, "WARNING");
 });

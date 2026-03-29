@@ -8,6 +8,7 @@
     "test": "pnpm run test:build && pnpm run test:run",
     "test:build": "tsc -p tsconfig.test.json",
     "test:run": "node --test .test-dist/tests/*.test.js",
+    "test:security-rules": "pnpm run test:build && node --test --test-isolation=none .test-dist/tests/security-rules-fixtures.test.js",
     "validate-publish": "tsx validate-publish.ts",
     "validate-update": "tsx validate-update.ts",
     "create-listing": "tsx create-listing.ts",
@@ -34,6 +35,8 @@
     "check:map-templates": "tsx generate-map-templates.ts --check"
   },
   "dependencies": {
+    "@babel/parser": "^7.29.2",
+    "@babel/traverse": "^7.29.0",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "jszip": "^3.10.1",
@@ -41,8 +44,9 @@
     "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@types/babel__traverse": "^7.28.0",
+    "@types/node": "^22.0.0",
     "tsx": "^4.19.0",
-    "typescript": "^5.7.0",
-    "@types/node": "^22.0.0"
+    "typescript": "^5.7.0"
   }
 }

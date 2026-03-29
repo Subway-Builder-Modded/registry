@@ -34,6 +34,7 @@ interface DiscordWebhookPayload {
 function resolveStatusColor(statusRaw: string): number {
   const status = statusRaw.trim().toLowerCase();
   if (status === "success" || status === "completed") return 0x2ECC71; // green
+  if (status === "warning" || status === "warn") return 0xF39C12; // orange
   if (status === "failure" || status === "failed" || status === "error") return 0xE74C3C; // red
   if (status === "cancelled" || status === "canceled") return 0x95A5A6; // gray
   return 0x3498DB; // blue fallback

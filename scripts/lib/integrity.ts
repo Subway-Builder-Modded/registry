@@ -1,5 +1,7 @@
 import JSZip from "jszip";
 import type { ManifestType } from "./manifests.js";
+import type { CompiledSecurityRule, SecurityIssue } from "./mod-security.js";
+import { scanZipForSecurityIssues } from "./mod-security.js";
 
 export interface IntegritySource {
   update_type: "github" | "custom";
@@ -16,6 +18,7 @@ export interface IntegrityVersionEntry {
   matched_files: Record<string, string | null>;
   release_size?: number;
   file_sizes?: Record<string, number>;
+  security_issue?: SecurityIssue;
   source: IntegritySource;
   fingerprint: string;
   checked_at: string;
@@ -54,12 +57,14 @@ export interface ZipCompletenessResult {
   requiredChecks: Record<string, boolean>;
   matchedFiles: Record<string, string | null>;
   fileSizes?: Record<string, number>;
+  securityIssue?: SecurityIssue;
 }
 
 interface InspectZipOptions {
   cityCode?: string;
   releaseHasManifestAsset?: boolean;
   expectedReleaseManifestAssetName?: string;
+  modSecurityRules?: CompiledSecurityRule[];
 }
 
 function listTopLevelFileNames(zip: JSZip): Set<string> {
@@ -263,11 +268,13 @@ function inspectMapZip(
   };
 }
 
-function inspectModZip(
+async function inspectModZip(
+  zip: JSZip,
   files: Set<string>,
   releaseHasManifestAsset: boolean,
   expectedReleaseManifestAssetName: string,
-): ZipCompletenessResult {
+  modSecurityRules: CompiledSecurityRule[],
+): Promise<ZipCompletenessResult> {
   const requiredChecks: Record<string, boolean> = {};
   const matchedFiles: Record<string, string | null> = {};
   const errors: string[] = [];
@@ -286,6 +293,45 @@ function inspectModZip(
     errors.push("missing top-level manifest.json in ZIP");
   }
 
+  let securityIssue: SecurityIssue | undefined;
+  try {
+    securityIssue = await scanZipForSecurityIssues(zip, modSecurityRules);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    requiredChecks.security_scan_passed = false;
+    matchedFiles.security_scan_passed = null;
+    errors.push(`security scan failed (${message})`);
+    return {
+      isComplete: false,
+      errors,
+      warnings,
+      requiredChecks,
+      matchedFiles,
+      fileSizes: undefined,
+      securityIssue: undefined,
+    };
+  }
+  const findings = securityIssue?.findings ?? [];
+  const errorFindings = findings.filter((finding) => finding.severity === "ERROR");
+  const warningFindings = findings.filter((finding) => finding.severity === "WARNING");
+
+  requiredChecks.security_scan_passed = errorFindings.length === 0;
+  matchedFiles.security_scan_passed = errorFindings.length === 0 ? "passed" : null;
+
+  if (errorFindings.length > 0) {
+    const summary = errorFindings
+      .map((finding) => `${finding.rule_id} in ${finding.file}`)
+      .join(", ");
+    errors.push(`security scan detected ${errorFindings.length} ERROR finding(s): ${summary}`);
+  }
+
+  if (warningFindings.length > 0) {
+    const summary = warningFindings
+      .map((finding) => `${finding.rule_id} in ${finding.file}`)
+      .join(", ");
+    warnings.push(`security scan detected ${warningFindings.length} WARNING finding(s): ${summary}`);
+  }
+
   return {
     isComplete: errors.length === 0,
     errors,
@@ -293,6 +339,7 @@ function inspectModZip(
     requiredChecks,
     matchedFiles,
     fileSizes: undefined,
+    securityIssue,
   };
 }
 
@@ -349,8 +396,10 @@ export async function inspectZipCompleteness(
     : "manifest.json";
 
   return inspectModZip(
+    zip,
     topLevelFiles,
     options.releaseHasManifestAsset === true,
     expectedReleaseManifestAssetName,
+    options.modSecurityRules ?? [],
   );
 }

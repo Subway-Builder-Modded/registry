@@ -36,10 +36,19 @@ function parseStringArray(raw: string | undefined): string[] {
   }
 }
 
+function isFailureStatus(statusRaw: string): boolean {
+  const status = statusRaw.trim().toLowerCase();
+  return status === "failure"
+    || status === "failed"
+    || status === "error"
+    || status === "cancelled"
+    || status === "canceled";
+}
+
 function readPayloadFromEnv(): ParsedNotificationPayload {
   const status = process.env.DISCORD_STATUS?.trim() || "unknown";
   const errors = parseStringArray(process.env.DISCORD_ERRORS_JSON);
-  if (errors.length === 0 && status.toLowerCase() !== "success") {
+  if (errors.length === 0 && isFailureStatus(status)) {
     errors.push("Workflow finished with a non-success status. Check run logs.");
   }
   return {
