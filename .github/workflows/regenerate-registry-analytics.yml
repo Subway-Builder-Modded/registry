@@ -25,6 +25,9 @@ jobs:
     outputs:
       warnings_json: ${{ steps.generate_map_analytics.outputs.warnings_json }}
       warning_count: ${{ steps.generate_map_analytics.outputs.warning_count }}
+      registry_fetches_added: ${{ steps.generate_map_analytics.outputs.registry_fetches_added }}
+      adjusted_delta_total: ${{ steps.generate_map_analytics.outputs.adjusted_delta_total }}
+      clamped_versions: ${{ steps.generate_map_analytics.outputs.clamped_versions }}
       integrity_listings: ${{ steps.generate_map_analytics.outputs.integrity_listings }}
       integrity_versions_checked: ${{ steps.generate_map_analytics.outputs.integrity_versions_checked }}
       integrity_complete_versions: ${{ steps.generate_map_analytics.outputs.integrity_complete_versions }}
@@ -63,6 +66,7 @@ jobs:
             maps/downloads.json
             maps/integrity.json
             maps/integrity-cache.json
+            maps/download-attribution-delta.json
           if-no-files-found: error
 
   generate-mods:
@@ -74,6 +78,9 @@ jobs:
       security_warning_count: ${{ steps.generate_mod_analytics.outputs.security_warning_count }}
       security_errors_json: ${{ steps.generate_mod_analytics.outputs.security_errors_json }}
       security_warnings_json: ${{ steps.generate_mod_analytics.outputs.security_warnings_json }}
+      registry_fetches_added: ${{ steps.generate_mod_analytics.outputs.registry_fetches_added }}
+      adjusted_delta_total: ${{ steps.generate_mod_analytics.outputs.adjusted_delta_total }}
+      clamped_versions: ${{ steps.generate_mod_analytics.outputs.clamped_versions }}
       integrity_listings: ${{ steps.generate_mod_analytics.outputs.integrity_listings }}
       integrity_versions_checked: ${{ steps.generate_mod_analytics.outputs.integrity_versions_checked }}
       integrity_complete_versions: ${{ steps.generate_mod_analytics.outputs.integrity_complete_versions }}
@@ -112,6 +119,7 @@ jobs:
             mods/downloads.json
             mods/integrity.json
             mods/integrity-cache.json
+            mods/download-attribution-delta.json
           if-no-files-found: error
 
   generate-map-demand-stats:
@@ -126,6 +134,7 @@ jobs:
       graphql_queries: ${{ steps.generate_map_demand_stats.outputs.graphql_queries }}
       graphql_total_cost: ${{ steps.generate_map_demand_stats.outputs.graphql_total_cost }}
       warnings_json: ${{ steps.generate_map_demand_stats.outputs.warnings_json }}
+      attribution_fetches_added: ${{ steps.generate_map_demand_stats.outputs.attribution_fetches_added }}
     steps:
       - uses: actions/checkout@v4
 
@@ -157,7 +166,7 @@ jobs:
       - name: Build map demand stats artifact
         run: |
           set -euo pipefail
-          tar -cf /tmp/maps-demand-stats.tar maps/demand-stats-cache.json maps/*/manifest.json
+          tar -cf /tmp/maps-demand-stats.tar maps/demand-stats-cache.json maps/*/manifest.json maps/demand-attribution-delta.json
 
       - name: Upload map demand stats artifact
         uses: actions/upload-artifact@v4
@@ -229,6 +238,8 @@ jobs:
           MOD_INTEGRITY_FILE="$(find /tmp/download-artifacts/mods -type f -name integrity.json | head -n 1 || true)"
           MAP_INTEGRITY_CACHE_FILE="$(find /tmp/download-artifacts/maps -type f -name integrity-cache.json | head -n 1 || true)"
           MOD_INTEGRITY_CACHE_FILE="$(find /tmp/download-artifacts/mods -type f -name integrity-cache.json | head -n 1 || true)"
+          MAP_ATTR_DELTA_FILE="$(find /tmp/download-artifacts/maps -type f -name download-attribution-delta.json | head -n 1 || true)"
+          MOD_ATTR_DELTA_FILE="$(find /tmp/download-artifacts/mods -type f -name download-attribution-delta.json | head -n 1 || true)"
           DEMAND_ARTIFACT_FILE="$(find /tmp/download-artifacts/demand -type f -name maps-demand-stats.tar | head -n 1 || true)"
 
           if [ -z "${MAP_ARTIFACT_FILE}" ]; then
@@ -266,7 +277,17 @@ jobs:
           cp "${MOD_INTEGRITY_FILE}" mods/integrity.json
           cp "${MAP_INTEGRITY_CACHE_FILE}" maps/integrity-cache.json
           cp "${MOD_INTEGRITY_CACHE_FILE}" mods/integrity-cache.json
+          if [ -n "${MAP_ATTR_DELTA_FILE}" ]; then
+            cp "${MAP_ATTR_DELTA_FILE}" maps/download-attribution-delta.json
+          fi
+          if [ -n "${MOD_ATTR_DELTA_FILE}" ]; then
+            cp "${MOD_ATTR_DELTA_FILE}" mods/download-attribution-delta.json
+          fi
           tar -xf "${DEMAND_ARTIFACT_FILE}" -C .
+
+      - name: Merge registry download attribution ledger
+        id: merge_attribution
+        run: pnpm --dir scripts run merge-download-attribution
 
       - name: Sync map manifest file sizes from integrity
         run: pnpm --dir scripts run sync-map-file-sizes
@@ -376,7 +397,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/demand-stats-cache.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/demand-stats-cache.json history/registry-download-attribution.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -460,6 +481,14 @@ jobs:
           INTEGRITY_FILTERED_VERSIONS_MODS: ${{ needs.generate-mods.outputs.integrity_filtered_versions }}
           INTEGRITY_CACHE_HITS_MAPS: ${{ needs.generate-maps.outputs.integrity_cache_hits }}
           INTEGRITY_CACHE_HITS_MODS: ${{ needs.generate-mods.outputs.integrity_cache_hits }}
+          ATTR_FETCHES_MAPS: ${{ needs.generate-maps.outputs.registry_fetches_added }}
+          ATTR_FETCHES_MODS: ${{ needs.generate-mods.outputs.registry_fetches_added }}
+          ATTR_FETCHES_DEMAND: ${{ needs.generate-map-demand-stats.outputs.attribution_fetches_added }}
+          ATTR_FETCHES_MERGED: ${{ steps.merge_attribution.outputs.registry_fetches_added_total }}
+          ADJUSTED_DELTA_MAPS: ${{ needs.generate-maps.outputs.adjusted_delta_total }}
+          ADJUSTED_DELTA_MODS: ${{ needs.generate-mods.outputs.adjusted_delta_total }}
+          CLAMPED_VERSIONS_MAPS: ${{ needs.generate-maps.outputs.clamped_versions }}
+          CLAMPED_VERSIONS_MODS: ${{ needs.generate-mods.outputs.clamped_versions }}
           MAP_WARNINGS_JSON: ${{ needs.generate-maps.outputs.warnings_json }}
           MOD_WARNINGS_JSON: ${{ needs.generate-mods.outputs.warnings_json }}
           COMMITTED: ${{ steps.commit_changes.outputs.committed }}
@@ -508,6 +537,14 @@ jobs:
             --arg integrity_filtered_versions_mods "${INTEGRITY_FILTERED_VERSIONS_MODS}" \
             --arg integrity_cache_hits_maps "${INTEGRITY_CACHE_HITS_MAPS}" \
             --arg integrity_cache_hits_mods "${INTEGRITY_CACHE_HITS_MODS}" \
+            --arg attr_fetches_maps "${ATTR_FETCHES_MAPS}" \
+            --arg attr_fetches_mods "${ATTR_FETCHES_MODS}" \
+            --arg attr_fetches_demand "${ATTR_FETCHES_DEMAND}" \
+            --arg attr_fetches_merged "${ATTR_FETCHES_MERGED}" \
+            --arg adjusted_delta_maps "${ADJUSTED_DELTA_MAPS}" \
+            --arg adjusted_delta_mods "${ADJUSTED_DELTA_MODS}" \
+            --arg clamped_versions_maps "${CLAMPED_VERSIONS_MAPS}" \
+            --arg clamped_versions_mods "${CLAMPED_VERSIONS_MODS}" \
             --arg new_downloads_total "${NEW_DOWNLOADS_TOTAL}" \
             --arg net_delta_total "${NET_DELTA_TOTAL}" \
             --arg updated_records_maps "${UPDATED_RECORDS_MAPS}" \
@@ -527,6 +564,9 @@ jobs:
               "- **Integrity complete/incomplete:** maps \($integrity_complete_versions_maps)/\($integrity_incomplete_versions_maps), mods \($integrity_complete_versions_mods)/\($integrity_incomplete_versions_mods)",
               "- **Integrity filtered versions:** maps \($integrity_filtered_versions_maps), mods \($integrity_filtered_versions_mods)",
               "- **Integrity cache hits:** maps \($integrity_cache_hits_maps), mods \($integrity_cache_hits_mods)",
+              "- **Registry-attributed fetches added:** merged \($attr_fetches_merged) (maps \($attr_fetches_maps), mods \($attr_fetches_mods), demand \($attr_fetches_demand))",
+              "- **Attribution subtraction this run:** maps \($adjusted_delta_maps), mods \($adjusted_delta_mods)",
+              "- **Attribution-clamped versions:** maps \($clamped_versions_maps), mods \($clamped_versions_mods)",
               "- **New downloads:** +\($new_downloads_total)",
               "- **Net delta:** \($net_delta_total)",
               "- **Maps:** \($updated_records_maps) updated records, +\($new_downloads_maps) (net \($net_delta_maps))",
@@ -601,6 +641,7 @@ jobs:
           RESIDENTS_DELTA_TOTAL: ${{ needs.generate-map-demand-stats.outputs.residents_delta_total }}
           GRAPHQL_QUERIES: ${{ needs.generate-map-demand-stats.outputs.graphql_queries }}
           GRAPHQL_TOTAL_COST: ${{ needs.generate-map-demand-stats.outputs.graphql_total_cost }}
+          ATTR_FETCHES_DEMAND: ${{ needs.generate-map-demand-stats.outputs.attribution_fetches_added }}
           WARNINGS_JSON: ${{ needs.generate-map-demand-stats.outputs.warnings_json }}
           COMMITTED: ${{ steps.commit_changes.outputs.committed }}
           COMMIT_SHA: ${{ steps.commit_changes.outputs.commit_sha }}
@@ -631,6 +672,7 @@ jobs:
             --arg residents_delta_total "${RESIDENTS_DELTA_TOTAL}" \
             --arg graphql_queries "${GRAPHQL_QUERIES}" \
             --arg graphql_total_cost "${GRAPHQL_TOTAL_COST}" \
+            --arg attr_fetches_demand "${ATTR_FETCHES_DEMAND}" \
             --arg commit_display "${COMMIT_DISPLAY}" \
             '[
               "- **Processed maps:** \($processed_maps)",
@@ -640,6 +682,7 @@ jobs:
               "- **Extraction failures:** \($extraction_failures)",
               "- **Residents total delta:** \($residents_delta_total)",
               "- **GraphQL usage:** queries=\($graphql_queries), totalCost=\($graphql_total_cost)",
+              "- **Registry-attributed fetches added:** \($attr_fetches_demand)",
               "- **Commit:** \($commit_display)"
             ]')"
 

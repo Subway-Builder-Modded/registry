@@ -5,6 +5,10 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import JSZip from "jszip";
 import { generateDownloadsData } from "../lib/downloads.js";
+import {
+  createDownloadAttributionDelta,
+  createEmptyDownloadAttributionLedger,
+} from "../lib/download-attribution.js";
 
 function writeJson(path: string, value: unknown): void {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, "utf-8");
@@ -709,6 +713,128 @@ test("download-only mode skips ZIP inspection and keeps semver zip counts", asyn
     assert.deepEqual(result.downloads, { "hourly-mod": { "v1.0.0": 7 } });
     assert.equal(result.stats.filtered_versions, 0);
     assert.equal(zipFetchCount, 0);
+  });
+});
+
+test("download-only mode subtracts registry-attributed fetches from raw counts", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["hourly-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "hourly-mod", {
+      ...makeBaseModManifest("hourly-mod"),
+      update: { type: "github", repo: "owner/hourly" },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "hourly.zip", downloadCount: 7, downloadUrl: "https://downloads.example.com/hourly.zip" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const ledger = createEmptyDownloadAttributionLedger("2026-03-30T00:00:00.000Z");
+    ledger.assets["owner/hourly@v1.0.0/hourly.zip"] = {
+      count: 3,
+      updated_at: "2026-03-30T00:00:00.000Z",
+      by_source: { "workflow:test": 3 },
+    };
+    const delta = createDownloadAttributionDelta("workflow:test", "run-1", "2026-03-30T01:00:00.000Z");
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      mode: "download-only",
+      fetchImpl: fetchMock,
+      token: "test-token",
+      attribution: {
+        ledger,
+        delta,
+      },
+    });
+
+    assert.deepEqual(result.downloads, { "hourly-mod": { "v1.0.0": 4 } });
+    assert.equal(result.stats.adjusted_delta_total, 3);
+    assert.equal(result.stats.clamped_versions, 0);
+  });
+});
+
+test("full mode records ZIP fetch attribution deltas on successful fetches", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["github-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "github-mod", {
+      ...makeBaseModManifest("github-mod"),
+      update: { type: "github", repo: "owner/good" },
+    });
+
+    const validZip = await makeModZip(true);
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://github.com/owner/good/releases/download/v2.0.0/good-v2.zip",
+        handle: () => new Response(new Uint8Array(validZip)),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v2.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "good-v2.zip", downloadCount: 15, downloadUrl: "https://github.com/owner/good/releases/download/v2.0.0/good-v2.zip" },
+                        { name: "manifest.json", downloadCount: 15, downloadUrl: "https://downloads.example.com/manifest-v2.json" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const ledger = createEmptyDownloadAttributionLedger("2026-03-30T00:00:00.000Z");
+    const delta = createDownloadAttributionDelta("workflow:test", "run-2", "2026-03-30T01:00:00.000Z");
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+      attribution: {
+        ledger,
+        delta,
+      },
+    });
+
+    assert.deepEqual(result.downloads, { "github-mod": { "v2.0.0": 15 } });
+    assert.equal(result.stats.registry_fetches_added, 1);
+    assert.equal(delta.assets["owner/good@v2.0.0/good-v2.zip"], 1);
   });
 });
 

@@ -298,6 +298,7 @@ export async function fetchZipBuffer(
   warnings: string[],
   version: string,
   assetName?: string,
+  onFetched?: (downloadUrl: string) => void,
 ): Promise<Buffer | null> {
   let response: Response;
   try {
@@ -326,7 +327,9 @@ export async function fetchZipBuffer(
     return null;
   }
   try {
-    return Buffer.from(await response.arrayBuffer());
+    const buffer = Buffer.from(await response.arrayBuffer());
+    onFetched?.(zipUrl);
+    return buffer;
   } catch {
     warnListing(
       warnings,
