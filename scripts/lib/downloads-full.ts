@@ -3,6 +3,7 @@ import * as D from "./download-definitions.js";
 import { createGraphqlUsageState, fetchRepoReleaseIndexes, isSupportedReleaseTag, graphqlUsageSnapshot } from "./release-resolution.js";
 import type { IntegrityCache, IntegrityCacheEntry, IntegritySource, IntegrityVersionEntry, ListingIntegrityEntry } from "./integrity.js";
 import { inspectZipCompleteness } from "./integrity.js";
+import { loadSecurityRules } from "./mod-security.js";
 import {
   bytesToMebibytesRounded,
   type CustomVersionCandidate,
@@ -21,7 +22,7 @@ import {
   withCheckResult,
 } from "./downloads-support.js";
 
-const INTEGRITY_RULES_VERSION = "v3";
+const INTEGRITY_RULES_VERSION = "v4";
 
 function versionedFingerprint(base: string): string {
   return `rules:${INTEGRITY_RULES_VERSION}:${base}`;
@@ -35,6 +36,15 @@ function isLegacyMapCacheMissingFileSizes(
   if (cacheEntry.result.is_complete !== true) return false;
   const fileSizes = cacheEntry.result.file_sizes;
   return !fileSizes || Object.keys(fileSizes).length === 0;
+}
+
+function isLegacyModCacheMissingSecurityCheck(
+  listingType: D.GenerateDownloadsOptions["listingType"],
+  cacheEntry: IntegrityCacheEntry | undefined,
+): boolean {
+  if (listingType !== "mod" || !cacheEntry) return false;
+  const securityScanPassed = cacheEntry.result.required_checks?.security_scan_passed;
+  return typeof securityScanPassed !== "boolean";
 }
 
 function releaseSizeFromBytes(sizeBytes: number | null | undefined): number | undefined {
@@ -88,11 +98,15 @@ export async function generateDownloadsDataFull(
   const fetchImpl = options.fetchImpl ?? fetch;
   const token = options.token;
   const strictFingerprintCache = options.strictFingerprintCache === true;
+  const forceIntegrityRecheck = options.forceIntegrityRecheck === true;
   const warnings: string[] = [];
   const dir = getDirectoryForType(listingType);
   const ids = getIndexIds(repoRoot, dir);
   const now = new Date();
   const nowIso = now.toISOString();
+  const modSecurityRules = listingType === "mod"
+    ? loadSecurityRules(repoRoot)
+    : null;
 
   const cache = loadIntegrityCache(repoRoot, dir);
   const nextCache: IntegrityCache = {
@@ -189,9 +203,12 @@ export async function generateDownloadsDataFull(
         const zipAssets = Array.from(releaseData.assets.entries())
           .filter(([assetName]) => assetName.toLowerCase().endsWith(".zip"));
         const zipAssetNames = zipAssets.map(([assetName]) => assetName).sort();
+        const securityFingerprintPart = listingType === "mod"
+          ? `:${modSecurityRules?.fingerprint ?? "security:none"}`
+          : "";
         const fingerprintBase = zipAssetNames.length > 0
-          ? `github:${repo}:${tag}:${zipAssetNames.join("|")}`
-          : `github:${repo}:${tag}:no-zip`;
+          ? `github:${repo}:${tag}:${zipAssetNames.join("|")}${securityFingerprintPart}`
+          : `github:${repo}:${tag}:no-zip${securityFingerprintPart}`;
         const fingerprint = versionedFingerprint(fingerprintBase);
         const cached = listingCacheEntries[tag];
         const sourceBase: IntegritySource = {
@@ -199,13 +216,17 @@ export async function generateDownloadsDataFull(
           repo,
           tag,
         };
-        const shouldReuseCached = shouldUseCachedIntegrity(
-          cached,
-          fingerprint,
-          now,
-          strictFingerprintCache,
-        )
-          && !isLegacyMapCacheMissingFileSizes(listingType, cached);
+        const shouldReuseCached = (
+          !forceIntegrityRecheck
+          && shouldUseCachedIntegrity(
+            cached,
+            fingerprint,
+            now,
+            strictFingerprintCache,
+          )
+          && !isLegacyMapCacheMissingFileSizes(listingType, cached)
+          && !isLegacyModCacheMissingSecurityCheck(listingType, cached)
+        );
 
         if (shouldReuseCached) {
           cacheHits += 1;
@@ -254,6 +275,7 @@ export async function generateDownloadsDataFull(
         } else {
           const hasReleaseManifestAsset = releaseData.assets.has("manifest.json");
           let selectedResult: IntegrityVersionEntry | null = null;
+          let lastFailedResult: IntegrityVersionEntry | null = null;
           const attemptedErrors: string[] = [];
           let attemptedReleaseSizeMiB: number | undefined;
 
@@ -271,6 +293,7 @@ export async function generateDownloadsDataFull(
             const check = await inspectZipCompleteness(listingType, zipBuffer, {
               cityCode: context.cityCode,
               releaseHasManifestAsset: hasReleaseManifestAsset,
+              modSecurityRules: modSecurityRules?.rules,
             });
             for (const warning of check.warnings) {
               warnListing(warnings, id, `integrity warning (${warning})`, tag);
@@ -286,18 +309,30 @@ export async function generateDownloadsDataFull(
               break;
             }
             attemptedErrors.push(...check.errors.map((error) => `asset '${assetName}': ${error}`));
+            lastFailedResult = selectedResult;
             selectedResult = null;
           }
 
-          const result = selectedResult ?? buildIncompleteVersionEntry(
-            sourceBase,
-            fingerprint,
-            nowIso,
-            attemptedErrors.length > 0 ? attemptedErrors : ["all zip assets failed integrity checks"],
-            {},
-            {},
-            attemptedReleaseSizeMiB,
-          );
+          const result = selectedResult
+            ?? (
+              lastFailedResult
+                ? {
+                  ...lastFailedResult,
+                  is_complete: false,
+                  errors: attemptedErrors.length > 0
+                    ? attemptedErrors
+                    : lastFailedResult.errors,
+                }
+                : buildIncompleteVersionEntry(
+                  sourceBase,
+                  fingerprint,
+                  nowIso,
+                  attemptedErrors.length > 0 ? attemptedErrors : ["all zip assets failed integrity checks"],
+                  {},
+                  {},
+                  attemptedReleaseSizeMiB,
+                )
+            );
           versionEntries[tag] = result;
           nextListingCacheEntries[tag] = {
             fingerprint,
@@ -334,12 +369,15 @@ export async function generateDownloadsDataFull(
         const fallbackFingerprintBase = candidate.sha256
           ? `sha256:${candidate.sha256}`
           : `custom:${versionKey}:${candidate.downloadUrl ?? "missing-download"}:${expectedReleaseManifestAssetName}`;
+        const securityFingerprintPart = listingType === "mod"
+          ? `:${modSecurityRules?.fingerprint ?? "security:none"}`
+          : "";
         const fingerprintBase = candidate.sha256
-          ? `sha256:${candidate.sha256}`
+          ? `sha256:${candidate.sha256}${securityFingerprintPart}`
           : (
             candidate.parsed
-              ? `custom:${candidate.parsed.repo}:${candidate.parsed.tag}:${candidate.parsed.assetName}:${expectedReleaseManifestAssetName}:${candidate.downloadUrl ?? "missing-download"}`
-              : fallbackFingerprintBase
+              ? `custom:${candidate.parsed.repo}:${candidate.parsed.tag}:${candidate.parsed.assetName}:${expectedReleaseManifestAssetName}:${candidate.downloadUrl ?? "missing-download"}${securityFingerprintPart}`
+              : `${fallbackFingerprintBase}${securityFingerprintPart}`
           );
         const fingerprint = versionedFingerprint(fingerprintBase);
         const sourceBase: IntegritySource = {
@@ -350,13 +388,17 @@ export async function generateDownloadsDataFull(
           download_url: candidate.downloadUrl ?? undefined,
         };
         const cached = listingCacheEntries[versionKey];
-        const shouldReuseCached = shouldUseCachedIntegrity(
-          cached,
-          fingerprint,
-          now,
-          strictFingerprintCache,
-        )
-          && !isLegacyMapCacheMissingFileSizes(listingType, cached);
+        const shouldReuseCached = (
+          !forceIntegrityRecheck
+          && shouldUseCachedIntegrity(
+            cached,
+            fingerprint,
+            now,
+            strictFingerprintCache,
+          )
+          && !isLegacyMapCacheMissingFileSizes(listingType, cached)
+          && !isLegacyModCacheMissingSecurityCheck(listingType, cached)
+        );
 
         if (shouldReuseCached) {
           cacheHits += 1;
@@ -504,6 +546,7 @@ export async function generateDownloadsDataFull(
                     cityCode: context.cityCode,
                     releaseHasManifestAsset: release.assets.has(expectedReleaseManifestAssetName),
                     expectedReleaseManifestAssetName,
+                    modSecurityRules: modSecurityRules?.rules,
                   });
                   for (const warning of check.warnings) {
                     warnListing(warnings, id, `integrity warning (${warning})`, versionKey);

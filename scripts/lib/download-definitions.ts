@@ -93,6 +93,7 @@ export interface GenerateDownloadsOptions {
   listingType: ManifestType;
   mode?: "full" | "download-only";
   strictFingerprintCache?: boolean;
+  forceIntegrityRecheck?: boolean;
   token?: string;
   fetchImpl?: typeof fetch;
 }

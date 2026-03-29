@@ -70,6 +70,10 @@ jobs:
     outputs:
       warnings_json: ${{ steps.generate_mod_analytics.outputs.warnings_json }}
       warning_count: ${{ steps.generate_mod_analytics.outputs.warning_count }}
+      security_error_count: ${{ steps.generate_mod_analytics.outputs.security_error_count }}
+      security_warning_count: ${{ steps.generate_mod_analytics.outputs.security_warning_count }}
+      security_errors_json: ${{ steps.generate_mod_analytics.outputs.security_errors_json }}
+      security_warnings_json: ${{ steps.generate_mod_analytics.outputs.security_warnings_json }}
       integrity_listings: ${{ steps.generate_mod_analytics.outputs.integrity_listings }}
       integrity_versions_checked: ${{ steps.generate_mod_analytics.outputs.integrity_versions_checked }}
       integrity_complete_versions: ${{ steps.generate_mod_analytics.outputs.integrity_complete_versions }}
@@ -528,6 +532,56 @@ jobs:
               "- **Maps:** \($updated_records_maps) updated records, +\($new_downloads_maps) (net \($net_delta_maps))",
               "- **Mods:** \($updated_records_mods) updated records, +\($new_downloads_mods) (net \($net_delta_mods))",
               "- **Commit:** \($commit_display)"
+            ]')"
+
+          pnpm --dir scripts run notify-discord
+
+      - name: Notify Discord (Mod Security Errors)
+        if: ${{ always() && needs.generate-mods.outputs.security_error_count != '0' }}
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_TITLE: 🚨🚨 Registry Security Alerts (ERROR)
+          DISCORD_STATUS: failure
+          DISCORD_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SECURITY_ERROR_COUNT: ${{ needs.generate-mods.outputs.security_error_count }}
+          SECURITY_ERRORS_JSON: ${{ needs.generate-mods.outputs.security_errors_json }}
+        run: |
+          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
+            echo "DISCORD_WEBHOOK_URL not set; skipping Discord notification."
+            exit 0
+          fi
+
+          export DISCORD_ERRORS_JSON="${SECURITY_ERRORS_JSON:-[]}"
+          export DISCORD_LINES_JSON="$(jq -nc \
+            --arg count "${SECURITY_ERROR_COUNT}" \
+            '[ 
+              "- **Affected latest mod versions:** \($count)",
+              "- **Status:** hard-blocked from integrity completeness"
+            ]')"
+
+          pnpm --dir scripts run notify-discord
+
+      - name: Notify Discord (Mod Security Warnings)
+        if: ${{ always() && needs.generate-mods.outputs.security_warning_count != '0' }}
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_TITLE: ⚠️ Registry Security Alerts (WARNING)
+          DISCORD_STATUS: warning
+          DISCORD_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          SECURITY_WARNING_COUNT: ${{ needs.generate-mods.outputs.security_warning_count }}
+          SECURITY_WARNINGS_JSON: ${{ needs.generate-mods.outputs.security_warnings_json }}
+        run: |
+          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
+            echo "DISCORD_WEBHOOK_URL not set; skipping Discord notification."
+            exit 0
+          fi
+
+          export DISCORD_WARNINGS_JSON="${SECURITY_WARNINGS_JSON:-[]}"
+          export DISCORD_LINES_JSON="$(jq -nc \
+            --arg count "${SECURITY_WARNING_COUNT}" \
+            '[ 
+              "- **Affected latest mod versions:** \($count)",
+              "- **Status:** warnings do not block integrity completeness"
             ]')"
 
           pnpm --dir scripts run notify-discord

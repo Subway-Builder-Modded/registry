@@ -5,6 +5,7 @@ import { makeAnnouncement } from "./make-announcement.js";
 import { generateDownloadsData } from "./lib/downloads.js";
 import type { IntegrityOutput } from "./lib/integrity.js";
 import type { ManifestType } from "./lib/manifests.js";
+import type { SecurityFinding } from "./lib/mod-security.js";
 
 const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
   ? resolve(import.meta.dirname, "..", "..")
@@ -114,6 +115,18 @@ function toWarningsOutputJson(listingType: ManifestType, warnings: string[]): st
   return JSON.stringify(displayed);
 }
 
+function toLimitedOutputJson(items: string[]): string {
+  const MAX_ITEMS = 30;
+  const normalized = items
+    .map((item) => item.trim())
+    .filter((item) => item !== "");
+  const displayed = normalized.slice(0, MAX_ITEMS);
+  if (normalized.length > displayed.length) {
+    displayed.push(`...and ${normalized.length - displayed.length} more`);
+  }
+  return JSON.stringify(displayed);
+}
+
 function semverParts(value: string): [number, number, number] | null {
   const match = value.match(/^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
   if (!match) return null;
@@ -185,6 +198,47 @@ function filterWarningsForGitHub(
   });
 }
 
+interface SecurityAlerts {
+  errors: string[];
+  warnings: string[];
+}
+
+function formatSecurityAlert(listingId: string, version: string, findings: SecurityFinding[]): string {
+  const uniqueRuleIds = [...new Set(findings.map((finding) => finding.rule_id))];
+  const uniqueFiles = [...new Set(findings.map((finding) => finding.file))];
+  return `listing=${listingId} version=${version}: rules=${uniqueRuleIds.join(", ")} files=${uniqueFiles.join(", ")}`;
+}
+
+function collectSecurityAlerts(integrity: IntegrityOutput, listingType: ManifestType): SecurityAlerts {
+  if (listingType !== "mod") {
+    return { errors: [], warnings: [] };
+  }
+
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  for (const listingId of Object.keys(integrity.listings).sort()) {
+    const listing = integrity.listings[listingId];
+    const latestVersion = listing.latest_semver_version;
+    if (!latestVersion) continue;
+
+    const versionEntry = listing.versions[latestVersion];
+    const findings = versionEntry?.security_issue?.findings ?? [];
+    if (findings.length === 0) continue;
+
+    const errorFindings = findings.filter((finding) => finding.severity === "ERROR");
+    if (errorFindings.length > 0) {
+      errors.push(formatSecurityAlert(listingId, latestVersion, errorFindings));
+    }
+
+    const warningFindings = findings.filter((finding) => finding.severity === "WARNING");
+    if (warningFindings.length > 0) {
+      warnings.push(formatSecurityAlert(listingId, latestVersion, warningFindings));
+    }
+  }
+
+  return { errors, warnings };
+}
+
 async function run(): Promise<void> {
   const listingType = resolveListingType(
     getArgValue("type") ?? process.env.LISTING_TYPE,
@@ -194,6 +248,11 @@ async function run(): Promise<void> {
     hasArgFlag("strict-fingerprint-cache")
     || isTruthyEnv(process.env.STRICT_FINGERPRINT_CACHE)
     || isTruthyEnv(process.env.REGISTRY_STRICT_FINGERPRINT_CACHE)
+  );
+  const forceIntegrityRecheck = (
+    hasArgFlag("force")
+    || hasArgFlag("force-integrity")
+    || isTruthyEnv(process.env.FORCE_INTEGRITY_RECHECK)
   );
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
   const ghDownloadsToken = getNonEmptyEnv("GH_DOWNLOADS_TOKEN");
@@ -221,8 +280,10 @@ async function run(): Promise<void> {
     listingType,
     mode,
     strictFingerprintCache,
+    forceIntegrityRecheck,
     token,
   });
+  const securityAlerts = collectSecurityAlerts(integrity, listingType);
 
   const outputDir = listingType === "map" ? "maps" : "mods";
   const outputPath = resolve(repoRoot, outputDir, "downloads.json");
@@ -238,6 +299,12 @@ async function run(): Promise<void> {
   for (const warning of warnings) {
     console.warn(`[downloads] ${warning}`);
   }
+  for (const securityError of securityAlerts.errors) {
+    console.warn(`[downloads][security][ERROR] ${securityError}`);
+  }
+  for (const securityWarning of securityAlerts.warnings) {
+    console.warn(`[downloads][security][WARNING] ${securityWarning}`);
+  }
 
   console.log(
     `[downloads] Mode: ${mode}`,
@@ -245,6 +312,9 @@ async function run(): Promise<void> {
   console.log(
     `[downloads] Strict fingerprint cache: ${strictFingerprintCache ? "enabled" : "disabled"}`,
   );
+  if (forceIntegrityRecheck) {
+    console.log("[downloads] Force integrity recheck: enabled");
+  }
   console.log(
     `[downloads] GraphQL usage: queries=${rateLimit.queries}, totalCost=${rateLimit.totalCost}, firstRemaining=${rateLimit.firstRemaining ?? "n/a"}, lastRemaining=${rateLimit.lastRemaining ?? "n/a"}, estimatedConsumed=${rateLimit.estimatedConsumed ?? "n/a"}, resetAt=${rateLimit.resetAt ?? "n/a"}`,
   );
@@ -282,6 +352,10 @@ async function run(): Promise<void> {
     const outputLines = [
       `warning_count=${warningsForGitHub.length}`,
       `warnings_json=${toWarningsOutputJson(listingType, warningsForGitHub)}`,
+      `security_error_count=${securityAlerts.errors.length}`,
+      `security_warning_count=${securityAlerts.warnings.length}`,
+      `security_errors_json=${toLimitedOutputJson(securityAlerts.errors)}`,
+      `security_warnings_json=${toLimitedOutputJson(securityAlerts.warnings)}`,
       `integrity_listings=${stats.listings}`,
       `integrity_versions_checked=${stats.versions_checked}`,
       `integrity_complete_versions=${stats.complete_versions}`,

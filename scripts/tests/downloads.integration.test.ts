@@ -65,6 +65,21 @@ async function makeModZip(includeTopLevelManifest: boolean): Promise<Buffer> {
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
+async function makeModZipWithSources(
+  includeTopLevelManifest: boolean,
+  sources: Record<string, string>,
+): Promise<Buffer> {
+  const zip = new JSZip();
+  if (includeTopLevelManifest) {
+    zip.file("manifest.json", "{\"schema_version\":1}");
+  }
+  zip.file("mod.dll", "binary");
+  for (const [path, source] of Object.entries(sources)) {
+    zip.file(path, source);
+  }
+  return zip.generateAsync({ type: "nodebuffer" });
+}
+
 async function makeMapZip(cityCode: string): Promise<Buffer> {
   const zip = new JSZip();
   zip.file("config.json", JSON.stringify({ code: cityCode }));
@@ -102,6 +117,10 @@ async function withTempRegistry(
       writeJson(join(repoRoot, kind, id, "manifest.json"), manifest);
     },
   };
+  writeJson(join(repoRoot, "security-rules.json"), {
+    schema_version: 1,
+    rules: [],
+  });
 
   try {
     await run(context);
@@ -792,5 +811,145 @@ test("map complete versions include file_sizes and legacy cache entries without 
     assert.equal(typeof secondVersion?.release_size, "number");
     assert.equal(typeof secondVersion?.file_sizes?.["config.json"], "number");
     assert.equal(typeof secondVersion?.file_sizes?.["ABC.pmtiles"], "number");
+  });
+});
+
+test("mod security ERROR findings block completeness and exclude downloads", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["security-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "security-mod", {
+      ...makeBaseModManifest("security-mod"),
+      update: { type: "github", repo: "owner/security" },
+    });
+    writeJson(join(repoRoot, "security-rules.json"), {
+      schema_version: 1,
+      rules: [
+        {
+          id: "forbidden-customSavesDirectory",
+          severity: "ERROR",
+          type: "literal",
+          pattern: "customSavesDirectory",
+        },
+      ],
+    });
+
+    const zipBuffer = await makeModZipWithSources(true, {
+      "index.js": "const x = customSavesDirectory;",
+    });
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/security-mod.zip",
+        handle: () => new Response(new Uint8Array(zipBuffer)),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "security-mod.zip", downloadCount: 22, downloadUrl: "https://downloads.example.com/security-mod.zip" },
+                        { name: "manifest.json", downloadCount: 22, downloadUrl: "https://downloads.example.com/manifest.json" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.deepEqual(result.downloads, { "security-mod": {} });
+    assert.equal(result.integrity.listings["security-mod"]?.versions["v1.0.0"]?.is_complete, false);
+    assert.equal(result.integrity.listings["security-mod"]?.versions["v1.0.0"]?.required_checks.security_scan_passed, false);
+    assert.equal(
+      result.integrity.listings["security-mod"]?.versions["v1.0.0"]?.security_issue?.findings[0]?.rule_id,
+      "forbidden-customSavesDirectory",
+    );
+  });
+});
+
+test("mod security WARNING findings are recorded but do not block completeness", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["warning-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "warning-mod", {
+      ...makeBaseModManifest("warning-mod"),
+      update: { type: "github", repo: "owner/warning" },
+    });
+    writeJson(join(repoRoot, "security-rules.json"), {
+      schema_version: 1,
+      rules: [
+        {
+          id: "suspicious-eval-atob",
+          severity: "WARNING",
+          type: "regex",
+          pattern: "eval\\s*\\(\\s*atob\\s*\\(",
+        },
+      ],
+    });
+
+    const zipBuffer = await makeModZipWithSources(true, {
+      "main.ts": "const x = eval(atob('Zm9v'));",
+    });
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/warning-mod.zip",
+        handle: () => new Response(new Uint8Array(zipBuffer)),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "warning-mod.zip", downloadCount: 5, downloadUrl: "https://downloads.example.com/warning-mod.zip" },
+                        { name: "manifest.json", downloadCount: 5, downloadUrl: "https://downloads.example.com/manifest.json" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.deepEqual(result.downloads, { "warning-mod": { "v1.0.0": 5 } });
+    assert.equal(result.integrity.listings["warning-mod"]?.versions["v1.0.0"]?.is_complete, true);
+    assert.equal(result.integrity.listings["warning-mod"]?.versions["v1.0.0"]?.required_checks.security_scan_passed, true);
+    assert.equal(
+      result.integrity.listings["warning-mod"]?.versions["v1.0.0"]?.security_issue?.findings[0]?.severity,
+      "WARNING",
+    );
   });
 });
