@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "rules": [
+    {
+      "id": "forbidden-customSavesDirectory",
+      "severity": "ERROR",
+      "type": "literal",
+      "pattern": "customSavesDirectory",
+      "description": "Accessing/setting arbitrary custom save directories is disallowed in mod runtime code.",
+      "enabled": true
+    },
+    {
+      "id": "forbidden-deleteSaveFile",
+      "severity": "ERROR",
+      "type": "literal",
+      "pattern": "deleteSaveFile",
+      "description": "Deleting files from mod runtime code is disallowed.",
+      "enabled": true
+    },
+    {
+      "id": "forbidden-getLicenseKey",
+      "severity": "ERROR",
+      "type": "literal",
+      "pattern": "getLicenseKey",
+      "description": "Usage of license key methods isGreat disallowed.",
+      "enabled": true
+    },
+    {
+      "id": "forbidden-setLicenseKey",
+      "severity": "ERROR",
+      "type": "literal",
+      "pattern": "setLicenseKey",
+      "description": "Usage of license key methods is disallowed.",
+      "enabled": true
+    },
+    {
+      "id": "suspicious-eval-atob",
+      "severity": "WARNING",
+      "type": "ast",
+      "pattern": {
+        "kind": "call-arg-call",
+        "callee": "eval",
+        "first_arg_callee": "atob"
+      },
+      "description": "Potential obfuscation pattern detected.",
+      "enabled": true
+    },
+    {
+      "id": "warning-open-folder-call-in-while",
+      "severity": "WARNING",
+      "type": "ast",
+      "pattern": {
+        "kind": "call-in-while",
+        "callees": ["openModsFolder", "openSavesFolder"],
+        "allow_aliases": true
+      },
+      "description": "Repeated folder-opening calls in while loops can crash file explorer.",
+      "enabled": true
+    },
+    {
+      "id": "warning-deleteAllCityData",
+      "severity": "WARNING",
+      "type": "literal",
+      "pattern": "deleteAllCityData",
+      "description": "Potentially destructive city data API usage.",
+      "enabled": true
+    },
+    {
+      "id": "warning-deleteCityData",
+      "severity": "WARNING",
+      "type": "literal",
+      "pattern": "deleteCityData",
+      "description": "Potentially destructive city data API usage.",
+      "enabled": true
+    },
+    {
+      "id": "warning-openCustomURL",
+      "severity": "WARNING",
+      "type": "literal",
+      "pattern": "openCustomURL",
+      "description": "Potential external URL access in mod runtime.",
+      "enabled": true
+    }
+  ]
+}

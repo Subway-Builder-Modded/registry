@@ -67,6 +67,55 @@ Automation:
 - `regenerate-registry-analytics.yml` runs every 3 hours in full mode (refreshes downloads + integrity + integrity cache, map demand stats, and syncs map manifest `file_sizes` from integrity).
 - Full mode posts two Discord summaries (downloads/integrity and map demand stats) to the same webhook secret: `DISCORD_WEBHOOK_URL`.
 
+## Security
+
+Mod security scanning runs inside the full integrity pass and is contributor-configurable.
+
+Configuration:
+
+- Rules live at `security-rules.json` in the repository root.
+- Each rule has:
+  - `id` (stable identifier)
+  - `severity` (`ERROR` or `WARNING`)
+  - `type` (`literal`, `regex`, or `ast`)
+  - `pattern` (string for `literal`/`regex`, object for `ast`)
+  - optional `description`, `enabled`
+
+Current enforcement model:
+
+- The scanner inspects all `.js` and `.ts` files inside each mod ZIP.
+- `ERROR` findings hard-fail version completeness (`is_complete=false`), so those versions are excluded from `mods/downloads.json`.
+- `WARNING` findings are recorded but do not block completeness.
+- Security findings are written to `mods/integrity.json` and cached in `mods/integrity-cache.json` under `security_issue.findings`.
+- Full analytics posts separate Discord alerts for security `ERROR` (red) and `WARNING` (yellow/orange).
+
+AST rule support:
+
+- `call-arg-call`: match calls like `eval(atob(...))`.
+- `call-in-while`: match configured calls inside `while` loops, with optional alias resolution (`allow_aliases: true`).
+
+Fixtures and validation:
+
+- Rule fixtures live under `scripts/tests/fixtures/security-rules/<rule-id>/`.
+- Each enabled rule must have a matching folder with at least one `.js` fixture that triggers it.
+- You can add multiple fixtures per rule (for example alias and non-alias variants).
+
+Commands:
+
+- Run focused security-rule fixture validation:
+  - `pnpm --dir scripts run test:security-rules`
+- Run full scripts test suite:
+  - `pnpm --dir scripts run test`
+- Force a fresh mod integrity/security evaluation (ignore cache):
+  - `pnpm --dir scripts run generate-registry-analytics:mods -- --force`
+
+How to add a new security rule:
+
+1. Add the rule to `security-rules.json` (with `enabled: true` when ready).
+2. Create `scripts/tests/fixtures/security-rules/<rule-id>/` and add one or more offending `.js` fixtures.
+3. Run `pnpm --dir scripts run test:security-rules` and confirm all fixture checks pass.
+4. Run a full mod integrity pass (`generate-registry-analytics:mods -- --force`) to verify runtime behavior.
+
 ## Download History
 
 Daily combined download snapshots are cached under:
