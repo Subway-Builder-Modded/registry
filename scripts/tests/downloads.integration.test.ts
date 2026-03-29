@@ -348,6 +348,86 @@ test("custom mixed versions produce explicit invalid integrity entries and hard-
   });
 });
 
+test("custom versions sharing the same release asset reuse a single ZIP inspection", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["shared-asset-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "shared-asset-mod", {
+      ...makeBaseModManifest("shared-asset-mod"),
+      update: { type: "custom", url: "https://example.com/shared-asset-update.json" },
+    });
+
+    const validZip = await makeModZip(true);
+    let zipFetchCount = 0;
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://example.com/shared-asset-update.json",
+        handle: () => jsonResponse({
+          schema_version: 1,
+          versions: [
+            {
+              version: "1.0.0",
+              download: "https://github.com/Owner/Shared/releases/download/v1.0.0/shared.zip",
+            },
+            {
+              version: "1.0.1",
+              download: "https://github.com/Owner/Shared/releases/download/v1.0.0/shared.zip",
+            },
+          ],
+        }),
+      },
+      {
+        match: (url) => url === "https://downloads.example.com/shared.zip",
+        handle: () => {
+          zipFetchCount += 1;
+          return new Response(new Uint8Array(validZip));
+        },
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "shared.zip", downloadCount: 21, downloadUrl: "https://downloads.example.com/shared.zip" },
+                        { name: "manifest.json", downloadCount: 21, downloadUrl: "https://downloads.example.com/shared-manifest.json" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.deepEqual(result.downloads, {
+      "shared-asset-mod": {
+        "1.0.0": 21,
+        "1.0.1": 21,
+      },
+    });
+    assert.equal(zipFetchCount, 1);
+    assert.equal(result.integrity.listings["shared-asset-mod"]?.versions["1.0.0"]?.is_complete, true);
+    assert.equal(result.integrity.listings["shared-asset-mod"]?.versions["1.0.1"]?.is_complete, true);
+  });
+});
+
 test("sha256-based custom versions reuse cache regardless of age with versioned fingerprints", async () => {
   await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
     writeIndex("mods", ["sha-cache-mod"]);
@@ -504,7 +584,7 @@ test("custom mod integrity honors versions[].manifest asset name when checking r
   });
 });
 
-test("non-sha integrity cache reuses recent entries without refetching ZIPs", async () => {
+test("mod non-sha integrity cache reuses matching fingerprints regardless of cache age", async () => {
   await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
     writeIndex("mods", ["cache-mod"]);
     writeIndex("maps", []);
@@ -556,7 +636,11 @@ test("non-sha integrity cache reuses recent entries without refetching ZIPs", as
       token: "test-token",
     });
     assert.equal(zipFetchCount, 1);
-    writeJson(join(repoRoot, "mods", "integrity-cache.json"), first.integrityCache);
+    const agedCache = JSON.parse(JSON.stringify(first.integrityCache)) as {
+      entries: Record<string, Record<string, { last_checked_at: string }>>;
+    };
+    agedCache.entries["cache-mod"]["v1.0.0"].last_checked_at = "2001-01-01T00:00:00.000Z";
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), agedCache);
 
     const second = await generateDownloadsData({
       repoRoot,

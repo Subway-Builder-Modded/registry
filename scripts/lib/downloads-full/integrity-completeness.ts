@@ -1,0 +1,214 @@
+import type * as D from "../download-definitions.js";
+import type {
+  IntegrityCacheEntry,
+  IntegrityVersionEntry,
+  IntegritySource,
+  ZipCompletenessResult,
+} from "../integrity.js";
+import { inspectZipCompleteness } from "../integrity.js";
+import type { LoadedSecurityRules } from "../mod-security.js";
+import {
+  bytesToMebibytesRounded,
+  type CustomVersionCandidate,
+  buildIncompleteVersionEntry,
+  fetchZipBuffer,
+  warnListing,
+  withCheckResult,
+} from "../downloads-support.js";
+
+const INTEGRITY_RULES_VERSION = "v4";
+
+export function versionedFingerprint(base: string): string {
+  return `rules:${INTEGRITY_RULES_VERSION}:${base}`;
+}
+
+export function isLegacyMapCacheMissingFileSizes(
+  listingType: D.GenerateDownloadsOptions["listingType"],
+  cacheEntry: IntegrityCacheEntry | undefined,
+): boolean {
+  if (listingType !== "map" || !cacheEntry) return false;
+  if (cacheEntry.result.is_complete !== true) return false;
+  const fileSizes = cacheEntry.result.file_sizes;
+  return !fileSizes || Object.keys(fileSizes).length === 0;
+}
+
+export function releaseSizeFromBytes(sizeBytes: number | null | undefined): number | undefined {
+  if (typeof sizeBytes !== "number" || !Number.isFinite(sizeBytes) || sizeBytes < 0) return undefined;
+  return bytesToMebibytesRounded(sizeBytes);
+}
+
+export function withReleaseSizeIfMissing(
+  result: IntegrityVersionEntry,
+  releaseSize: number | undefined,
+): IntegrityVersionEntry {
+  if (result.release_size !== undefined || releaseSize === undefined) return result;
+  return {
+    ...result,
+    release_size: releaseSize,
+  };
+}
+
+export function resolveExpectedCustomReleaseManifestAssetName(
+  candidate: CustomVersionCandidate,
+  warnings: string[],
+  listingId: string,
+): string {
+  if (!candidate.parsedManifest) {
+    return "manifest.json";
+  }
+  if (!candidate.parsed) {
+    return "manifest.json";
+  }
+
+  const manifestRepo = candidate.parsedManifest.repo;
+  const manifestTag = candidate.parsedManifest.tag;
+  if (manifestRepo !== candidate.parsed.repo || manifestTag !== candidate.parsed.tag) {
+    warnListing(
+      warnings,
+      listingId,
+      `manifest URL targets ${manifestRepo}@${manifestTag} but download URL targets ${candidate.parsed.repo}@${candidate.parsed.tag}; falling back to manifest.json release-asset check`,
+      candidate.version,
+    );
+    return "manifest.json";
+  }
+
+  return candidate.parsedManifest.assetName;
+}
+
+export interface InspectZipMemoResult {
+  check: ZipCompletenessResult;
+  releaseSizeMiB: number;
+  fromMemo: boolean;
+}
+
+function buildInspectionMemoKey(args: {
+  listingId: string;
+  listingType: D.GenerateDownloadsOptions["listingType"];
+  cityCode: string | undefined;
+  downloadUrl: string;
+  assetName: string;
+  releaseHasManifestAsset: boolean;
+  expectedReleaseManifestAssetName: string;
+  securityFingerprint: string;
+}): string {
+  return [
+    `listing=${args.listingId}`,
+    `type=${args.listingType}`,
+    `city=${args.cityCode ?? ""}`,
+    `url=${args.downloadUrl}`,
+    `asset=${args.assetName}`,
+    `releaseManifest=${args.releaseHasManifestAsset ? "1" : "0"}`,
+    `expectedManifest=${args.expectedReleaseManifestAssetName}`,
+    `security=${args.securityFingerprint}`,
+  ].join("|");
+}
+
+export function createInspectZipWithMemo(options: {
+  listingId: string;
+  listingType: D.GenerateDownloadsOptions["listingType"];
+  cityCode: string | undefined;
+  nowIso: string;
+  warnings: string[];
+  fetchImpl: typeof fetch;
+  modSecurityRules: LoadedSecurityRules | null;
+  securityFingerprint: string;
+}): (params: {
+  version: string;
+  assetName: string;
+  downloadUrl: string;
+  releaseHasManifestAsset: boolean;
+  expectedReleaseManifestAssetName?: string;
+}) => Promise<{ ok: true; value: InspectZipMemoResult } | { ok: false; error: string }> {
+  const inspectionMemo = new Map<string, InspectZipMemoResult>();
+
+  return async (params) => {
+    const expectedReleaseManifestAssetName = (
+      typeof params.expectedReleaseManifestAssetName === "string"
+      && params.expectedReleaseManifestAssetName.trim() !== ""
+    )
+      ? params.expectedReleaseManifestAssetName.trim()
+      : "manifest.json";
+    const memoKey = buildInspectionMemoKey({
+      listingId: options.listingId,
+      listingType: options.listingType,
+      cityCode: options.cityCode,
+      downloadUrl: params.downloadUrl,
+      assetName: params.assetName,
+      releaseHasManifestAsset: params.releaseHasManifestAsset,
+      expectedReleaseManifestAssetName,
+      securityFingerprint: options.securityFingerprint,
+    });
+    const memoEntry = inspectionMemo.get(memoKey);
+    if (memoEntry) {
+      return { ok: true, value: { ...memoEntry, fromMemo: true } };
+    }
+
+    const zipBuffer = await fetchZipBuffer(
+      options.listingId,
+      params.downloadUrl,
+      options.fetchImpl,
+      options.warnings,
+      params.version,
+      params.assetName,
+    );
+    if (!zipBuffer) {
+      return { ok: false, error: `zip asset '${params.assetName}' could not be fetched` };
+    }
+    const releaseSizeMiB = bytesToMebibytesRounded(zipBuffer.byteLength);
+    let check: ZipCompletenessResult;
+    try {
+      check = await inspectZipCompleteness(options.listingType, zipBuffer, {
+        cityCode: options.cityCode,
+        releaseHasManifestAsset: params.releaseHasManifestAsset,
+        expectedReleaseManifestAssetName,
+        modSecurityRules: options.modSecurityRules?.rules,
+      });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      return { ok: false, error: `integrity inspection failed (${message})` };
+    }
+
+    const value: InspectZipMemoResult = {
+      check,
+      releaseSizeMiB,
+      fromMemo: false,
+    };
+    inspectionMemo.set(memoKey, value);
+    return { ok: true, value };
+  };
+}
+
+export function buildIncompleteInspectionResult(
+  sourceBase: IntegritySource,
+  fingerprint: string,
+  nowIso: string,
+  errorMessage: string,
+  releaseSizeMiB?: number,
+): IntegrityVersionEntry {
+  return buildIncompleteVersionEntry(
+    sourceBase,
+    fingerprint,
+    nowIso,
+    [errorMessage],
+    {},
+    {},
+    releaseSizeMiB,
+  );
+}
+
+export function buildInspectionResult(
+  check: ZipCompletenessResult,
+  source: IntegritySource,
+  fingerprint: string,
+  nowIso: string,
+  releaseSizeMiB: number,
+): IntegrityVersionEntry {
+  return withCheckResult(
+    check,
+    source,
+    fingerprint,
+    nowIso,
+    releaseSizeMiB,
+  );
+}
+

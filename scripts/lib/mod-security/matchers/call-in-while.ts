@@ -1,35 +1,23 @@
 import type { AstRuleCallInWhilePattern } from "../../mod-security-types.js";
-import { getCalleeName, resolveAliasName, safeNodeStart, traverse } from "../ast-context.js";
 import type { AstScanContext } from "../ast-context.js";
 import { matchedAt } from "./match-result.js";
 import type { MatchResult } from "./match-result.js";
 
 export function matchCallInWhilePattern(
-  sourceAst: unknown,
+  _sourceAst: unknown,
   pattern: AstRuleCallInWhilePattern,
   context: AstScanContext,
 ): MatchResult {
-  const targetCallees = new Set(pattern.callees);
-  let matchIndex = -1;
-
-  traverse(sourceAst as any, {
-    WhileStatement(path: any) {
-      if (matchIndex >= 0) return;
-      path.traverse({
-        CallExpression(callPath: any) {
-          if (matchIndex >= 0) return;
-          const node = callPath.node as { callee?: unknown };
-          const directName = getCalleeName(node.callee);
-          if (!directName) return;
-          const nameToCheck = pattern.allow_aliases === true
-            ? resolveAliasName(directName, context.aliases)
-            : directName;
-          if (!targetCallees.has(nameToCheck)) return;
-          matchIndex = safeNodeStart(callPath.node);
-        },
-      });
-    },
-  });
-
-  return matchedAt(matchIndex);
+  const indexMap = pattern.allow_aliases === true
+    ? context.whileCallResolvedFirstIndex
+    : context.whileCallDirectFirstIndex;
+  let bestIndex = -1;
+  for (const calleeName of pattern.callees) {
+    const index = indexMap.get(calleeName);
+    if (typeof index !== "number") continue;
+    if (bestIndex < 0 || index < bestIndex) {
+      bestIndex = index;
+    }
+  }
+  return matchedAt(bestIndex);
 }

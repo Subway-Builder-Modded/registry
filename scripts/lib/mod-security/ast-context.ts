@@ -8,6 +8,9 @@ const traverse = (
 
 export interface AstScanContext {
   aliases: Map<string, string>;
+  callArgCallFirstIndex: Map<string, number>;
+  whileCallDirectFirstIndex: Map<string, number>;
+  whileCallResolvedFirstIndex: Map<string, number>;
 }
 
 export function safeNodeStart(node: unknown): number {
@@ -73,9 +76,22 @@ function resolveExpressionName(expression: unknown): string | null {
   return getCalleeName(expression);
 }
 
-function collectAliasMappings(ast: unknown): Map<string, string> {
+function getOrSetFirstIndex(indexMap: Map<string, number>, key: string, index: number): void {
+  if (!Number.isFinite(index) || index < 0) return;
+  const current = indexMap.get(key);
+  if (typeof current === "number" && current <= index) return;
+  indexMap.set(key, index);
+}
+
+function buildAstIndexes(ast: unknown): {
+  aliases: Map<string, string>;
+  callArgCallFirstIndex: Map<string, number>;
+  whileCallDirectFirstIndex: Map<string, number>;
+} {
   const aliases = new Map<string, string>();
   const mappings: Array<{ alias: string; target: string }> = [];
+  const callArgCallFirstIndex = new Map<string, number>();
+  const whileCallDirectFirstIndex = new Map<string, number>();
 
   traverse(ast as any, {
     VariableDeclarator(path: any) {
@@ -114,6 +130,43 @@ function collectAliasMappings(ast: unknown): Map<string, string> {
       if (!target) return;
       mappings.push({ alias, target });
     },
+    CallExpression(path: any) {
+      const node = path.node as {
+        callee?: unknown;
+        arguments?: unknown[];
+      };
+
+      const calleeName = getCalleeName(node.callee);
+      if (calleeName) {
+        const firstArg = Array.isArray(node.arguments) ? node.arguments[0] : undefined;
+        if (
+          typeof firstArg === "object"
+          && firstArg !== null
+          && (firstArg as { type?: unknown }).type === "CallExpression"
+        ) {
+          const argCalleeName = getCalleeName((firstArg as { callee?: unknown }).callee);
+          if (argCalleeName) {
+            getOrSetFirstIndex(
+              callArgCallFirstIndex,
+              `${calleeName}::${argCalleeName}`,
+              safeNodeStart(path.node),
+            );
+          }
+        }
+
+        const isInsideWhile = path.findParent((parentPath: any) => {
+          const parentNode = parentPath?.node as { type?: unknown } | undefined;
+          return parentNode?.type === "WhileStatement";
+        });
+        if (isInsideWhile) {
+          getOrSetFirstIndex(
+            whileCallDirectFirstIndex,
+            calleeName,
+            safeNodeStart(path.node),
+          );
+        }
+      }
+    },
   });
 
   let changed = true;
@@ -129,12 +182,30 @@ function collectAliasMappings(ast: unknown): Map<string, string> {
     }
   }
 
-  return aliases;
+  return {
+    aliases,
+    callArgCallFirstIndex,
+    whileCallDirectFirstIndex,
+  };
 }
 
 export function createAstScanContext(sourceAst: unknown): AstScanContext {
+  const {
+    aliases,
+    callArgCallFirstIndex,
+    whileCallDirectFirstIndex,
+  } = buildAstIndexes(sourceAst);
+  const whileCallResolvedFirstIndex = new Map<string, number>();
+  for (const [directName, index] of whileCallDirectFirstIndex.entries()) {
+    const resolved = resolveAliasName(directName, aliases);
+    getOrSetFirstIndex(whileCallResolvedFirstIndex, resolved, index);
+  }
+
   return {
-    aliases: collectAliasMappings(sourceAst),
+    aliases,
+    callArgCallFirstIndex,
+    whileCallDirectFirstIndex,
+    whileCallResolvedFirstIndex,
   };
 }
 

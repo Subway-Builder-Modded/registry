@@ -8,6 +8,7 @@ import { loadSecurityRules, scanZipForSecurityIssues } from "../lib/mod-security
 const scriptsRoot = resolve(import.meta.dirname, "..", "..");
 const repoRoot = resolve(scriptsRoot, "..");
 const fixturesRoot = resolve(scriptsRoot, "tests", "fixtures", "security-rules");
+const multiFixturesRoot = resolve(scriptsRoot, "tests", "fixtures", "security-rules-multi");
 
 function readRuleFixtureMap(): Record<string, string[]> {
   const ruleDirs = readdirSync(fixturesRoot, { withFileTypes: true })
@@ -98,6 +99,37 @@ test("all fixtures combined trigger every enabled rule in security-rules.json", 
     assert.ok(
       foundRuleIds.has(rule.id),
       `Combined fixture scan did not trigger enabled rule '${rule.id}'`,
+    );
+  }
+});
+
+test("single fixture can trigger multiple enabled security rules", async () => {
+  const rules = loadSecurityRules(repoRoot).rules.filter((rule) => rule.enabled);
+  const fixturePath = resolve(
+    multiFixturesRoot,
+    "fixture-multi-rule.js",
+  );
+  const zip = await makeZipForFixture("multi-rule", fixturePath);
+  const issue = await scanZipForSecurityIssues(zip, rules);
+
+  assert.ok(issue, "Expected multi-rule fixture to produce findings");
+  const foundRuleIds = new Set(issue.findings.map((finding) => finding.rule_id));
+  assert.ok(
+    foundRuleIds.size > 1,
+    "Expected multi-rule fixture to trigger more than one security rule",
+  );
+
+  const expectedTriggeredRules = [
+    "forbidden-customSavesDirectory",
+    "warning-deleteCityData",
+    "forbidden-getLicenseKey",
+    "forbidden-deleteSaveFile",
+    "warning-open-folder-call-in-while",
+  ];
+  for (const ruleId of expectedTriggeredRules) {
+    assert.ok(
+      foundRuleIds.has(ruleId),
+      `Expected multi-rule fixture to trigger '${ruleId}'`,
     );
   }
 });
