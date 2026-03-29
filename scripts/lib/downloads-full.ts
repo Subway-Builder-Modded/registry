@@ -290,11 +290,18 @@ export async function generateDownloadsDataFull(
               continue;
             }
             attemptedReleaseSizeMiB = bytesToMebibytesRounded(zipBuffer.byteLength);
-            const check = await inspectZipCompleteness(listingType, zipBuffer, {
-              cityCode: context.cityCode,
-              releaseHasManifestAsset: hasReleaseManifestAsset,
-              modSecurityRules: modSecurityRules?.rules,
-            });
+            let check: Awaited<ReturnType<typeof inspectZipCompleteness>>;
+            try {
+              check = await inspectZipCompleteness(listingType, zipBuffer, {
+                cityCode: context.cityCode,
+                releaseHasManifestAsset: hasReleaseManifestAsset,
+                modSecurityRules: modSecurityRules?.rules,
+              });
+            } catch (error) {
+              const message = error instanceof Error ? error.message : String(error);
+              attemptedErrors.push(`asset '${assetName}': integrity inspection failed (${message})`);
+              continue;
+            }
             for (const warning of check.warnings) {
               warnListing(warnings, id, `integrity warning (${warning})`, tag);
             }
@@ -542,12 +549,33 @@ export async function generateDownloadsDataFull(
                   };
                 } else {
                   const releaseSizeMiB = bytesToMebibytesRounded(zipBuffer.byteLength);
-                  const check = await inspectZipCompleteness(listingType, zipBuffer, {
-                    cityCode: context.cityCode,
-                    releaseHasManifestAsset: release.assets.has(expectedReleaseManifestAssetName),
-                    expectedReleaseManifestAssetName,
-                    modSecurityRules: modSecurityRules?.rules,
-                  });
+                  let check: Awaited<ReturnType<typeof inspectZipCompleteness>>;
+                  try {
+                    check = await inspectZipCompleteness(listingType, zipBuffer, {
+                      cityCode: context.cityCode,
+                      releaseHasManifestAsset: release.assets.has(expectedReleaseManifestAssetName),
+                      expectedReleaseManifestAssetName,
+                      modSecurityRules: modSecurityRules?.rules,
+                    });
+                  } catch (error) {
+                    const message = error instanceof Error ? error.message : String(error);
+                    const result = buildIncompleteVersionEntry(
+                      sourceBase,
+                      fingerprint,
+                      nowIso,
+                      [`integrity inspection failed (${message})`],
+                      {},
+                      {},
+                      releaseSizeMiB,
+                    );
+                    versionEntries[versionKey] = result;
+                    nextListingCacheEntries[versionKey] = {
+                      fingerprint,
+                      last_checked_at: nowIso,
+                      result,
+                    };
+                    continue;
+                  }
                   for (const warning of check.warnings) {
                     warnListing(warnings, id, `integrity warning (${warning})`, versionKey);
                   }

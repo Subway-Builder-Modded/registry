@@ -293,7 +293,24 @@ async function inspectModZip(
     errors.push("missing top-level manifest.json in ZIP");
   }
 
-  const securityIssue = await scanZipForSecurityIssues(zip, modSecurityRules);
+  let securityIssue: SecurityIssue | undefined;
+  try {
+    securityIssue = await scanZipForSecurityIssues(zip, modSecurityRules);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    requiredChecks.security_scan_passed = false;
+    matchedFiles.security_scan_passed = null;
+    errors.push(`security scan failed (${message})`);
+    return {
+      isComplete: false,
+      errors,
+      warnings,
+      requiredChecks,
+      matchedFiles,
+      fileSizes: undefined,
+      securityIssue: undefined,
+    };
+  }
   const findings = securityIssue?.findings ?? [];
   const errorFindings = findings.filter((finding) => finding.severity === "ERROR");
   const warningFindings = findings.filter((finding) => finding.severity === "WARNING");
