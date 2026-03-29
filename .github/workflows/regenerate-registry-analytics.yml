@@ -289,6 +289,12 @@ jobs:
         id: merge_attribution
         run: pnpm --dir scripts run merge-download-attribution
 
+      - name: Reconcile adjusted downloads using merged attribution
+        id: reconcile_downloads
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm --dir scripts run reconcile-attributed-downloads -- --no-refresh-history
+
       - name: Sync map manifest file sizes from integrity
         run: pnpm --dir scripts run sync-map-file-sizes
 
