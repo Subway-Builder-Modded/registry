@@ -19,6 +19,8 @@ jobs:
     outputs:
       warnings_json: ${{ steps.generate_map_downloads.outputs.warnings_json }}
       warning_count: ${{ steps.generate_map_downloads.outputs.warning_count }}
+      adjusted_delta_total: ${{ steps.generate_map_downloads.outputs.adjusted_delta_total }}
+      clamped_versions: ${{ steps.generate_map_downloads.outputs.clamped_versions }}
     steps:
       - uses: actions/checkout@v4
 
@@ -54,6 +56,8 @@ jobs:
     outputs:
       warnings_json: ${{ steps.generate_mod_downloads.outputs.warnings_json }}
       warning_count: ${{ steps.generate_mod_downloads.outputs.warning_count }}
+      adjusted_delta_total: ${{ steps.generate_mod_downloads.outputs.adjusted_delta_total }}
+      clamped_versions: ${{ steps.generate_mod_downloads.outputs.clamped_versions }}
     steps:
       - uses: actions/checkout@v4
 
@@ -327,6 +331,10 @@ jobs:
           TRACKED_VERSIONS_TOTAL: ${{ steps.download_stats.outputs.tracked_versions_total }}
           TRACKED_VERSIONS_MAPS: ${{ steps.download_stats.outputs.tracked_versions_maps }}
           TRACKED_VERSIONS_MODS: ${{ steps.download_stats.outputs.tracked_versions_mods }}
+          ADJUSTED_DELTA_MAPS: ${{ needs.generate-maps.outputs.adjusted_delta_total }}
+          ADJUSTED_DELTA_MODS: ${{ needs.generate-mods.outputs.adjusted_delta_total }}
+          CLAMPED_VERSIONS_MAPS: ${{ needs.generate-maps.outputs.clamped_versions }}
+          CLAMPED_VERSIONS_MODS: ${{ needs.generate-mods.outputs.clamped_versions }}
           MAP_WARNINGS_JSON: ${{ needs.generate-maps.outputs.warnings_json }}
           MOD_WARNINGS_JSON: ${{ needs.generate-mods.outputs.warnings_json }}
           COMMITTED: ${{ steps.commit_changes.outputs.committed }}
@@ -363,6 +371,10 @@ jobs:
             --arg tracked_versions_total "${TRACKED_VERSIONS_TOTAL}" \
             --arg tracked_versions_maps "${TRACKED_VERSIONS_MAPS}" \
             --arg tracked_versions_mods "${TRACKED_VERSIONS_MODS}" \
+            --arg adjusted_delta_maps "${ADJUSTED_DELTA_MAPS}" \
+            --arg adjusted_delta_mods "${ADJUSTED_DELTA_MODS}" \
+            --arg clamped_versions_maps "${CLAMPED_VERSIONS_MAPS}" \
+            --arg clamped_versions_mods "${CLAMPED_VERSIONS_MODS}" \
             --arg new_downloads_total "${NEW_DOWNLOADS_TOTAL}" \
             --arg net_delta_total "${NET_DELTA_TOTAL}" \
             --arg updated_records_maps "${UPDATED_RECORDS_MAPS}" \
@@ -377,6 +389,8 @@ jobs:
               "- **Listings touched:** \($updated_listings_total)",
               "- **Tracked listings:** \($tracked_listings_total) (maps \($tracked_listings_maps), mods \($tracked_listings_mods))",
               "- **Tracked versions:** \($tracked_versions_total) (maps \($tracked_versions_maps), mods \($tracked_versions_mods))",
+              "- **Attribution subtraction this run:** maps \($adjusted_delta_maps), mods \($adjusted_delta_mods)",
+              "- **Attribution-clamped versions:** maps \($clamped_versions_maps), mods \($clamped_versions_mods)",
               "- **New downloads:** +\($new_downloads_total)",
               "- **Net delta:** \($net_delta_total)",
               "- **Maps:** \($updated_records_maps) updated records, +\($new_downloads_maps) (net \($net_delta_maps))",

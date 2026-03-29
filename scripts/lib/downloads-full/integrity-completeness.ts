@@ -112,6 +112,11 @@ export function createInspectZipWithMemo(options: {
   fetchImpl: typeof fetch;
   modSecurityRules: LoadedSecurityRules | null;
   securityFingerprint: string;
+  attributionRecorder?: (params: {
+    version: string;
+    assetName: string;
+    downloadUrl: string;
+  }) => void;
 }): (params: {
   version: string;
   assetName: string;
@@ -150,6 +155,11 @@ export function createInspectZipWithMemo(options: {
       options.warnings,
       params.version,
       params.assetName,
+      (downloadUrl) => options.attributionRecorder?.({
+        version: params.version,
+        assetName: params.assetName,
+        downloadUrl,
+      }),
     );
     if (!zipBuffer) {
       return { ok: false, error: `zip asset '${params.assetName}' could not be fetched` };

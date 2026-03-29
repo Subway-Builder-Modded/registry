@@ -39,6 +39,109 @@ import {
   isLegacyModCacheMissingSecurityCheck,
   resolveModSecurityRules,
 } from "./downloads-full/integrity-security.js";
+import {
+  adjustDownloadCount,
+  createDownloadAttributionDelta,
+  createEmptyDownloadAttributionLedger,
+  getAttributedCountForAssetKey,
+  recordDownloadAttributionFetchByAssetKey,
+  toDownloadAttributionAssetKey,
+  type DownloadAttributionDelta,
+  type DownloadAttributionLedger,
+} from "./download-attribution.js";
+
+interface AdjustedVersionCount {
+  adjustedCount: number;
+  subtractedTotal: number;
+  clamped: boolean;
+}
+
+function getAdjustedGithubZipTotal(params: {
+  listingId: string;
+  version: string;
+  repo: string;
+  assets: Map<string, { downloadCount: number; downloadUrl: string | null; sizeBytes: number | null }>;
+  attributionLedger: DownloadAttributionLedger;
+  attributionDelta: DownloadAttributionDelta;
+  warnings: string[];
+}): AdjustedVersionCount {
+  const {
+    listingId,
+    version,
+    repo,
+    assets,
+    attributionLedger,
+    attributionDelta,
+    warnings,
+  } = params;
+  let adjustedCount = 0;
+  let subtractedTotal = 0;
+  let clamped = false;
+
+  for (const [assetName, asset] of assets.entries()) {
+    if (!assetName.toLowerCase().endsWith(".zip")) continue;
+    const key = toDownloadAttributionAssetKey(repo, version, assetName);
+    const attributed = getAttributedCountForAssetKey(attributionLedger, attributionDelta, key);
+    const adjusted = adjustDownloadCount(asset.downloadCount, attributed);
+    adjustedCount += adjusted.adjusted;
+    subtractedTotal += adjusted.subtracted;
+    if (adjusted.clamped) {
+      clamped = true;
+      warnListing(
+        warnings,
+        listingId,
+        `download attribution clamped '${assetName}' (raw=${adjusted.raw}, attributed=${adjusted.attributed}, adjusted=${adjusted.adjusted})`,
+        version,
+      );
+    }
+  }
+
+  return {
+    adjustedCount,
+    subtractedTotal,
+    clamped,
+  };
+}
+
+function getAdjustedSingleAssetCount(params: {
+  listingId: string;
+  version: string;
+  repo: string;
+  tag: string;
+  assetName: string;
+  rawCount: number;
+  attributionLedger: DownloadAttributionLedger;
+  attributionDelta: DownloadAttributionDelta;
+  warnings: string[];
+}): AdjustedVersionCount {
+  const {
+    listingId,
+    version,
+    repo,
+    tag,
+    assetName,
+    rawCount,
+    attributionLedger,
+    attributionDelta,
+    warnings,
+  } = params;
+  const key = toDownloadAttributionAssetKey(repo, tag, assetName);
+  const attributed = getAttributedCountForAssetKey(attributionLedger, attributionDelta, key);
+  const adjusted = adjustDownloadCount(rawCount, attributed);
+  if (adjusted.clamped) {
+    warnListing(
+      warnings,
+      listingId,
+      `download attribution clamped '${assetName}' (raw=${adjusted.raw}, attributed=${adjusted.attributed}, adjusted=${adjusted.adjusted})`,
+      version,
+    );
+  }
+  return {
+    adjustedCount: adjusted.adjusted,
+    subtractedTotal: adjusted.subtracted,
+    clamped: adjusted.clamped,
+  };
+}
 
 export async function generateDownloadsDataFull(
   options: D.GenerateDownloadsOptions,
@@ -58,6 +161,9 @@ export async function generateDownloadsDataFull(
   const ids = getIndexIds(repoRoot, dir);
   const now = new Date();
   const nowIso = now.toISOString();
+  const attributionLedger = options.attribution?.ledger ?? createEmptyDownloadAttributionLedger(nowIso);
+  const attributionDelta = options.attribution?.delta
+    ?? createDownloadAttributionDelta(`runtime:${listingType}:full`, undefined, nowIso);
   const modSecurityRules = resolveModSecurityRules(listingType, repoRoot);
 
   const cache = loadIntegrityCache(repoRoot, dir);
@@ -124,6 +230,8 @@ export async function generateDownloadsDataFull(
   let incompleteVersions = 0;
   let filteredVersions = 0;
   let cacheHits = 0;
+  let adjustedDeltaTotal = 0;
+  let clampedVersions = 0;
 
   for (const id of [...ids].sort()) {
     console.log(`[downloads] heartbeat:listing mode=full listing=${id}`);
@@ -257,6 +365,10 @@ export async function generateDownloadsDataFull(
               attemptedErrors.push(`asset '${assetName}': ${inspected.error}`);
               continue;
             }
+            if (!inspected.value.fromMemo) {
+              const key = toDownloadAttributionAssetKey(repo, tag, assetName);
+              recordDownloadAttributionFetchByAssetKey(attributionDelta, key);
+            }
             const { check, releaseSizeMiB } = inspected.value;
             attemptedReleaseSizeMiB = releaseSizeMiB;
             for (const warning of check.warnings) {
@@ -307,12 +419,25 @@ export async function generateDownloadsDataFull(
 
         if (isSupportedReleaseTag(tag)) {
           const result = versionEntries[tag];
+          const adjusted = getAdjustedGithubZipTotal({
+            listingId: id,
+            version: tag,
+            repo,
+            assets: releaseData.assets,
+            attributionLedger,
+            attributionDelta,
+            warnings,
+          });
+          adjustedDeltaTotal += adjusted.subtractedTotal;
+          if (adjusted.clamped) {
+            clampedVersions += 1;
+          }
           const included = applyDownloadCountForVersion({
             warnings,
             listingId: id,
             version: tag,
             result,
-            downloadCount: releaseData.zipTotal,
+            downloadCount: adjusted.adjustedCount,
             downloadsByListing,
           });
           if (!included) {
@@ -505,6 +630,14 @@ export async function generateDownloadsDataFull(
                     result,
                   };
                 } else {
+                  if (!inspected.value.fromMemo) {
+                    const key = toDownloadAttributionAssetKey(
+                      candidate.parsed.repo,
+                      candidate.parsed.tag,
+                      candidate.parsed.assetName,
+                    );
+                    recordDownloadAttributionFetchByAssetKey(attributionDelta, key);
+                  }
                   const { check, releaseSizeMiB } = inspected.value;
                   for (const warning of check.warnings) {
                     warnListing(warnings, id, `integrity warning (${warning})`, versionKey);
@@ -534,15 +667,34 @@ export async function generateDownloadsDataFull(
 
         if (candidate.semver) {
           const result = versionEntries[versionKey];
-          const downloadCount = candidate.parsed
-            ? repoIndexes
+          let downloadCount: number | undefined;
+          if (candidate.parsed) {
+            const rawCount = repoIndexes
               .get(candidate.parsed.repo)
               ?.byTag
               .get(candidate.parsed.tag)
               ?.assets
               .get(candidate.parsed.assetName)
-              ?.downloadCount
-            : undefined;
+              ?.downloadCount;
+            if (typeof rawCount === "number") {
+              const adjusted = getAdjustedSingleAssetCount({
+                listingId: id,
+                version: versionKey,
+                repo: candidate.parsed.repo,
+                tag: candidate.parsed.tag,
+                assetName: candidate.parsed.assetName,
+                rawCount,
+                attributionLedger,
+                attributionDelta,
+                warnings,
+              });
+              adjustedDeltaTotal += adjusted.subtractedTotal;
+              if (adjusted.clamped) {
+                clampedVersions += 1;
+              }
+              downloadCount = adjusted.adjustedCount;
+            }
+          }
           const included = applyDownloadCountForVersion({
             warnings,
             listingId: id,
@@ -593,6 +745,9 @@ export async function generateDownloadsDataFull(
       incomplete_versions: incompleteVersions,
       filtered_versions: filteredVersions,
       cache_hits: cacheHits,
+      registry_fetches_added: Object.values(attributionDelta.assets).reduce((sum, count) => sum + count, 0),
+      adjusted_delta_total: adjustedDeltaTotal,
+      clamped_versions: clampedVersions,
     },
     warnings,
     rateLimit: graphqlUsageSnapshot(usageState),

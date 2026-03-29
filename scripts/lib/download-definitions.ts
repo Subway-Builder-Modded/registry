@@ -1,5 +1,6 @@
 import type { ManifestType } from "./manifests.js";
 import type { IntegrityOutput, IntegrityCache } from "./integrity.js";
+import type { DownloadAttributionDelta, DownloadAttributionLedger } from "./download-attribution.js";
 
 export interface ParsedReleaseAssetUrl {
   repo: string;
@@ -94,6 +95,10 @@ export interface GenerateDownloadsOptions {
   mode?: "full" | "download-only";
   strictFingerprintCache?: boolean;
   forceIntegrityRecheck?: boolean;
+  attribution?: {
+    ledger: DownloadAttributionLedger;
+    delta: DownloadAttributionDelta;
+  };
   token?: string;
   fetchImpl?: typeof fetch;
 }
@@ -109,6 +114,9 @@ export interface GenerateDownloadsResult {
     incomplete_versions: number;
     filtered_versions: number;
     cache_hits: number;
+    registry_fetches_added: number;
+    adjusted_delta_total: number;
+    clamped_versions: number;
   };
   warnings: string[];
   rateLimit: {

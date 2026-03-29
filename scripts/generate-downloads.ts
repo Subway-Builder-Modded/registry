@@ -3,6 +3,11 @@ import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { makeAnnouncement } from "./make-announcement.js";
 import { generateDownloadsData } from "./lib/downloads.js";
+import {
+  createDownloadAttributionDelta,
+  loadDownloadAttributionLedger,
+  writeDownloadAttributionDeltaFile,
+} from "./lib/download-attribution.js";
 import type { IntegrityOutput } from "./lib/integrity.js";
 import type { ManifestType } from "./lib/manifests.js";
 import type { SecurityFinding } from "./lib/mod-security.js";
@@ -255,6 +260,21 @@ async function run(): Promise<void> {
     || isTruthyEnv(process.env.FORCE_INTEGRITY_RECHECK)
   );
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const runId = getNonEmptyEnv("GITHUB_RUN_ID") ?? "local";
+  const jobId = getNonEmptyEnv("GITHUB_JOB") ?? "manual";
+  const workflowName = getNonEmptyEnv("GITHUB_WORKFLOW") ?? "local";
+  const attributionLedger = loadDownloadAttributionLedger(repoRoot);
+  const outputDir = listingType === "map" ? "maps" : "mods";
+  const defaultAttributionDeltaPath = resolve(repoRoot, outputDir, "download-attribution-delta.json");
+  const attributionDeltaPath = (
+    getArgValue("attribution-delta-path")
+    ?? getNonEmptyEnv("DOWNLOAD_ATTRIBUTION_DELTA_PATH")
+    ?? defaultAttributionDeltaPath
+  );
+  const attributionDelta = createDownloadAttributionDelta(
+    `workflow:${workflowName}:${listingType}:${mode}`,
+    `${runId}:${jobId}:${listingType}:${mode}`,
+  );
   const ghDownloadsToken = getNonEmptyEnv("GH_DOWNLOADS_TOKEN");
   const githubToken = getNonEmptyEnv("GITHUB_TOKEN");
   const token = ghDownloadsToken ?? githubToken;
@@ -282,10 +302,13 @@ async function run(): Promise<void> {
     strictFingerprintCache,
     forceIntegrityRecheck,
     token,
+    attribution: {
+      ledger: attributionLedger,
+      delta: attributionDelta,
+    },
   });
   const securityAlerts = collectSecurityAlerts(integrity, listingType);
 
-  const outputDir = listingType === "map" ? "maps" : "mods";
   const outputPath = resolve(repoRoot, outputDir, "downloads.json");
   const integrityPath = resolve(repoRoot, outputDir, "integrity.json");
   const integrityCachePath = resolve(repoRoot, outputDir, "integrity-cache.json");
@@ -294,6 +317,7 @@ async function run(): Promise<void> {
     await announceNewAssets(integrity, integrityPath, listingType, repoRoot);
     writeFileSync(integrityPath, `${JSON.stringify(integrity, null, 2)}\n`, "utf-8");
     writeFileSync(integrityCachePath, `${JSON.stringify(integrityCache, null, 2)}\n`, "utf-8");
+    writeDownloadAttributionDeltaFile(attributionDeltaPath, attributionDelta);
   }
 
   for (const warning of warnings) {
@@ -320,6 +344,9 @@ async function run(): Promise<void> {
   );
   console.log(
     `[downloads] Integrity stats: listings=${stats.listings}, versionsChecked=${stats.versions_checked}, completeVersions=${stats.complete_versions}, incompleteVersions=${stats.incomplete_versions}, filteredVersions=${stats.filtered_versions}, cacheHits=${stats.cache_hits}`,
+  );
+  console.log(
+    `[downloads] Attribution stats: registryFetchesAdded=${stats.registry_fetches_added}, adjustedDeltaTotal=${stats.adjusted_delta_total}, clampedVersions=${stats.clamped_versions}`,
   );
 
   const zeroValidSemverListings = Object.entries(downloads)
@@ -362,6 +389,9 @@ async function run(): Promise<void> {
       `integrity_incomplete_versions=${stats.incomplete_versions}`,
       `integrity_filtered_versions=${stats.filtered_versions}`,
       `integrity_cache_hits=${stats.cache_hits}`,
+      `registry_fetches_added=${stats.registry_fetches_added}`,
+      `adjusted_delta_total=${stats.adjusted_delta_total}`,
+      `clamped_versions=${stats.clamped_versions}`,
     ];
     appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);
   }

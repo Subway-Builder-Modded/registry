@@ -9,8 +9,15 @@ import {
   fetchRepoReleaseIndexes,
   graphqlUsageSnapshot,
   isSupportedReleaseTag,
+  parseGitHubReleaseAssetDownloadUrl,
 } from "./release-resolution.js";
 import { fetchWithTimeout, resolveTimeoutMsFromEnv } from "./http.js";
+import {
+  recordDownloadAttributionFetchByAssetKey,
+  recordDownloadAttributionFetchByUrl,
+  toDownloadAttributionAssetKey,
+  type DownloadAttributionDelta,
+} from "./download-attribution.js";
 
 export interface DemandStats {
   residents_total: number;
@@ -36,6 +43,7 @@ export interface GenerateMapDemandStatsOptions {
   force?: boolean;
   mapId?: string;
   strictFingerprintCache?: boolean;
+  attributionDelta?: DownloadAttributionDelta;
 }
 
 export interface GenerateMapDemandStatsResult {
@@ -45,6 +53,7 @@ export interface GenerateMapDemandStatsResult {
   skippedUnchanged: number;
   extractionFailures: number;
   residentsDeltaTotal: number;
+  attributionFetchesAdded: number;
   warnings: string[];
   rateLimit: {
     queries: number;
@@ -72,6 +81,7 @@ type DemandStatsCache = Record<string, DemandStatsCacheEntry>;
 interface ResolvedInstallTarget {
   zipUrl: string;
   sourceFingerprint: string;
+  attributionAssetKey?: string;
 }
 
 const CACHE_FILE_NAME = "demand-stats-cache.json";
@@ -233,6 +243,11 @@ async function fetchCustomInstallTargetZipUrl(
     sourceFingerprint: sha256
       ? `sha256:${sha256}`
       : `custom:${version}|${download}`,
+    attributionAssetKey: (() => {
+      const parsed = parseGitHubReleaseAssetDownloadUrl(download);
+      if (!parsed) return undefined;
+      return toDownloadAttributionAssetKey(parsed.repo, parsed.tag, parsed.assetName);
+    })(),
   };
 }
 
@@ -264,6 +279,7 @@ function getLatestGithubZipUrl(
     return {
       zipUrl: asset.downloadUrl,
       sourceFingerprint: `github:${tag}|${assetName}`,
+      attributionAssetKey: toDownloadAttributionAssetKey(repo.toLowerCase(), tag, assetName),
     };
   }
 
@@ -276,6 +292,7 @@ async function fetchZipBuffer(
   zipUrl: string,
   fetchImpl: typeof fetch,
   warnings: string[],
+  attributionRecorder?: (downloadUrl: string) => void,
 ): Promise<Buffer | null> {
   let response: Response;
   try {
@@ -317,6 +334,7 @@ async function fetchZipBuffer(
       );
       return null;
     }
+    attributionRecorder?.(zipUrl);
     return buffer;
   } catch {
     warnListing(warnings, listingId, "failed to read map ZIP response body");
@@ -727,6 +745,7 @@ export async function generateMapDemandStats(
   const token = options.token;
   const force = options.force === true;
   const strictFingerprintCache = options.strictFingerprintCache === true;
+  const attributionDelta = options.attributionDelta;
   const mapId = typeof options.mapId === "string" && options.mapId.trim() !== ""
     ? options.mapId.trim()
     : undefined;
@@ -768,6 +787,7 @@ export async function generateMapDemandStats(
   let skippedUnchanged = 0;
   let extractionFailures = 0;
   let residentsDeltaTotal = 0;
+  let attributionFetchesAdded = 0;
 
   for (const id of ids) {
     processedMaps += 1;
@@ -832,7 +852,33 @@ export async function generateMapDemandStats(
       continue;
     }
 
-    const zipBuffer = await fetchZipBuffer(id, resolvedSource.zipUrl, fetchImpl, warnings);
+    const zipBuffer = await fetchZipBuffer(
+      id,
+      resolvedSource.zipUrl,
+      fetchImpl,
+      warnings,
+      (downloadUrl) => {
+        if (!attributionDelta) return;
+        if (resolvedSource.attributionAssetKey) {
+          recordDownloadAttributionFetchByAssetKey(
+            attributionDelta,
+            resolvedSource.attributionAssetKey,
+          );
+          attributionFetchesAdded += 1;
+          return;
+        }
+        const recorded = recordDownloadAttributionFetchByUrl(attributionDelta, downloadUrl);
+        if (!recorded.ok) {
+          warnListing(
+            warnings,
+            id,
+            `download attribution key is unparseable for fetched ZIP (${recorded.reason ?? "unknown reason"})`,
+          );
+          return;
+        }
+        attributionFetchesAdded += 1;
+      },
+    );
     if (!zipBuffer) {
       skippedMaps += 1;
       extractionFailures += 1;
@@ -907,6 +953,7 @@ export async function generateMapDemandStats(
     skippedUnchanged,
     extractionFailures,
     residentsDeltaTotal,
+    attributionFetchesAdded,
     warnings,
     rateLimit: graphqlUsageSnapshot(usageState),
   };

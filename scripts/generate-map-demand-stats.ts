@@ -1,6 +1,11 @@
 import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateMapDemandStats } from "./lib/map-demand-stats.js";
+import {
+  createDownloadAttributionDelta,
+  sumDownloadAttributionDeltaFetches,
+  writeDownloadAttributionDeltaFile,
+} from "./lib/download-attribution.js";
 
 const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
   ? resolve(import.meta.dirname, "..", "..")
@@ -78,6 +83,17 @@ function toWarningsOutputJson(prefix: string, warnings: string[]): string {
 async function run(): Promise<void> {
   const cli = parseCliArgs(process.argv.slice(2));
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const runId = getNonEmptyEnv("GITHUB_RUN_ID") ?? "local";
+  const jobId = getNonEmptyEnv("GITHUB_JOB") ?? "manual";
+  const workflowName = getNonEmptyEnv("GITHUB_WORKFLOW") ?? "local";
+  const attributionDeltaPath = (
+    getNonEmptyEnv("DOWNLOAD_ATTRIBUTION_DELTA_PATH")
+    ?? resolve(repoRoot, "maps", "demand-attribution-delta.json")
+  );
+  const attributionDelta = createDownloadAttributionDelta(
+    `workflow:${workflowName}:map-demand-stats`,
+    `${runId}:${jobId}:map-demand-stats`,
+  );
   const token = getNonEmptyEnv("GH_DOWNLOADS_TOKEN") ?? getNonEmptyEnv("GITHUB_TOKEN");
   const strictFingerprintCache = (
     cli.strictFingerprintCache
@@ -105,7 +121,9 @@ async function run(): Promise<void> {
     force: cli.force,
     mapId: cli.mapId,
     strictFingerprintCache,
+    attributionDelta,
   });
+  writeDownloadAttributionDeltaFile(attributionDeltaPath, attributionDelta);
 
   for (const warning of result.warnings) {
     console.warn(`[map-demand-stats] ${warning}`);
@@ -116,6 +134,9 @@ async function run(): Promise<void> {
   );
   console.log(
     `[map-demand-stats] Summary: processedMaps=${result.processedMaps}, updatedMaps=${result.updatedMaps}, skippedMaps=${result.skippedMaps}, skippedUnchanged=${result.skippedUnchanged}, extractionFailures=${result.extractionFailures}, residentsDeltaTotal=${result.residentsDeltaTotal}`,
+  );
+  console.log(
+    `[map-demand-stats] Attribution stats: registryFetchesAdded=${sumDownloadAttributionDeltaFetches(attributionDelta)}`,
   );
 
   if (process.env.GITHUB_OUTPUT) {
@@ -128,6 +149,7 @@ async function run(): Promise<void> {
       `residents_delta_total=${result.residentsDeltaTotal}`,
       `graphql_queries=${result.rateLimit.queries}`,
       `graphql_total_cost=${result.rateLimit.totalCost}`,
+      `attribution_fetches_added=${result.attributionFetchesAdded}`,
       `warning_count=${result.warnings.length}`,
       `warnings_json=${toWarningsOutputJson("map-demand-stats: ", result.warnings)}`,
     ];

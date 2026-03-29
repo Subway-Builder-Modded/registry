@@ -2,6 +2,13 @@ import type { MapManifest } from "./manifests.js";
 import * as D from "./download-definitions.js";
 import { createGraphqlUsageState, fetchRepoReleaseIndexes, isSupportedReleaseTag, graphqlUsageSnapshot } from "./release-resolution.js";
 import {
+  adjustDownloadCount,
+  createDownloadAttributionDelta,
+  createEmptyDownloadAttributionLedger,
+  getAttributedCountForAssetKey,
+  toDownloadAttributionAssetKey,
+} from "./download-attribution.js";
+import {
   type ListingContext,
   emptyIntegrity,
   fetchCustomVersions,
@@ -25,6 +32,9 @@ export async function generateDownloadsDataDownloadOnly(
   const dir = getDirectoryForType(listingType);
   const ids = getIndexIds(repoRoot, dir);
   const nowIso = new Date().toISOString();
+  const attributionLedger = options.attribution?.ledger ?? createEmptyDownloadAttributionLedger(nowIso);
+  const attributionDelta = options.attribution?.delta
+    ?? createDownloadAttributionDelta(`runtime:${listingType}:download-only`, undefined, nowIso);
   const loadedIntegrity = loadIntegritySnapshot(repoRoot, dir);
   const integrity = loadedIntegrity ?? emptyIntegrity(nowIso);
   const hasIntegritySnapshot = loadedIntegrity !== null && Object.keys(loadedIntegrity.listings).length > 0;
@@ -82,6 +92,8 @@ export async function generateDownloadsDataDownloadOnly(
   });
 
   let versionsChecked = 0;
+  let adjustedDeltaTotal = 0;
+  let clampedVersions = 0;
 
   for (const id of [...ids].sort()) {
     console.log(`[downloads] heartbeat:listing mode=download-only listing=${id}`);
@@ -104,7 +116,29 @@ export async function generateDownloadsDataDownloadOnly(
         if (!hasZipAsset) continue;
 
         versionsChecked += 1;
-        downloadsByListing[id][tag] = releaseData.zipTotal;
+        let adjustedTotal = 0;
+        let sawClamped = false;
+        for (const [assetName, asset] of releaseData.assets.entries()) {
+          if (!assetName.toLowerCase().endsWith(".zip")) continue;
+          const key = toDownloadAttributionAssetKey(context.update.repo, tag, assetName);
+          const attributed = getAttributedCountForAssetKey(attributionLedger, attributionDelta, key);
+          const adjusted = adjustDownloadCount(asset.downloadCount, attributed);
+          adjustedTotal += adjusted.adjusted;
+          adjustedDeltaTotal += adjusted.subtracted;
+          if (adjusted.clamped) {
+            sawClamped = true;
+            warnListing(
+              warnings,
+              id,
+              `download attribution clamped '${assetName}' (raw=${adjusted.raw}, attributed=${adjusted.attributed}, adjusted=${adjusted.adjusted})`,
+              tag,
+            );
+          }
+        }
+        if (sawClamped) {
+          clampedVersions += 1;
+        }
+        downloadsByListing[id][tag] = adjustedTotal;
       }
       continue;
     }
@@ -149,7 +183,24 @@ export async function generateDownloadsDataDownloadOnly(
         continue;
       }
 
-      downloadsByListing[id][candidate.version] = asset.downloadCount;
+      const key = toDownloadAttributionAssetKey(
+        candidate.parsed.repo,
+        candidate.parsed.tag,
+        candidate.parsed.assetName,
+      );
+      const attributed = getAttributedCountForAssetKey(attributionLedger, attributionDelta, key);
+      const adjusted = adjustDownloadCount(asset.downloadCount, attributed);
+      adjustedDeltaTotal += adjusted.subtracted;
+      if (adjusted.clamped) {
+        clampedVersions += 1;
+        warnListing(
+          warnings,
+          id,
+          `download attribution clamped '${candidate.parsed.assetName}' (raw=${adjusted.raw}, attributed=${adjusted.attributed}, adjusted=${adjusted.adjusted})`,
+          candidate.version,
+        );
+      }
+      downloadsByListing[id][candidate.version] = adjusted.adjusted;
     }
   }
 
@@ -200,6 +251,9 @@ export async function generateDownloadsDataDownloadOnly(
       incomplete_versions: incompleteVersions,
       filtered_versions: filteredVersions,
       cache_hits: 0,
+      registry_fetches_added: 0,
+      adjusted_delta_total: adjustedDeltaTotal,
+      clamped_versions: clampedVersions,
     },
     warnings,
     rateLimit: graphqlUsageSnapshot(usageState),

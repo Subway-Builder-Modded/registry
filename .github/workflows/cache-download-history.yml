@@ -43,7 +43,7 @@ jobs:
       - name: Stage snapshot changes
         id: commit_changes
         run: |
-          git add history/snapshot_*.json analytics/*.csv 2>/dev/null || true
+          git add history/snapshot_*.json history/download_attribution_*.json analytics/*.csv 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No history snapshot/analytics changes detected; skipping PR update."
             echo "committed=false" >> "$GITHUB_OUTPUT"
@@ -103,6 +103,11 @@ jobs:
           DISCORD_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SNAPSHOT_FILE: ${{ steps.generate_history.outputs.snapshot_file }}
           PREVIOUS_SNAPSHOT_FILE: ${{ steps.generate_history.outputs.previous_snapshot_file }}
+          ATTRIBUTION_SNAPSHOT_FILE: ${{ steps.generate_history.outputs.attribution_snapshot_file }}
+          ATTRIBUTION_PREVIOUS_SNAPSHOT_FILE: ${{ steps.generate_history.outputs.attribution_previous_snapshot_file }}
+          ATTRIBUTION_TOTAL_FETCHES: ${{ steps.generate_history.outputs.attribution_total_fetches }}
+          ATTRIBUTION_NET_FETCHES: ${{ steps.generate_history.outputs.attribution_net_fetches }}
+          ATTRIBUTION_DAILY_FETCHES: ${{ steps.generate_history.outputs.attribution_daily_fetches }}
           MAPS_TOTAL_DOWNLOADS: ${{ steps.generate_history.outputs.maps_total_downloads }}
           MAPS_NET_DOWNLOADS: ${{ steps.generate_history.outputs.maps_net_downloads }}
           MAPS_ENTRIES: ${{ steps.generate_history.outputs.maps_entries }}
@@ -128,11 +133,17 @@ jobs:
             fi
           fi
           PREVIOUS_DISPLAY="${PREVIOUS_SNAPSHOT_FILE:-none}"
+          ATTR_PREVIOUS_DISPLAY="${ATTRIBUTION_PREVIOUS_SNAPSHOT_FILE:-none}"
 
           export DISCORD_WARNINGS_JSON="${WARNINGS_JSON:-[]}"
           export DISCORD_LINES_JSON="$(jq -nc \
             --arg snapshot_file "${SNAPSHOT_FILE}" \
             --arg previous_snapshot_file "${PREVIOUS_DISPLAY}" \
+            --arg attribution_snapshot_file "${ATTRIBUTION_SNAPSHOT_FILE}" \
+            --arg attribution_previous_snapshot_file "${ATTR_PREVIOUS_DISPLAY}" \
+            --arg attribution_total_fetches "${ATTRIBUTION_TOTAL_FETCHES}" \
+            --arg attribution_net_fetches "${ATTRIBUTION_NET_FETCHES}" \
+            --arg attribution_daily_fetches "${ATTRIBUTION_DAILY_FETCHES}" \
             --arg maps_total "${MAPS_TOTAL_DOWNLOADS}" \
             --arg maps_net "${MAPS_NET_DOWNLOADS}" \
             --arg maps_entries "${MAPS_ENTRIES}" \
@@ -143,6 +154,9 @@ jobs:
             '[
               "- **Snapshot:** \($snapshot_file)",
               "- **Previous snapshot:** \($previous_snapshot_file)",
+              "- **Attribution snapshot:** \($attribution_snapshot_file)",
+              "- **Attribution previous snapshot:** \($attribution_previous_snapshot_file)",
+              "- **Attribution fetches:** total=\($attribution_total_fetches), net=\($attribution_net_fetches), daily=\($attribution_daily_fetches)",
               "- **Maps:** total=\($maps_total), net=\($maps_net), entries=\($maps_entries)",
               "- **Mods:** total=\($mods_total), net=\($mods_net), entries=\($mods_entries)",
               "- **Commit:** \($commit_display)"
