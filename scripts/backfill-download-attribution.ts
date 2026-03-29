@@ -4,6 +4,7 @@ import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import JSZip from "jszip";
 import {
   createDownloadAttributionDelta,
+  createEmptyDownloadAttributionLedger,
   loadDownloadAttributionLedger,
   mergeDownloadAttributionDeltas,
   toDownloadAttributionAssetKey,
@@ -24,6 +25,7 @@ interface CliArgs {
   repoFullName: string;
   token: string;
   lookbackDays: number;
+  rebuildLedger: boolean;
 }
 
 interface WorkflowRun {
@@ -77,9 +79,14 @@ function parseArgs(argv: string[]): CliArgs {
   ).trim();
 
   let lookbackDays = parseLookbackDays(process.env.BACKFILL_LOOKBACK_DAYS);
+  let rebuildLedger = false;
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
     if (arg === "--") continue;
+    if (arg === "--rebuild-ledger") {
+      rebuildLedger = true;
+      continue;
+    }
     if (arg === "--days") {
       const value = argv[index + 1];
       if (!value || value.startsWith("-")) {
@@ -108,6 +115,7 @@ function parseArgs(argv: string[]): CliArgs {
     repoFullName,
     token,
     lookbackDays,
+    rebuildLedger,
   };
 }
 
@@ -258,7 +266,7 @@ async function run(): Promise<void> {
     const delta = createDownloadAttributionDelta(
       "backfill:regenerate-registry-analytics",
       `backfill:run:${runInfo.id}`,
-      new Date().toISOString(),
+      runInfo.created_at,
     );
     let runHasHits = false;
 
@@ -291,7 +299,9 @@ async function run(): Promise<void> {
     }
   }
 
-  const ledger = loadDownloadAttributionLedger(cli.repoRoot);
+  const ledger = cli.rebuildLedger
+    ? createEmptyDownloadAttributionLedger()
+    : loadDownloadAttributionLedger(cli.repoRoot);
   const merge = mergeDownloadAttributionDeltas(ledger, deltas);
   writeDownloadAttributionLedger(cli.repoRoot, merge.ledger);
 

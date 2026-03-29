@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import type { ParsedReleaseAssetUrl } from "./download-definitions.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
 
-const DOWNLOAD_ATTRIBUTION_SCHEMA_VERSION = 1;
+const DOWNLOAD_ATTRIBUTION_SCHEMA_VERSION = 2;
 const DOWNLOAD_ATTRIBUTION_FILE = ["history", "registry-download-attribution.json"] as const;
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -32,15 +32,21 @@ export interface DownloadAttributionEntry {
   by_source: Record<string, number>;
 }
 
+export interface DownloadAttributionDailyEntry {
+  total: number;
+  assets: Record<string, number>;
+}
+
 export interface DownloadAttributionLedger {
-  schema_version: 1;
+  schema_version: 2;
   updated_at: string;
   assets: Record<string, DownloadAttributionEntry>;
   applied_delta_ids: Record<string, string>;
+  daily: Record<string, DownloadAttributionDailyEntry>;
 }
 
 export interface DownloadAttributionDelta {
-  schema_version: 1;
+  schema_version: 2;
   delta_id: string;
   source: string;
   generated_at: string;
@@ -75,10 +81,11 @@ export function getDownloadAttributionPath(repoRoot: string): string {
 
 export function createEmptyDownloadAttributionLedger(nowIso = new Date().toISOString()): DownloadAttributionLedger {
   return {
-    schema_version: 1,
+    schema_version: 2,
     updated_at: nowIso,
     assets: {},
     applied_delta_ids: {},
+    daily: {},
   };
 }
 
@@ -95,7 +102,7 @@ export function createDownloadAttributionDelta(
     ? deltaId.trim()
     : `${normalizedSource}:${generatedAt}`;
   return {
-    schema_version: 1,
+    schema_version: 2,
     delta_id: normalizedDeltaId,
     source: normalizedSource,
     generated_at: generatedAt,
@@ -110,14 +117,17 @@ export function normalizeDownloadAttributionLedger(
   if (!isObject(value)) {
     return createEmptyDownloadAttributionLedger(nowIso);
   }
-  if (value.schema_version !== DOWNLOAD_ATTRIBUTION_SCHEMA_VERSION) {
+  const schemaVersion = value.schema_version;
+  if (schemaVersion !== 1 && schemaVersion !== DOWNLOAD_ATTRIBUTION_SCHEMA_VERSION) {
     return createEmptyDownloadAttributionLedger(nowIso);
   }
 
   const assetsRaw = value.assets;
   const appliedRaw = value.applied_delta_ids;
+  const dailyRaw = value.daily;
   const assets: Record<string, DownloadAttributionEntry> = {};
   const appliedDeltaIds: Record<string, string> = {};
+  const daily: Record<string, DownloadAttributionDailyEntry> = {};
 
   if (isObject(assetsRaw)) {
     for (const [assetKey, rawEntry] of Object.entries(assetsRaw)) {
@@ -152,13 +162,34 @@ export function normalizeDownloadAttributionLedger(
     }
   }
 
+  if (isObject(dailyRaw)) {
+    for (const [dateKey, dateValue] of Object.entries(dailyRaw)) {
+      if (!isObject(dateValue)) continue;
+      const total = toFiniteNonNegativeNumber(dateValue.total);
+      if (total === null) continue;
+      const dailyAssets: Record<string, number> = {};
+      if (isObject(dateValue.assets)) {
+        for (const [assetKey, rawCount] of Object.entries(dateValue.assets)) {
+          const parsedCount = toFiniteNonNegativeNumber(rawCount);
+          if (parsedCount === null || parsedCount === 0) continue;
+          dailyAssets[assetKey] = parsedCount;
+        }
+      }
+      daily[dateKey] = {
+        total,
+        assets: sortObjectByKeys(dailyAssets),
+      };
+    }
+  }
+
   return {
-    schema_version: 1,
+    schema_version: 2,
     updated_at: typeof value.updated_at === "string" && value.updated_at.trim() !== ""
       ? value.updated_at
       : nowIso,
     assets: sortObjectByKeys(assets),
     applied_delta_ids: sortObjectByKeys(appliedDeltaIds),
+    daily: sortObjectByKeys(daily),
   };
 }
 
@@ -180,7 +211,7 @@ export function normalizeDownloadAttributionDelta(
   }
 
   return {
-    schema_version: 1,
+    schema_version: 2,
     delta_id: value.delta_id,
     source: value.source,
     generated_at: value.generated_at,
@@ -314,6 +345,10 @@ export function mergeDownloadAttributionDeltas(
   for (const delta of deltas) {
     const normalizedDelta = normalizeDownloadAttributionDelta(delta);
     if (!normalizedDelta) continue;
+    const parsedGeneratedAt = Date.parse(normalizedDelta.generated_at);
+    const deltaDateKey = Number.isFinite(parsedGeneratedAt)
+      ? new Date(parsedGeneratedAt).toISOString().slice(0, 10).replaceAll("-", "_")
+      : nowIso.slice(0, 10).replaceAll("-", "_");
     if (nextLedger.applied_delta_ids[normalizedDelta.delta_id]) {
       skippedDeltaIds.push(normalizedDelta.delta_id);
       continue;
@@ -337,6 +372,13 @@ export function mergeDownloadAttributionDeltas(
         ...existing,
         by_source: sortObjectByKeys(existing.by_source),
       };
+      const dailyEntry = nextLedger.daily[deltaDateKey] ?? { total: 0, assets: {} };
+      dailyEntry.total += count;
+      dailyEntry.assets[assetKey] = (dailyEntry.assets[assetKey] ?? 0) + count;
+      nextLedger.daily[deltaDateKey] = {
+        total: dailyEntry.total,
+        assets: sortObjectByKeys(dailyEntry.assets),
+      };
       addedFetches += count;
       touchedAssetKeys.add(assetKey);
     }
@@ -345,6 +387,7 @@ export function mergeDownloadAttributionDeltas(
   nextLedger.updated_at = nowIso;
   nextLedger.assets = sortObjectByKeys(nextLedger.assets);
   nextLedger.applied_delta_ids = sortObjectByKeys(nextLedger.applied_delta_ids);
+  nextLedger.daily = sortObjectByKeys(nextLedger.daily);
 
   return {
     ledger: nextLedger,
