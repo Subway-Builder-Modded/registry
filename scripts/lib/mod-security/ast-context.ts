@@ -89,11 +89,19 @@ function buildAstIndexes(ast: unknown): {
   whileCallDirectFirstIndex: Map<string, number>;
 } {
   const aliases = new Map<string, string>();
-  const mappings: Array<{ alias: string; target: string }> = [];
   const callArgCallFirstIndex = new Map<string, number>();
   const whileCallDirectFirstIndex = new Map<string, number>();
+  let whileDepth = 0;
 
   traverse(ast as any, {
+    WhileStatement: {
+      enter() {
+        whileDepth += 1;
+      },
+      exit() {
+        whileDepth = Math.max(0, whileDepth - 1);
+      },
+    },
     VariableDeclarator(path: any) {
       const node = path.node as {
         id?: unknown;
@@ -110,7 +118,7 @@ function buildAstIndexes(ast: unknown): {
       if (typeof alias !== "string") return;
       const target = resolveExpressionName(node.init);
       if (!target) return;
-      mappings.push({ alias, target });
+      aliases.set(alias, target);
     },
     AssignmentExpression(path: any) {
       const node = path.node as {
@@ -128,7 +136,7 @@ function buildAstIndexes(ast: unknown): {
       if (typeof alias !== "string") return;
       const target = resolveExpressionName(node.right);
       if (!target) return;
-      mappings.push({ alias, target });
+      aliases.set(alias, target);
     },
     CallExpression(path: any) {
       const node = path.node as {
@@ -154,11 +162,7 @@ function buildAstIndexes(ast: unknown): {
           }
         }
 
-        const isInsideWhile = path.findParent((parentPath: any) => {
-          const parentNode = parentPath?.node as { type?: unknown } | undefined;
-          return parentNode?.type === "WhileStatement";
-        });
-        if (isInsideWhile) {
+        if (whileDepth > 0) {
           getOrSetFirstIndex(
             whileCallDirectFirstIndex,
             calleeName,
@@ -168,19 +172,6 @@ function buildAstIndexes(ast: unknown): {
       }
     },
   });
-
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const mapping of mappings) {
-      const resolvedTarget = resolveAliasName(mapping.target, aliases);
-      const current = aliases.get(mapping.alias);
-      if (current !== resolvedTarget) {
-        aliases.set(mapping.alias, resolvedTarget);
-        changed = true;
-      }
-    }
-  }
 
   return {
     aliases,

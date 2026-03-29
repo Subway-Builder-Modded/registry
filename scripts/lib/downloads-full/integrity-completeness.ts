@@ -156,6 +156,9 @@ export function createInspectZipWithMemo(options: {
     }
     const releaseSizeMiB = bytesToMebibytesRounded(zipBuffer.byteLength);
     let check: ZipCompletenessResult;
+    const inspectHeartbeatLabel = `inspect-zip listing=${options.listingId} version=${params.version} asset=${params.assetName}`;
+    const inspectStartMs = Date.now();
+    console.log(`[downloads] heartbeat:start ${inspectHeartbeatLabel}`);
     try {
       check = await inspectZipCompleteness(options.listingType, zipBuffer, {
         cityCode: options.cityCode,
@@ -163,7 +166,13 @@ export function createInspectZipWithMemo(options: {
         expectedReleaseManifestAssetName,
         modSecurityRules: options.modSecurityRules?.rules,
       });
+      console.log(
+        `[downloads] heartbeat:end ${inspectHeartbeatLabel} durationMs=${Date.now() - inspectStartMs}`,
+      );
     } catch (error) {
+      console.log(
+        `[downloads] heartbeat:error ${inspectHeartbeatLabel} durationMs=${Date.now() - inspectStartMs}`,
+      );
       const message = error instanceof Error ? error.message : String(error);
       return { ok: false, error: `integrity inspection failed (${message})` };
     }
@@ -211,4 +220,3 @@ export function buildInspectionResult(
     releaseSizeMiB,
   );
 }
-
