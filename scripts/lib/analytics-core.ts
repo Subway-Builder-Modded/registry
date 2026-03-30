@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import { writeCsv } from "./csv.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 import { isTestListing } from "./test-listings.js";
+import { loadAuthorAliasIndex, resolveAuthorPresentation, type AuthorAliasIndex } from "./author-aliases.js";
 
 interface SnapshotEntry {
   file: string;
@@ -27,6 +28,9 @@ type ListingTotals = Map<ListingKey, number>;
 interface ListingMeta {
   name: string;
   author: string;
+  author_alias: string;
+  attribution_link: string;
+  github_id: number | null;
 }
 
 interface ListingProjectRow {
@@ -43,6 +47,8 @@ interface ListingWindowRow {
   id: string;
   name: string;
   author: string;
+  author_alias: string;
+  attribution_link: string;
   download_change: number;
   adjusted_download_change: number;
   current_total: number;
@@ -59,6 +65,8 @@ interface ListingAllTimeRow {
   id: string;
   name: string;
   author: string;
+  author_alias: string;
+  attribution_link: string;
   total_downloads: number;
   adjusted_total_downloads: number;
   latest_snapshot: string;
@@ -68,6 +76,9 @@ interface ProjectWindowRow {
   rank: number;
   project_key: string;
   project_name: string;
+  author: string;
+  author_alias: string;
+  attribution_link: string;
   listing_count: number;
   download_change: number;
   adjusted_download_change: number;
@@ -83,6 +94,9 @@ interface ProjectAllTimeRow {
   rank: number;
   project_key: string;
   project_name: string;
+  author: string;
+  author_alias: string;
+  attribution_link: string;
   listing_count: number;
   total_downloads: number;
   adjusted_total_downloads: number;
@@ -92,6 +106,8 @@ interface ProjectAllTimeRow {
 interface AuthorAssetCountRow {
   rank: number;
   author: string;
+  author_alias: string;
+  attribution_link: string;
   asset_count: number;
   map_count: number;
   mod_count: number;
@@ -102,6 +118,8 @@ interface AuthorAssetCountRow {
 interface AuthorTotalDownloadsRow {
   rank: number;
   author: string;
+  author_alias: string;
+  attribution_link: string;
   total_downloads: number;
   adjusted_total_downloads: number;
   asset_count: number;
@@ -114,6 +132,8 @@ interface MapPopulationRow {
   id: string;
   name: string;
   author: string;
+  author_alias: string;
+  attribution_link: string;
   city_code: string;
   country: string;
   population: number;
@@ -294,7 +314,12 @@ function filterOutTestListingTotals(
   return filtered;
 }
 
-function loadManifestMeta(repoRoot: string, listingType: "maps" | "mods", id: string): ListingMeta {
+function loadManifestMeta(
+  repoRoot: string,
+  listingType: "maps" | "mods",
+  id: string,
+  authorAliases: AuthorAliasIndex,
+): ListingMeta {
   const manifestPath = join(repoRoot, listingType, id, "manifest.json");
   try {
     const manifest = loadJsonFile<Record<string, unknown>>(manifestPath);
@@ -304,9 +329,25 @@ function loadManifestMeta(repoRoot: string, listingType: "maps" | "mods", id: st
     const author = typeof manifest.author === "string" && manifest.author.trim() !== ""
       ? manifest.author
       : "UNKNOWN";
-    return { name, author };
+    const githubId = typeof manifest.github_id === "number" && Number.isFinite(manifest.github_id)
+      ? manifest.github_id
+      : null;
+    const presentation = resolveAuthorPresentation(author, githubId, authorAliases);
+    return {
+      name,
+      author: presentation.author,
+      author_alias: presentation.author_alias,
+      attribution_link: presentation.attribution_link,
+      github_id: githubId,
+    };
   } catch {
-    return { name: id, author: "UNKNOWN" };
+    return {
+      name: id,
+      author: "UNKNOWN",
+      author_alias: "UNKNOWN",
+      attribution_link: "https://github.com/UNKNOWN",
+      github_id: null,
+    };
   }
 }
 
@@ -404,7 +445,7 @@ function toNonNegativeNumber(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
-function loadMapPopulationRows(repoRoot: string): MapPopulationRow[] {
+function loadMapPopulationRows(repoRoot: string, authorAliases: AuthorAliasIndex): MapPopulationRow[] {
   const indexPath = join(repoRoot, "maps", "index.json");
   const index = loadJsonFile<{ maps?: unknown }>(indexPath);
   const mapIds = Array.isArray(index.maps)
@@ -416,10 +457,17 @@ function loadMapPopulationRows(repoRoot: string): MapPopulationRow[] {
     const manifestPath = join(repoRoot, "maps", id, "manifest.json");
     try {
       const manifest = loadJsonFile<Record<string, unknown>>(manifestPath);
+      const author = toNonEmptyString(manifest.author, "UNKNOWN");
+      const githubId = typeof manifest.github_id === "number" && Number.isFinite(manifest.github_id)
+        ? manifest.github_id
+        : null;
+      const presentation = resolveAuthorPresentation(author, githubId, authorAliases);
       rows.push({
         id,
         name: toNonEmptyString(manifest.name, id),
-        author: toNonEmptyString(manifest.author, "UNKNOWN"),
+        author: presentation.author,
+        author_alias: presentation.author_alias,
+        attribution_link: presentation.attribution_link,
         city_code: toNonEmptyString(manifest.city_code, ""),
         country: toNonEmptyString(manifest.country, ""),
         population: toNonNegativeNumber(manifest.population),
@@ -431,6 +479,8 @@ function loadMapPopulationRows(repoRoot: string): MapPopulationRow[] {
         id,
         name: id,
         author: "UNKNOWN",
+        author_alias: "UNKNOWN",
+        attribution_link: "https://github.com/UNKNOWN",
         city_code: "",
         country: "",
         population: 0,
@@ -494,13 +544,21 @@ function buildListingByDayRows(
   const rows: DailySeriesRow[] = [];
   for (const [key, totalDownloads] of latestTotals.entries()) {
     const [listingType, id] = key.split(":") as ["maps" | "mods", string];
-    const meta = listingMeta.get(key) ?? { name: id, author: "UNKNOWN" };
+    const meta = listingMeta.get(key) ?? {
+      name: id,
+      author: "UNKNOWN",
+      author_alias: "UNKNOWN",
+      attribution_link: "https://github.com/UNKNOWN",
+      github_id: null,
+    };
     const project = listingProjectByKey.get(key);
     const row: DailySeriesRow = {
       listing_type: toListingLabel(listingType),
       id,
       name: meta.name,
       author: meta.author,
+      author_alias: meta.author_alias,
+      attribution_link: meta.attribution_link,
       project_key: project?.project_key ?? `${toListingLabel(listingType)}:${id}`,
       project_name: project?.project_name ?? meta.name,
       total_downloads: totalDownloads,
@@ -521,6 +579,7 @@ function buildProjectByDayRows(
   snapshotDates: string[],
   latestTotals: ListingTotals,
   dailyDeltasBySnapshot: Map<string, ListingTotals>,
+  listingMeta: Map<ListingKey, ListingMeta>,
   listingProjectByKey: Map<ListingKey, ListingProjectRow>,
 ): DailySeriesRow[] {
   const projectRows = new Map<string, DailySeriesRow>();
@@ -531,9 +590,28 @@ function buildProjectByDayRows(
     const existing = projectRows.get(project.project_key) ?? {
       project_key: project.project_key,
       project_name: project.project_name,
+      author: "",
+      author_alias: "",
+      attribution_link: "",
       listing_count: 0,
       total_downloads: 0,
     };
+    const meta = listingMeta.get(key) ?? {
+      name: "",
+      author: "UNKNOWN",
+      author_alias: "UNKNOWN",
+      attribution_link: "https://github.com/UNKNOWN",
+      github_id: null,
+    };
+    const authors = new Set(String(existing.author).split("; ").filter(Boolean));
+    const authorAliases = new Set(String(existing.author_alias).split("; ").filter(Boolean));
+    const attributionLinks = new Set(String(existing.attribution_link).split("; ").filter(Boolean));
+    authors.add(meta.author);
+    authorAliases.add(meta.author_alias);
+    attributionLinks.add(meta.attribution_link);
+    existing.author = [...authors].sort().join("; ");
+    existing.author_alias = [...authorAliases].sort().join("; ");
+    existing.attribution_link = [...attributionLinks].sort().join("; ");
     existing.listing_count = Number(existing.listing_count) + 1;
     existing.total_downloads = Number(existing.total_downloads) + totalDownloads;
     for (const snapshotDate of snapshotDates) {
@@ -558,9 +636,17 @@ function buildAuthorByDayRows(
 
   for (const [key, totalDownloads] of latestTotals.entries()) {
     const [listingType] = key.split(":") as ["maps" | "mods", string];
-    const meta = listingMeta.get(key) ?? { name: "", author: "UNKNOWN" };
+    const meta = listingMeta.get(key) ?? {
+      name: "",
+      author: "UNKNOWN",
+      author_alias: "UNKNOWN",
+      attribution_link: "https://github.com/UNKNOWN",
+      github_id: null,
+    };
     const existing = authorRows.get(meta.author) ?? {
       author: meta.author,
+      author_alias: meta.author_alias,
+      attribution_link: meta.attribution_link,
       asset_count: 0,
       map_count: 0,
       mod_count: 0,
@@ -603,6 +689,7 @@ export function runGenerateAnalyticsCli(
   const historyDir = join(resolvedRepoRoot, "history");
   const analyticsDir = join(resolvedRepoRoot, "analytics");
   mkdirSync(analyticsDir, { recursive: true });
+  const authorAliases = loadAuthorAliasIndex(resolvedRepoRoot);
 
   const snapshots = listSnapshots(historyDir);
   if (snapshots.length === 0) {
@@ -625,7 +712,7 @@ export function runGenerateAnalyticsCli(
   const listingMeta = new Map<ListingKey, ListingMeta>();
   for (const key of latestAdjustedTotals.keys()) {
     const [listingType, id] = key.split(":") as ["maps" | "mods", string];
-    listingMeta.set(key, loadManifestMeta(resolvedRepoRoot, listingType, id));
+    listingMeta.set(key, loadManifestMeta(resolvedRepoRoot, listingType, id, authorAliases));
   }
 
   const listingProjectRows: ListingProjectRow[] = [...latestAdjustedTotals.keys()]
@@ -666,12 +753,20 @@ export function runGenerateAnalyticsCli(
       const change = currentTotal - baselineTotal;
       const adjustedChange = currentAdjustedTotal - baselineAdjustedTotal;
       const [listingType, id] = key.split(":") as ["maps" | "mods", string];
-      const meta = listingMeta.get(key) ?? { name: id, author: "UNKNOWN" };
+      const meta = listingMeta.get(key) ?? {
+        name: id,
+        author: "UNKNOWN",
+        author_alias: "UNKNOWN",
+        attribution_link: "https://github.com/UNKNOWN",
+        github_id: null,
+      };
       rows.push({
         listing_type: toListingLabel(listingType),
         id,
         name: meta.name,
         author: meta.author,
+        author_alias: meta.author_alias,
+        attribution_link: meta.attribution_link,
         download_change: change,
         adjusted_download_change: adjustedChange,
         current_total: currentTotal,
@@ -698,12 +793,20 @@ export function runGenerateAnalyticsCli(
     const rows: Omit<ListingAllTimeRow, "rank">[] = [];
     for (const [key, total] of latestTotals.entries()) {
       const [listingType, id] = key.split(":") as ["maps" | "mods", string];
-      const meta = listingMeta.get(key) ?? { name: id, author: "UNKNOWN" };
+      const meta = listingMeta.get(key) ?? {
+        name: id,
+        author: "UNKNOWN",
+        author_alias: "UNKNOWN",
+        attribution_link: "https://github.com/UNKNOWN",
+        github_id: null,
+      };
       rows.push({
         listing_type: toListingLabel(listingType),
         id,
         name: meta.name,
         author: meta.author,
+        author_alias: meta.author_alias,
+        attribution_link: meta.attribution_link,
         total_downloads: total,
         adjusted_total_downloads: latestAdjustedTotals.get(key) ?? 0,
         latest_snapshot: latest.file,
@@ -740,6 +843,9 @@ export function runGenerateAnalyticsCli(
       const existing = projectStats.get(listingProject.project_key) ?? {
         project_key: listingProject.project_key,
         project_name: listingProject.project_name,
+        author: "",
+        author_alias: "",
+        attribution_link: "",
         listing_count: 0,
         download_change: 0,
         adjusted_download_change: 0,
@@ -750,6 +856,22 @@ export function runGenerateAnalyticsCli(
         latest_snapshot: latest.file,
         baseline_snapshot: baseline.file,
       };
+      const meta = listingMeta.get(key) ?? {
+        name: "",
+        author: "UNKNOWN",
+        author_alias: "UNKNOWN",
+        attribution_link: "https://github.com/UNKNOWN",
+        github_id: null,
+      };
+      const authors = new Set(existing.author.split("; ").filter(Boolean));
+      const authorAliases = new Set(existing.author_alias.split("; ").filter(Boolean));
+      const attributionLinks = new Set(existing.attribution_link.split("; ").filter(Boolean));
+      authors.add(meta.author);
+      authorAliases.add(meta.author_alias);
+      attributionLinks.add(meta.attribution_link);
+      existing.author = [...authors].sort().join("; ");
+      existing.author_alias = [...authorAliases].sort().join("; ");
+      existing.attribution_link = [...attributionLinks].sort().join("; ");
       existing.listing_count += 1;
       existing.current_total += currentTotal;
       existing.adjusted_current_total += currentAdjustedTotal;
@@ -780,11 +902,30 @@ export function runGenerateAnalyticsCli(
       const existing = projectStats.get(listingProject.project_key) ?? {
         project_key: listingProject.project_key,
         project_name: listingProject.project_name,
+        author: "",
+        author_alias: "",
+        attribution_link: "",
         listing_count: 0,
         total_downloads: 0,
         adjusted_total_downloads: 0,
         latest_snapshot: latest.file,
       };
+      const meta = listingMeta.get(key) ?? {
+        name: "",
+        author: "UNKNOWN",
+        author_alias: "UNKNOWN",
+        attribution_link: "https://github.com/UNKNOWN",
+        github_id: null,
+      };
+      const authors = new Set(existing.author.split("; ").filter(Boolean));
+      const authorAliases = new Set(existing.author_alias.split("; ").filter(Boolean));
+      const attributionLinks = new Set(existing.attribution_link.split("; ").filter(Boolean));
+      authors.add(meta.author);
+      authorAliases.add(meta.author_alias);
+      attributionLinks.add(meta.attribution_link);
+      existing.author = [...authors].sort().join("; ");
+      existing.author_alias = [...authorAliases].sort().join("; ");
+      existing.attribution_link = [...attributionLinks].sort().join("; ");
       existing.listing_count += 1;
       existing.total_downloads += total;
       existing.adjusted_total_downloads += latestAdjustedTotals.get(key) ?? 0;
@@ -806,9 +947,17 @@ export function runGenerateAnalyticsCli(
   const authorStats = new Map<string, Omit<AuthorAssetCountRow, "rank">>();
   for (const [key, total] of latestTotals.entries()) {
     const [listingType] = key.split(":") as ["maps" | "mods", string];
-    const meta = listingMeta.get(key) ?? { name: "", author: "UNKNOWN" };
+    const meta = listingMeta.get(key) ?? {
+      name: "",
+      author: "UNKNOWN",
+      author_alias: "UNKNOWN",
+      attribution_link: "https://github.com/UNKNOWN",
+      github_id: null,
+    };
     const previous = authorStats.get(meta.author) ?? {
       author: meta.author,
+      author_alias: meta.author_alias,
+      attribution_link: meta.attribution_link,
       asset_count: 0,
       map_count: 0,
       mod_count: 0,
@@ -840,6 +989,8 @@ export function runGenerateAnalyticsCli(
     .map((row, index) => ({
       rank: index + 1,
       author: row.author,
+      author_alias: row.author_alias,
+      attribution_link: row.attribution_link,
       total_downloads: row.total_downloads,
       adjusted_total_downloads: row.adjusted_total_downloads,
       asset_count: row.asset_count,
@@ -858,6 +1009,7 @@ export function runGenerateAnalyticsCli(
     snapshotDates,
     latestTotals,
     dailyDeltasBySnapshot,
+    listingMeta,
     listingProjectByKey,
   );
   const authorByDayRows = buildAuthorByDayRows(
@@ -875,6 +1027,8 @@ export function runGenerateAnalyticsCli(
       "id",
       "name",
       "author",
+      "author_alias",
+      "attribution_link",
       "download_change",
       "adjusted_download_change",
       "current_total",
@@ -895,6 +1049,8 @@ export function runGenerateAnalyticsCli(
       "id",
       "name",
       "author",
+      "author_alias",
+      "attribution_link",
       "download_change",
       "adjusted_download_change",
       "current_total",
@@ -915,6 +1071,8 @@ export function runGenerateAnalyticsCli(
       "id",
       "name",
       "author",
+      "author_alias",
+      "attribution_link",
       "download_change",
       "adjusted_download_change",
       "current_total",
@@ -933,6 +1091,9 @@ export function runGenerateAnalyticsCli(
       "rank",
       "project_key",
       "project_name",
+      "author",
+      "author_alias",
+      "attribution_link",
       "listing_count",
       "download_change",
       "adjusted_download_change",
@@ -952,6 +1113,9 @@ export function runGenerateAnalyticsCli(
       "rank",
       "project_key",
       "project_name",
+      "author",
+      "author_alias",
+      "attribution_link",
       "listing_count",
       "download_change",
       "adjusted_download_change",
@@ -971,6 +1135,9 @@ export function runGenerateAnalyticsCli(
       "rank",
       "project_key",
       "project_name",
+      "author",
+      "author_alias",
+      "attribution_link",
       "listing_count",
       "download_change",
       "adjusted_download_change",
@@ -992,6 +1159,8 @@ export function runGenerateAnalyticsCli(
       "id",
       "name",
       "author",
+      "author_alias",
+      "attribution_link",
       "total_downloads",
       "adjusted_total_downloads",
       "latest_snapshot",
@@ -1005,6 +1174,9 @@ export function runGenerateAnalyticsCli(
       "rank",
       "project_key",
       "project_name",
+      "author",
+      "author_alias",
+      "attribution_link",
       "listing_count",
       "total_downloads",
       "adjusted_total_downloads",
@@ -1018,6 +1190,8 @@ export function runGenerateAnalyticsCli(
     [
       "rank",
       "author",
+      "author_alias",
+      "attribution_link",
       "asset_count",
       "map_count",
       "mod_count",
@@ -1032,6 +1206,8 @@ export function runGenerateAnalyticsCli(
     [
       "rank",
       "author",
+      "author_alias",
+      "attribution_link",
       "total_downloads",
       "adjusted_total_downloads",
       "asset_count",
@@ -1041,7 +1217,7 @@ export function runGenerateAnalyticsCli(
     authorRowsByTotalDownloads,
   );
 
-  const mapPopulationRows = loadMapPopulationRows(resolvedRepoRoot);
+  const mapPopulationRows = loadMapPopulationRows(resolvedRepoRoot, authorAliases);
   writeCsv<MapPopulationRow>(
     join(analyticsDir, "maps_by_population.csv"),
     [
@@ -1049,6 +1225,8 @@ export function runGenerateAnalyticsCli(
       "id",
       "name",
       "author",
+      "author_alias",
+      "attribution_link",
       "city_code",
       "country",
       "population",
@@ -1077,6 +1255,8 @@ export function runGenerateAnalyticsCli(
       "id",
       "name",
       "author",
+      "author_alias",
+      "attribution_link",
       "project_key",
       "project_name",
       "total_downloads",
@@ -1090,6 +1270,9 @@ export function runGenerateAnalyticsCli(
     [
       "project_key",
       "project_name",
+      "author",
+      "author_alias",
+      "attribution_link",
       "listing_count",
       "total_downloads",
       ...snapshotDates,
@@ -1101,6 +1284,8 @@ export function runGenerateAnalyticsCli(
     join(analyticsDir, "authors_by_day.csv"),
     [
       "author",
+      "author_alias",
+      "attribution_link",
       "asset_count",
       "map_count",
       "mod_count",
