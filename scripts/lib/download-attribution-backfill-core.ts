@@ -317,7 +317,11 @@ async function listWorkflowRuns(
 
 export async function runDownloadAttributionBackfillCli(
   argv = process.argv.slice(2),
+  repoRootHint?: string,
 ): Promise<void> {
+  if (repoRootHint) {
+    process.env.RAILYARD_REPO_ROOT = repoRootHint;
+  }
   const cli = parseArgs(argv);
   const cutoffMs = Date.now() - (cli.lookbackDays * 24 * 60 * 60 * 1000);
   const lineIndex = buildLineToAssetKeyIndex(cli.repoRoot);

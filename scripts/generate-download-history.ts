@@ -6,6 +6,7 @@ import {
   generateDownloadAttributionHistorySnapshot,
 } from "./lib/download-attribution-history.js";
 import { appendGitHubOutput, resolveRepoRoot } from "./lib/script-runtime.js";
+import { isTestListing } from "./lib/test-listings.js";
 
 function toWarningsOutputJson(warnings: string[]): string {
   const MAX_WARNINGS = 30;
@@ -18,6 +19,14 @@ function toWarningsOutputJson(warnings: string[]): string {
     displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
   }
   return JSON.stringify(displayed);
+}
+
+function filterHistoryWarningsForDiscord(repoRoot: string, warnings: string[]): string[] {
+  return warnings.filter((warning) => {
+    const match = warning.match(/history\/[^:]+:(maps|mods)[^']*listing='([^']+)'/);
+    if (!match) return true;
+    return !isTestListing(repoRoot, match[1] as "maps" | "mods", match[2]!);
+  });
 }
 
 function getDateArg(argv: string[]): string | undefined {
@@ -74,7 +83,11 @@ async function run(): Promise<void> {
       }
     }
 
-    const warningCount = result.warnings.length + attributionResult.warnings.length;
+    const filteredWarnings = filterHistoryWarningsForDiscord(
+      repoRoot,
+      [...result.warnings, ...attributionResult.warnings],
+    );
+    const warningCount = filteredWarnings.length;
     appendGitHubOutput([
       "snapshot_file=",
       "previous_snapshot_file=",
@@ -87,7 +100,7 @@ async function run(): Promise<void> {
       "mods_net_downloads=",
       "mods_entries=",
       `warning_count=${warningCount}`,
-      `warnings_json=${toWarningsOutputJson([...result.warnings, ...attributionResult.warnings])}`,
+      `warnings_json=${toWarningsOutputJson(filteredWarnings)}`,
     ]);
     return;
   }
@@ -116,7 +129,11 @@ async function run(): Promise<void> {
     `[download-history] Attribution snapshot ${attributionResult.snapshotFile} (previous=${attributionResult.previousSnapshotFile ?? "none"}) total=${attributionResult.snapshot.total_attributed_fetches}, net=${attributionResult.snapshot.net_attributed_fetches}, daily=${attributionResult.snapshot.daily_attributed_fetches}`,
   );
 
-  const warningCount = result.warnings.length + attributionResult.warnings.length;
+  const filteredWarnings = filterHistoryWarningsForDiscord(
+    repoRoot,
+    [...result.warnings, ...attributionResult.warnings],
+  );
+  const warningCount = filteredWarnings.length;
   appendGitHubOutput([
     `snapshot_file=${result.snapshotFile}`,
     `previous_snapshot_file=${result.previousSnapshotFile ?? ""}`,
@@ -132,7 +149,7 @@ async function run(): Promise<void> {
     `mods_net_downloads=${result.snapshot.mods.net_downloads}`,
     `mods_entries=${result.snapshot.mods.entries}`,
     `warning_count=${warningCount}`,
-    `warnings_json=${toWarningsOutputJson([...result.warnings, ...attributionResult.warnings])}`,
+    `warnings_json=${toWarningsOutputJson(filteredWarnings)}`,
   ]);
 }
 

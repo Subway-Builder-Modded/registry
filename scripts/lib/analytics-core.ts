@@ -3,6 +3,7 @@ import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { writeCsv } from "./csv.js";
 import { resolveRepoRoot } from "./script-runtime.js";
+import { isTestListing } from "./test-listings.js";
 
 interface SnapshotEntry {
   file: string;
@@ -279,6 +280,19 @@ function toListingLabel(listingType: "maps" | "mods"): "map" | "mod" {
   return listingType === "maps" ? "map" : "mod";
 }
 
+function filterOutTestListingTotals(
+  repoRoot: string,
+  totals: ListingTotals,
+): ListingTotals {
+  const filtered = new Map<ListingKey, number>();
+  for (const [key, total] of totals.entries()) {
+    const [listingType, id] = key.split(":") as ["maps" | "mods", string];
+    if (isTestListing(repoRoot, listingType, id)) continue;
+    filtered.set(key, total);
+  }
+  return filtered;
+}
+
 function loadManifestMeta(repoRoot: string, listingType: "maps" | "mods", id: string): ListingMeta {
   const manifestPath = join(repoRoot, listingType, id, "manifest.json");
   try {
@@ -439,8 +453,9 @@ function loadMapPopulationRows(repoRoot: string): MapPopulationRow[] {
 
 export function runGenerateAnalyticsCli(
   argv = process.argv.slice(2),
-  repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname),
+  repoRoot?: string,
 ): void {
+  const resolvedRepoRoot = repoRoot ?? process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   validateArgs(argv);
   const topListings = parseTopK(
     getArgValue(argv, "top-k-listings")
@@ -454,8 +469,8 @@ export function runGenerateAnalyticsCli(
     DEFAULT_TOP_AUTHORS,
     "top-k-authors",
   );
-  const historyDir = join(repoRoot, "history");
-  const analyticsDir = join(repoRoot, "analytics");
+  const historyDir = join(resolvedRepoRoot, "history");
+  const analyticsDir = join(resolvedRepoRoot, "analytics");
   mkdirSync(analyticsDir, { recursive: true });
 
   const snapshots = listSnapshots(historyDir);
@@ -466,21 +481,24 @@ export function runGenerateAnalyticsCli(
   const latest = snapshots[snapshots.length - 1];
   const latestData = loadJsonFile<SnapshotData>(join(historyDir, latest.file));
   const adjustedTotalsBySnapshot = new Map<string, ListingTotals>();
-  adjustedTotalsBySnapshot.set(latest.file, toListingTotals(latestData));
+  adjustedTotalsBySnapshot.set(latest.file, filterOutTestListingTotals(resolvedRepoRoot, toListingTotals(latestData)));
   const monotonicTotalsBySnapshot = buildMonotonicSnapshotTotals(snapshots, historyDir);
-  const latestTotals = monotonicTotalsBySnapshot.get(latest.file) ?? new Map<ListingKey, number>();
+  const latestTotals = filterOutTestListingTotals(
+    resolvedRepoRoot,
+    monotonicTotalsBySnapshot.get(latest.file) ?? new Map<ListingKey, number>(),
+  );
   const latestAdjustedTotals = adjustedTotalsBySnapshot.get(latest.file) ?? new Map<ListingKey, number>();
 
   const listingMeta = new Map<ListingKey, ListingMeta>();
   for (const key of latestAdjustedTotals.keys()) {
     const [listingType, id] = key.split(":") as ["maps" | "mods", string];
-    listingMeta.set(key, loadManifestMeta(repoRoot, listingType, id));
+    listingMeta.set(key, loadManifestMeta(resolvedRepoRoot, listingType, id));
   }
 
   const listingProjectRows: ListingProjectRow[] = [...latestAdjustedTotals.keys()]
     .map((key) => {
       const [listingType, id] = key.split(":") as ["maps" | "mods", string];
-      return loadListingProjectRow(repoRoot, listingType, id);
+      return loadListingProjectRow(resolvedRepoRoot, listingType, id);
     })
     .sort((a, b) =>
       a.project_key.localeCompare(b.project_key)
@@ -498,10 +516,14 @@ export function runGenerateAnalyticsCli(
     const baselineAdjustedTotals = adjustedTotalsBySnapshot.get(baseline.file)
       ?? (() => {
         const totals = toListingTotals(loadJsonFile<SnapshotData>(join(historyDir, baseline.file)));
-        adjustedTotalsBySnapshot.set(baseline.file, totals);
-        return totals;
+        const filteredTotals = filterOutTestListingTotals(resolvedRepoRoot, totals);
+        adjustedTotalsBySnapshot.set(baseline.file, filteredTotals);
+        return filteredTotals;
       })();
-    const baselineTotals = monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>();
+    const baselineTotals = filterOutTestListingTotals(
+      resolvedRepoRoot,
+      monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>(),
+    );
 
     const rows: Omit<ListingWindowRow, "rank">[] = [];
     for (const [key, currentTotal] of latestTotals.entries()) {
@@ -566,10 +588,14 @@ export function runGenerateAnalyticsCli(
     const baselineAdjustedTotals = adjustedTotalsBySnapshot.get(baseline.file)
       ?? (() => {
         const totals = toListingTotals(loadJsonFile<SnapshotData>(join(historyDir, baseline.file)));
-        adjustedTotalsBySnapshot.set(baseline.file, totals);
-        return totals;
+        const filteredTotals = filterOutTestListingTotals(resolvedRepoRoot, totals);
+        adjustedTotalsBySnapshot.set(baseline.file, filteredTotals);
+        return filteredTotals;
       })();
-    const baselineTotals = monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>();
+    const baselineTotals = filterOutTestListingTotals(
+      resolvedRepoRoot,
+      monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>(),
+    );
 
     const projectStats = new Map<string, Omit<ProjectWindowRow, "rank">>();
     for (const [key, currentTotal] of latestTotals.entries()) {
@@ -862,7 +888,7 @@ export function runGenerateAnalyticsCli(
     authorRowsByTotalDownloads,
   );
 
-  const mapPopulationRows = loadMapPopulationRows(repoRoot);
+  const mapPopulationRows = loadMapPopulationRows(resolvedRepoRoot);
   writeCsv<MapPopulationRow>(
     join(analyticsDir, "maps_by_population.csv"),
     [

@@ -12,6 +12,10 @@ See more [here](https://subwaybuildermodded.com/railyard/$TYPE_LOWER/$NAME_LOWER
 export async function makeAnnouncement(filename: string) {
     const manifestContent = fs.readFileSync(filename, 'utf-8');
     const manifest = JSON.parse(manifestContent);
+    if (manifest.is_test === true) {
+        console.log('Skipping announcement for test listing.');
+        return;
+    }
     const modName = manifest.name?.trim();
     const modId = manifest.id?.trim();
     const modAuthor = manifest.author?.trim();

@@ -18,6 +18,7 @@ import {
   resolveRepoRoot,
 } from "./lib/script-runtime.js";
 import { compareStableSemverAsc, isStableSemverTag } from "./lib/semver.js";
+import { filterListingMessages, isTestListing } from "./lib/test-listings.js";
 
 async function announceNewAssets(
   newIntegrity: IntegrityOutput,
@@ -41,6 +42,9 @@ async function announceNewAssets(
     .filter(([id]) => !previousIntegrity.listings[id])
     .map(([id]) => id);
   for (const listingId of newListings) {
+    if (isTestListing(repoRoot, listingType === "map" ? "maps" : "mods", listingId)) {
+      continue;
+    }
     if (!newIntegrity.listings[listingId]?.has_complete_version) {
       continue;
     }
@@ -337,7 +341,18 @@ async function run(): Promise<void> {
       : `Generated ${outputDir}/downloads.json for ${Object.keys(downloads).length} listings (download-only mode)`,
   );
 
-  const warningsForGitHub = filterWarningsForGitHub(warnings, integrity);
+  const warningsForGitHub = filterListingMessages(
+    filterWarningsForGitHub(warnings, integrity),
+    (listingId) => isTestListing(repoRoot, listingType === "map" ? "maps" : "mods", listingId),
+  );
+  const securityErrorsForOutput = filterListingMessages(
+    securityAlerts.errors,
+    (listingId) => isTestListing(repoRoot, "mods", listingId),
+  );
+  const securityWarningsForOutput = filterListingMessages(
+    securityAlerts.warnings,
+    (listingId) => isTestListing(repoRoot, "mods", listingId),
+  );
   const suppressedWarnings = warnings.length - warningsForGitHub.length;
   if (suppressedWarnings > 0) {
     console.log(
@@ -347,10 +362,10 @@ async function run(): Promise<void> {
   appendGitHubOutput([
     `warning_count=${warningsForGitHub.length}`,
     `warnings_json=${toWarningsOutputJson(listingType, warningsForGitHub)}`,
-    `security_error_count=${securityAlerts.errors.length}`,
-    `security_warning_count=${securityAlerts.warnings.length}`,
-    `security_errors_json=${toLimitedOutputJson(securityAlerts.errors)}`,
-    `security_warnings_json=${toLimitedOutputJson(securityAlerts.warnings)}`,
+    `security_error_count=${securityErrorsForOutput.length}`,
+    `security_warning_count=${securityWarningsForOutput.length}`,
+    `security_errors_json=${toLimitedOutputJson(securityErrorsForOutput)}`,
+    `security_warnings_json=${toLimitedOutputJson(securityWarningsForOutput)}`,
     `integrity_listings=${stats.listings}`,
     `integrity_versions_checked=${stats.versions_checked}`,
     `integrity_complete_versions=${stats.complete_versions}`,

@@ -7,6 +7,7 @@ import {
   writeDownloadAttributionDeltaFile,
 } from "./lib/download-attribution.js";
 import { appendGitHubOutput, getNonEmptyEnv, isTruthyEnv, resolveRepoRoot } from "./lib/script-runtime.js";
+import { filterListingMessages, isTestListing } from "./lib/test-listings.js";
 
 function parseCliArgs(argv: string[]): { force: boolean; mapId?: string; strictFingerprintCache: boolean } {
   let force = false;
@@ -123,6 +124,11 @@ async function run(): Promise<void> {
     `[map-demand-stats] Attribution stats: registryFetchesAdded=${sumDownloadAttributionDeltaFetches(attributionDelta)}`,
   );
 
+  const warningsForDiscord = filterListingMessages(
+    result.warnings,
+    (listingId) => isTestListing(repoRoot, "maps", listingId),
+  );
+
   appendGitHubOutput([
     `processed_maps=${result.processedMaps}`,
     `updated_maps=${result.updatedMaps}`,
@@ -133,8 +139,8 @@ async function run(): Promise<void> {
     `graphql_queries=${result.rateLimit.queries}`,
     `graphql_total_cost=${result.rateLimit.totalCost}`,
     `attribution_fetches_added=${result.attributionFetchesAdded}`,
-    `warning_count=${result.warnings.length}`,
-    `warnings_json=${toWarningsOutputJson("map-demand-stats: ", result.warnings)}`,
+    `warning_count=${warningsForDiscord.length}`,
+    `warnings_json=${toWarningsOutputJson("map-demand-stats: ", warningsForDiscord)}`,
   ]);
 }
 
