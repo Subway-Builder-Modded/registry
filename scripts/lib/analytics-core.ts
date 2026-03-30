@@ -121,6 +121,7 @@ interface MapPopulationRow {
   points_count: number;
 }
 
+type DailySeriesRow = Record<string, string | number>;
 type ListingKey = `${"maps" | "mods"}:${string}`;
 
 const DEFAULT_TOP_LISTINGS = 30;
@@ -451,6 +452,136 @@ function loadMapPopulationRows(repoRoot: string): MapPopulationRow[] {
   }));
 }
 
+function toSnapshotDateLabel(fileName: string): string {
+  const match = fileName.match(/^snapshot_(\d{4}_\d{2}_\d{2})\.json$/);
+  return match?.[1] ?? fileName;
+}
+
+function buildDailyDeltaSnapshotTotals(
+  snapshots: SnapshotEntry[],
+  monotonicTotalsBySnapshot: Map<string, ListingTotals>,
+): Map<string, ListingTotals> {
+  const bySnapshot = new Map<string, ListingTotals>();
+  let previousTotals = new Map<ListingKey, number>();
+
+  for (const snapshot of snapshots) {
+    const currentTotals = monotonicTotalsBySnapshot.get(snapshot.file) ?? new Map<ListingKey, number>();
+    const keys = new Set<ListingKey>([
+      ...previousTotals.keys(),
+      ...currentTotals.keys(),
+    ]);
+    const deltaTotals = new Map<ListingKey, number>();
+    for (const key of keys) {
+      const delta = Math.max(0, (currentTotals.get(key) ?? 0) - (previousTotals.get(key) ?? 0));
+      if (delta > 0 || currentTotals.has(key) || previousTotals.has(key)) {
+        deltaTotals.set(key, delta);
+      }
+    }
+    bySnapshot.set(snapshot.file, deltaTotals);
+    previousTotals = currentTotals;
+  }
+
+  return bySnapshot;
+}
+
+function buildListingByDayRows(
+  snapshotDates: string[],
+  latestTotals: ListingTotals,
+  dailyDeltasBySnapshot: Map<string, ListingTotals>,
+  listingMeta: Map<ListingKey, ListingMeta>,
+  listingProjectByKey: Map<ListingKey, ListingProjectRow>,
+): DailySeriesRow[] {
+  const rows: DailySeriesRow[] = [];
+  for (const [key, totalDownloads] of latestTotals.entries()) {
+    const [listingType, id] = key.split(":") as ["maps" | "mods", string];
+    const meta = listingMeta.get(key) ?? { name: id, author: "UNKNOWN" };
+    const project = listingProjectByKey.get(key);
+    const row: DailySeriesRow = {
+      listing_type: toListingLabel(listingType),
+      id,
+      name: meta.name,
+      author: meta.author,
+      project_key: project?.project_key ?? `${toListingLabel(listingType)}:${id}`,
+      project_name: project?.project_name ?? meta.name,
+      total_downloads: totalDownloads,
+    };
+    for (const snapshotDate of snapshotDates) {
+      row[snapshotDate] = dailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)?.get(key) ?? 0;
+    }
+    rows.push(row);
+  }
+
+  rows.sort((a, b) =>
+    Number(b.total_downloads) - Number(a.total_downloads)
+    || String(a.id).localeCompare(String(b.id)));
+  return rows;
+}
+
+function buildProjectByDayRows(
+  snapshotDates: string[],
+  latestTotals: ListingTotals,
+  dailyDeltasBySnapshot: Map<string, ListingTotals>,
+  listingProjectByKey: Map<ListingKey, ListingProjectRow>,
+): DailySeriesRow[] {
+  const projectRows = new Map<string, DailySeriesRow>();
+
+  for (const [key, totalDownloads] of latestTotals.entries()) {
+    const project = listingProjectByKey.get(key);
+    if (!project) continue;
+    const existing = projectRows.get(project.project_key) ?? {
+      project_key: project.project_key,
+      project_name: project.project_name,
+      listing_count: 0,
+      total_downloads: 0,
+    };
+    existing.listing_count = Number(existing.listing_count) + 1;
+    existing.total_downloads = Number(existing.total_downloads) + totalDownloads;
+    for (const snapshotDate of snapshotDates) {
+      existing[snapshotDate] = Number(existing[snapshotDate] ?? 0)
+        + (dailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)?.get(key) ?? 0);
+    }
+    projectRows.set(project.project_key, existing);
+  }
+
+  return [...projectRows.values()].sort((a, b) =>
+    Number(b.total_downloads) - Number(a.total_downloads)
+    || String(a.project_key).localeCompare(String(b.project_key)));
+}
+
+function buildAuthorByDayRows(
+  snapshotDates: string[],
+  latestTotals: ListingTotals,
+  dailyDeltasBySnapshot: Map<string, ListingTotals>,
+  listingMeta: Map<ListingKey, ListingMeta>,
+): DailySeriesRow[] {
+  const authorRows = new Map<string, DailySeriesRow>();
+
+  for (const [key, totalDownloads] of latestTotals.entries()) {
+    const [listingType] = key.split(":") as ["maps" | "mods", string];
+    const meta = listingMeta.get(key) ?? { name: "", author: "UNKNOWN" };
+    const existing = authorRows.get(meta.author) ?? {
+      author: meta.author,
+      asset_count: 0,
+      map_count: 0,
+      mod_count: 0,
+      total_downloads: 0,
+    };
+    existing.asset_count = Number(existing.asset_count) + 1;
+    if (listingType === "maps") existing.map_count = Number(existing.map_count) + 1;
+    if (listingType === "mods") existing.mod_count = Number(existing.mod_count) + 1;
+    existing.total_downloads = Number(existing.total_downloads) + totalDownloads;
+    for (const snapshotDate of snapshotDates) {
+      existing[snapshotDate] = Number(existing[snapshotDate] ?? 0)
+        + (dailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)?.get(key) ?? 0);
+    }
+    authorRows.set(meta.author, existing);
+  }
+
+  return [...authorRows.values()].sort((a, b) =>
+    Number(b.total_downloads) - Number(a.total_downloads)
+    || String(a.author).localeCompare(String(b.author)));
+}
+
 export function runGenerateAnalyticsCli(
   argv = process.argv.slice(2),
   repoRoot?: string,
@@ -483,6 +614,8 @@ export function runGenerateAnalyticsCli(
   const adjustedTotalsBySnapshot = new Map<string, ListingTotals>();
   adjustedTotalsBySnapshot.set(latest.file, filterOutTestListingTotals(resolvedRepoRoot, toListingTotals(latestData)));
   const monotonicTotalsBySnapshot = buildMonotonicSnapshotTotals(snapshots, historyDir);
+  const dailyDeltasBySnapshot = buildDailyDeltaSnapshotTotals(snapshots, monotonicTotalsBySnapshot);
+  const snapshotDates = snapshots.map((snapshot) => toSnapshotDateLabel(snapshot.file));
   const latestTotals = filterOutTestListingTotals(
     resolvedRepoRoot,
     monotonicTotalsBySnapshot.get(latest.file) ?? new Map<ListingKey, number>(),
@@ -714,6 +847,26 @@ export function runGenerateAnalyticsCli(
       mod_count: row.mod_count,
     }));
 
+  const listingByDayRows = buildListingByDayRows(
+    snapshotDates,
+    latestTotals,
+    dailyDeltasBySnapshot,
+    listingMeta,
+    listingProjectByKey,
+  );
+  const projectByDayRows = buildProjectByDayRows(
+    snapshotDates,
+    latestTotals,
+    dailyDeltasBySnapshot,
+    listingProjectByKey,
+  );
+  const authorByDayRows = buildAuthorByDayRows(
+    snapshotDates,
+    latestTotals,
+    dailyDeltasBySnapshot,
+    listingMeta,
+  );
+
   writeCsv<ListingWindowRow>(
     join(analyticsDir, "most_popular_last_1d.csv"),
     [
@@ -915,6 +1068,46 @@ export function runGenerateAnalyticsCli(
       "project_name",
     ],
     listingProjectRows,
+  );
+
+  writeCsv<DailySeriesRow>(
+    join(analyticsDir, "most_popular_by_day.csv"),
+    [
+      "listing_type",
+      "id",
+      "name",
+      "author",
+      "project_key",
+      "project_name",
+      "total_downloads",
+      ...snapshotDates,
+    ],
+    listingByDayRows,
+  );
+
+  writeCsv<DailySeriesRow>(
+    join(analyticsDir, "projects_by_day.csv"),
+    [
+      "project_key",
+      "project_name",
+      "listing_count",
+      "total_downloads",
+      ...snapshotDates,
+    ],
+    projectByDayRows,
+  );
+
+  writeCsv<DailySeriesRow>(
+    join(analyticsDir, "authors_by_day.csv"),
+    [
+      "author",
+      "asset_count",
+      "map_count",
+      "mod_count",
+      "total_downloads",
+      ...snapshotDates,
+    ],
+    authorByDayRows,
   );
 
   console.log(`Generated analytics CSVs in ${analyticsDir}`);

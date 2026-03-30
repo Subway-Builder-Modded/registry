@@ -86,6 +86,12 @@ export interface RailyardAppCsvRow {
   [key: string]: string | number | null;
 }
 
+export interface RailyardAppByDayCsvRow {
+  version: string;
+  total_downloads: number;
+  [key: string]: string | number;
+}
+
 export function getRailyardAppDownloadHistoryPath(repoRoot: string): string {
   return resolve(repoRoot, ...RAILYARD_APP_DOWNLOAD_HISTORY_FILE);
 }
@@ -258,6 +264,12 @@ function listSnapshotKeys(history: RailyardAppDownloadHistory): string[] {
   return Object.keys(history.snapshots).sort((a, b) => Date.parse(a) - Date.parse(b));
 }
 
+function toDateKey(isoValue: string): string | null {
+  const parsed = Date.parse(isoValue);
+  if (!Number.isFinite(parsed)) return null;
+  return new Date(parsed).toISOString().slice(0, 10).replaceAll("-", "_");
+}
+
 function findSnapshotAtOrBefore(history: RailyardAppDownloadHistory, targetMs: number): string | null {
   let selected: string | null = null;
   for (const key of listSnapshotKeys(history)) {
@@ -389,4 +401,73 @@ export function buildRailyardAppAnalyticsCsvRows(analytics: RailyardAppAnalytics
 
     return row;
   });
+}
+
+export function buildRailyardAppByDayCsvRows(history: RailyardAppDownloadHistory): {
+  headers: string[];
+  rows: RailyardAppByDayCsvRow[];
+} {
+  const snapshotKeys = listSnapshotKeys(history);
+  const latestSnapshotKey = snapshotKeys[snapshotKeys.length - 1] ?? null;
+  if (!latestSnapshotKey) {
+    return {
+      headers: ["version", "total_downloads"],
+      rows: [],
+    };
+  }
+
+  const dayToSnapshot = new Map<string, RailyardAppHistorySnapshot>();
+  for (const key of snapshotKeys) {
+    const dateKey = toDateKey(key);
+    if (!dateKey) continue;
+    dayToSnapshot.set(dateKey, history.snapshots[key]!);
+  }
+
+  const dateKeys = [...dayToSnapshot.keys()].sort();
+  const latestSnapshot = history.snapshots[latestSnapshotKey]!;
+  const previousTotals = new Map<string, number>();
+  const dailyByVersion = new Map<string, Record<string, number>>();
+
+  for (const dateKey of dateKeys) {
+    const snapshot = dayToSnapshot.get(dateKey)!;
+    const currentTotals = new Map<string, number>();
+    const versionKeys = new Set<string>([
+      ...Object.keys(snapshot.versions),
+      ...previousTotals.keys(),
+    ]);
+
+    for (const version of versionKeys) {
+      const currentTotal = snapshot.versions[version]?.total_downloads ?? previousTotals.get(version) ?? 0;
+      currentTotals.set(version, currentTotal);
+      const previousTotal = previousTotals.get(version) ?? 0;
+      const delta = Math.max(0, currentTotal - previousTotal);
+      const row = dailyByVersion.get(version) ?? {};
+      row[dateKey] = delta;
+      dailyByVersion.set(version, row);
+    }
+
+    previousTotals.clear();
+    for (const [version, total] of currentTotals.entries()) {
+      previousTotals.set(version, total);
+    }
+  }
+
+  const rows = Object.entries(latestSnapshot.versions)
+    .filter(([, snapshot]) => snapshot.total_downloads > 0)
+    .sort(([a], [b]) => compareSemverDescending(a, b))
+    .map(([version, snapshot]) => {
+      const row: RailyardAppByDayCsvRow = {
+        version,
+        total_downloads: snapshot.total_downloads,
+      };
+      for (const dateKey of dateKeys) {
+        row[dateKey] = dailyByVersion.get(version)?.[dateKey] ?? 0;
+      }
+      return row;
+    });
+
+  return {
+    headers: ["version", "total_downloads", ...dateKeys],
+    rows,
+  };
 }

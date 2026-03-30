@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import {
   buildRailyardAppAnalytics,
   buildRailyardAppAnalyticsCsvRows,
+  buildRailyardAppByDayCsvRows,
   listRailyardAppAnalyticsAssetNames,
   loadRailyardAppDownloadHistory,
 } from "./lib/railyard-app-downloads.js";
@@ -18,6 +19,7 @@ function run(): void {
   const history = loadRailyardAppDownloadHistory(repoRoot);
   const analytics = buildRailyardAppAnalytics(history);
   const rows = buildRailyardAppAnalyticsCsvRows(analytics);
+  const byDay = buildRailyardAppByDayCsvRows(history);
   const assetNames = listRailyardAppAnalyticsAssetNames(analytics);
   const headers = [
     "version",
@@ -43,9 +45,14 @@ function run(): void {
     headers,
     rows,
   );
+  writeCsv(
+    join(analyticsDir, "railyard_app_by_day.csv"),
+    byDay.headers,
+    byDay.rows,
+  );
 
   console.log(
-    `Generated railyard app download analytics in ${analyticsDir} (versions=${rows.length}, assets=${assetNames.length})`,
+    `Generated railyard app download analytics in ${analyticsDir} (versions=${rows.length}, assets=${assetNames.length}, byDayVersions=${byDay.rows.length})`,
   );
 }
 
