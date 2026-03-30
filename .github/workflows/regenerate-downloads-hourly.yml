@@ -154,6 +154,14 @@ jobs:
           cp "${MAP_ARTIFACT_FILE}" maps/downloads.json
           cp "${MOD_ARTIFACT_FILE}" mods/downloads.json
 
+      - name: Capture Railyard app download history
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm --dir scripts run capture-railyard-app-downloads
+
+      - name: Generate Railyard app analytics
+        run: pnpm --dir scripts run generate-railyard-app-analytics
+
       - name: Compute download change stats
         id: download_stats
         run: |
@@ -259,7 +267,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json history/railyard_app_downloads.json analytics/railyard_app_downloads.json analytics/railyard_app_downloads.csv 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No download changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"

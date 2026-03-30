@@ -158,6 +158,19 @@ Automation:
 
 - `cache-download-history.yml` runs daily (and on manual dispatch), commits `history/snapshot_YYYY_MM_DD.json`, and posts summary stats to Discord.
 
+Separate Railyard app download analytics:
+
+- Capture hourly `Subway-Builder-Modded/railyard` release download history:
+  - `pnpm --dir scripts run capture-railyard-app-downloads`
+- Generate app download analytics artifacts:
+  - `pnpm --dir scripts run generate-railyard-app-analytics`
+
+The hourly workflow writes:
+
+- `history/railyard_app_downloads.json`
+- `analytics/railyard_app_downloads.json`
+- `analytics/railyard_app_downloads.csv`
+
 ## Map Demand Stats
 
 Map manifests now support auto-derived demand metrics from map ZIPs:
