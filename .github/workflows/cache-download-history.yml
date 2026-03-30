@@ -18,6 +18,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Restore latest cached history from bot branch
+        run: |
+          if git ls-remote --exit-code --heads origin bot/cache-download-history >/dev/null 2>&1; then
+            git fetch origin bot/cache-download-history:refs/remotes/origin/bot/cache-download-history
+            git checkout origin/bot/cache-download-history -- history
+          else
+            echo "No bot/cache-download-history branch found; using history from checked out ref."
+          fi
 
       - uses: pnpm/action-setup@v4
         with:
