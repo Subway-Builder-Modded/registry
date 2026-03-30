@@ -14,6 +14,7 @@ import type {
 } from "./integrity.js";
 import { fetchWithTimeout, resolveTimeoutMsFromEnv } from "./http.js";
 import { isSupportedReleaseTag, parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
+import { compareStableSemverDesc } from "./semver.js";
 
 export interface CustomVersionCandidate {
   version: string;
@@ -219,20 +220,8 @@ export function shouldUseCachedIntegrity(
   return now.getTime() - lastChecked <= NON_SHA_RECHECK_WINDOW_MS;
 }
 
-function semverParts(value: string): [number, number, number] | null {
-  const match = value.match(/^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
-  if (!match) return null;
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
-}
-
 function compareSemverDescending(a: string, b: string): number {
-  const pa = semverParts(a);
-  const pb = semverParts(b);
-  if (!pa || !pb) return b.localeCompare(a);
-  if (pa[0] !== pb[0]) return pb[0] - pa[0];
-  if (pa[1] !== pb[1]) return pb[1] - pa[1];
-  if (pa[2] !== pb[2]) return pb[2] - pa[2];
-  return b.localeCompare(a);
+  return compareStableSemverDesc(a, b);
 }
 
 export function buildIncompleteVersionEntry(

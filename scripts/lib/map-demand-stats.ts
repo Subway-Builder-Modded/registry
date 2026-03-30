@@ -18,6 +18,7 @@ import {
   toDownloadAttributionAssetKey,
   type DownloadAttributionDelta,
 } from "./download-attribution.js";
+import { compareStableSemverDesc } from "./semver.js";
 
 export interface DemandStats {
   residents_total: number;
@@ -90,20 +91,8 @@ const CACHE_FILE_NAME = "demand-stats-cache.json";
 const UNCHANGED_SKIP_WINDOW_MS = 12 * 60 * 60 * 1000;
 const MAP_DEMAND_FETCH_TIMEOUT_MS = resolveTimeoutMsFromEnv("REGISTRY_FETCH_TIMEOUT_MS", 45_000);
 
-function semverParts(value: string): [number, number, number] | null {
-  const match = value.match(/^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
-  if (!match) return null;
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
-}
-
 function compareSemverDescending(a: string, b: string): number {
-  const pa = semverParts(a);
-  const pb = semverParts(b);
-  if (!pa || !pb) return b.localeCompare(a);
-  if (pa[0] !== pb[0]) return pb[0] - pa[0];
-  if (pa[1] !== pb[1]) return pb[1] - pa[1];
-  if (pa[2] !== pb[2]) return pb[2] - pa[2];
-  return b.localeCompare(a);
+  return compareStableSemverDesc(a, b);
 }
 
 function readJsonFile<T>(path: string): T {

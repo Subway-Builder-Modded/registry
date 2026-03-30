@@ -1,4 +1,3 @@
-import { basename, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   buildRailyardAppHistorySnapshot,
@@ -9,10 +8,7 @@ import {
   writeRailyardAppDownloadHistory,
   type GitHubReleaseLike,
 } from "./lib/railyard-app-downloads.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
+import { getNonEmptyEnv, resolveRepoRoot } from "./lib/script-runtime.js";
 
 const DEFAULT_REPO = "Subway-Builder-Modded/railyard";
 const GITHUB_API_BASE = "https://api.github.com";
@@ -38,11 +34,11 @@ interface GitHubReleaseApiResponse {
 
 function parseArgs(): CliArgs {
   return {
-    repoRoot: process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT,
+    repoRoot: process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname),
     repo: (process.env.RAILYARD_APP_DOWNLOADS_REPO ?? DEFAULT_REPO).trim(),
     token: (
-      process.env.GH_DOWNLOADS_TOKEN
-      ?? process.env.GITHUB_TOKEN
+      getNonEmptyEnv("GH_DOWNLOADS_TOKEN")
+      ?? getNonEmptyEnv("GITHUB_TOKEN")
       ?? ""
     ).trim(),
   };

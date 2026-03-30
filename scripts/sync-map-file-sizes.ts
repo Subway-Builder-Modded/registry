@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { appendGitHubOutput, resolveRepoRoot } from "./lib/script-runtime.js";
 
 interface IntegrityVersionEntry {
   is_complete?: unknown;
@@ -23,10 +24,6 @@ interface SyncMapFileSizesResult {
   mapsWithoutCompleteVersion: number;
   mapsWithMissingFileSizes: number;
 }
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -145,22 +142,18 @@ export function syncMapFileSizesFromIntegrity(
 }
 
 async function run(): Promise<void> {
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const result = syncMapFileSizesFromIntegrity(repoRoot);
   console.log(
     `[sync-map-file-sizes] Summary: processedMaps=${result.processedMaps}, updatedMaps=${result.updatedMaps}, mapsWithoutCompleteVersion=${result.mapsWithoutCompleteVersion}, mapsWithMissingFileSizes=${result.mapsWithMissingFileSizes}`,
   );
 
-  if (process.env.GITHUB_OUTPUT) {
-    const { appendFileSync } = await import("node:fs");
-    appendFileSync(
-      process.env.GITHUB_OUTPUT,
-      `map_file_sizes_processed=${result.processedMaps}\n`
-      + `map_file_sizes_updated=${result.updatedMaps}\n`
-      + `map_file_sizes_without_complete=${result.mapsWithoutCompleteVersion}\n`
-      + `map_file_sizes_missing_in_integrity=${result.mapsWithMissingFileSizes}\n`,
-    );
-  }
+  appendGitHubOutput([
+    `map_file_sizes_processed=${result.processedMaps}`,
+    `map_file_sizes_updated=${result.updatedMaps}`,
+    `map_file_sizes_without_complete=${result.mapsWithoutCompleteVersion}`,
+    `map_file_sizes_missing_in_integrity=${result.mapsWithMissingFileSizes}`,
+  ]);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

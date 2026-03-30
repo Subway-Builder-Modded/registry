@@ -1,11 +1,8 @@
 import { readdirSync, readFileSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { DownloadHistorySnapshot } from "./lib/download-history.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
+import { resolveRepoRoot } from "./lib/script-runtime.js";
 
 type SectionName = "maps" | "mods";
 
@@ -246,7 +243,7 @@ function summarizeIssues(issues: AuditIssue[]): void {
 }
 
 function run(): void {
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const snapshotFiles = listSnapshots(repoRoot);
   const issues: AuditIssue[] = [];
   let previous: DownloadHistorySnapshot | null = null;

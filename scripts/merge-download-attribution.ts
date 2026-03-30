@@ -1,5 +1,4 @@
-import { basename, resolve } from "node:path";
-import { appendFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   loadDownloadAttributionLedger,
@@ -7,10 +6,7 @@ import {
   readDownloadAttributionDeltaFile,
   writeDownloadAttributionLedger,
 } from "./lib/download-attribution.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
+import { appendGitHubOutput, resolveRepoRoot } from "./lib/script-runtime.js";
 
 interface CliArgs {
   repoRoot: string;
@@ -18,7 +14,7 @@ interface CliArgs {
 }
 
 function parseCliArgs(argv: string[]): CliArgs {
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const deltaPaths: string[] = [];
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -75,15 +71,12 @@ async function run(): Promise<void> {
     `[download-attribution] merged delta files=${deltas.length}, appliedDeltas=${merge.appliedDeltaIds.length}, skippedDeltas=${merge.skippedDeltaIds.length}, addedFetches=${merge.addedFetches}, assetKeysUpdated=${merge.assetKeysUpdated}`,
   );
 
-  if (process.env.GITHUB_OUTPUT) {
-    const lines = [
-      `registry_fetches_added_total=${merge.addedFetches}`,
-      `applied_delta_count=${merge.appliedDeltaIds.length}`,
-      `skipped_delta_count=${merge.skippedDeltaIds.length}`,
-      `asset_keys_updated=${merge.assetKeysUpdated}`,
-    ];
-    appendFileSync(process.env.GITHUB_OUTPUT, `${lines.join("\n")}\n`);
-  }
+  appendGitHubOutput([
+    `registry_fetches_added_total=${merge.addedFetches}`,
+    `applied_delta_count=${merge.appliedDeltaIds.length}`,
+    `skipped_delta_count=${merge.skippedDeltaIds.length}`,
+    `asset_keys_updated=${merge.assetKeysUpdated}`,
+  ]);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

@@ -1,5 +1,11 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import {
+  compareStableSemverDesc,
+  normalizeStableSemverTag,
+  parseStableSemverTag,
+} from "./semver.js";
+export { normalizeStableSemverTag } from "./semver.js";
 
 const RAILYARD_APP_DOWNLOAD_HISTORY_FILE = ["history", "railyard_app_downloads.json"] as const;
 
@@ -18,8 +24,6 @@ function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
   }
   return sorted;
 }
-
-type SemverParts = readonly [number, number, number];
 
 export interface GitHubReleaseAssetLike {
   name: string;
@@ -92,32 +96,8 @@ export function toHourBucketIso(date: Date): string {
   return bucket.toISOString();
 }
 
-export function parseStableSemverTag(tag: string): SemverParts | null {
-  const match = tag.trim().match(/^v?(\d+)\.(\d+)\.(\d+)$/);
-  if (!match) return null;
-  return [
-    Number.parseInt(match[1]!, 10),
-    Number.parseInt(match[2]!, 10),
-    Number.parseInt(match[3]!, 10),
-  ] as const;
-}
-
-export function normalizeStableSemverTag(tag: string): string | null {
-  const parts = parseStableSemverTag(tag);
-  if (!parts) return null;
-  return `${parts[0]}.${parts[1]}.${parts[2]}`;
-}
-
 export function compareSemverDescending(a: string, b: string): number {
-  const pa = parseStableSemverTag(a);
-  const pb = parseStableSemverTag(b);
-  if (!pa && !pb) return a.localeCompare(b);
-  if (!pa) return 1;
-  if (!pb) return -1;
-  if (pa[0] !== pb[0]) return pb[0] - pa[0];
-  if (pa[1] !== pb[1]) return pb[1] - pa[1];
-  if (pa[2] !== pb[2]) return pb[2] - pa[2];
-  return a.localeCompare(b);
+  return compareStableSemverDesc(a, b);
 }
 
 export function createEmptyRailyardAppDownloadHistory(

@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { makeAnnouncement } from "./make-announcement.js";
 import { generateDownloadsData } from "./lib/downloads.js";
@@ -11,17 +11,13 @@ import {
 import type { IntegrityOutput } from "./lib/integrity.js";
 import type { ManifestType } from "./lib/manifests.js";
 import type { SecurityFinding } from "./lib/mod-security.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
-
-function getNonEmptyEnv(name: string): string | undefined {
-  const value = process.env[name];
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  return trimmed === "" ? undefined : trimmed;
-}
+import {
+  appendGitHubOutput,
+  getNonEmptyEnv,
+  isTruthyEnv,
+  resolveRepoRoot,
+} from "./lib/script-runtime.js";
+import { compareStableSemverAsc, isStableSemverTag } from "./lib/semver.js";
 
 async function announceNewAssets(
   newIntegrity: IntegrityOutput,
@@ -86,12 +82,6 @@ function hasArgFlag(name: string): boolean {
   return process.argv.slice(2).includes(target);
 }
 
-function isTruthyEnv(value: string | undefined): boolean {
-  if (!value) return false;
-  const normalized = value.trim().toLowerCase();
-  return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
-}
-
 function resolveListingType(rawValue: string | undefined): ManifestType {
   if (rawValue === "map" || rawValue === "mod") {
     return rawValue;
@@ -132,26 +122,6 @@ function toLimitedOutputJson(items: string[]): string {
   return JSON.stringify(displayed);
 }
 
-function semverParts(value: string): [number, number, number] | null {
-  const match = value.match(/^v?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/);
-  if (!match) return null;
-  return [Number(match[1]), Number(match[2]), Number(match[3])];
-}
-
-function isSupportedSemver(value: string): boolean {
-  return semverParts(value) !== null;
-}
-
-function compareSemver(a: string, b: string): number {
-  const pa = semverParts(a);
-  const pb = semverParts(b);
-  if (!pa || !pb) return a.localeCompare(b);
-  if (pa[0] !== pb[0]) return pa[0] - pb[0];
-  if (pa[1] !== pb[1]) return pa[1] - pb[1];
-  if (pa[2] !== pb[2]) return pa[2] - pb[2];
-  return a.localeCompare(b);
-}
-
 interface ParsedListingWarning {
   listingId: string;
   version: string | null;
@@ -184,7 +154,7 @@ function filterWarningsForGitHub(
   return warnings.filter((warning) => {
     const parsed = parseListingWarning(warning);
     if (!parsed || !parsed.version) return true;
-    if (!isSupportedSemver(parsed.version)) return true;
+    if (!isStableSemverTag(parsed.version)) return true;
 
     const listingIntegrity = integrity.listings[parsed.listingId];
     if (!listingIntegrity) return true;
@@ -194,12 +164,12 @@ function filterWarningsForGitHub(
       return true;
     }
 
-    const latestValidVersion = listingIntegrity.complete_versions.find((version) => isSupportedSemver(version)) ?? null;
+    const latestValidVersion = listingIntegrity.complete_versions.find((version) => isStableSemverTag(version)) ?? null;
     if (!latestValidVersion) {
       return false;
     }
 
-    return compareSemver(parsed.version, latestValidVersion) > 0;
+    return compareStableSemverAsc(parsed.version, latestValidVersion) > 0;
   });
 }
 
@@ -259,7 +229,7 @@ async function run(): Promise<void> {
     || hasArgFlag("force-integrity")
     || isTruthyEnv(process.env.FORCE_INTEGRITY_RECHECK)
   );
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const runId = getNonEmptyEnv("GITHUB_RUN_ID") ?? "local";
   const jobId = getNonEmptyEnv("GITHUB_JOB") ?? "manual";
   const workflowName = getNonEmptyEnv("GITHUB_WORKFLOW") ?? "local";
@@ -367,34 +337,30 @@ async function run(): Promise<void> {
       : `Generated ${outputDir}/downloads.json for ${Object.keys(downloads).length} listings (download-only mode)`,
   );
 
-  if (process.env.GITHUB_OUTPUT) {
-    const warningsForGitHub = filterWarningsForGitHub(warnings, integrity);
-    const suppressedWarnings = warnings.length - warningsForGitHub.length;
-    if (suppressedWarnings > 0) {
-      console.log(
-        `[downloads] Suppressed ${suppressedWarnings} older-version warnings from GitHub/Discord output`,
-      );
-    }
-    const { appendFileSync } = await import("node:fs");
-    const outputLines = [
-      `warning_count=${warningsForGitHub.length}`,
-      `warnings_json=${toWarningsOutputJson(listingType, warningsForGitHub)}`,
-      `security_error_count=${securityAlerts.errors.length}`,
-      `security_warning_count=${securityAlerts.warnings.length}`,
-      `security_errors_json=${toLimitedOutputJson(securityAlerts.errors)}`,
-      `security_warnings_json=${toLimitedOutputJson(securityAlerts.warnings)}`,
-      `integrity_listings=${stats.listings}`,
-      `integrity_versions_checked=${stats.versions_checked}`,
-      `integrity_complete_versions=${stats.complete_versions}`,
-      `integrity_incomplete_versions=${stats.incomplete_versions}`,
-      `integrity_filtered_versions=${stats.filtered_versions}`,
-      `integrity_cache_hits=${stats.cache_hits}`,
-      `registry_fetches_added=${stats.registry_fetches_added}`,
-      `adjusted_delta_total=${stats.adjusted_delta_total}`,
-      `clamped_versions=${stats.clamped_versions}`,
-    ];
-    appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);
+  const warningsForGitHub = filterWarningsForGitHub(warnings, integrity);
+  const suppressedWarnings = warnings.length - warningsForGitHub.length;
+  if (suppressedWarnings > 0) {
+    console.log(
+      `[downloads] Suppressed ${suppressedWarnings} older-version warnings from GitHub/Discord output`,
+    );
   }
+  appendGitHubOutput([
+    `warning_count=${warningsForGitHub.length}`,
+    `warnings_json=${toWarningsOutputJson(listingType, warningsForGitHub)}`,
+    `security_error_count=${securityAlerts.errors.length}`,
+    `security_warning_count=${securityAlerts.warnings.length}`,
+    `security_errors_json=${toLimitedOutputJson(securityAlerts.errors)}`,
+    `security_warnings_json=${toLimitedOutputJson(securityAlerts.warnings)}`,
+    `integrity_listings=${stats.listings}`,
+    `integrity_versions_checked=${stats.versions_checked}`,
+    `integrity_complete_versions=${stats.complete_versions}`,
+    `integrity_incomplete_versions=${stats.incomplete_versions}`,
+    `integrity_filtered_versions=${stats.filtered_versions}`,
+    `integrity_cache_hits=${stats.cache_hits}`,
+    `registry_fetches_added=${stats.registry_fetches_added}`,
+    `adjusted_delta_total=${stats.adjusted_delta_total}`,
+    `clamped_versions=${stats.clamped_versions}`,
+  ]);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

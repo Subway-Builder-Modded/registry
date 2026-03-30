@@ -1,26 +1,16 @@
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { appendFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { generateDownloadsData } from "./lib/downloads.js";
 import {
   createDownloadAttributionDelta,
   loadDownloadAttributionLedger,
 } from "./lib/download-attribution.js";
 import { generateDownloadHistorySnapshot } from "./lib/download-history.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
+import { appendGitHubOutput, getNonEmptyEnv, resolveRepoRoot } from "./lib/script-runtime.js";
 
 interface CliOptions {
   refreshHistory: boolean;
-}
-
-function getNonEmptyEnv(name: string): string | undefined {
-  const value = process.env[name];
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  return trimmed === "" ? undefined : trimmed;
 }
 
 function parseCliOptions(argv: string[]): CliOptions {
@@ -54,7 +44,7 @@ function sumDownloads(downloads: Record<string, Record<string, number>>): number
 
 async function run(): Promise<void> {
   const options = parseCliOptions(process.argv.slice(2));
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const token = getNonEmptyEnv("GH_DOWNLOADS_TOKEN") ?? getNonEmptyEnv("GITHUB_TOKEN");
   const ledger = loadDownloadAttributionLedger(repoRoot);
   const nowIso = new Date().toISOString();
@@ -98,16 +88,13 @@ async function run(): Promise<void> {
     `[reconcile-attributed-downloads] done mapsTotal=${mapsTotal} modsTotal=${modsTotal} adjustedDeltaTotal=${adjustedDeltaTotal} clampedVersions=${clampedVersions}`,
   );
 
-  if (process.env.GITHUB_OUTPUT) {
-    const lines = [
-      `maps_total=${mapsTotal}`,
-      `mods_total=${modsTotal}`,
-      `adjusted_delta_total=${adjustedDeltaTotal}`,
-      `clamped_versions=${clampedVersions}`,
-      `snapshot_file=${snapshotFile}`,
-    ];
-    appendFileSync(process.env.GITHUB_OUTPUT, `${lines.join("\n")}\n`);
-  }
+  appendGitHubOutput([
+    `maps_total=${mapsTotal}`,
+    `mods_total=${modsTotal}`,
+    `adjusted_delta_total=${adjustedDeltaTotal}`,
+    `clamped_versions=${clampedVersions}`,
+    `snapshot_file=${snapshotFile}`,
+  ]);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

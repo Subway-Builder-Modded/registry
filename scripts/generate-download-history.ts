@@ -1,15 +1,11 @@
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { appendFileSync } from "node:fs";
 import { backfillDownloadHistorySnapshots, generateDownloadHistorySnapshot } from "./lib/download-history.js";
 import {
   backfillDownloadAttributionHistorySnapshots,
   generateDownloadAttributionHistorySnapshot,
 } from "./lib/download-attribution-history.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
+import { appendGitHubOutput, resolveRepoRoot } from "./lib/script-runtime.js";
 
 function toWarningsOutputJson(warnings: string[]): string {
   const MAX_WARNINGS = 30;
@@ -52,7 +48,7 @@ function parseDateOrThrow(value: string | undefined): Date | undefined {
 
 async function run(): Promise<void> {
   const argv = process.argv.slice(2);
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const isBackfill = hasFlag(argv, "--backfill") || hasFlag(argv, "--backfill-existing");
 
   if (isBackfill) {
@@ -78,24 +74,21 @@ async function run(): Promise<void> {
       }
     }
 
-    if (process.env.GITHUB_OUTPUT) {
-      const warningCount = result.warnings.length + attributionResult.warnings.length;
-      const outputLines = [
-        "snapshot_file=",
-        "previous_snapshot_file=",
-        "attribution_snapshot_file=",
-        "attribution_previous_snapshot_file=",
-        "maps_total_downloads=",
-        "maps_net_downloads=",
-        "maps_entries=",
-        "mods_total_downloads=",
-        "mods_net_downloads=",
-        "mods_entries=",
-        `warning_count=${warningCount}`,
-        `warnings_json=${toWarningsOutputJson([...result.warnings, ...attributionResult.warnings])}`,
-      ];
-      appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);
-    }
+    const warningCount = result.warnings.length + attributionResult.warnings.length;
+    appendGitHubOutput([
+      "snapshot_file=",
+      "previous_snapshot_file=",
+      "attribution_snapshot_file=",
+      "attribution_previous_snapshot_file=",
+      "maps_total_downloads=",
+      "maps_net_downloads=",
+      "maps_entries=",
+      "mods_total_downloads=",
+      "mods_net_downloads=",
+      "mods_entries=",
+      `warning_count=${warningCount}`,
+      `warnings_json=${toWarningsOutputJson([...result.warnings, ...attributionResult.warnings])}`,
+    ]);
     return;
   }
 
@@ -123,27 +116,24 @@ async function run(): Promise<void> {
     `[download-history] Attribution snapshot ${attributionResult.snapshotFile} (previous=${attributionResult.previousSnapshotFile ?? "none"}) total=${attributionResult.snapshot.total_attributed_fetches}, net=${attributionResult.snapshot.net_attributed_fetches}, daily=${attributionResult.snapshot.daily_attributed_fetches}`,
   );
 
-  if (process.env.GITHUB_OUTPUT) {
-    const warningCount = result.warnings.length + attributionResult.warnings.length;
-    const outputLines = [
-      `snapshot_file=${result.snapshotFile}`,
-      `previous_snapshot_file=${result.previousSnapshotFile ?? ""}`,
-      `attribution_snapshot_file=${attributionResult.snapshotFile}`,
-      `attribution_previous_snapshot_file=${attributionResult.previousSnapshotFile ?? ""}`,
-      `attribution_total_fetches=${attributionResult.snapshot.total_attributed_fetches}`,
-      `attribution_net_fetches=${attributionResult.snapshot.net_attributed_fetches}`,
-      `attribution_daily_fetches=${attributionResult.snapshot.daily_attributed_fetches}`,
-      `maps_total_downloads=${result.snapshot.maps.total_downloads}`,
-      `maps_net_downloads=${result.snapshot.maps.net_downloads}`,
-      `maps_entries=${result.snapshot.maps.entries}`,
-      `mods_total_downloads=${result.snapshot.mods.total_downloads}`,
-      `mods_net_downloads=${result.snapshot.mods.net_downloads}`,
-      `mods_entries=${result.snapshot.mods.entries}`,
-      `warning_count=${warningCount}`,
-      `warnings_json=${toWarningsOutputJson([...result.warnings, ...attributionResult.warnings])}`,
-    ];
-    appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);
-  }
+  const warningCount = result.warnings.length + attributionResult.warnings.length;
+  appendGitHubOutput([
+    `snapshot_file=${result.snapshotFile}`,
+    `previous_snapshot_file=${result.previousSnapshotFile ?? ""}`,
+    `attribution_snapshot_file=${attributionResult.snapshotFile}`,
+    `attribution_previous_snapshot_file=${attributionResult.previousSnapshotFile ?? ""}`,
+    `attribution_total_fetches=${attributionResult.snapshot.total_attributed_fetches}`,
+    `attribution_net_fetches=${attributionResult.snapshot.net_attributed_fetches}`,
+    `attribution_daily_fetches=${attributionResult.snapshot.daily_attributed_fetches}`,
+    `maps_total_downloads=${result.snapshot.maps.total_downloads}`,
+    `maps_net_downloads=${result.snapshot.maps.net_downloads}`,
+    `maps_entries=${result.snapshot.maps.entries}`,
+    `mods_total_downloads=${result.snapshot.mods.total_downloads}`,
+    `mods_net_downloads=${result.snapshot.mods.net_downloads}`,
+    `mods_entries=${result.snapshot.mods.entries}`,
+    `warning_count=${warningCount}`,
+    `warnings_json=${toWarningsOutputJson([...result.warnings, ...attributionResult.warnings])}`,
+  ]);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

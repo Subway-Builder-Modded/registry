@@ -1,4 +1,4 @@
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateMapDemandStats } from "./lib/map-demand-stats.js";
 import {
@@ -6,17 +6,7 @@ import {
   sumDownloadAttributionDeltaFetches,
   writeDownloadAttributionDeltaFile,
 } from "./lib/download-attribution.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
-
-function getNonEmptyEnv(name: string): string | undefined {
-  const value = process.env[name];
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  return trimmed === "" ? undefined : trimmed;
-}
+import { appendGitHubOutput, getNonEmptyEnv, isTruthyEnv, resolveRepoRoot } from "./lib/script-runtime.js";
 
 function parseCliArgs(argv: string[]): { force: boolean; mapId?: string; strictFingerprintCache: boolean } {
   let force = false;
@@ -61,12 +51,6 @@ function parseCliArgs(argv: string[]): { force: boolean; mapId?: string; strictF
   return { force, mapId, strictFingerprintCache };
 }
 
-function isTruthyEnv(value: string | undefined): boolean {
-  if (!value) return false;
-  const normalized = value.trim().toLowerCase();
-  return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
-}
-
 function toWarningsOutputJson(prefix: string, warnings: string[]): string {
   const MAX_WARNINGS = 30;
   const normalized = warnings
@@ -82,7 +66,7 @@ function toWarningsOutputJson(prefix: string, warnings: string[]): string {
 
 async function run(): Promise<void> {
   const cli = parseCliArgs(process.argv.slice(2));
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const runId = getNonEmptyEnv("GITHUB_RUN_ID") ?? "local";
   const jobId = getNonEmptyEnv("GITHUB_JOB") ?? "manual";
   const workflowName = getNonEmptyEnv("GITHUB_WORKFLOW") ?? "local";
@@ -139,23 +123,19 @@ async function run(): Promise<void> {
     `[map-demand-stats] Attribution stats: registryFetchesAdded=${sumDownloadAttributionDeltaFetches(attributionDelta)}`,
   );
 
-  if (process.env.GITHUB_OUTPUT) {
-    const outputLines = [
-      `processed_maps=${result.processedMaps}`,
-      `updated_maps=${result.updatedMaps}`,
-      `skipped_maps=${result.skippedMaps}`,
-      `skipped_unchanged=${result.skippedUnchanged}`,
-      `extraction_failures=${result.extractionFailures}`,
-      `residents_delta_total=${result.residentsDeltaTotal}`,
-      `graphql_queries=${result.rateLimit.queries}`,
-      `graphql_total_cost=${result.rateLimit.totalCost}`,
-      `attribution_fetches_added=${result.attributionFetchesAdded}`,
-      `warning_count=${result.warnings.length}`,
-      `warnings_json=${toWarningsOutputJson("map-demand-stats: ", result.warnings)}`,
-    ];
-    const { appendFileSync } = await import("node:fs");
-    appendFileSync(process.env.GITHUB_OUTPUT, `${outputLines.join("\n")}\n`);
-  }
+  appendGitHubOutput([
+    `processed_maps=${result.processedMaps}`,
+    `updated_maps=${result.updatedMaps}`,
+    `skipped_maps=${result.skippedMaps}`,
+    `skipped_unchanged=${result.skippedUnchanged}`,
+    `extraction_failures=${result.extractionFailures}`,
+    `residents_delta_total=${result.residentsDeltaTotal}`,
+    `graphql_queries=${result.rateLimit.queries}`,
+    `graphql_total_cost=${result.rateLimit.totalCost}`,
+    `attribution_fetches_added=${result.attributionFetchesAdded}`,
+    `warning_count=${result.warnings.length}`,
+    `warnings_json=${toWarningsOutputJson("map-demand-stats: ", result.warnings)}`,
+  ]);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

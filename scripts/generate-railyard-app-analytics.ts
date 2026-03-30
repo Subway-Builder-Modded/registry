@@ -1,36 +1,17 @@
 import { mkdirSync, writeFileSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   buildRailyardAppAnalytics,
   buildRailyardAppAnalyticsCsvRows,
   listRailyardAppAnalyticsAssetNames,
   loadRailyardAppDownloadHistory,
-  type RailyardAppCsvRow,
 } from "./lib/railyard-app-downloads.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
-
-function escapeCsv(value: unknown): string {
-  const text = String(value ?? "");
-  if (/[",\n\r]/.test(text)) {
-    return `"${text.replace(/"/g, "\"\"")}"`;
-  }
-  return text;
-}
-
-function writeCsv(path: string, headers: string[], rows: RailyardAppCsvRow[]): void {
-  const lines = [headers.join(",")];
-  for (const row of rows) {
-    lines.push(headers.map((header) => escapeCsv(row[header] ?? "")).join(","));
-  }
-  writeFileSync(path, `${lines.join("\n")}\n`, "utf-8");
-}
+import { writeCsv } from "./lib/csv.js";
+import { resolveRepoRoot } from "./lib/script-runtime.js";
 
 function run(): void {
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const analyticsDir = join(repoRoot, "analytics");
   mkdirSync(analyticsDir, { recursive: true });
 

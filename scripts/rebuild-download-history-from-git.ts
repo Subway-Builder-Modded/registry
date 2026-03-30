@@ -1,16 +1,13 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { basename, dirname, resolve } from "node:path";
+import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   normalizeDownloadHistorySnapshot,
   type DownloadHistorySnapshot,
 } from "./lib/download-history.js";
-
-const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
-  ? resolve(import.meta.dirname, "..", "..")
-  : resolve(import.meta.dirname, "..");
+import { resolveRepoRoot } from "./lib/script-runtime.js";
 
 const ATTRIBUTION_ROLLOUT_COMMIT = "60e49f4cb10e6900e12bfaf3b48a06a27eb48f85";
 
@@ -228,7 +225,7 @@ function isCommitAtOrAfterRollout(repoRoot: string, commit: string): boolean {
 }
 
 function run(): void {
-  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const tempRepoRoot = mkdtempSync(resolve(tmpdir(), "railyard-history-rebuild-"));
   const warnings: string[] = [];
 
