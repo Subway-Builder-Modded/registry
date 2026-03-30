@@ -94,6 +94,7 @@ test("generateDownloadHistorySnapshot filters out versions not marked complete i
     assert.equal(result.snapshot.total_downloads, 32);
     assert.equal(result.snapshot.raw_total_downloads, 32);
     assert.equal(result.snapshot.total_attributed_downloads, 0);
+    assert.equal(result.snapshot.total_attributed_fetches, 0);
     assert.equal(result.snapshot.net_downloads, 32);
     assert.equal(result.snapshot.mods.entries, 1);
     assert.equal(result.warnings.length, 1);
@@ -156,6 +157,7 @@ test("generateDownloadHistorySnapshot can produce negative net when versions bec
     assert.equal(result.snapshot.total_downloads, 25);
     assert.equal(result.snapshot.raw_total_downloads, 25);
     assert.equal(result.snapshot.total_attributed_downloads, 0);
+    assert.equal(result.snapshot.total_attributed_fetches, 0);
     assert.equal(result.snapshot.net_downloads, -7);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
@@ -241,6 +243,7 @@ test("backfillDownloadHistorySnapshots rewrites snapshots to keep complete versi
     assert.equal(first.total_downloads, 25);
     assert.equal(first.raw_total_downloads, 25);
     assert.equal(first.total_attributed_downloads, 0);
+    assert.equal(first.total_attributed_fetches, 0);
     assert.equal(first.net_downloads, 25);
     assert.deepEqual(firstMods.downloads, { "mod-a": { "1.0.0": 5 } });
     assert.equal(firstMods.total_downloads, 5);
@@ -248,6 +251,7 @@ test("backfillDownloadHistorySnapshots rewrites snapshots to keep complete versi
     assert.equal(second.total_downloads, 27);
     assert.equal(second.raw_total_downloads, 27);
     assert.equal(second.total_attributed_downloads, 0);
+    assert.equal(second.total_attributed_fetches, 0);
     assert.equal(second.net_downloads, 2);
     assert.deepEqual(secondMods.downloads, { "mod-a": { "1.0.0": 6 } });
     assert.equal(secondMods.total_downloads, 6);
@@ -342,6 +346,7 @@ test("backfillDownloadHistorySnapshots retroactively adjusts legacy snapshots wi
     assert.equal(snapshot.total_downloads, 7);
     assert.equal(snapshot.raw_total_downloads, 10);
     assert.equal(snapshot.total_attributed_downloads, 3);
+    assert.equal(snapshot.total_attributed_fetches, 3);
     assert.equal(snapshot.net_downloads, 7);
     assert.equal(maps.source_downloads_mode, "legacy_unadjusted");
     assert.deepEqual(maps.downloads, { toronto: { "1.0.1": 7 } });
@@ -438,6 +443,7 @@ test("backfillDownloadHistorySnapshots preserves already adjusted snapshots afte
     assert.equal(snapshot.total_downloads, 5);
     assert.equal(snapshot.raw_total_downloads, 7);
     assert.equal(snapshot.total_attributed_downloads, 2);
+    assert.equal(snapshot.total_attributed_fetches, 2);
     assert.equal(snapshot.net_downloads, 5);
     assert.equal(mods.source_downloads_mode, "already_adjusted");
     assert.deepEqual(mods.downloads, { "advanced-analytics": { "v1.3.0": 5 } });

@@ -52,6 +52,7 @@ export interface DownloadHistorySnapshot {
   total_downloads: number;
   raw_total_downloads: number;
   total_attributed_downloads: number;
+  total_attributed_fetches: number;
   net_downloads: number;
   maps: DownloadHistorySection;
   mods: DownloadHistorySection;
@@ -236,6 +237,19 @@ function computeTotalDownloads(downloads: DownloadsByListing): number {
     for (const count of Object.values(versions)) {
       total += count;
     }
+  }
+  return total;
+}
+
+function sumLedgerTotalUpToDate(ledger: DownloadAttributionLedger, snapshotDate: string): number {
+  let total = 0;
+  for (const [dateKey, entry] of Object.entries(ledger.daily)) {
+    if (dateKey > snapshotDate) continue;
+    if (typeof entry.total === "number" && Number.isFinite(entry.total)) {
+      total += entry.total;
+      continue;
+    }
+    total += Object.values(entry.assets).reduce((sum, value) => sum + value, 0);
   }
   return total;
 }
@@ -665,6 +679,7 @@ export function generateDownloadHistorySnapshot(
   const modsRawDownloads = addDownloads(modsData.downloads, modsAttributedDownloads);
   const mapsAttributedTotal = computeTotalDownloads(mapsAttributedDownloads);
   const modsAttributedTotal = computeTotalDownloads(modsAttributedDownloads);
+  const totalAttributedFetches = sumLedgerTotalUpToDate(attributionLedger, snapshotDate);
 
   const previousMapsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "maps", warnings);
   const previousModsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "mods", warnings);
@@ -676,6 +691,7 @@ export function generateDownloadHistorySnapshot(
     total_downloads: mapsData.totalDownloads + modsData.totalDownloads,
     raw_total_downloads: (mapsData.totalDownloads + mapsAttributedTotal) + (modsData.totalDownloads + modsAttributedTotal),
     total_attributed_downloads: mapsAttributedTotal + modsAttributedTotal,
+    total_attributed_fetches: totalAttributedFetches,
     net_downloads: computeNetDownloads(
       mapsData.totalDownloads + modsData.totalDownloads,
       previousMapsTotal === null || previousModsTotal === null
@@ -829,6 +845,7 @@ export function backfillDownloadHistorySnapshots(
     const modsRawTotalDownloads = computeTotalDownloads(modsFilteredRawDownloads);
     const mapsAttributedTotal = computeTotalDownloads(mapsFilteredAttribution);
     const modsAttributedTotal = computeTotalDownloads(modsFilteredAttribution);
+    const totalAttributedFetches = sumLedgerTotalUpToDate(attributionLedger, snapshot.snapshot_date);
 
     const mapsIndex = asIndexFileOrFallback(
       snapshot.maps?.index,
@@ -864,6 +881,7 @@ export function backfillDownloadHistorySnapshots(
       total_downloads: mapsTotalDownloads + modsTotalDownloads,
       raw_total_downloads: mapsRawTotalDownloads + modsRawTotalDownloads,
       total_attributed_downloads: mapsAttributedTotal + modsAttributedTotal,
+      total_attributed_fetches: totalAttributedFetches,
       net_downloads: computeNetDownloads(
         mapsTotalDownloads + modsTotalDownloads,
         previousSnapshot === null
