@@ -19,6 +19,8 @@ interface SnapshotData {
   mods?: { downloads?: Record<string, Record<string, unknown>> };
 }
 
+type ListingTotals = Map<ListingKey, number>;
+
 interface ListingMeta {
   name: string;
   author: string;
@@ -39,8 +41,11 @@ interface ListingWindowRow {
   name: string;
   author: string;
   download_change: number;
+  adjusted_download_change: number;
   current_total: number;
+  adjusted_current_total: number;
   baseline_total: number;
+  adjusted_baseline_total: number;
   latest_snapshot: string;
   baseline_snapshot: string;
 }
@@ -52,6 +57,7 @@ interface ListingAllTimeRow {
   name: string;
   author: string;
   total_downloads: number;
+  adjusted_total_downloads: number;
   latest_snapshot: string;
 }
 
@@ -61,8 +67,11 @@ interface ProjectWindowRow {
   project_name: string;
   listing_count: number;
   download_change: number;
+  adjusted_download_change: number;
   current_total: number;
+  adjusted_current_total: number;
   baseline_total: number;
+  adjusted_baseline_total: number;
   latest_snapshot: string;
   baseline_snapshot: string;
 }
@@ -73,6 +82,7 @@ interface ProjectAllTimeRow {
   project_name: string;
   listing_count: number;
   total_downloads: number;
+  adjusted_total_downloads: number;
   latest_snapshot: string;
 }
 
@@ -83,12 +93,14 @@ interface AuthorAssetCountRow {
   map_count: number;
   mod_count: number;
   total_downloads: number;
+  adjusted_total_downloads: number;
 }
 
 interface AuthorTotalDownloadsRow {
   rank: number;
   author: string;
   total_downloads: number;
+  adjusted_total_downloads: number;
   asset_count: number;
   map_count: number;
   mod_count: number;
@@ -190,7 +202,7 @@ function listSnapshots(historyDir: string): SnapshotEntry[] {
     .sort((a, b) => a.date.getTime() - b.date.getTime());
 }
 
-function toListingTotals(snapshot: SnapshotData): Map<ListingKey, number> {
+function toListingTotals(snapshot: SnapshotData): ListingTotals {
   const totals = new Map<ListingKey, number>();
   for (const listingType of ["maps", "mods"] as const) {
     // `downloads` is the canonical adjusted/non-attributed listing data in schema v2.
@@ -208,6 +220,38 @@ function toListingTotals(snapshot: SnapshotData): Map<ListingKey, number> {
     }
   }
   return totals;
+}
+
+function buildMonotonicSnapshotTotals(
+  snapshots: SnapshotEntry[],
+  historyDir: string,
+): Map<string, ListingTotals> {
+  const monotonicBySnapshot = new Map<string, ListingTotals>();
+  const runningMax = new Map<ListingKey, number>();
+
+  for (const snapshot of snapshots) {
+    const snapshotData = loadJsonFile<SnapshotData>(join(historyDir, snapshot.file));
+    const adjustedTotals = toListingTotals(snapshotData);
+    const snapshotMonotonic = new Map<ListingKey, number>();
+    const keys = new Set<ListingKey>([
+      ...runningMax.keys(),
+      ...adjustedTotals.keys(),
+    ]);
+
+    for (const key of keys) {
+      const previousMax = runningMax.get(key) ?? 0;
+      const adjustedTotal = adjustedTotals.get(key) ?? 0;
+      const nextMax = Math.max(previousMax, adjustedTotal);
+      if (nextMax > 0 || adjustedTotals.has(key) || runningMax.has(key)) {
+        runningMax.set(key, nextMax);
+        snapshotMonotonic.set(key, nextMax);
+      }
+    }
+
+    monotonicBySnapshot.set(snapshot.file, snapshotMonotonic);
+  }
+
+  return monotonicBySnapshot;
 }
 
 function addDays(date: Date, days: number): Date {
@@ -442,15 +486,19 @@ function main(): void {
 
   const latest = snapshots[snapshots.length - 1];
   const latestData = loadJsonFile<SnapshotData>(join(historyDir, latest.file));
-  const latestTotals = toListingTotals(latestData);
+  const adjustedTotalsBySnapshot = new Map<string, ListingTotals>();
+  adjustedTotalsBySnapshot.set(latest.file, toListingTotals(latestData));
+  const monotonicTotalsBySnapshot = buildMonotonicSnapshotTotals(snapshots, historyDir);
+  const latestTotals = monotonicTotalsBySnapshot.get(latest.file) ?? new Map<ListingKey, number>();
+  const latestAdjustedTotals = adjustedTotalsBySnapshot.get(latest.file) ?? new Map<ListingKey, number>();
 
   const listingMeta = new Map<ListingKey, ListingMeta>();
-  for (const key of latestTotals.keys()) {
+  for (const key of latestAdjustedTotals.keys()) {
     const [listingType, id] = key.split(":") as ["maps" | "mods", string];
     listingMeta.set(key, loadManifestMeta(repoRoot, listingType, id));
   }
 
-  const listingProjectRows: ListingProjectRow[] = [...latestTotals.keys()]
+  const listingProjectRows: ListingProjectRow[] = [...latestAdjustedTotals.keys()]
     .map((key) => {
       const [listingType, id] = key.split(":") as ["maps" | "mods", string];
       return loadListingProjectRow(repoRoot, listingType, id);
@@ -468,13 +516,21 @@ function main(): void {
 
   const rowsForWindow = (days: number): ListingWindowRow[] => {
     const baseline = resolveBaselineSnapshot(snapshots, latest.date, days);
-    const baselineData = loadJsonFile<SnapshotData>(join(historyDir, baseline.file));
-    const baselineTotals = toListingTotals(baselineData);
+    const baselineAdjustedTotals = adjustedTotalsBySnapshot.get(baseline.file)
+      ?? (() => {
+        const totals = toListingTotals(loadJsonFile<SnapshotData>(join(historyDir, baseline.file)));
+        adjustedTotalsBySnapshot.set(baseline.file, totals);
+        return totals;
+      })();
+    const baselineTotals = monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>();
 
     const rows: Omit<ListingWindowRow, "rank">[] = [];
     for (const [key, currentTotal] of latestTotals.entries()) {
+      const currentAdjustedTotal = latestAdjustedTotals.get(key) ?? 0;
       const baselineTotal = baselineTotals.get(key) ?? 0;
+      const baselineAdjustedTotal = baselineAdjustedTotals.get(key) ?? 0;
       const change = currentTotal - baselineTotal;
+      const adjustedChange = currentAdjustedTotal - baselineAdjustedTotal;
       const [listingType, id] = key.split(":") as ["maps" | "mods", string];
       const meta = listingMeta.get(key) ?? { name: id, author: "UNKNOWN" };
       rows.push({
@@ -483,8 +539,11 @@ function main(): void {
         name: meta.name,
         author: meta.author,
         download_change: change,
+        adjusted_download_change: adjustedChange,
         current_total: currentTotal,
+        adjusted_current_total: currentAdjustedTotal,
         baseline_total: baselineTotal,
+        adjusted_baseline_total: baselineAdjustedTotal,
         latest_snapshot: latest.file,
         baseline_snapshot: baseline.file,
       });
@@ -512,6 +571,7 @@ function main(): void {
         name: meta.name,
         author: meta.author,
         total_downloads: total,
+        adjusted_total_downloads: latestAdjustedTotals.get(key) ?? 0,
         latest_snapshot: latest.file,
       });
     }
@@ -524,28 +584,41 @@ function main(): void {
 
   const projectRowsForWindow = (days: number): ProjectWindowRow[] => {
     const baseline = resolveBaselineSnapshot(snapshots, latest.date, days);
-    const baselineData = loadJsonFile<SnapshotData>(join(historyDir, baseline.file));
-    const baselineTotals = toListingTotals(baselineData);
+    const baselineAdjustedTotals = adjustedTotalsBySnapshot.get(baseline.file)
+      ?? (() => {
+        const totals = toListingTotals(loadJsonFile<SnapshotData>(join(historyDir, baseline.file)));
+        adjustedTotalsBySnapshot.set(baseline.file, totals);
+        return totals;
+      })();
+    const baselineTotals = monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>();
 
     const projectStats = new Map<string, Omit<ProjectWindowRow, "rank">>();
     for (const [key, currentTotal] of latestTotals.entries()) {
       const listingProject = listingProjectByKey.get(key);
       if (!listingProject) continue;
       const baselineTotal = baselineTotals.get(key) ?? 0;
+      const currentAdjustedTotal = latestAdjustedTotals.get(key) ?? 0;
+      const baselineAdjustedTotal = baselineAdjustedTotals.get(key) ?? 0;
       const existing = projectStats.get(listingProject.project_key) ?? {
         project_key: listingProject.project_key,
         project_name: listingProject.project_name,
         listing_count: 0,
         download_change: 0,
+        adjusted_download_change: 0,
         current_total: 0,
+        adjusted_current_total: 0,
         baseline_total: 0,
+        adjusted_baseline_total: 0,
         latest_snapshot: latest.file,
         baseline_snapshot: baseline.file,
       };
       existing.listing_count += 1;
       existing.current_total += currentTotal;
+      existing.adjusted_current_total += currentAdjustedTotal;
       existing.baseline_total += baselineTotal;
+      existing.adjusted_baseline_total += baselineAdjustedTotal;
       existing.download_change += currentTotal - baselineTotal;
+      existing.adjusted_download_change += currentAdjustedTotal - baselineAdjustedTotal;
       projectStats.set(listingProject.project_key, existing);
     }
 
@@ -571,10 +644,12 @@ function main(): void {
         project_name: listingProject.project_name,
         listing_count: 0,
         total_downloads: 0,
+        adjusted_total_downloads: 0,
         latest_snapshot: latest.file,
       };
       existing.listing_count += 1;
       existing.total_downloads += total;
+      existing.adjusted_total_downloads += latestAdjustedTotals.get(key) ?? 0;
       projectStats.set(listingProject.project_key, existing);
     }
 
@@ -600,11 +675,13 @@ function main(): void {
       map_count: 0,
       mod_count: 0,
       total_downloads: 0,
+      adjusted_total_downloads: 0,
     };
     previous.asset_count += 1;
     if (listingType === "maps") previous.map_count += 1;
     if (listingType === "mods") previous.mod_count += 1;
     previous.total_downloads += total;
+    previous.adjusted_total_downloads += latestAdjustedTotals.get(key) ?? 0;
     authorStats.set(meta.author, previous);
   }
 
@@ -626,6 +703,7 @@ function main(): void {
       rank: index + 1,
       author: row.author,
       total_downloads: row.total_downloads,
+      adjusted_total_downloads: row.adjusted_total_downloads,
       asset_count: row.asset_count,
       map_count: row.map_count,
       mod_count: row.mod_count,
@@ -640,8 +718,11 @@ function main(): void {
       "name",
       "author",
       "download_change",
+      "adjusted_download_change",
       "current_total",
+      "adjusted_current_total",
       "baseline_total",
+      "adjusted_baseline_total",
       "latest_snapshot",
       "baseline_snapshot",
     ],
@@ -657,8 +738,11 @@ function main(): void {
       "name",
       "author",
       "download_change",
+      "adjusted_download_change",
       "current_total",
+      "adjusted_current_total",
       "baseline_total",
+      "adjusted_baseline_total",
       "latest_snapshot",
       "baseline_snapshot",
     ],
@@ -674,8 +758,11 @@ function main(): void {
       "name",
       "author",
       "download_change",
+      "adjusted_download_change",
       "current_total",
+      "adjusted_current_total",
       "baseline_total",
+      "adjusted_baseline_total",
       "latest_snapshot",
       "baseline_snapshot",
     ],
@@ -690,8 +777,11 @@ function main(): void {
       "project_name",
       "listing_count",
       "download_change",
+      "adjusted_download_change",
       "current_total",
+      "adjusted_current_total",
       "baseline_total",
+      "adjusted_baseline_total",
       "latest_snapshot",
       "baseline_snapshot",
     ],
@@ -706,8 +796,11 @@ function main(): void {
       "project_name",
       "listing_count",
       "download_change",
+      "adjusted_download_change",
       "current_total",
+      "adjusted_current_total",
       "baseline_total",
+      "adjusted_baseline_total",
       "latest_snapshot",
       "baseline_snapshot",
     ],
@@ -722,8 +815,11 @@ function main(): void {
       "project_name",
       "listing_count",
       "download_change",
+      "adjusted_download_change",
       "current_total",
+      "adjusted_current_total",
       "baseline_total",
+      "adjusted_baseline_total",
       "latest_snapshot",
       "baseline_snapshot",
     ],
@@ -739,6 +835,7 @@ function main(): void {
       "name",
       "author",
       "total_downloads",
+      "adjusted_total_downloads",
       "latest_snapshot",
     ],
     allTimeRows,
@@ -752,6 +849,7 @@ function main(): void {
       "project_name",
       "listing_count",
       "total_downloads",
+      "adjusted_total_downloads",
       "latest_snapshot",
     ],
     projectAllTimeRows,
@@ -766,6 +864,7 @@ function main(): void {
       "map_count",
       "mod_count",
       "total_downloads",
+      "adjusted_total_downloads",
     ],
     authorRowsByAssetCount,
   );
@@ -776,6 +875,7 @@ function main(): void {
       "rank",
       "author",
       "total_downloads",
+      "adjusted_total_downloads",
       "asset_count",
       "map_count",
       "mod_count",
