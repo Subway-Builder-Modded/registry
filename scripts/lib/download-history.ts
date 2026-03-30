@@ -298,6 +298,36 @@ function subtractDownloads(raw: DownloadsByListing, attributed: DownloadsByListi
   return adjusted;
 }
 
+function capAttributedDownloadsToRaw(
+  raw: DownloadsByListing,
+  attributed: DownloadsByListing,
+  warnings: string[],
+  sourceLabel: string,
+): DownloadsByListing {
+  const capped: DownloadsByListing = {};
+  const listingIds = new Set<string>([...Object.keys(raw), ...Object.keys(attributed)]);
+  for (const listingId of [...listingIds].sort()) {
+    const versions = new Set<string>([
+      ...Object.keys(raw[listingId] ?? {}),
+      ...Object.keys(attributed[listingId] ?? {}),
+    ]);
+    const cappedVersions: Record<string, number> = {};
+    for (const version of [...versions].sort()) {
+      const rawCount = raw[listingId]?.[version] ?? 0;
+      const attributedCount = attributed[listingId]?.[version] ?? 0;
+      const cappedCount = Math.min(rawCount, attributedCount);
+      if (cappedCount !== attributedCount) {
+        warnings.push(
+          `${sourceLabel}: listing='${listingId}' version='${version}' attributed downloads exceeded stored raw downloads (${attributedCount} > ${rawCount}); capping attribution to raw count`,
+        );
+      }
+      cappedVersions[version] = cappedCount;
+    }
+    capped[listingId] = cappedVersions;
+  }
+  return capped;
+}
+
 function parseAttributionAssetKey(assetKey: string): { repo: string; tag: string; assetName: string } | null {
   const slashIndex = assetKey.lastIndexOf("/");
   if (slashIndex <= 0) return null;
@@ -339,14 +369,18 @@ function normalizeTagForMatching(tag: string): string {
   return lowered.startsWith("v") ? lowered.slice(1) : lowered;
 }
 
-function inferAssetMatcherToken(
+function inferAssetMatcherTokenFromManifest(
   listingKind: ListingKind,
   manifest: Record<string, unknown>,
-  updateUrl: string,
+  updateUrl?: string,
 ): string | null {
   if (listingKind === "maps") {
     const cityCode = typeof manifest.city_code === "string" ? manifest.city_code.trim() : "";
     if (cityCode !== "") return cityCode.toLowerCase();
+  }
+
+  if (!updateUrl) {
+    return null;
   }
 
   try {
@@ -405,12 +439,13 @@ function sumAttributedForVersion(
     const updateRepo = (update as { repo?: unknown }).repo;
     if (typeof updateRepo === "string" && updateRepo.trim() !== "") {
       repo = updateRepo.trim().toLowerCase();
+      assetMatcherToken = inferAssetMatcherTokenFromManifest(listingKind, manifest);
     }
   } else if (updateType === "custom") {
     const updateUrl = (update as { url?: unknown }).url;
     if (typeof updateUrl === "string" && updateUrl.trim() !== "") {
       repo = parseCustomUpdateRepo(updateUrl);
-      assetMatcherToken = inferAssetMatcherToken(listingKind, manifest, updateUrl);
+      assetMatcherToken = inferAssetMatcherTokenFromManifest(listingKind, manifest, updateUrl);
     }
   }
 
@@ -773,14 +808,14 @@ export function backfillDownloadHistorySnapshots(
       warnings,
       `history/${fileName}:mods`,
     );
-    const mapsAttribution = buildAttributedDownloadsForSnapshot(
+    const mapsAttributionUncapped = buildAttributedDownloadsForSnapshot(
       options.repoRoot,
       "maps",
       mapsStoredDownloads,
       snapshot.snapshot_date,
       attributionLedger,
     );
-    const modsAttribution = buildAttributedDownloadsForSnapshot(
+    const modsAttributionUncapped = buildAttributedDownloadsForSnapshot(
       options.repoRoot,
       "mods",
       modsStoredDownloads,
@@ -789,6 +824,22 @@ export function backfillDownloadHistorySnapshots(
     );
     const mapsSourceMode = resolveSourceDownloadsMode(snapshot.snapshot_date, snapshot.maps);
     const modsSourceMode = resolveSourceDownloadsMode(snapshot.snapshot_date, snapshot.mods);
+    const mapsAttribution = mapsSourceMode === "legacy_unadjusted"
+      ? capAttributedDownloadsToRaw(
+        mapsStoredDownloads,
+        mapsAttributionUncapped,
+        warnings,
+        `history/${fileName}:maps.attributed_downloads`,
+      )
+      : mapsAttributionUncapped;
+    const modsAttribution = modsSourceMode === "legacy_unadjusted"
+      ? capAttributedDownloadsToRaw(
+        modsStoredDownloads,
+        modsAttributionUncapped,
+        warnings,
+        `history/${fileName}:mods.attributed_downloads`,
+      )
+      : modsAttributionUncapped;
     const mapsRawDownloads = mapsSourceMode === "already_adjusted"
       ? addDownloads(mapsStoredDownloads, mapsAttribution)
       : cloneDownloads(mapsStoredDownloads);

@@ -24,6 +24,14 @@ interface ListingMeta {
   author: string;
 }
 
+interface ListingProjectRow {
+  listing_type: "map" | "mod";
+  id: string;
+  name: string;
+  project_key: string;
+  project_name: string;
+}
+
 interface ListingWindowRow {
   rank: number;
   listing_type: "map" | "mod";
@@ -43,6 +51,27 @@ interface ListingAllTimeRow {
   id: string;
   name: string;
   author: string;
+  total_downloads: number;
+  latest_snapshot: string;
+}
+
+interface ProjectWindowRow {
+  rank: number;
+  project_key: string;
+  project_name: string;
+  listing_count: number;
+  download_change: number;
+  current_total: number;
+  baseline_total: number;
+  latest_snapshot: string;
+  baseline_snapshot: string;
+}
+
+interface ProjectAllTimeRow {
+  rank: number;
+  project_key: string;
+  project_name: string;
+  listing_count: number;
   total_downloads: number;
   latest_snapshot: string;
 }
@@ -89,6 +118,10 @@ const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function getArgValue(argv: string[], name: string): string | undefined {
@@ -220,6 +253,92 @@ function loadManifestMeta(repoRoot: string, listingType: "maps" | "mods", id: st
   }
 }
 
+function parseProjectFromUrl(urlValue: string): { projectKey: string; projectName: string } | null {
+  try {
+    const parsed = new URL(urlValue);
+    const segments = parsed.pathname.split("/").filter((segment) => segment !== "");
+
+    if (parsed.hostname === "github.com" && segments.length >= 2) {
+      const owner = segments[0]!;
+      const repo = segments[1]!;
+      return {
+        projectKey: `${owner.toLowerCase()}/${repo.toLowerCase()}`,
+        projectName: repo,
+      };
+    }
+
+    if (parsed.hostname === "raw.githubusercontent.com" && segments.length >= 2) {
+      const owner = segments[0]!;
+      const repo = segments[1]!;
+      return {
+        projectKey: `${owner.toLowerCase()}/${repo.toLowerCase()}`,
+        projectName: repo,
+      };
+    }
+
+    if (parsed.hostname.endsWith(".github.io")) {
+      const owner = parsed.hostname.slice(0, -".github.io".length);
+      const repo = segments[0] ?? owner;
+      return {
+        projectKey: `${owner.toLowerCase()}/${repo.toLowerCase()}`,
+        projectName: repo,
+      };
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function loadListingProjectRow(
+  repoRoot: string,
+  listingType: "maps" | "mods",
+  id: string,
+): ListingProjectRow {
+  const manifestPath = join(repoRoot, listingType, id, "manifest.json");
+  const listingLabel = toListingLabel(listingType);
+
+  try {
+    const manifest = loadJsonFile<Record<string, unknown>>(manifestPath);
+    const name = typeof manifest.name === "string" && manifest.name.trim() !== ""
+      ? manifest.name
+      : id;
+
+    const sourceUrl = typeof manifest.source === "string" ? manifest.source.trim() : "";
+    const update = isObject(manifest.update) ? manifest.update : null;
+    const updateRepo = typeof update?.repo === "string" ? update.repo.trim() : "";
+    const updateUrl = typeof update?.url === "string" ? update.url.trim() : "";
+
+    const parsedProject = (
+      (sourceUrl !== "" ? parseProjectFromUrl(sourceUrl) : null)
+      ?? (updateUrl !== "" ? parseProjectFromUrl(updateUrl) : null)
+      ?? (updateRepo !== ""
+        ? {
+          projectKey: updateRepo.toLowerCase(),
+          projectName: updateRepo.split("/").pop() ?? updateRepo,
+        }
+        : null)
+    );
+
+    return {
+      listing_type: listingLabel,
+      id,
+      name,
+      project_key: parsedProject?.projectKey ?? `${listingLabel}:${id}`,
+      project_name: parsedProject?.projectName ?? name,
+    };
+  } catch {
+    return {
+      listing_type: listingLabel,
+      id,
+      name: id,
+      project_key: `${listingLabel}:${id}`,
+      project_name: id,
+    };
+  }
+}
+
 function toNonEmptyString(value: unknown, fallback: string): string {
   return typeof value === "string" && value.trim() !== "" ? value : fallback;
 }
@@ -331,6 +450,22 @@ function main(): void {
     listingMeta.set(key, loadManifestMeta(repoRoot, listingType, id));
   }
 
+  const listingProjectRows: ListingProjectRow[] = [...latestTotals.keys()]
+    .map((key) => {
+      const [listingType, id] = key.split(":") as ["maps" | "mods", string];
+      return loadListingProjectRow(repoRoot, listingType, id);
+    })
+    .sort((a, b) =>
+      a.project_key.localeCompare(b.project_key)
+      || a.listing_type.localeCompare(b.listing_type)
+      || a.id.localeCompare(b.id));
+
+  const listingProjectByKey = new Map<ListingKey, ListingProjectRow>();
+  for (const row of listingProjectRows) {
+    const listingType = row.listing_type === "map" ? "maps" : "mods";
+    listingProjectByKey.set(`${listingType}:${row.id}`, row);
+  }
+
   const rowsForWindow = (days: number): ListingWindowRow[] => {
     const baseline = resolveBaselineSnapshot(snapshots, latest.date, days);
     const baselineData = loadJsonFile<SnapshotData>(join(historyDir, baseline.file));
@@ -381,6 +516,74 @@ function main(): void {
       });
     }
     rows.sort((a, b) => b.total_downloads - a.total_downloads || a.id.localeCompare(b.id));
+    return limitRows(rows, topListings).map((row, index) => ({
+      rank: index + 1,
+      ...row,
+    }));
+  })();
+
+  const projectRowsForWindow = (days: number): ProjectWindowRow[] => {
+    const baseline = resolveBaselineSnapshot(snapshots, latest.date, days);
+    const baselineData = loadJsonFile<SnapshotData>(join(historyDir, baseline.file));
+    const baselineTotals = toListingTotals(baselineData);
+
+    const projectStats = new Map<string, Omit<ProjectWindowRow, "rank">>();
+    for (const [key, currentTotal] of latestTotals.entries()) {
+      const listingProject = listingProjectByKey.get(key);
+      if (!listingProject) continue;
+      const baselineTotal = baselineTotals.get(key) ?? 0;
+      const existing = projectStats.get(listingProject.project_key) ?? {
+        project_key: listingProject.project_key,
+        project_name: listingProject.project_name,
+        listing_count: 0,
+        download_change: 0,
+        current_total: 0,
+        baseline_total: 0,
+        latest_snapshot: latest.file,
+        baseline_snapshot: baseline.file,
+      };
+      existing.listing_count += 1;
+      existing.current_total += currentTotal;
+      existing.baseline_total += baselineTotal;
+      existing.download_change += currentTotal - baselineTotal;
+      projectStats.set(listingProject.project_key, existing);
+    }
+
+    const rows = [...projectStats.values()]
+      .sort((a, b) =>
+        b.download_change - a.download_change
+        || b.current_total - a.current_total
+        || a.project_key.localeCompare(b.project_key));
+
+    return limitRows(rows, topListings).map((row, index) => ({
+      rank: index + 1,
+      ...row,
+    }));
+  };
+
+  const projectAllTimeRows = (() => {
+    const projectStats = new Map<string, Omit<ProjectAllTimeRow, "rank">>();
+    for (const [key, total] of latestTotals.entries()) {
+      const listingProject = listingProjectByKey.get(key);
+      if (!listingProject) continue;
+      const existing = projectStats.get(listingProject.project_key) ?? {
+        project_key: listingProject.project_key,
+        project_name: listingProject.project_name,
+        listing_count: 0,
+        total_downloads: 0,
+        latest_snapshot: latest.file,
+      };
+      existing.listing_count += 1;
+      existing.total_downloads += total;
+      projectStats.set(listingProject.project_key, existing);
+    }
+
+    const rows = [...projectStats.values()]
+      .sort((a, b) =>
+        b.total_downloads - a.total_downloads
+        || b.listing_count - a.listing_count
+        || a.project_key.localeCompare(b.project_key));
+
     return limitRows(rows, topListings).map((row, index) => ({
       rank: index + 1,
       ...row,
@@ -479,6 +682,54 @@ function main(): void {
     rowsForWindow(WINDOWS[2]),
   );
 
+  writeCsv<ProjectWindowRow>(
+    join(analyticsDir, "projects_most_popular_last_1d.csv"),
+    [
+      "rank",
+      "project_key",
+      "project_name",
+      "listing_count",
+      "download_change",
+      "current_total",
+      "baseline_total",
+      "latest_snapshot",
+      "baseline_snapshot",
+    ],
+    projectRowsForWindow(WINDOWS[0]),
+  );
+
+  writeCsv<ProjectWindowRow>(
+    join(analyticsDir, "projects_most_popular_last_3d.csv"),
+    [
+      "rank",
+      "project_key",
+      "project_name",
+      "listing_count",
+      "download_change",
+      "current_total",
+      "baseline_total",
+      "latest_snapshot",
+      "baseline_snapshot",
+    ],
+    projectRowsForWindow(WINDOWS[1]),
+  );
+
+  writeCsv<ProjectWindowRow>(
+    join(analyticsDir, "projects_most_popular_last_7d.csv"),
+    [
+      "rank",
+      "project_key",
+      "project_name",
+      "listing_count",
+      "download_change",
+      "current_total",
+      "baseline_total",
+      "latest_snapshot",
+      "baseline_snapshot",
+    ],
+    projectRowsForWindow(WINDOWS[2]),
+  );
+
   writeCsv<ListingAllTimeRow>(
     join(analyticsDir, "most_popular_all_time.csv"),
     [
@@ -491,6 +742,19 @@ function main(): void {
       "latest_snapshot",
     ],
     allTimeRows,
+  );
+
+  writeCsv<ProjectAllTimeRow>(
+    join(analyticsDir, "projects_most_popular_all_time.csv"),
+    [
+      "rank",
+      "project_key",
+      "project_name",
+      "listing_count",
+      "total_downloads",
+      "latest_snapshot",
+    ],
+    projectAllTimeRows,
   );
 
   writeCsv<AuthorAssetCountRow>(
@@ -534,6 +798,18 @@ function main(): void {
       "points_count",
     ],
     mapPopulationRows,
+  );
+
+  writeCsv<ListingProjectRow>(
+    join(analyticsDir, "listing_projects.csv"),
+    [
+      "listing_type",
+      "id",
+      "name",
+      "project_key",
+      "project_name",
+    ],
+    listingProjectRows,
   );
 
   console.log(`Generated analytics CSVs in ${analyticsDir}`);
