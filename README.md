@@ -135,6 +135,25 @@ Local command:
 - Generate/update today’s history snapshot:
   - `pnpm --dir scripts run generate-download-history`
 
+Shared-pack attribution audit:
+
+- Export an attribution audit bundle under `tmp/shared-map-attribution-audit/`:
+  - `bash scripts/export-shared-map-attribution-audit.sh 2026_03_30`
+- Audit JP shared-pack listings by prefix:
+  - `pnpm --dir scripts run audit-shared-map-attribution -- --snapshot-date 2026_03_30 --listing-prefix yukina-`
+- Audit a shared pack by exact source repo:
+  - `pnpm --dir scripts run audit-shared-map-attribution -- --snapshot-date 2026_03_30 --repo rslurry/subwaybuilder-maps`
+  - `pnpm --dir scripts run audit-shared-map-attribution -- --snapshot-date 2026_03_30 --repo maximilian284/subwaybuilder-it-maps`
+- Audit a single listing:
+  - `pnpm --dir scripts run audit-shared-map-attribution -- --snapshot-date 2026_03_30 --listing-id yukina-osaka`
+
+The audit writes:
+
+- `tmp/shared-map-attribution-audit/results/shared-map-attribution-audit.json`
+- `tmp/shared-map-attribution-audit/results/shared-map-attribution-audit.csv`
+
+It compares snapshot attribution against the exact `repo/tag/asset_name` stored in `maps/integrity.json`, which is especially useful for shared custom repos where listing version and release tag differ.
+
 Automation:
 
 - `cache-download-history.yml` runs daily (and on manual dispatch), commits `history/snapshot_YYYY_MM_DD.json`, and posts summary stats to Discord.
