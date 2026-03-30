@@ -38,7 +38,7 @@ jobs:
         run: pnpm --dir scripts run generate-download-history
 
       - name: Generate analytics CSVs
-        run: pnpm --dir scripts run analytics
+        run: pnpm --dir scripts run analytics -- --top-k-listings 0 --top-k-authors 0
 
       - name: Stage snapshot changes
         id: commit_changes

@@ -11,6 +11,10 @@ interface SnapshotData {
   schema_version?: unknown;
   snapshot_date?: unknown;
   generated_at?: unknown;
+  total_downloads?: unknown;
+  raw_total_downloads?: unknown;
+  total_attributed_downloads?: unknown;
+  net_downloads?: unknown;
   maps?: { downloads?: Record<string, Record<string, unknown>> };
   mods?: { downloads?: Record<string, Record<string, unknown>> };
 }
@@ -75,8 +79,8 @@ interface MapPopulationRow {
 
 type ListingKey = `${"maps" | "mods"}:${string}`;
 
-const TOP_LISTINGS = 30;
-const TOP_AUTHORS = 20;
+const DEFAULT_TOP_LISTINGS = 30;
+const DEFAULT_TOP_AUTHORS = 20;
 const WINDOWS = [1, 3, 7, 14] as const;
 
 const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
@@ -85,6 +89,53 @@ const FALLBACK_REPO_ROOT = basename(import.meta.dirname) === "dist"
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
+}
+
+function getArgValue(argv: string[], name: string): string | undefined {
+  const exact = `--${name}=`;
+  for (const arg of argv) {
+    if (arg.startsWith(exact)) {
+      return arg.slice(exact.length);
+    }
+  }
+  for (let index = 0; index < argv.length; index += 1) {
+    if (argv[index] === `--${name}`) {
+      return argv[index + 1];
+    }
+  }
+  return undefined;
+}
+
+function validateArgs(argv: string[]): void {
+  const valueFlags = new Set(["--top-k-listings", "--top-k-authors"]);
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index]!;
+    if (arg === "--") continue;
+    if (arg.startsWith("--top-k-listings=") || arg.startsWith("--top-k-authors=")) continue;
+    if (valueFlags.has(arg)) {
+      index += 1;
+      continue;
+    }
+    throw new Error(
+      `Unknown argument '${arg}'. Supported flags: --top-k-listings <n>, --top-k-authors <n>.`,
+    );
+  }
+}
+
+function parseTopK(rawValue: string | undefined, fallback: number, label: string): number | null {
+  if (!rawValue || rawValue.trim() === "") return fallback;
+  if (!/^\d+$/.test(rawValue.trim())) {
+    throw new Error(`Invalid ${label} value '${rawValue}'. Expected a non-negative integer.`);
+  }
+  const parsed = Number(rawValue);
+  if (!Number.isSafeInteger(parsed) || parsed < 0) {
+    throw new Error(`Invalid ${label} value '${rawValue}'. Expected a non-negative integer.`);
+  }
+  return parsed === 0 ? null : parsed;
+}
+
+function limitRows<T>(rows: T[], topK: number | null): T[] {
+  return topK === null ? rows : rows.slice(0, topK);
 }
 
 function parseSnapshotDate(fileName: string): Date | null {
@@ -109,6 +160,7 @@ function listSnapshots(historyDir: string): SnapshotEntry[] {
 function toListingTotals(snapshot: SnapshotData): Map<ListingKey, number> {
   const totals = new Map<ListingKey, number>();
   for (const listingType of ["maps", "mods"] as const) {
+    // `downloads` is the canonical adjusted/non-attributed listing data in schema v2.
     const downloads = snapshot?.[listingType]?.downloads;
     if (!downloads || typeof downloads !== "object") continue;
     for (const [id, versions] of Object.entries(downloads)) {
@@ -245,7 +297,21 @@ function writeCsv<T extends object>(
 }
 
 function main(): void {
+  const argv = process.argv.slice(2);
+  validateArgs(argv);
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? FALLBACK_REPO_ROOT;
+  const topListings = parseTopK(
+    getArgValue(argv, "top-k-listings")
+      ?? process.env.ANALYTICS_TOP_K_LISTINGS
+      ?? process.env.ANALYTICS_TOP_K,
+    DEFAULT_TOP_LISTINGS,
+    "top-k-listings",
+  );
+  const topAuthors = parseTopK(
+    getArgValue(argv, "top-k-authors") ?? process.env.ANALYTICS_TOP_K_AUTHORS,
+    DEFAULT_TOP_AUTHORS,
+    "top-k-authors",
+  );
   const historyDir = join(repoRoot, "history");
   const analyticsDir = join(repoRoot, "analytics");
   mkdirSync(analyticsDir, { recursive: true });
@@ -294,7 +360,7 @@ function main(): void {
       || b.current_total - a.current_total
       || a.id.localeCompare(b.id));
 
-    return rows.slice(0, TOP_LISTINGS).map((row, index) => ({
+    return limitRows(rows, topListings).map((row, index) => ({
       rank: index + 1,
       ...row,
     }));
@@ -315,7 +381,7 @@ function main(): void {
       });
     }
     rows.sort((a, b) => b.total_downloads - a.total_downloads || a.id.localeCompare(b.id));
-    return rows.slice(0, TOP_LISTINGS).map((row, index) => ({
+    return limitRows(rows, topListings).map((row, index) => ({
       rank: index + 1,
       ...row,
     }));
@@ -344,7 +410,7 @@ function main(): void {
       b.asset_count - a.asset_count
       || b.total_downloads - a.total_downloads
       || a.author.localeCompare(b.author))
-    .slice(0, TOP_AUTHORS)
+    .slice(0, topAuthors ?? authorStats.size)
     .map((row, index) => ({ rank: index + 1, ...row }));
 
   const authorRowsByTotalDownloads: AuthorTotalDownloadsRow[] = [...authorStats.values()]
@@ -352,7 +418,7 @@ function main(): void {
       b.total_downloads - a.total_downloads
       || b.asset_count - a.asset_count
       || a.author.localeCompare(b.author))
-    .slice(0, TOP_AUTHORS)
+    .slice(0, topAuthors ?? authorStats.size)
     .map((row, index) => ({
       rank: index + 1,
       author: row.author,
@@ -472,6 +538,8 @@ function main(): void {
 
   console.log(`Generated analytics CSVs in ${analyticsDir}`);
   console.log(`Latest snapshot: ${latest.file}`);
+  console.log(`Top listings: ${topListings ?? "all"}`);
+  console.log(`Top authors: ${topAuthors ?? "all"}`);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

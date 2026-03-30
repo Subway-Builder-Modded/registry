@@ -1,9 +1,16 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { DownloadsByListing } from "./download-definitions.js";
+import {
+  loadDownloadAttributionLedger,
+  type DownloadAttributionLedger,
+} from "./download-attribution.js";
+import { getManifest } from "./downloads-support.js";
+import type { ManifestDirectory } from "./manifests.js";
 
 type ListingKind = "maps" | "mods";
 type ValidVersionsByListing = Record<string, Set<string>>;
+type SourceDownloadsMode = "already_adjusted" | "legacy_unadjusted";
 
 interface IndexFile {
   schema_version?: number;
@@ -14,8 +21,13 @@ interface IndexFile {
 
 interface DownloadHistorySection {
   downloads: DownloadsByListing;
+  raw_downloads?: DownloadsByListing;
+  attributed_downloads?: DownloadsByListing;
   total_downloads: number;
+  raw_total_downloads?: number;
+  total_attributed_downloads?: number;
   net_downloads: number;
+  source_downloads_mode?: SourceDownloadsMode;
   index: IndexFile;
   entries: number;
 }
@@ -34,9 +46,13 @@ interface IntegrityOutputLike {
 }
 
 export interface DownloadHistorySnapshot {
-  schema_version: 1;
+  schema_version: 2;
   snapshot_date: string;
   generated_at: string;
+  total_downloads: number;
+  raw_total_downloads: number;
+  total_attributed_downloads: number;
+  net_downloads: number;
   maps: DownloadHistorySection;
   mods: DownloadHistorySection;
 }
@@ -63,6 +79,8 @@ export interface BackfillDownloadHistoryResult {
 }
 
 const SNAPSHOT_PATTERN = /^snapshot_(\d{4}_\d{2}_\d{2})\.json$/;
+const DOWNLOAD_HISTORY_SCHEMA_VERSION = 2;
+const ATTRIBUTION_ADJUSTED_SNAPSHOT_START_DATE = "2026_03_30";
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf-8")) as T;
@@ -222,6 +240,225 @@ function computeTotalDownloads(downloads: DownloadsByListing): number {
   return total;
 }
 
+function cloneDownloads(downloads: DownloadsByListing): DownloadsByListing {
+  const clone: DownloadsByListing = {};
+  for (const listingId of Object.keys(downloads).sort()) {
+    clone[listingId] = { ...(downloads[listingId] ?? {}) };
+  }
+  return clone;
+}
+
+function addDownloads(a: DownloadsByListing, b: DownloadsByListing): DownloadsByListing {
+  const merged: DownloadsByListing = {};
+  const listingIds = new Set<string>([...Object.keys(a), ...Object.keys(b)]);
+  for (const listingId of [...listingIds].sort()) {
+    const versions = new Set<string>([
+      ...Object.keys(a[listingId] ?? {}),
+      ...Object.keys(b[listingId] ?? {}),
+    ]);
+    const mergedVersions: Record<string, number> = {};
+    for (const version of [...versions].sort()) {
+      mergedVersions[version] = (a[listingId]?.[version] ?? 0) + (b[listingId]?.[version] ?? 0);
+    }
+    merged[listingId] = mergedVersions;
+  }
+  return merged;
+}
+
+function subtractDownloads(raw: DownloadsByListing, attributed: DownloadsByListing): DownloadsByListing {
+  const adjusted: DownloadsByListing = {};
+  const listingIds = new Set<string>([...Object.keys(raw), ...Object.keys(attributed)]);
+  for (const listingId of [...listingIds].sort()) {
+    const versions = new Set<string>([
+      ...Object.keys(raw[listingId] ?? {}),
+      ...Object.keys(attributed[listingId] ?? {}),
+    ]);
+    const adjustedVersions: Record<string, number> = {};
+    for (const version of [...versions].sort()) {
+      const rawCount = raw[listingId]?.[version] ?? 0;
+      const attributedCount = attributed[listingId]?.[version] ?? 0;
+      adjustedVersions[version] = Math.max(0, rawCount - attributedCount);
+    }
+    adjusted[listingId] = adjustedVersions;
+  }
+  return adjusted;
+}
+
+function parseAttributionAssetKey(assetKey: string): { repo: string; tag: string; assetName: string } | null {
+  const slashIndex = assetKey.lastIndexOf("/");
+  if (slashIndex <= 0) return null;
+  const repoAndTag = assetKey.slice(0, slashIndex);
+  const assetName = assetKey.slice(slashIndex + 1);
+  const atIndex = repoAndTag.lastIndexOf("@");
+  if (atIndex <= 0 || atIndex === repoAndTag.length - 1 || assetName.trim() === "") return null;
+  return {
+    repo: repoAndTag.slice(0, atIndex).toLowerCase(),
+    tag: repoAndTag.slice(atIndex + 1),
+    assetName,
+  };
+}
+
+function parseCustomUpdateRepo(updateUrl: string): string | null {
+  try {
+    const parsed = new URL(updateUrl);
+    if (parsed.hostname === "raw.githubusercontent.com") {
+      const segments = parsed.pathname.split("/").filter((segment) => segment !== "");
+      if (segments.length >= 2) {
+        return `${segments[0]}/${segments[1]}`.toLowerCase();
+      }
+    }
+    if (parsed.hostname.endsWith(".github.io")) {
+      const owner = parsed.hostname.slice(0, -".github.io".length);
+      const segments = parsed.pathname.split("/").filter((segment) => segment !== "");
+      if (owner !== "" && segments.length >= 1) {
+        return `${owner}/${segments[0]}`.toLowerCase();
+      }
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+function normalizeTagForMatching(tag: string): string {
+  const lowered = tag.trim().toLowerCase();
+  return lowered.startsWith("v") ? lowered.slice(1) : lowered;
+}
+
+function inferAssetMatcherToken(
+  listingKind: ListingKind,
+  manifest: Record<string, unknown>,
+  updateUrl: string,
+): string | null {
+  if (listingKind === "maps") {
+    const cityCode = typeof manifest.city_code === "string" ? manifest.city_code.trim() : "";
+    if (cityCode !== "") return cityCode.toLowerCase();
+  }
+
+  try {
+    const parsed = new URL(updateUrl);
+    const baseName = parsed.pathname.split("/").pop() ?? "";
+    const normalized = baseName
+      .replace(/\.json$/i, "")
+      .replace(/^update[-_]?/i, "")
+      .replace(/[-_]?update$/i, "")
+      .trim()
+      .toLowerCase();
+    return normalized !== "" ? normalized : null;
+  } catch {
+    return null;
+  }
+}
+
+function assetMatchesToken(assetName: string, token: string | null): boolean {
+  if (!assetName.toLowerCase().endsWith(".zip")) return false;
+  if (!token) return true;
+  const normalizedAsset = assetName.toLowerCase().replace(/\.zip$/i, "");
+  return normalizedAsset === token
+    || normalizedAsset.startsWith(`${token}_`)
+    || normalizedAsset.startsWith(`${token}-`)
+    || normalizedAsset.startsWith(token)
+    || normalizedAsset.includes(`-${token}`)
+    || normalizedAsset.includes(`_${token}`)
+    || normalizedAsset.includes(token);
+}
+
+function sumAttributedForVersion(
+  ledger: DownloadAttributionLedger,
+  listingKind: ListingKind,
+  listingId: string,
+  version: string,
+  snapshotDate: string,
+  repoRoot: string,
+): number {
+  const dir: ManifestDirectory = listingKind;
+  let manifest: Record<string, unknown>;
+  try {
+    manifest = getManifest(repoRoot, dir, listingId) as unknown as Record<string, unknown>;
+  } catch {
+    return 0;
+  }
+
+  const update = manifest.update;
+  if (typeof update !== "object" || update === null || Array.isArray(update)) {
+    return 0;
+  }
+
+  let repo: string | null = null;
+  let assetMatcherToken: string | null = null;
+  const updateType = (update as { type?: unknown }).type;
+  if (updateType === "github") {
+    const updateRepo = (update as { repo?: unknown }).repo;
+    if (typeof updateRepo === "string" && updateRepo.trim() !== "") {
+      repo = updateRepo.trim().toLowerCase();
+    }
+  } else if (updateType === "custom") {
+    const updateUrl = (update as { url?: unknown }).url;
+    if (typeof updateUrl === "string" && updateUrl.trim() !== "") {
+      repo = parseCustomUpdateRepo(updateUrl);
+      assetMatcherToken = inferAssetMatcherToken(listingKind, manifest, updateUrl);
+    }
+  }
+
+  if (!repo) return 0;
+
+  const normalizedVersion = normalizeTagForMatching(version);
+  let total = 0;
+  for (const [dateKey, entry] of Object.entries(ledger.daily)) {
+    if (dateKey > snapshotDate) continue;
+    for (const [assetKey, count] of Object.entries(entry.assets)) {
+      const parsed = parseAttributionAssetKey(assetKey);
+      if (!parsed) continue;
+      if (parsed.repo !== repo) continue;
+      if (normalizeTagForMatching(parsed.tag) !== normalizedVersion && !normalizeTagForMatching(parsed.tag).includes(normalizedVersion)) {
+        continue;
+      }
+      if (!assetMatchesToken(parsed.assetName, assetMatcherToken)) continue;
+      total += count;
+    }
+  }
+  return total;
+}
+
+function buildAttributedDownloadsForSnapshot(
+  repoRoot: string,
+  listingKind: ListingKind,
+  downloads: DownloadsByListing,
+  snapshotDate: string,
+  ledger: DownloadAttributionLedger,
+): DownloadsByListing {
+  const attributed: DownloadsByListing = {};
+  for (const listingId of Object.keys(downloads).sort()) {
+    const versions = downloads[listingId] ?? {};
+    const attributedVersions: Record<string, number> = {};
+    for (const version of Object.keys(versions).sort()) {
+      attributedVersions[version] = sumAttributedForVersion(
+        ledger,
+        listingKind,
+        listingId,
+        version,
+        snapshotDate,
+        repoRoot,
+      );
+    }
+    attributed[listingId] = attributedVersions;
+  }
+  return attributed;
+}
+
+function resolveSourceDownloadsMode(
+  snapshotDate: string,
+  section: DownloadHistorySection | undefined,
+): SourceDownloadsMode {
+  const existing = section?.source_downloads_mode;
+  if (existing === "already_adjusted" || existing === "legacy_unadjusted") {
+    return existing;
+  }
+  return snapshotDate >= ATTRIBUTION_ADJUSTED_SNAPSHOT_START_DATE
+    ? "already_adjusted"
+    : "legacy_unadjusted";
+}
+
 function readListingData(
   repoRoot: string,
   listingKind: ListingKind,
@@ -372,6 +609,30 @@ function normalizeSnapshotDownloadsOrEmpty(
   }
 }
 
+function resolveStoredDownloadsForBackfill(
+  snapshotDate: string,
+  section: DownloadHistorySection | undefined,
+  listingKind: ListingKind,
+  warnings: string[],
+  sourceLabel: string,
+): DownloadsByListing {
+  const sourceMode = resolveSourceDownloadsMode(snapshotDate, section);
+  if (sourceMode === "legacy_unadjusted" && section?.raw_downloads) {
+    return normalizeSnapshotDownloadsOrEmpty(
+      section.raw_downloads,
+      listingKind,
+      warnings,
+      `${sourceLabel}.raw_downloads`,
+    );
+  }
+  return normalizeSnapshotDownloadsOrEmpty(
+    section?.downloads,
+    listingKind,
+    warnings,
+    `${sourceLabel}.downloads`,
+  );
+}
+
 export function generateDownloadHistorySnapshot(
   options: GenerateDownloadHistoryOptions,
 ): GenerateDownloadHistoryResult {
@@ -380,30 +641,68 @@ export function generateDownloadHistorySnapshot(
   const snapshotDate = toSnapshotDate(now);
   const snapshotFileName = `snapshot_${snapshotDate}.json`;
   const previous = readPreviousSnapshot(options.repoRoot, snapshotFileName, warnings);
+  const attributionLedger = loadDownloadAttributionLedger(options.repoRoot);
   const mapsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "maps", warnings);
   const modsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "mods", warnings);
 
   const mapsData = readListingData(options.repoRoot, "maps", warnings, mapsValidVersions);
   const modsData = readListingData(options.repoRoot, "mods", warnings, modsValidVersions);
+  const mapsAttributedDownloads = buildAttributedDownloadsForSnapshot(
+    options.repoRoot,
+    "maps",
+    mapsData.downloads,
+    snapshotDate,
+    attributionLedger,
+  );
+  const modsAttributedDownloads = buildAttributedDownloadsForSnapshot(
+    options.repoRoot,
+    "mods",
+    modsData.downloads,
+    snapshotDate,
+    attributionLedger,
+  );
+  const mapsRawDownloads = addDownloads(mapsData.downloads, mapsAttributedDownloads);
+  const modsRawDownloads = addDownloads(modsData.downloads, modsAttributedDownloads);
+  const mapsAttributedTotal = computeTotalDownloads(mapsAttributedDownloads);
+  const modsAttributedTotal = computeTotalDownloads(modsAttributedDownloads);
 
   const previousMapsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "maps", warnings);
   const previousModsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "mods", warnings);
 
   const snapshot: DownloadHistorySnapshot = {
-    schema_version: 1,
+    schema_version: DOWNLOAD_HISTORY_SCHEMA_VERSION,
     snapshot_date: snapshotDate,
     generated_at: now.toISOString(),
+    total_downloads: mapsData.totalDownloads + modsData.totalDownloads,
+    raw_total_downloads: (mapsData.totalDownloads + mapsAttributedTotal) + (modsData.totalDownloads + modsAttributedTotal),
+    total_attributed_downloads: mapsAttributedTotal + modsAttributedTotal,
+    net_downloads: computeNetDownloads(
+      mapsData.totalDownloads + modsData.totalDownloads,
+      previousMapsTotal === null || previousModsTotal === null
+        ? null
+        : previousMapsTotal + previousModsTotal,
+    ),
     maps: {
       downloads: mapsData.downloads,
+      raw_downloads: mapsRawDownloads,
+      attributed_downloads: mapsAttributedDownloads,
       total_downloads: mapsData.totalDownloads,
+      raw_total_downloads: mapsData.totalDownloads + mapsAttributedTotal,
+      total_attributed_downloads: mapsAttributedTotal,
       net_downloads: computeNetDownloads(mapsData.totalDownloads, previousMapsTotal),
+      source_downloads_mode: "already_adjusted",
       index: mapsData.index,
       entries: mapsData.entries,
     },
     mods: {
       downloads: modsData.downloads,
+      raw_downloads: modsRawDownloads,
+      attributed_downloads: modsAttributedDownloads,
       total_downloads: modsData.totalDownloads,
+      raw_total_downloads: modsData.totalDownloads + modsAttributedTotal,
+      total_attributed_downloads: modsAttributedTotal,
       net_downloads: computeNetDownloads(modsData.totalDownloads, previousModsTotal),
+      source_downloads_mode: "already_adjusted",
       index: modsData.index,
       entries: modsData.entries,
     },
@@ -428,6 +727,7 @@ export function backfillDownloadHistorySnapshots(
   const warnings: string[] = [];
   const historyDir = getHistoryDir(options.repoRoot);
   const snapshotFiles = listSnapshotFileNames(historyDir);
+  const attributionLedger = loadDownloadAttributionLedger(options.repoRoot);
   const mapsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "maps", warnings);
   const modsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "mods", warnings);
   const updatedFiles: string[] = [];
@@ -443,34 +743,92 @@ export function backfillDownloadHistorySnapshots(
       continue;
     }
 
-    const mapsRawDownloads = normalizeSnapshotDownloadsOrEmpty(
-      snapshot.maps?.downloads,
+    const mapsStoredDownloads = resolveStoredDownloadsForBackfill(
+      snapshot.snapshot_date,
+      snapshot.maps,
       "maps",
       warnings,
-      `history/${fileName}:maps.downloads`,
+      `history/${fileName}:maps`,
     );
-    const modsRawDownloads = normalizeSnapshotDownloadsOrEmpty(
-      snapshot.mods?.downloads,
+    const modsStoredDownloads = resolveStoredDownloadsForBackfill(
+      snapshot.snapshot_date,
+      snapshot.mods,
       "mods",
       warnings,
-      `history/${fileName}:mods.downloads`,
+      `history/${fileName}:mods`,
     );
+    const mapsAttribution = buildAttributedDownloadsForSnapshot(
+      options.repoRoot,
+      "maps",
+      mapsStoredDownloads,
+      snapshot.snapshot_date,
+      attributionLedger,
+    );
+    const modsAttribution = buildAttributedDownloadsForSnapshot(
+      options.repoRoot,
+      "mods",
+      modsStoredDownloads,
+      snapshot.snapshot_date,
+      attributionLedger,
+    );
+    const mapsSourceMode = resolveSourceDownloadsMode(snapshot.snapshot_date, snapshot.maps);
+    const modsSourceMode = resolveSourceDownloadsMode(snapshot.snapshot_date, snapshot.mods);
+    const mapsRawDownloads = mapsSourceMode === "already_adjusted"
+      ? addDownloads(mapsStoredDownloads, mapsAttribution)
+      : cloneDownloads(mapsStoredDownloads);
+    const modsRawDownloads = modsSourceMode === "already_adjusted"
+      ? addDownloads(modsStoredDownloads, modsAttribution)
+      : cloneDownloads(modsStoredDownloads);
+    const mapsAdjustedDownloads = mapsSourceMode === "already_adjusted"
+      ? cloneDownloads(mapsStoredDownloads)
+      : subtractDownloads(mapsStoredDownloads, mapsAttribution);
+    const modsAdjustedDownloads = modsSourceMode === "already_adjusted"
+      ? cloneDownloads(modsStoredDownloads)
+      : subtractDownloads(modsStoredDownloads, modsAttribution);
 
     const mapsDownloads = filterDownloadsByIntegrity(
-      mapsRawDownloads,
+      mapsAdjustedDownloads,
       mapsValidVersions,
       `history/${fileName}:maps.downloads`,
       warnings,
     );
     const modsDownloads = filterDownloadsByIntegrity(
-      modsRawDownloads,
+      modsAdjustedDownloads,
       modsValidVersions,
       `history/${fileName}:mods.downloads`,
+      warnings,
+    );
+    const mapsFilteredRawDownloads = filterDownloadsByIntegrity(
+      mapsRawDownloads,
+      mapsValidVersions,
+      `history/${fileName}:maps.raw_downloads`,
+      warnings,
+    );
+    const modsFilteredRawDownloads = filterDownloadsByIntegrity(
+      modsRawDownloads,
+      modsValidVersions,
+      `history/${fileName}:mods.raw_downloads`,
+      warnings,
+    );
+    const mapsFilteredAttribution = filterDownloadsByIntegrity(
+      mapsAttribution,
+      mapsValidVersions,
+      `history/${fileName}:maps.attributed_downloads`,
+      warnings,
+    );
+    const modsFilteredAttribution = filterDownloadsByIntegrity(
+      modsAttribution,
+      modsValidVersions,
+      `history/${fileName}:mods.attributed_downloads`,
       warnings,
     );
 
     const mapsTotalDownloads = computeTotalDownloads(mapsDownloads);
     const modsTotalDownloads = computeTotalDownloads(modsDownloads);
+    const mapsRawTotalDownloads = computeTotalDownloads(mapsFilteredRawDownloads);
+    const modsRawTotalDownloads = computeTotalDownloads(modsFilteredRawDownloads);
+    const mapsAttributedTotal = computeTotalDownloads(mapsFilteredAttribution);
+    const modsAttributedTotal = computeTotalDownloads(modsFilteredAttribution);
 
     const mapsIndex = asIndexFileOrFallback(
       snapshot.maps?.index,
@@ -500,20 +858,39 @@ export function backfillDownloadHistorySnapshots(
     );
 
     const normalizedSnapshot: DownloadHistorySnapshot = {
-      schema_version: 1,
+      schema_version: DOWNLOAD_HISTORY_SCHEMA_VERSION,
       snapshot_date: snapshot.snapshot_date,
       generated_at: snapshot.generated_at,
+      total_downloads: mapsTotalDownloads + modsTotalDownloads,
+      raw_total_downloads: mapsRawTotalDownloads + modsRawTotalDownloads,
+      total_attributed_downloads: mapsAttributedTotal + modsAttributedTotal,
+      net_downloads: computeNetDownloads(
+        mapsTotalDownloads + modsTotalDownloads,
+        previousSnapshot === null
+          ? null
+          : previousSnapshot.total_downloads,
+      ),
       maps: {
         downloads: mapsDownloads,
+        raw_downloads: mapsFilteredRawDownloads,
+        attributed_downloads: mapsFilteredAttribution,
         total_downloads: mapsTotalDownloads,
+        raw_total_downloads: mapsRawTotalDownloads,
+        total_attributed_downloads: mapsAttributedTotal,
         net_downloads: computeNetDownloads(mapsTotalDownloads, previousSnapshot?.maps.total_downloads ?? null),
+        source_downloads_mode: mapsSourceMode,
         index: mapsIndex,
         entries: mapsEntries,
       },
       mods: {
         downloads: modsDownloads,
+        raw_downloads: modsFilteredRawDownloads,
+        attributed_downloads: modsFilteredAttribution,
         total_downloads: modsTotalDownloads,
+        raw_total_downloads: modsRawTotalDownloads,
+        total_attributed_downloads: modsAttributedTotal,
         net_downloads: computeNetDownloads(modsTotalDownloads, previousSnapshot?.mods.total_downloads ?? null),
+        source_downloads_mode: modsSourceMode,
         index: modsIndex,
         entries: modsEntries,
       },
