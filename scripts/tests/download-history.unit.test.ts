@@ -423,6 +423,135 @@ test("generateDownloadHistorySnapshot filters github map attribution by city cod
   }
 });
 
+test("generateDownloadHistorySnapshot prefers integrity source tags for custom shared repos", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-download-history-"));
+  try {
+    mkdirSync(join(repoRoot, "maps", "yukina-osaka"), { recursive: true });
+    mkdirSync(join(repoRoot, "maps", "yukina-nagoya"), { recursive: true });
+    mkdirSync(join(repoRoot, "maps", "yukina-nagasaki"), { recursive: true });
+    mkdirSync(join(repoRoot, "mods"), { recursive: true });
+
+    writeJson(join(repoRoot, "maps", "index.json"), {
+      schema_version: 1,
+      maps: ["yukina-osaka", "yukina-nagoya", "yukina-nagasaki"],
+    });
+    writeJson(join(repoRoot, "mods", "index.json"), {
+      schema_version: 1,
+      mods: [],
+    });
+    writeJson(join(repoRoot, "maps", "downloads.json"), {
+      "yukina-osaka": { "0.1.0": 65, "0.1.1": 53, "0.1.2": 91 },
+      "yukina-nagoya": { "0.1.4": 51 },
+      "yukina-nagasaki": { "0.1.0": 24, "0.2.0": 17 },
+    });
+    writeJson(join(repoRoot, "mods", "downloads.json"), {});
+    writeJson(join(repoRoot, "maps", "yukina-osaka", "manifest.json"), {
+      id: "yukina-osaka",
+      city_code: "ITM",
+      update: { type: "custom", url: "https://ahkimn.github.io/subwaybuilder-jp-maps/ITM.json" },
+    });
+    writeJson(join(repoRoot, "maps", "yukina-nagoya", "manifest.json"), {
+      id: "yukina-nagoya",
+      city_code: "NGO",
+      update: { type: "custom", url: "https://ahkimn.github.io/subwaybuilder-jp-maps/NGO.json" },
+    });
+    writeJson(join(repoRoot, "maps", "yukina-nagasaki", "manifest.json"), {
+      id: "yukina-nagasaki",
+      city_code: "NGS",
+      update: { type: "custom", url: "https://ahkimn.github.io/subwaybuilder-jp-maps/NGS.json" },
+    });
+    writeJson(join(repoRoot, "maps", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-30T00:00:00.000Z",
+      listings: {
+        "yukina-osaka": {
+          has_complete_version: true,
+          latest_semver_version: "0.1.2",
+          latest_semver_complete: true,
+          complete_versions: ["0.1.0", "0.1.1", "0.1.2"],
+          incomplete_versions: [],
+          versions: {
+            "0.1.0": { is_complete: true, source: { update_type: "custom", repo: "ahkimn/subwaybuilder-jp-maps", tag: "0.3.0", asset_name: "ITM.zip" } },
+            "0.1.1": { is_complete: true, source: { update_type: "custom", repo: "ahkimn/subwaybuilder-jp-maps", tag: "0.3.1", asset_name: "ITM.zip" } },
+            "0.1.2": { is_complete: true, source: { update_type: "custom", repo: "ahkimn/subwaybuilder-jp-maps", tag: "0.3.2", asset_name: "ITM.zip" } },
+          },
+        },
+        "yukina-nagoya": {
+          has_complete_version: true,
+          latest_semver_version: "0.1.4",
+          latest_semver_complete: true,
+          complete_versions: ["0.1.4"],
+          incomplete_versions: [],
+          versions: {
+            "0.1.4": { is_complete: true, source: { update_type: "custom", repo: "ahkimn/subwaybuilder-jp-maps", tag: "0.3.2", asset_name: "NGO.zip" } },
+          },
+        },
+        "yukina-nagasaki": {
+          has_complete_version: true,
+          latest_semver_version: "0.2.0",
+          latest_semver_complete: true,
+          complete_versions: ["0.1.0", "0.2.0"],
+          incomplete_versions: [],
+          versions: {
+            "0.1.0": { is_complete: true, source: { update_type: "custom", repo: "ahkimn/subwaybuilder-jp-maps", tag: "0.2.0", asset_name: "NGS.zip" } },
+            "0.2.0": { is_complete: true, source: { update_type: "custom", repo: "ahkimn/subwaybuilder-jp-maps", tag: "0.3.0", asset_name: "NGS.zip" } },
+          },
+        },
+      },
+    });
+    writeJson(join(repoRoot, "mods", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-30T00:00:00.000Z",
+      listings: {},
+    });
+    mkdirSync(join(repoRoot, "history"), { recursive: true });
+    writeJson(join(repoRoot, "history", "registry-download-attribution.json"), {
+      schema_version: 2,
+      updated_at: "2026-03-30T00:00:00.000Z",
+      assets: {
+        "ahkimn/subwaybuilder-jp-maps@0.2.0/NGS.zip": { count: 30, updated_at: "2026-03-30T00:00:00.000Z", by_source: {} },
+        "ahkimn/subwaybuilder-jp-maps@0.3.0/ITM.zip": { count: 12, updated_at: "2026-03-30T00:00:00.000Z", by_source: {} },
+        "ahkimn/subwaybuilder-jp-maps@0.3.0/NGS.zip": { count: 12, updated_at: "2026-03-30T00:00:00.000Z", by_source: {} },
+        "ahkimn/subwaybuilder-jp-maps@0.3.1/ITM.zip": { count: 4, updated_at: "2026-03-30T00:00:00.000Z", by_source: {} },
+        "ahkimn/subwaybuilder-jp-maps@0.3.2/ITM.zip": { count: 4, updated_at: "2026-03-30T00:00:00.000Z", by_source: {} },
+        "ahkimn/subwaybuilder-jp-maps@0.3.2/NGO.zip": { count: 4, updated_at: "2026-03-30T00:00:00.000Z", by_source: {} },
+      },
+      applied_delta_ids: {},
+      daily: {
+        "2026_03_30": {
+          total: 66,
+          assets: {
+            "ahkimn/subwaybuilder-jp-maps@0.2.0/NGS.zip": 30,
+            "ahkimn/subwaybuilder-jp-maps@0.3.0/ITM.zip": 12,
+            "ahkimn/subwaybuilder-jp-maps@0.3.0/NGS.zip": 12,
+            "ahkimn/subwaybuilder-jp-maps@0.3.1/ITM.zip": 4,
+            "ahkimn/subwaybuilder-jp-maps@0.3.2/ITM.zip": 4,
+            "ahkimn/subwaybuilder-jp-maps@0.3.2/NGO.zip": 4,
+          },
+        },
+      },
+    });
+
+    const result = generateDownloadHistorySnapshot({
+      repoRoot,
+      now: new Date("2026-03-30T00:00:00Z"),
+    });
+
+    assert.deepEqual(result.snapshot.maps.attributed_downloads, {
+      "yukina-osaka": { "0.1.0": 12, "0.1.1": 4, "0.1.2": 4 },
+      "yukina-nagoya": { "0.1.4": 4 },
+      "yukina-nagasaki": { "0.1.0": 30, "0.2.0": 12 },
+    });
+    assert.deepEqual(result.snapshot.maps.raw_downloads, {
+      "yukina-osaka": { "0.1.0": 77, "0.1.1": 57, "0.1.2": 95 },
+      "yukina-nagoya": { "0.1.4": 55 },
+      "yukina-nagasaki": { "0.1.0": 54, "0.2.0": 29 },
+    });
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
 test("backfillDownloadHistorySnapshots retroactively adjusts legacy snapshots with attribution metadata", () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-download-history-"));
   try {
