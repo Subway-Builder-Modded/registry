@@ -223,6 +223,7 @@ export async function generateMapDemandStats(
         if (!recorded.ok) return;
         attributionFetchesAdded += 1;
       },
+      `fetch-zip listing=${id}${resolvedSource.attributionAssetKey ? ` assetKey=${resolvedSource.attributionAssetKey}` : ""} zipUrl=${resolvedSource.zipUrl}`,
     );
     if (!zipBuffer) {
       skippedMaps += 1;

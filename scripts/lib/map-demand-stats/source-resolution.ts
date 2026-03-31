@@ -160,6 +160,7 @@ export async function fetchZipBuffer(
   fetchImpl: typeof fetch,
   warnings: string[],
   attributionRecorder?: (downloadUrl: string) => void,
+  heartbeatLabel?: string,
 ): Promise<Buffer | null> {
   let response: Response;
   try {
@@ -170,7 +171,7 @@ export async function fetchZipBuffer(
       {
         timeoutMs: MAP_DEMAND_FETCH_TIMEOUT_MS,
         heartbeatPrefix: "[map-demand-stats]",
-        heartbeatLabel: `fetch-zip listing=${listingId}`,
+        heartbeatLabel: heartbeatLabel ?? `fetch-zip listing=${listingId}`,
       },
     );
   } catch (error) {
