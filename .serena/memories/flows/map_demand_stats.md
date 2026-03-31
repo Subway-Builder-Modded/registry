@@ -1,0 +1,15 @@
+# Map demand stats flow
+- Entrypoint: `scripts/generate-map-demand-stats.ts` calls `generateMapDemandStats()` from `scripts/lib/map-demand-stats.ts`.
+- CLI flags: `--force`, `--id <map-id>` / `-id <map-id>`, and `--strict-fingerprint-cache`.
+- Token resolution: prefers `GH_DOWNLOADS_TOKEN`, then `GITHUB_TOKEN`; logs token source and warns when neither is set because GraphQL release queries may 401.
+- Outputs: updates map manifests with derived `population`, `residents_total`, `points_count`, `population_count`, and `initial_view_state`; writes cache file `maps/demand-stats-cache.json`; writes attribution delta file (default `maps/demand-attribution-delta.json`).
+- Source resolution: GitHub-backed maps use release index data; custom install targets resolve ZIP URLs directly. ZIP fetch timeout is controlled by `REGISTRY_FETCH_TIMEOUT_MS` with a 45s default.
+- Cache/skip behavior: if source fingerprint matches cached entry, `sha256:*` fingerprints skip unconditionally; non-sha fingerprints skip only when `last_checked_at` is within 12 hours, unless `--force` bypasses the cache. `--strict-fingerprint-cache` treats matching fingerprints as immediately skippable even for non-sha fingerprints.
+- Failure behavior: if ZIP resolution/fetch/extraction fails, the flow warns, counts an extraction failure, applies default derived fields where needed, and may still rewrite manifests.
+- Metrics returned/output: `processed_maps`, `updated_maps`, `skipped_maps`, `skipped_unchanged`, `extraction_failures`, `residents_delta_total`, GraphQL query/cost info, attribution fetch count, and filtered warnings.
+- Workflow integration: `regenerate-registry-analytics.yml` runs a dedicated `generate-map-demand-stats` job, uploads a tar artifact containing `maps/demand-stats-cache.json`, `maps/*/manifest.json`, and `maps/demand-attribution-delta.json`, then the commit job restores that artifact, merges attribution, reconciles adjusted downloads, and runs `sync-map-file-sizes` before staging changes.
+- Local commands:
+  - `pnpm --dir scripts run generate-registry-demand-stats`
+  - `pnpm --dir scripts run generate-map-demand-stats`
+  - `pnpm --dir scripts run generate-registry-demand-stats -- --force`
+  - `pnpm --dir scripts run generate-registry-demand-stats -- --id <map-id>`
