@@ -9,14 +9,21 @@ import { generateGrid } from "../lib/map-analytics-grid.js";
 import { extractDemandStatsFromZipBuffer } from "../lib/map-demand-stats.js";
 import { DEFAULT_INITIAL_VIEW_STATE, buildDemandPayload, makeZipBuffer } from "./map-demand-stats/helpers.js";
 
-test("generateGrid aggregates commute metrics into populated and empty cells", async () => {
+function assertClose(actual: number, expected: number, tolerance = 0.05): void {
+  assert.ok(
+    Math.abs(actual - expected) <= tolerance,
+    `expected ${actual} to be within ${tolerance} of ${expected}`,
+  );
+}
+
+test("generateGrid emits percentile metric bundles and aggregated cell counts", async () => {
   const grid = await generateGrid({
     points: [
-      { id: "min-boundary", location: [0, 0], jobs: 0, residents: 0 },
-      { id: "pt1", location: [0.01, 0.01], jobs: 3, residents: 10 },
-      { id: "pt2", location: [0.0105, 0.0105], jobs: 5, residents: 20 },
-      { id: "pt3", location: [0.03, 0.03], jobs: 7, residents: 30 },
-      { id: "max-boundary", location: [0.04, 0.04], jobs: 0, residents: 0 },
+      { id: "min-boundary", location: [-0.03, -0.03], jobs: 0, residents: 0 },
+      { id: "pt1", location: [0, 0], jobs: 1, residents: 10 },
+      { id: "pt2", location: [0.005, 0.005], jobs: 3, residents: 20 },
+      { id: "pt3", location: [0.03, 0.03], jobs: 5, residents: 30 },
+      { id: "max-boundary", location: [0.06, 0.06], jobs: 0, residents: 0 },
     ],
     pops: [
       { residenceId: "pt1", jobId: "pt2", drivingDistance: 5 },
@@ -27,27 +34,149 @@ test("generateGrid aggregates commute metrics into populated and empty cells", a
   }, "sample-map");
 
   const gridSummary = grid as typeof grid & {
-    properties?: { meanCommuteDistance?: number; medianCommuteDistance?: number };
+    properties?: {
+      residentWeightedNearestNeighborKm?: {
+        p10?: number;
+        p25?: number;
+        p50?: number;
+        p75?: number;
+        mean?: number;
+      };
+      workerWeightedNearestNeighborKm?: {
+        p10?: number;
+        p25?: number;
+        p50?: number;
+        p75?: number;
+        mean?: number;
+      };
+      commuteDistanceKm?: {
+        p10?: number;
+        p25?: number;
+        p50?: number;
+        p75?: number;
+        mean?: number;
+      };
+      residentCellDensity?: {
+        p10?: number;
+        p25?: number;
+        p50?: number;
+        p75?: number;
+        mean?: number;
+      };
+      workerCellDensity?: {
+        p10?: number;
+        p25?: number;
+        p50?: number;
+        p75?: number;
+        mean?: number;
+      };
+      meanCommuteDistance?: number;
+      medianCommuteDistance?: number;
+    };
   };
 
-  assert.equal(gridSummary.properties?.meanCommuteDistance, 12.5);
-  assert.equal(gridSummary.properties?.medianCommuteDistance, 15);
+  assert.equal(gridSummary.properties?.meanCommuteDistance, undefined);
+  assert.equal(gridSummary.properties?.medianCommuteDistance, undefined);
+  assert.deepEqual(gridSummary.properties?.commuteDistanceKm, {
+    p10: 5,
+    p25: 5,
+    p50: 10,
+    p75: 15,
+    mean: 12.5,
+  });
+  assert.deepEqual(gridSummary.properties?.residentCellDensity, {
+    p10: 30,
+    p25: 30,
+    p50: 30,
+    p75: 30,
+    mean: 30,
+  });
+  assert.deepEqual(gridSummary.properties?.workerCellDensity, {
+    p10: 4,
+    p25: 4,
+    p50: 4,
+    p75: 5,
+    mean: 4.5,
+  });
+  assertClose(gridSummary.properties?.residentWeightedNearestNeighborKm?.p10 ?? 0, 0.79);
+  assertClose(gridSummary.properties?.residentWeightedNearestNeighborKm?.p25 ?? 0, 0.79);
+  assertClose(gridSummary.properties?.residentWeightedNearestNeighborKm?.p50 ?? 0, 0.79);
+  assertClose(gridSummary.properties?.residentWeightedNearestNeighborKm?.p75 ?? 0, 3.93);
+  assertClose(gridSummary.properties?.residentWeightedNearestNeighborKm?.mean ?? 0, 2.36);
+  assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p10 ?? 0, 0.79);
+  assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p25 ?? 0, 0.79);
+  assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p50 ?? 0, 3.93);
+  assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p75 ?? 0, 3.93);
+  assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.mean ?? 0, 2.53);
 
   const populatedCell = grid.features.find((feature: any) => feature.properties?.pointCount === 2);
   assert.ok(populatedCell);
-  assert.equal(populatedCell.properties?.jobs, 8);
+  assert.equal(populatedCell.properties?.jobs, 4);
   assert.equal(populatedCell.properties?.pop, 30);
-  assert.equal(populatedCell.properties?.homeWorkCommuteMedian, 15);
-  assert.equal(populatedCell.properties?.workHomeCommuteMedian, 15);
+  assert.equal(populatedCell.properties?.homeWorkCommuteMedian, undefined);
+  assert.equal(populatedCell.properties?.workHomeCommuteMedian, undefined);
 
-  const emptyCommuteCell = grid.features.find((feature: any) => (
+  const secondCell = grid.features.find((feature: any) => (
     feature.properties?.pointCount === 1
-    && feature.properties?.jobs === 7
+    && feature.properties?.jobs === 5
     && feature.properties?.pop === 30
   ));
-  assert.ok(emptyCommuteCell);
-  assert.equal(emptyCommuteCell.properties?.homeWorkCommuteMedian, -1);
-  assert.equal(emptyCommuteCell.properties?.workHomeCommuteMedian, -1);
+  assert.ok(secondCell);
+});
+
+test("generateGrid returns zeroed metric bundles when commute and density samples are empty", async () => {
+  const grid = await generateGrid({
+    points: [
+      { id: "solo", location: [0, 0], jobs: 0, residents: 0 },
+    ],
+    pops: [],
+  }, "empty-metrics-map");
+
+  const gridSummary = grid as typeof grid & {
+    properties?: {
+      residentWeightedNearestNeighborKm?: unknown;
+      workerWeightedNearestNeighborKm?: unknown;
+      commuteDistanceKm?: unknown;
+      residentCellDensity?: unknown;
+      workerCellDensity?: unknown;
+    };
+  };
+
+  assert.deepEqual(gridSummary.properties?.residentWeightedNearestNeighborKm, {
+    p10: 0,
+    p25: 0,
+    p50: 0,
+    p75: 0,
+    mean: 0,
+  });
+  assert.deepEqual(gridSummary.properties?.workerWeightedNearestNeighborKm, {
+    p10: 0,
+    p25: 0,
+    p50: 0,
+    p75: 0,
+    mean: 0,
+  });
+  assert.deepEqual(gridSummary.properties?.commuteDistanceKm, {
+    p10: 0,
+    p25: 0,
+    p50: 0,
+    p75: 0,
+    mean: 0,
+  });
+  assert.deepEqual(gridSummary.properties?.residentCellDensity, {
+    p10: 0,
+    p25: 0,
+    p50: 0,
+    p75: 0,
+    mean: 0,
+  });
+  assert.deepEqual(gridSummary.properties?.workerCellDensity, {
+    p10: 0,
+    p25: 0,
+    p50: 0,
+    p75: 0,
+    mean: 0,
+  });
 });
 
 test("extractDemandStatsFromZipBuffer returns stats and grid without writing files directly", async () => {
@@ -64,6 +193,17 @@ test("extractDemandStatsFromZipBuffer returns stats and grid without writing fil
       points_count: 3,
       population_count: 3,
       initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+    });
+    assert.deepEqual((extraction.grid as typeof extraction.grid & {
+      properties?: {
+        commuteDistanceKm?: { p10?: number; p25?: number; p50?: number; p75?: number; mean?: number };
+      };
+    }).properties?.commuteDistanceKm, {
+      p10: 10,
+      p25: 10,
+      p50: 20,
+      p75: 30,
+      mean: 20,
     });
     assert.ok(extraction.grid.features.length > 0);
     assert.equal(existsSync(join(repoRoot, "maps", "sample-map", "grid.geojson")), false);
