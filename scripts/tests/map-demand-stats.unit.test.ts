@@ -7,54 +7,7 @@ import { gzipSync } from "node:zlib";
 import JSZip from "jszip";
 import { generateGrid } from "../lib/map-analytics-grid.js";
 import { extractDemandStatsFromZipBuffer } from "../lib/map-demand-stats.js";
-
-const DEFAULT_INITIAL_VIEW_STATE = {
-  latitude: 38.312462,
-  longitude: 140.325418,
-  zoom: 12,
-  bearing: 0,
-};
-
-function buildDemandPayload(
-  pointResidents: Array<number | undefined>,
-  populationSizes: number[],
-): Record<string, unknown> {
-  return {
-    points: pointResidents.map((residents, index) => {
-      const point: Record<string, unknown> = {
-        id: `pt${index + 1}`,
-        location: [index * 0.03, index * 0.03],
-        jobs: index + 1,
-      };
-      if (residents !== undefined) {
-        point.residents = residents;
-      }
-      return point;
-    }),
-    pops_map: populationSizes.map((size, index) => ({
-      id: `pop${index + 1}`,
-      size,
-    })),
-    pops: pointResidents.map((_, index) => ({
-      residenceId: `pt${index + 1}`,
-      jobId: `pt${index + 1}`,
-      drivingDistance: (index + 1) * 10,
-    })),
-  };
-}
-
-async function makeZipBuffer(fileName: string, content: Buffer | string): Promise<Buffer> {
-  const zip = new JSZip();
-  zip.file(fileName, content);
-  zip.file(
-    "config.json",
-    JSON.stringify({
-      code: "TST",
-      initialViewState: DEFAULT_INITIAL_VIEW_STATE,
-    }),
-  );
-  return zip.generateAsync({ type: "nodebuffer" });
-}
+import { DEFAULT_INITIAL_VIEW_STATE, buildDemandPayload, makeZipBuffer } from "./map-demand-stats/helpers.js";
 
 test("generateGrid aggregates commute metrics into populated and empty cells", async () => {
   const grid = await generateGrid({
