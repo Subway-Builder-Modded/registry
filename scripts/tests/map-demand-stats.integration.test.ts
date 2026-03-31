@@ -290,6 +290,117 @@ test("generateMapDemandStats chooses latest semver custom version (not versions[
   }
 });
 
+test("generateMapDemandStats prefers the github asset named by manifest source for shared release repos", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-github-asset-"));
+  mkdirSync(join(repoRoot, "maps"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "bucharest-medium"), { recursive: true });
+
+  writeJson(join(repoRoot, "maps", "index.json"), {
+    schema_version: 1,
+    maps: ["bucharest-medium"],
+  });
+
+  writeJson(join(repoRoot, "maps", "bucharest-medium", "manifest.json"), {
+    schema_version: 1,
+    id: "bucharest-medium",
+    name: "Bucharest",
+    author: "test",
+    github_id: 1,
+    description: "desc",
+    tags: ["europe"],
+    gallery: ["gallery/a.png"],
+    source: "https://github.com/owner/romania/releases/latest/download/BUC.zip",
+    update: { type: "github", repo: "owner/romania" },
+    city_code: "BUC",
+    country: "RO",
+    population: 0,
+    residents_total: 0,
+    points_count: 0,
+    population_count: 0,
+    data_source: "Kontur",
+    source_quality: "medium-quality",
+    level_of_detail: "medium-detail",
+    location: "europe",
+    special_demand: [],
+  });
+
+  const iasiZip = await makeDemandZip([328_946]);
+  const bucharestZip = await makeDemandZip([2_300_000]);
+
+  const fetchMock = makeFetchRouter([
+    {
+      match: (url) => url === "https://api.github.com/graphql",
+      handle: () => new Response(JSON.stringify({
+        data: {
+          repository: {
+            releases: {
+              nodes: [
+                {
+                  tagName: "v1.1.1",
+                  releaseAssets: {
+                    nodes: [
+                      {
+                        name: "IAS.zip",
+                        downloadCount: 10,
+                        downloadUrl: "https://downloads.example.com/IAS.zip",
+                      },
+                      {
+                        name: "BUC.zip",
+                        downloadCount: 20,
+                        downloadUrl: "https://downloads.example.com/BUC.zip",
+                      },
+                    ],
+                    pageInfo: { hasNextPage: false, endCursor: null },
+                  },
+                },
+              ],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+          rateLimit: {
+            remaining: 4999,
+            cost: 1,
+            resetAt: "2026-03-11T00:00:00Z",
+          },
+        },
+      })),
+    },
+    {
+      match: (url) => url === "https://downloads.example.com/IAS.zip",
+      handle: () => new Response(new Uint8Array(iasiZip)),
+    },
+    {
+      match: (url) => url === "https://downloads.example.com/BUC.zip",
+      handle: () => new Response(new Uint8Array(bucharestZip)),
+    },
+  ]);
+
+  try {
+    const result = await generateMapDemandStats({
+      repoRoot,
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.equal(result.processedMaps, 1);
+    assert.equal(result.updatedMaps, 1);
+    assert.equal(result.skippedMaps, 0);
+    assert.equal(result.extractionFailures, 0);
+    assert.deepEqual(result.warnings, []);
+
+    const manifest = JSON.parse(readFileSync(join(repoRoot, "maps", "bucharest-medium", "manifest.json"), "utf-8"));
+    assert.equal(manifest.population, 2_300_000);
+    assert.equal(manifest.residents_total, 2_300_000);
+    assert.equal(manifest.points_count, 1);
+    assert.equal(manifest.population_count, 1);
+
+    const cache = JSON.parse(readFileSync(join(repoRoot, "maps", "demand-stats-cache.json"), "utf-8"));
+    assert.equal(cache["bucharest-medium"].source_fingerprint, "github:v1.1.1|BUC.zip");
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
 test("generateMapDemandStats warns when fetched custom payload is not a ZIP", async () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-nonzip-"));
   mkdirSync(join(repoRoot, "maps"), { recursive: true });

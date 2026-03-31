@@ -107,6 +107,45 @@ function warnListing(warnings: string[], listingId: string, message: string): vo
   warn(warnings, `listing=${listingId}: ${message}`);
 }
 
+function inferPreferredGithubAssetName(sourceUrl: string | undefined, repo: string): string | null {
+  if (typeof sourceUrl !== "string" || sourceUrl.trim() === "") {
+    return null;
+  }
+
+  const parsedAssetUrl = parseGitHubReleaseAssetDownloadUrl(sourceUrl);
+  if (parsedAssetUrl) {
+    return parsedAssetUrl.repo === repo.toLowerCase()
+      ? parsedAssetUrl.assetName
+      : null;
+  }
+
+  let parsed: URL;
+  try {
+    parsed = new URL(sourceUrl);
+  } catch {
+    return null;
+  }
+
+  if (parsed.hostname.toLowerCase() !== "github.com") {
+    return null;
+  }
+
+  const segments = parsed.pathname.split("/").filter(Boolean);
+  if (segments.length < 6) return null;
+  if (segments[2] !== "releases" || segments[3] !== "latest" || segments[4] !== "download") {
+    return null;
+  }
+
+  const sourceRepo = `${decodeURIComponent(segments[0] ?? "").trim()}/${decodeURIComponent(segments[1] ?? "").trim()}`
+    .toLowerCase();
+  if (!sourceRepo || sourceRepo !== repo.toLowerCase()) {
+    return null;
+  }
+
+  const assetName = decodeURIComponent(segments.slice(5).join("/")).trim();
+  return assetName !== "" ? assetName : null;
+}
+
 function isObject(value: unknown): value is JsonObject {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -245,6 +284,7 @@ function getLatestGithubZipUrl(
   repo: string,
   repoIndexes: Map<string, D.RepoReleaseIndex>,
   warnings: string[],
+  preferredAssetName?: string | null,
 ): ResolvedInstallTarget | null {
   const index = repoIndexes.get(repo.toLowerCase());
   if (!index) {
@@ -259,6 +299,31 @@ function getLatestGithubZipUrl(
   }
 
   const [tag, releaseData] = firstTagEntry.value;
+  if (preferredAssetName) {
+    const normalizedPreferredAssetName = preferredAssetName.toLowerCase();
+    for (const [assetName, asset] of releaseData.assets.entries()) {
+      if (assetName.toLowerCase() !== normalizedPreferredAssetName) continue;
+      if (!assetName.toLowerCase().endsWith(".zip")) {
+        warnListing(warnings, listingId, `preferred asset '${assetName}' in latest release '${tag}' is not a .zip`);
+        return null;
+      }
+      if (!asset.downloadUrl || asset.downloadUrl.trim() === "") {
+        warnListing(warnings, listingId, `preferred asset '${assetName}' in latest release '${tag}' is missing download URL`);
+        return null;
+      }
+      return {
+        zipUrl: asset.downloadUrl,
+        sourceFingerprint: `github:${tag}|${assetName}`,
+        attributionAssetKey: toDownloadAttributionAssetKey(repo.toLowerCase(), tag, assetName),
+      };
+    }
+    warnListing(
+      warnings,
+      listingId,
+      `preferred asset '${preferredAssetName}' not found in latest release '${tag}'; falling back to first .zip asset`,
+    );
+  }
+
   for (const [assetName, asset] of releaseData.assets.entries()) {
     if (!assetName.toLowerCase().endsWith(".zip")) continue;
     if (!asset.downloadUrl || asset.downloadUrl.trim() === "") {
@@ -670,6 +735,7 @@ export async function extractDemandStatsFromZipBuffer(
 
 async function resolveZipUrlForMapSource(
   listingId: string,
+  manifestSource: string | undefined,
   update: MapUpdateSource,
   fetchImpl: typeof fetch,
   token: string | undefined,
@@ -686,7 +752,13 @@ async function resolveZipUrlForMapSource(
     warnings,
     usageState,
   });
-  return getLatestGithubZipUrl(listingId, update.repo, repoIndexes, warnings);
+  return getLatestGithubZipUrl(
+    listingId,
+    update.repo,
+    repoIndexes,
+    warnings,
+    inferPreferredGithubAssetName(manifestSource, update.repo),
+  );
 }
 
 export async function resolveAndExtractDemandStatsForMapSource(
@@ -696,12 +768,14 @@ export async function resolveAndExtractDemandStatsForMapSource(
     fetchImpl?: typeof fetch;
     token?: string;
     requireResidentTotalsMatch?: boolean;
+    sourceUrl?: string;
   } = {},
 ): Promise<DemandStats> {
   const warnings: string[] = [];
   const fetchImpl = options.fetchImpl ?? fetch;
   const resolvedSource = await resolveZipUrlForMapSource(
     listingId,
+    options.sourceUrl,
     update,
     fetchImpl,
     options.token,
@@ -789,7 +863,13 @@ export async function generateMapDemandStats(
 
     let resolvedSource: ResolvedInstallTarget | null = null;
     if (manifest.update.type === "github") {
-      resolvedSource = getLatestGithubZipUrl(id, manifest.update.repo, repoIndexes, warnings);
+      resolvedSource = getLatestGithubZipUrl(
+        id,
+        manifest.update.repo,
+        repoIndexes,
+        warnings,
+        inferPreferredGithubAssetName(manifest.source, manifest.update.repo),
+      );
     } else {
       resolvedSource = await fetchCustomInstallTargetZipUrl(id, manifest.update.url, fetchImpl, warnings);
     }
