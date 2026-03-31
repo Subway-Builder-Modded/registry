@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { runGenerateAnalyticsCli } from "../lib/analytics-core.js";
@@ -92,6 +92,113 @@ test("runGenerateAnalyticsCli writes assets_by_day.csv grouped by listing type",
         "",
       ].join("\n"),
     );
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and removes legacy maps_by_population.csv", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-statistics-"));
+  mkdirSync(join(repoRoot, "analytics"), { recursive: true });
+  mkdirSync(join(repoRoot, "history"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "sample-map"), { recursive: true });
+
+  try {
+    writeJson(join(repoRoot, "maps", "index.json"), {
+      schema_version: 1,
+      maps: ["sample-map"],
+    });
+    writeJson(join(repoRoot, "maps", "sample-map", "manifest.json"), {
+      schema_version: 1,
+      id: "sample-map",
+      name: "Sample Map",
+      author: "mapmaker",
+      github_id: 1,
+      source: "https://github.com/example/sample-map",
+      city_code: "ABC",
+      country: "US",
+      population: 600,
+      population_count: 9,
+      points_count: 12,
+    });
+    writeJson(join(repoRoot, "maps", "sample-map", "grid.geojson"), {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {
+            jobs: 10,
+            pop: 100,
+            pointCount: 4,
+          },
+          geometry: {
+            type: "Polygon",
+            coordinates: [],
+          },
+        },
+        {
+          type: "Feature",
+          properties: {
+            jobs: 30,
+            pop: 300,
+            pointCount: 2,
+          },
+          geometry: {
+            type: "Polygon",
+            coordinates: [],
+          },
+        },
+        {
+          type: "Feature",
+          properties: {
+            jobs: 20,
+            pop: 200,
+            pointCount: 6,
+          },
+          geometry: {
+            type: "Polygon",
+            coordinates: [],
+          },
+        },
+      ],
+      properties: {
+        meanCommuteDistance: 15,
+        medianCommuteDistance: 12,
+      },
+    });
+    writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
+      schema_version: 2,
+      snapshot_date: "2026_03_31",
+      generated_at: "2026-03-31T00:00:00.000Z",
+      maps: {
+        downloads: {
+          "sample-map": {
+            "1.0.0": 1,
+          },
+        },
+      },
+      mods: {
+        downloads: {},
+      },
+    });
+    writeFileSync(
+      join(repoRoot, "analytics", "maps_by_population.csv"),
+      "legacy,stale,file\n",
+      "utf-8",
+    );
+
+    runGenerateAnalyticsCli([], repoRoot);
+
+    const mapsStatisticsCsv = readFileSync(join(repoRoot, "analytics", "maps_statistics.csv"), "utf-8");
+    assert.equal(
+      mapsStatisticsCsv,
+      [
+        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,median_point_density,mean_point_density,median_cell_resident_density,mean_cell_resident_density,median_cell_worker_density,mean_cell_worker_density,median_commute_distance,mean_commute_distance",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,4,200,200,20,20,12,15",
+        "",
+      ].join("\n"),
+    );
+    assert.equal(existsSync(join(repoRoot, "analytics", "maps_by_population.csv")), false);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }

@@ -1,4 +1,4 @@
-import { mkdirSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { writeCsv } from "./csv.js";
@@ -127,7 +127,7 @@ interface AuthorTotalDownloadsRow {
   mod_count: number;
 }
 
-interface MapPopulationRow {
+interface MapStatisticsRow {
   rank: number;
   id: string;
   name: string;
@@ -139,6 +139,15 @@ interface MapPopulationRow {
   population: number;
   population_count: number;
   points_count: number;
+  n_cells: number;
+  median_point_density: number;
+  mean_point_density: number;
+  median_cell_resident_density: number;
+  mean_cell_resident_density: number;
+  median_cell_worker_density: number;
+  mean_cell_worker_density: number;
+  median_commute_distance: number;
+  mean_commute_distance: number;
 }
 
 interface AssetByDayRow {
@@ -455,14 +464,108 @@ function toNonNegativeNumber(value: unknown): number {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
-function loadMapPopulationRows(repoRoot: string, authorAliases: AuthorAliasIndex): MapPopulationRow[] {
+function medianOf(values: number[]): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  return sorted[Math.floor(sorted.length / 2)] ?? 0;
+}
+
+interface GridCellFeatureProperties {
+  jobs?: unknown;
+  pop?: unknown;
+  pointCount?: unknown;
+}
+
+interface GridSummary {
+  n_cells: number;
+  median_point_density: number;
+  mean_point_density: number;
+  median_cell_resident_density: number;
+  mean_cell_resident_density: number;
+  median_cell_worker_density: number;
+  mean_cell_worker_density: number;
+  median_commute_distance: number;
+  mean_commute_distance: number;
+}
+
+function emptyGridSummary(): GridSummary {
+  return {
+    n_cells: 0,
+    median_point_density: 0,
+    mean_point_density: 0,
+    median_cell_resident_density: 0,
+    mean_cell_resident_density: 0,
+    median_cell_worker_density: 0,
+    mean_cell_worker_density: 0,
+    median_commute_distance: 0,
+    mean_commute_distance: 0,
+  };
+}
+
+function loadGridSummary(repoRoot: string, id: string): GridSummary {
+  const gridPath = join(repoRoot, "maps", id, "grid.geojson");
+  if (!existsSync(gridPath)) return emptyGridSummary();
+
+  try {
+    const grid = loadJsonFile<Record<string, unknown>>(gridPath);
+    const features = Array.isArray(grid.features) ? grid.features : [];
+    const populatedCells = features
+      .map((feature) => {
+        if (!isObject(feature)) return null;
+        const properties = isObject(feature.properties)
+          ? feature.properties as GridCellFeatureProperties
+          : {};
+        const pointCount = toNonNegativeNumber(properties.pointCount);
+        if (pointCount <= 0) return null;
+        return {
+          pointCount,
+          pop: toNonNegativeNumber(properties.pop),
+          jobs: toNonNegativeNumber(properties.jobs),
+        };
+      })
+      .filter((feature): feature is { pointCount: number; pop: number; jobs: number } => feature !== null);
+
+    const nCells = populatedCells.length;
+    if (nCells === 0) {
+      return {
+        ...emptyGridSummary(),
+        median_commute_distance: toNonNegativeNumber(isObject(grid.properties) ? grid.properties.medianCommuteDistance : undefined),
+        mean_commute_distance: toNonNegativeNumber(isObject(grid.properties) ? grid.properties.meanCommuteDistance : undefined),
+      };
+    }
+
+    const pointCounts = populatedCells.map((cell) => cell.pointCount);
+    const residentCounts = populatedCells.map((cell) => cell.pop);
+    const workerCounts = populatedCells.map((cell) => cell.jobs);
+    const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
+    const totalResidents = residentCounts.reduce((sum, value) => sum + value, 0);
+    const totalWorkers = workerCounts.reduce((sum, value) => sum + value, 0);
+    const gridProperties = isObject(grid.properties) ? grid.properties : {};
+
+    return {
+      n_cells: nCells,
+      median_point_density: medianOf(pointCounts),
+      mean_point_density: totalPoints / nCells,
+      median_cell_resident_density: medianOf(residentCounts),
+      mean_cell_resident_density: totalResidents / nCells,
+      median_cell_worker_density: medianOf(workerCounts),
+      mean_cell_worker_density: totalWorkers / nCells,
+      median_commute_distance: toNonNegativeNumber(gridProperties.medianCommuteDistance),
+      mean_commute_distance: toNonNegativeNumber(gridProperties.meanCommuteDistance),
+    };
+  } catch {
+    return emptyGridSummary();
+  }
+}
+
+function loadMapStatisticsRows(repoRoot: string, authorAliases: AuthorAliasIndex): MapStatisticsRow[] {
   const indexPath = join(repoRoot, "maps", "index.json");
   const index = loadJsonFile<{ maps?: unknown }>(indexPath);
   const mapIds = Array.isArray(index.maps)
     ? index.maps.filter((value): value is string => typeof value === "string")
     : [];
 
-  const rows: Omit<MapPopulationRow, "rank">[] = [];
+  const rows: Omit<MapStatisticsRow, "rank">[] = [];
   for (const id of mapIds) {
     const manifestPath = join(repoRoot, "maps", id, "manifest.json");
     try {
@@ -472,6 +575,7 @@ function loadMapPopulationRows(repoRoot: string, authorAliases: AuthorAliasIndex
         ? manifest.github_id
         : null;
       const presentation = resolveAuthorPresentation(author, githubId, authorAliases);
+      const gridSummary = loadGridSummary(repoRoot, id);
       rows.push({
         id,
         name: toNonEmptyString(manifest.name, id),
@@ -483,6 +587,7 @@ function loadMapPopulationRows(repoRoot: string, authorAliases: AuthorAliasIndex
         population: toNonNegativeNumber(manifest.population),
         population_count: toNonNegativeNumber(manifest.population_count),
         points_count: toNonNegativeNumber(manifest.points_count),
+        ...gridSummary,
       });
     } catch {
       rows.push({
@@ -496,12 +601,14 @@ function loadMapPopulationRows(repoRoot: string, authorAliases: AuthorAliasIndex
         population: 0,
         population_count: 0,
         points_count: 0,
+        ...emptyGridSummary(),
       });
     }
   }
 
   rows.sort((a, b) =>
     b.population - a.population
+    || b.n_cells - a.n_cells
     || b.population_count - a.population_count
     || b.points_count - a.points_count
     || a.id.localeCompare(b.id));
@@ -1272,9 +1379,12 @@ export function runGenerateAnalyticsCli(
     authorRowsByTotalDownloads,
   );
 
-  const mapPopulationRows = loadMapPopulationRows(resolvedRepoRoot, authorAliases);
-  writeCsv<MapPopulationRow>(
-    join(analyticsDir, "maps_by_population.csv"),
+  const legacyMapPopulationCsvPath = join(analyticsDir, "maps_by_population.csv");
+  rmSync(legacyMapPopulationCsvPath, { force: true });
+
+  const mapStatisticsRows = loadMapStatisticsRows(resolvedRepoRoot, authorAliases);
+  writeCsv<MapStatisticsRow>(
+    join(analyticsDir, "maps_statistics.csv"),
     [
       "rank",
       "id",
@@ -1287,8 +1397,17 @@ export function runGenerateAnalyticsCli(
       "population",
       "population_count",
       "points_count",
+      "n_cells",
+      "median_point_density",
+      "mean_point_density",
+      "median_cell_resident_density",
+      "mean_cell_resident_density",
+      "median_cell_worker_density",
+      "mean_cell_worker_density",
+      "median_commute_distance",
+      "mean_commute_distance",
     ],
-    mapPopulationRows,
+    mapStatisticsRows,
   );
 
   writeCsv<ListingProjectRow>(
