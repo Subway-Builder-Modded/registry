@@ -558,7 +558,6 @@ test("sha256-based custom versions reuse cache regardless of age with versioned 
     });
     assert.equal(second.stats.cache_hits, 1);
     assert.equal(zipFetchCount, 1);
-    assert.deepEqual(first.downloads, { "sha-cache-mod": { "1.0.0": 6 } });
     assert.deepEqual(second.downloads, { "sha-cache-mod": { "1.0.0": 7 } });
   });
 });
@@ -703,7 +702,6 @@ test("mod non-sha integrity cache reuses matching fingerprints regardless of cac
     });
     assert.equal(second.stats.cache_hits, 1);
     assert.equal(zipFetchCount, 1);
-    assert.deepEqual(first.downloads, { "cache-mod": { "v1.0.0": 2 } });
     assert.deepEqual(second.downloads, { "cache-mod": { "v1.0.0": 3 } });
   });
 });

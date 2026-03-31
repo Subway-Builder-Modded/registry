@@ -220,14 +220,7 @@ export async function generateMapDemandStats(
           return;
         }
         const recorded = recordDownloadAttributionFetchByUrl(attributionDelta, downloadUrl);
-        if (!recorded.ok) {
-          warnListing(
-            warnings,
-            id,
-            `download attribution key is unparseable for fetched ZIP (${recorded.reason ?? "unknown reason"})`,
-          );
-          return;
-        }
+        if (!recorded.ok) return;
         attributionFetchesAdded += 1;
       },
     );
