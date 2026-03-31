@@ -1,4 +1,5 @@
 import JSZip from "jszip";
+import { gunzipSync } from "node:zlib";
 import type { ManifestType } from "./manifests.js";
 import type { CompiledSecurityRule, SecurityIssue } from "./mod-security.js";
 import { scanZipForSecurityIssues } from "./mod-security.js";
@@ -67,6 +68,14 @@ interface InspectZipOptions {
   modSecurityRules?: CompiledSecurityRule[];
 }
 
+interface DemandPointCoordinate {
+  id: string;
+  location: [number, number];
+}
+
+const ISOLATED_MAP_POINT_DISTANCE_KM = 100;
+const EARTH_RADIUS_KM = 6371.0088;
+
 function listTopLevelFileNames(zip: JSZip): Set<string> {
   const names = new Set<string>();
   for (const entry of Object.values(zip.files)) {
@@ -75,6 +84,16 @@ function listTopLevelFileNames(zip: JSZip): Set<string> {
     names.add(entry.name);
   }
   return names;
+}
+
+function findTopLevelEntry(zip: JSZip, names: string[]): JSZip.JSZipObject | null {
+  for (const name of names) {
+    const entry = zip.files[name];
+    if (entry && !entry.dir && !entry.name.includes("/")) {
+      return entry;
+    }
+  }
+  return null;
 }
 
 function bytesToMebibytesRounded(value: number): number {
@@ -123,6 +142,23 @@ function firstMatch(files: Set<string>, names: string[]): string | null {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function toFiniteNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function getDemandPointRef(pointValue: unknown, fallbackRef: string): string {
+  if (isObject(pointValue)) {
+    const idValue = pointValue.id;
+    if (typeof idValue === "string" && idValue.trim() !== "") {
+      return idValue.trim();
+    }
+    if (typeof idValue === "number" && Number.isFinite(idValue)) {
+      return String(idValue);
+    }
+  }
+  return fallbackRef;
 }
 
 function findConfigCode(value: unknown): string | null {
@@ -178,14 +214,157 @@ async function parseConfigCode(zip: JSZip): Promise<{
   };
 }
 
-function inspectMapZip(
+async function parseDemandPointCoordinates(zip: JSZip): Promise<DemandPointCoordinate[]> {
+  const demandDataEntry = findTopLevelEntry(zip, ["demand_data.json", "demand_data.json.gz"]);
+  if (!demandDataEntry) {
+    return [];
+  }
+
+  let rawText: string;
+  try {
+    if (demandDataEntry.name.toLowerCase().endsWith(".gz")) {
+      const compressed = await demandDataEntry.async("nodebuffer");
+      rawText = gunzipSync(compressed).toString("utf-8");
+    } else {
+      rawText = await demandDataEntry.async("string");
+    }
+  } catch {
+    return [];
+  }
+
+  let payload: unknown;
+  try {
+    payload = JSON.parse(rawText);
+  } catch {
+    return [];
+  }
+
+  if (!isObject(payload) && !Array.isArray(payload)) {
+    return [];
+  }
+
+  const pointsRaw = isObject(payload) ? payload.points : null;
+  if (!Array.isArray(pointsRaw) && !isObject(pointsRaw)) {
+    return [];
+  }
+
+  const pointEntries = Array.isArray(pointsRaw)
+    ? pointsRaw.map((pointValue, index) => [String(index), pointValue] as const)
+    : Object.entries(pointsRaw);
+
+  const coordinates: DemandPointCoordinate[] = [];
+  for (const [pointKey, pointValue] of pointEntries) {
+    if (!isObject(pointValue)) continue;
+    const locationRaw = pointValue.location;
+    if (!Array.isArray(locationRaw) || locationRaw.length < 2) continue;
+    const longitude = toFiniteNumber(locationRaw[0]);
+    const latitude = toFiniteNumber(locationRaw[1]);
+    if (longitude === null || latitude === null) continue;
+    coordinates.push({
+      id: getDemandPointRef(pointValue, pointKey),
+      location: [longitude, latitude],
+    });
+  }
+
+  return coordinates;
+}
+
+function greatCircleDistanceKm(a: [number, number], b: [number, number]): number {
+  const toRadians = (degrees: number) => degrees * (Math.PI / 180);
+  const latitude1 = toRadians(a[1]);
+  const latitude2 = toRadians(b[1]);
+  const deltaLatitude = toRadians(b[1] - a[1]);
+  const deltaLongitude = toRadians(b[0] - a[0]);
+  const haversine = (
+    Math.sin(deltaLatitude / 2) ** 2
+    + Math.cos(latitude1) * Math.cos(latitude2) * Math.sin(deltaLongitude / 2) ** 2
+  );
+  const arc = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+  return EARTH_RADIUS_KM * arc;
+}
+
+function findIsolatedDemandPoints(points: DemandPointCoordinate[]): Array<{ id: string; nearestDistanceKm: number }> {
+  if (points.length < 2) {
+    return [];
+  }
+
+  const cellSizeDegrees = 1;
+  const bucketKey = (longitude: number, latitude: number): string => (
+    `${Math.floor(latitude / cellSizeDegrees)}:${Math.floor(longitude / cellSizeDegrees)}`
+  );
+  const buckets = new Map<string, number[]>();
+
+  for (let index = 0; index < points.length; index += 1) {
+    const [longitude, latitude] = points[index].location;
+    const key = bucketKey(longitude, latitude);
+    const existing = buckets.get(key) ?? [];
+    existing.push(index);
+    buckets.set(key, existing);
+  }
+
+  const isolated: Array<{ id: string; nearestDistanceKm: number }> = [];
+  const latitudeRange = Math.ceil(ISOLATED_MAP_POINT_DISTANCE_KM / 111.32) + 1;
+
+  for (let index = 0; index < points.length; index += 1) {
+    const point = points[index];
+    const [longitude, latitude] = point.location;
+    const latBucket = Math.floor(latitude / cellSizeDegrees);
+    const lonBucket = Math.floor(longitude / cellSizeDegrees);
+    const cosLatitude = Math.max(0.01, Math.abs(Math.cos(latitude * (Math.PI / 180))));
+    const longitudeRange = Math.ceil(ISOLATED_MAP_POINT_DISTANCE_KM / (111.32 * cosLatitude)) + 1;
+
+    let nearestDistanceKm = Number.POSITIVE_INFINITY;
+    let hasNeighborWithinThreshold = false;
+
+    for (let latOffset = -latitudeRange; latOffset <= latitudeRange && !hasNeighborWithinThreshold; latOffset += 1) {
+      for (let lonOffset = -longitudeRange; lonOffset <= longitudeRange; lonOffset += 1) {
+        const candidateIndexes = buckets.get(`${latBucket + latOffset}:${lonBucket + lonOffset}`);
+        if (!candidateIndexes) continue;
+        for (const candidateIndex of candidateIndexes) {
+          if (candidateIndex === index) continue;
+          const distanceKm = greatCircleDistanceKm(point.location, points[candidateIndex].location);
+          if (distanceKm < nearestDistanceKm) {
+            nearestDistanceKm = distanceKm;
+          }
+          if (distanceKm <= ISOLATED_MAP_POINT_DISTANCE_KM) {
+            hasNeighborWithinThreshold = true;
+            break;
+          }
+        }
+        if (hasNeighborWithinThreshold) {
+          break;
+        }
+      }
+    }
+
+    if (!hasNeighborWithinThreshold) {
+      if (!Number.isFinite(nearestDistanceKm)) {
+        for (let candidateIndex = 0; candidateIndex < points.length; candidateIndex += 1) {
+          if (candidateIndex === index) continue;
+          const distanceKm = greatCircleDistanceKm(point.location, points[candidateIndex].location);
+          if (distanceKm < nearestDistanceKm) {
+            nearestDistanceKm = distanceKm;
+          }
+        }
+      }
+      if (Number.isFinite(nearestDistanceKm) && nearestDistanceKm > ISOLATED_MAP_POINT_DISTANCE_KM) {
+        isolated.push({ id: point.id, nearestDistanceKm });
+      }
+    }
+  }
+
+  return isolated;
+}
+
+async function inspectMapZip(
+  zip: JSZip,
   files: Set<string>,
   fileSizes: Record<string, number>,
   registryCityCode: string | null,
   configCode: string | null,
   parseError: string | null,
   configCodeMismatchWarning: string | null,
-): ZipCompletenessResult {
+): Promise<ZipCompletenessResult> {
   const requiredChecks: Record<string, boolean> = {};
   const matchedFiles: Record<string, string | null> = {};
   const errors: string[] = [];
@@ -205,6 +384,25 @@ function inspectMapZip(
   matchedFiles.demand_data = demandData;
   if (!demandData) {
     errors.push("missing top-level demand_data.json or demand_data.json.gz");
+  } else {
+    const demandPoints = await parseDemandPointCoordinates(zip);
+    if (demandPoints.length >= 2) {
+      const isolatedPoints = findIsolatedDemandPoints(demandPoints);
+      requiredChecks.demand_point_spacing = isolatedPoints.length === 0;
+      matchedFiles.demand_point_spacing = demandData;
+      if (isolatedPoints.length > 0) {
+        const examples = isolatedPoints
+          .slice(0, 5)
+          .map((point) => `${point.id}=${point.nearestDistanceKm.toFixed(1)}km`)
+          .join(", ");
+        const remainder = isolatedPoints.length > 5
+          ? ` (+${isolatedPoints.length - 5} more)`
+          : "";
+        errors.push(
+          `demand_data contains ${isolatedPoints.length} isolated point(s) with nearest-neighbor distance >${ISOLATED_MAP_POINT_DISTANCE_KM}km: ${examples}${remainder}`,
+        );
+      }
+    }
   }
 
   const buildingsIndex = firstMatch(files, ["buildings_index.json", "buildings_index.json.gz"]);
@@ -378,7 +576,8 @@ export async function inspectZipCompleteness(
       )
       : null;
 
-    return inspectMapZip(
+    return await inspectMapZip(
+      zip,
       topLevelFiles,
       zipFileSizes,
       registryCityCode,

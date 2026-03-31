@@ -4,6 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { generateMapDemandStats } from "../lib/map-demand-stats.js";
+import { createDownloadAttributionDelta } from "../lib/download-attribution.js";
 import { DEFAULT_INITIAL_VIEW_STATE, makeDemandZip, makeFetchRouter, writeJson } from "./map-demand-stats/helpers.js";
 
 function writeDemandStatsCacheV2(
@@ -78,6 +79,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
 
   const githubZip = await makeDemandZip([11, 22, 33]);
   const customZip = await makeDemandZip([5, 6]);
+  const attributionDelta = createDownloadAttributionDelta("workflow:test", "run-map-demand");
 
   const fetchMock = makeFetchRouter([
     {
@@ -139,6 +141,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
       repoRoot,
       fetchImpl: fetchMock,
       token: "test-token",
+      attributionDelta,
     });
 
     assert.equal(result.processedMaps, 2);
@@ -148,7 +151,10 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     assert.equal(result.skippedUnchanged, 0);
     assert.equal(result.extractionFailures, 0);
     assert.equal(result.residentsDeltaTotal, 74);
+    assert.equal(result.attributionFetchesAdded, 1);
     assert.deepEqual(result.warnings, []);
+    assert.equal(attributionDelta.assets["owner/repo@v1.0.0/map.zip"], 1);
+    assert.equal(Object.keys(attributionDelta.assets).length, 1);
 
     const githubManifest = JSON.parse(readFileSync(join(repoRoot, "maps", "github-map", "manifest.json"), "utf-8"));
     assert.equal(githubManifest.population, 66);

@@ -12,6 +12,26 @@ async function makeZip(entries: Record<string, string>): Promise<Buffer> {
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
+function makeDemandData(points: Array<{ id: string; location: [number, number] }>): string {
+  return JSON.stringify({
+    points: points.map((point) => ({
+      id: point.id,
+      location: point.location,
+      jobs: 1,
+      residents: 1,
+    })),
+    pops_map: points.map((point, index) => ({
+      id: `pop-${index + 1}`,
+      size: 1,
+    })),
+    pops: points.map((point) => ({
+      residenceId: point.id,
+      jobId: point.id,
+      drivingDistance: 1,
+    })),
+  });
+}
+
 test("map integrity requires exact top-level files including city pmtiles", async () => {
   const zipBuffer = await makeZip({
     "config.json": "{\"code\":\"ABC\"}",
@@ -100,6 +120,28 @@ test("map integrity does not fall back to registry city_code when config code is
   const result = await inspectZipCompleteness("map", zipBuffer, { cityCode: "REG" });
   assert.equal(result.isComplete, false);
   assert.ok(result.errors.some((error) => error.includes("missing code in config.json")));
+});
+
+test("map integrity fails when a demand point is more than 100km from its nearest neighbor", async () => {
+  const zipBuffer = await makeZip({
+    "config.json": "{\"code\":\"ABC\"}",
+    "demand_data.json": makeDemandData([
+      { id: "city-a", location: [0, 0] },
+      { id: "city-b", location: [0.02, 0.02] },
+      { id: "remote", location: [2, 2] },
+    ]),
+    "buildings_index.json": "{}",
+    "roads.geojson": "{}",
+    "runways_taxiways.geojson": "{}",
+    "ABC.pmtiles": "stub",
+  });
+
+  const result = await inspectZipCompleteness("map", zipBuffer, { cityCode: "ABC" });
+  assert.equal(result.isComplete, false);
+  assert.equal(result.requiredChecks.demand_point_spacing, false);
+  assert.ok(result.errors.some((error) => error.includes("isolated point(s)")));
+  assert.ok(result.errors.some((error) => error.includes(">100km")));
+  assert.ok(result.errors.some((error) => error.includes("remote")));
 });
 
 test("mod integrity requires both release manifest asset and top-level zip manifest", async () => {

@@ -87,7 +87,47 @@ async function makeModZipWithSources(
 async function makeMapZip(cityCode: string): Promise<Buffer> {
   const zip = new JSZip();
   zip.file("config.json", JSON.stringify({ code: cityCode }));
-  zip.file("demand_data.json", "{}");
+  zip.file("demand_data.json", JSON.stringify({
+    points: [
+      { id: "pt1", location: [0, 0], jobs: 1, residents: 1 },
+    ],
+    pops_map: [
+      { id: "pop1", size: 1 },
+    ],
+    pops: [
+      { residenceId: "pt1", jobId: "pt1", drivingDistance: 1 },
+    ],
+  }));
+  zip.file("buildings_index.json", "{}");
+  zip.file("roads.geojson", "{}");
+  zip.file("runways_taxiways.geojson", "{}");
+  zip.file(`${cityCode}.pmtiles`, "stub");
+  return zip.generateAsync({ type: "nodebuffer" });
+}
+
+async function makeMapZipWithPointLocations(
+  cityCode: string,
+  locations: Array<{ id: string; location: [number, number] }>,
+): Promise<Buffer> {
+  const zip = new JSZip();
+  zip.file("config.json", JSON.stringify({ code: cityCode }));
+  zip.file("demand_data.json", JSON.stringify({
+    points: locations.map((point) => ({
+      id: point.id,
+      location: point.location,
+      jobs: 1,
+      residents: 1,
+    })),
+    pops_map: locations.map((point, index) => ({
+      id: `pop${index + 1}`,
+      size: 1,
+    })),
+    pops: locations.map((point) => ({
+      residenceId: point.id,
+      jobId: point.id,
+      drivingDistance: 1,
+    })),
+  }));
   zip.file("buildings_index.json", "{}");
   zip.file("roads.geojson", "{}");
   zip.file("runways_taxiways.geojson", "{}");
@@ -238,9 +278,11 @@ test("github releases are integrity-validated and filtered before download aggre
 
     assert.deepEqual(downloads, {
       "github-mod": {
-        "v2.0.0": 15,
+        "v2.0.0": 14,
       },
     });
+    assert.equal(stats.registry_fetches_added, 2);
+    assert.equal(stats.adjusted_delta_total, 2);
     assert.equal(stats.filtered_versions, 1);
     assert.equal(stats.complete_versions, 1);
     assert.equal(stats.incomplete_versions, 2);
@@ -337,9 +379,11 @@ test("custom mixed versions produce explicit invalid integrity entries and hard-
 
     assert.deepEqual(downloads, {
       "custom-mod": {
-        "1.0.0": 12,
+        "1.0.0": 11,
       },
     });
+    assert.equal(stats.registry_fetches_added, 1);
+    assert.equal(stats.adjusted_delta_total, 1);
     assert.equal(stats.filtered_versions, 2);
     assert.equal(integrity.listings["custom-mod"]?.versions["1.0.0"]?.is_complete, true);
     assert.equal(typeof integrity.listings["custom-mod"]?.versions["1.0.0"]?.release_size, "number");
@@ -422,11 +466,13 @@ test("custom versions sharing the same release asset reuse a single ZIP inspecti
 
     assert.deepEqual(result.downloads, {
       "shared-asset-mod": {
-        "1.0.0": 21,
-        "1.0.1": 21,
+        "1.0.0": 20,
+        "1.0.1": 20,
       },
     });
     assert.equal(zipFetchCount, 1);
+    assert.equal(result.stats.registry_fetches_added, 1);
+    assert.equal(result.stats.adjusted_delta_total, 2);
     assert.equal(result.integrity.listings["shared-asset-mod"]?.versions["1.0.0"]?.is_complete, true);
     assert.equal(result.integrity.listings["shared-asset-mod"]?.versions["1.0.1"]?.is_complete, true);
   });
@@ -512,7 +558,8 @@ test("sha256-based custom versions reuse cache regardless of age with versioned 
     });
     assert.equal(second.stats.cache_hits, 1);
     assert.equal(zipFetchCount, 1);
-    assert.deepEqual(second.downloads, first.downloads);
+    assert.deepEqual(first.downloads, { "sha-cache-mod": { "1.0.0": 6 } });
+    assert.deepEqual(second.downloads, { "sha-cache-mod": { "1.0.0": 7 } });
   });
 });
 
@@ -580,10 +627,12 @@ test("custom mod integrity honors versions[].manifest asset name when checking r
 
     assert.deepEqual(result.downloads, {
       "custom-manifest-mod": {
-        "0.1.0": 13,
+        "0.1.0": 12,
       },
     });
     assert.equal(result.integrity.listings["custom-manifest-mod"]?.versions["0.1.0"]?.is_complete, true);
+    assert.equal(result.stats.registry_fetches_added, 1);
+    assert.equal(result.stats.adjusted_delta_total, 1);
     assert.equal(result.stats.filtered_versions, 0);
   });
 });
@@ -654,7 +703,8 @@ test("mod non-sha integrity cache reuses matching fingerprints regardless of cac
     });
     assert.equal(second.stats.cache_hits, 1);
     assert.equal(zipFetchCount, 1);
-    assert.deepEqual(second.downloads, first.downloads);
+    assert.deepEqual(first.downloads, { "cache-mod": { "v1.0.0": 2 } });
+    assert.deepEqual(second.downloads, { "cache-mod": { "v1.0.0": 3 } });
   });
 });
 
@@ -832,8 +882,9 @@ test("full mode records ZIP fetch attribution deltas on successful fetches", asy
       },
     });
 
-    assert.deepEqual(result.downloads, { "github-mod": { "v2.0.0": 15 } });
+    assert.deepEqual(result.downloads, { "github-mod": { "v2.0.0": 14 } });
     assert.equal(result.stats.registry_fetches_added, 1);
+    assert.equal(result.stats.adjusted_delta_total, 1);
     assert.equal(delta.assets["owner/good@v2.0.0/good-v2.zip"], 1);
   });
 });
@@ -994,7 +1045,9 @@ test("map complete versions include file_sizes and legacy cache entries without 
       token: "test-token",
     });
     assert.equal(zipFetchCount, 1);
-    assert.deepEqual(first.downloads, { "cache-map": { "v1.0.0": 11 } });
+    assert.deepEqual(first.downloads, { "cache-map": { "v1.0.0": 10 } });
+    assert.equal(first.stats.registry_fetches_added, 1);
+    assert.equal(first.stats.adjusted_delta_total, 1);
     const firstVersion = first.integrity.listings["cache-map"]?.versions["v1.0.0"];
     assert.equal(firstVersion?.is_complete, true);
     assert.equal(typeof firstVersion?.release_size, "number");
@@ -1021,6 +1074,74 @@ test("map complete versions include file_sizes and legacy cache entries without 
     assert.equal(typeof secondVersion?.release_size, "number");
     assert.equal(typeof secondVersion?.file_sizes?.["config.json"], "number");
     assert.equal(typeof secondVersion?.file_sizes?.["ABC.pmtiles"], "number");
+  });
+});
+
+test("map integrity blocks downloads when a demand point is isolated by more than 100km", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("maps", ["isolated-map"]);
+    writeIndex("mods", []);
+    writeManifest("maps", "isolated-map", {
+      ...makeBaseMapManifest("isolated-map"),
+      update: { type: "github", repo: "owner/isolated-map" },
+    });
+
+    const mapZip = await makeMapZipWithPointLocations("ABC", [
+      { id: "center-1", location: [0, 0] },
+      { id: "center-2", location: [0.02, 0.02] },
+      { id: "remote", location: [2, 2] },
+    ]);
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/isolated-map.zip",
+        handle: () => new Response(new Uint8Array(mapZip)),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "isolated-map.zip", downloadCount: 11, downloadUrl: "https://downloads.example.com/isolated-map.zip" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "map",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.deepEqual(result.downloads, { "isolated-map": {} });
+    assert.equal(result.integrity.listings["isolated-map"]?.versions["v1.0.0"]?.is_complete, false);
+    assert.equal(result.integrity.listings["isolated-map"]?.versions["v1.0.0"]?.required_checks.demand_point_spacing, false);
+    assert.ok(
+      (result.integrity.listings["isolated-map"]?.versions["v1.0.0"]?.errors ?? [])
+        .some((error) => error.includes("isolated point(s)") && error.includes("remote")),
+    );
+    assert.ok(
+      result.warnings.some((warning) => (
+        warning.includes("isolated-map")
+        && warning.includes("excluded by integrity validation")
+        && warning.includes(">100km")
+      )),
+    );
   });
 });
 
@@ -1154,7 +1275,9 @@ test("mod security WARNING findings are recorded but do not block completeness",
       fetchImpl: fetchMock,
       token: "test-token",
     });
-    assert.deepEqual(result.downloads, { "warning-mod": { "v1.0.0": 5 } });
+    assert.deepEqual(result.downloads, { "warning-mod": { "v1.0.0": 4 } });
+    assert.equal(result.stats.registry_fetches_added, 1);
+    assert.equal(result.stats.adjusted_delta_total, 1);
     assert.equal(result.integrity.listings["warning-mod"]?.versions["v1.0.0"]?.is_complete, true);
     assert.equal(result.integrity.listings["warning-mod"]?.versions["v1.0.0"]?.required_checks.security_scan_passed, true);
     assert.equal(

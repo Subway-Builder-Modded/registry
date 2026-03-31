@@ -20,16 +20,40 @@ export interface DemandData {
 }
 
 const HEARTBEAT_INTERVAL_MS = Number.parseInt(process.env.CI_HEARTBEAT_MS ?? "5000", 10);
+const HEARTBEAT_ITEMS = Number.parseInt(process.env.CI_HEARTBEAT_ITEMS ?? "2500", 10);
 
 const createHeartbeat = (label: string, mapId: string, total: number) => {
     let lastLogTime = 0;
+    let lastLoggedCount = 0;
+    let hasLogged = false;
 
     return (current: number, force = false) => {
+        const boundedCurrent = Math.max(0, Math.min(current, total));
         const now = Date.now();
-        if(force || now - lastLogTime >= HEARTBEAT_INTERVAL_MS) {
+        const reachedCountInterval = (
+            HEARTBEAT_ITEMS > 0
+            && boundedCurrent - lastLoggedCount >= HEARTBEAT_ITEMS
+        );
+        const reachedTimeInterval = (
+            hasLogged
+            && boundedCurrent > lastLoggedCount
+            && now - lastLogTime >= HEARTBEAT_INTERVAL_MS
+        );
+        const reachedCompletion = boundedCurrent === total && boundedCurrent > lastLoggedCount;
+        const shouldLog = (
+            (force && boundedCurrent !== lastLoggedCount)
+            || (!hasLogged && boundedCurrent > 0 && (reachedCountInterval || reachedCompletion))
+            || reachedCountInterval
+            || reachedTimeInterval
+            || reachedCompletion
+        );
+
+        if (shouldLog) {
             lastLogTime = now;
-            const percent = total > 0 ? ((current / total) * 100).toFixed(1) : "0.0";
-            console.log(`[heartbeat] ${label}{${mapId}}: ${current}/${total} (${percent}%)`);
+            lastLoggedCount = boundedCurrent;
+            hasLogged = true;
+            const percent = total > 0 ? ((boundedCurrent / total) * 100).toFixed(1) : "0.0";
+            console.log(`[heartbeat] ${label}{${mapId}}: ${boundedCurrent}/${total} (${percent}%)`);
         }
     };
 };
@@ -53,7 +77,7 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
     }))
     pointsHeartbeat(pointsCounter, true);
 
-    const grid = turf.squareGrid(turf.bbox(points), 1, {units: "kilometers"});
+    const grid = turf.squareGrid(turf.bbox(points), 1, { units: "kilometers" });
 
     let counter = 0;
     let total = grid.features.length;
@@ -64,34 +88,34 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
         const jobs = pointsInCell.features.reduce((sum: number, point: any) => sum + point.properties.jobs, 0);
         const pop = pointsInCell.features.reduce((sum: number, point: any) => sum + point.properties.pop, 0);
         const homeWorkCommuteDistances = pointsInCell.features.reduce(
-          (arr: number[], point: any) => arr.concat(point.properties!.homeWorkCommuteDistances as number[]),
-          [],
+            (arr: number[], point: any) => arr.concat(point.properties!.homeWorkCommuteDistances as number[]),
+            [],
         );
         const workHomeCommuteDistances = pointsInCell.features.reduce(
-          (arr: number[], point: any) => arr.concat(point.properties!.workHomeCommuteDistances as number[]),
-          [],
+            (arr: number[], point: any) => arr.concat(point.properties!.workHomeCommuteDistances as number[]),
+            [],
         );
 
         feature.properties!.jobs = jobs;
         feature.properties!.pop = pop;
 
         feature.properties!.pointCount = pointsInCell.features.length;
-        
-        if(homeWorkCommuteDistances.length === 0) {
+
+        if (homeWorkCommuteDistances.length === 0) {
             feature.properties!.homeWorkCommuteMedian = -1;
         }
         else {
             feature.properties!.homeWorkCommuteMedian = homeWorkCommuteDistances
-              .sort((a: number, b: number) => a - b)[Math.floor(homeWorkCommuteDistances.length / 2)];
+                .sort((a: number, b: number) => a - b)[Math.floor(homeWorkCommuteDistances.length / 2)];
         }
-   
-        if(workHomeCommuteDistances.length > 0) {
+
+        if (workHomeCommuteDistances.length > 0) {
             feature.properties!.workHomeCommuteMedian = workHomeCommuteDistances
-              .sort((a: number, b: number) => a - b)[Math.floor(workHomeCommuteDistances.length / 2)];
+                .sort((a: number, b: number) => a - b)[Math.floor(workHomeCommuteDistances.length / 2)];
         } else {
             feature.properties!.workHomeCommuteMedian = -1;
         }
-    cellsHeartbeat(counter);
+        cellsHeartbeat(counter);
     });
     cellsHeartbeat(counter, true);
 
