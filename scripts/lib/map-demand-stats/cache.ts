@@ -108,7 +108,7 @@ export function writeGridFile(
   listingId: string,
   grid: FeatureCollection<Polygon, GeoJsonProperties>,
 ): void {
-  writeFileSync(getGridPath(repoRoot, listingId), `${JSON.stringify(grid, null, 2)}\n`, "utf-8");
+  writeFileSync(getGridPath(repoRoot, listingId), `${JSON.stringify(grid)}\n`, "utf-8");
 }
 
 export function buildGridCacheEntry(): { schema_version: number } {
