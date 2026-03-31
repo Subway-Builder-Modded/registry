@@ -179,7 +179,10 @@ Map manifests now support auto-derived demand metrics from map ZIPs:
 - `residents_total`
 - `points_count`
 - `population_count`
+- `maps/<map-id>/grid.geojson` (generated demand grid artifact committed by the registry analytics workflow)
 - `file_sizes` (synced from integrity for the latest complete semver version)
+
+The demand-stats cache at `maps/demand-stats-cache.json` is schema-versioned. Grid algorithm changes should bump the grid schema version so the next registry analytics run regenerates cached grids.
 
 Local command:
 

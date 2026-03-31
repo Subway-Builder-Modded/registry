@@ -118,7 +118,7 @@ async function run(): Promise<void> {
     `[map-demand-stats] GraphQL usage: queries=${result.rateLimit.queries}, totalCost=${result.rateLimit.totalCost}, firstRemaining=${result.rateLimit.firstRemaining ?? "n/a"}, lastRemaining=${result.rateLimit.lastRemaining ?? "n/a"}, estimatedConsumed=${result.rateLimit.estimatedConsumed ?? "n/a"}, resetAt=${result.rateLimit.resetAt ?? "n/a"}`,
   );
   console.log(
-    `[map-demand-stats] Summary: processedMaps=${result.processedMaps}, updatedMaps=${result.updatedMaps}, skippedMaps=${result.skippedMaps}, skippedUnchanged=${result.skippedUnchanged}, extractionFailures=${result.extractionFailures}, residentsDeltaTotal=${result.residentsDeltaTotal}`,
+    `[map-demand-stats] Summary: processedMaps=${result.processedMaps}, updatedMaps=${result.updatedMaps}, gridFilesWritten=${result.gridFilesWritten}, skippedMaps=${result.skippedMaps}, skippedUnchanged=${result.skippedUnchanged}, extractionFailures=${result.extractionFailures}, residentsDeltaTotal=${result.residentsDeltaTotal}`,
   );
   console.log(
     `[map-demand-stats] Attribution stats: registryFetchesAdded=${sumDownloadAttributionDeltaFetches(attributionDelta)}`,
@@ -132,6 +132,7 @@ async function run(): Promise<void> {
   appendGitHubOutput([
     `processed_maps=${result.processedMaps}`,
     `updated_maps=${result.updatedMaps}`,
+    `grid_files_written=${result.gridFilesWritten}`,
     `skipped_maps=${result.skippedMaps}`,
     `skipped_unchanged=${result.skippedUnchanged}`,
     `extraction_failures=${result.extractionFailures}`,

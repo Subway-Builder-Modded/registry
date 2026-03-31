@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import JSZip from "jszip";
@@ -26,6 +26,16 @@ function writeJson(path: string, value: unknown): void {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, "utf-8");
 }
 
+function writeDemandStatsCacheV2(
+  repoRoot: string,
+  listings: Record<string, unknown>,
+): void {
+  writeJson(join(repoRoot, "maps", "demand-stats-cache.json"), {
+    schema_version: 2,
+    listings,
+  });
+}
+
 const DEFAULT_INITIAL_VIEW_STATE = {
   latitude: 38.312462,
   longitude: 140.325418,
@@ -34,13 +44,23 @@ const DEFAULT_INITIAL_VIEW_STATE = {
 };
 
 async function makeDemandZip(residents: number[]): Promise<Buffer> {
-  const points: Record<string, { residents: number }> = {};
-  const popsMap: Record<string, { size: number }> = {};
-  residents.forEach((value, index) => {
-    points[`pt${index + 1}`] = { residents: value };
-    popsMap[`pop${index + 1}`] = { size: value };
-  });
-  const payload = { points, pops_map: popsMap };
+  const payload = {
+    points: residents.map((value, index) => ({
+      id: `pt${index + 1}`,
+      location: [index * 0.03, index * 0.03],
+      jobs: index + 1,
+      residents: value,
+    })),
+    pops_map: residents.map((value, index) => ({
+      id: `pop${index + 1}`,
+      size: value,
+    })),
+    pops: residents.map((_, index) => ({
+      residenceId: `pt${index + 1}`,
+      jobId: `pt${index + 1}`,
+      drivingDistance: (index + 1) * 10,
+    })),
+  };
   const zip = new JSZip();
   zip.file("demand_data.json", JSON.stringify(payload));
   zip.file(
@@ -179,6 +199,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
 
     assert.equal(result.processedMaps, 2);
     assert.equal(result.updatedMaps, 2);
+    assert.equal(result.gridFilesWritten, 2);
     assert.equal(result.skippedMaps, 0);
     assert.equal(result.skippedUnchanged, 0);
     assert.equal(result.extractionFailures, 0);
@@ -196,6 +217,9 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     assert.equal(customManifest.residents_total, 11);
     assert.equal(customManifest.points_count, 2);
     assert.equal(customManifest.population_count, 2);
+
+    assert.equal(existsSync(join(repoRoot, "maps", "github-map", "grid.geojson")), true);
+    assert.equal(existsSync(join(repoRoot, "maps", "custom-map", "grid.geojson")), true);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
@@ -276,6 +300,7 @@ test("generateMapDemandStats chooses latest semver custom version (not versions[
 
     assert.equal(result.processedMaps, 1);
     assert.equal(result.updatedMaps, 1);
+    assert.equal(result.gridFilesWritten, 1);
     assert.equal(result.skippedMaps, 0);
     assert.equal(result.extractionFailures, 0);
     assert.equal(oldZipFetchCount, 0);
@@ -384,6 +409,7 @@ test("generateMapDemandStats prefers the github asset named by manifest source f
 
     assert.equal(result.processedMaps, 1);
     assert.equal(result.updatedMaps, 1);
+    assert.equal(result.gridFilesWritten, 1);
     assert.equal(result.skippedMaps, 0);
     assert.equal(result.extractionFailures, 0);
     assert.deepEqual(result.warnings, []);
@@ -395,7 +421,10 @@ test("generateMapDemandStats prefers the github asset named by manifest source f
     assert.equal(manifest.population_count, 1);
 
     const cache = JSON.parse(readFileSync(join(repoRoot, "maps", "demand-stats-cache.json"), "utf-8"));
-    assert.equal(cache["bucharest-medium"].source_fingerprint, "github:v1.1.1|BUC.zip");
+    assert.equal(cache.schema_version, 2);
+    assert.equal(cache.listings["bucharest-medium"].source_fingerprint, "github:v1.1.1|BUC.zip");
+    assert.equal(cache.listings["bucharest-medium"].grid.schema_version, 1);
+    assert.equal(existsSync(join(repoRoot, "maps", "bucharest-medium", "grid.geojson")), true);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
@@ -464,6 +493,7 @@ test("generateMapDemandStats warns when fetched custom payload is not a ZIP", as
 
     assert.equal(result.processedMaps, 1);
     assert.equal(result.updatedMaps, 0);
+    assert.equal(result.gridFilesWritten, 0);
     assert.equal(result.skippedMaps, 1);
     assert.equal(result.extractionFailures, 1);
     assert.ok(
@@ -523,6 +553,7 @@ test("generateMapDemandStats skips failed maps and keeps existing manifests", as
 
     assert.equal(result.processedMaps, 1);
     assert.equal(result.updatedMaps, 0);
+    assert.equal(result.gridFilesWritten, 0);
     assert.equal(result.skippedMaps, 1);
     assert.equal(result.skippedUnchanged, 0);
     assert.equal(result.extractionFailures, 1);
@@ -573,7 +604,7 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
     location: "europe",
     special_demand: [],
   });
-  writeJson(join(repoRoot, "maps", "demand-stats-cache.json"), {
+  writeDemandStatsCacheV2(repoRoot, {
     "cached-map": {
       source_fingerprint: "sha256:abc123",
       last_checked_at: new Date(Date.now() - (48 * 60 * 60 * 1000)).toISOString(),
@@ -583,7 +614,15 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
         population_count: 12,
         initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
       },
+      grid: {
+        schema_version: 1,
+      },
     },
+  });
+  writeJson(join(repoRoot, "maps", "cached-map", "grid.geojson"), {
+    type: "FeatureCollection",
+    features: [],
+    properties: {},
   });
 
   const fetchMock = makeFetchRouter([
@@ -610,6 +649,7 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
 
     assert.equal(result.processedMaps, 1);
     assert.equal(result.updatedMaps, 0);
+    assert.equal(result.gridFilesWritten, 0);
     assert.equal(result.skippedMaps, 1);
     assert.equal(result.skippedUnchanged, 1);
     assert.equal(result.extractionFailures, 0);
@@ -618,7 +658,91 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
   }
 });
 
-test("generateMapDemandStats recomputes unchanged sha fingerprint when cache has no stats", async () => {
+test("generateMapDemandStats recomputes when unchanged fingerprint cache is missing grid metadata", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-grid-refresh-"));
+  mkdirSync(join(repoRoot, "maps"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "grid-refresh-map"), { recursive: true });
+
+  writeJson(join(repoRoot, "maps", "index.json"), {
+    schema_version: 1,
+    maps: ["grid-refresh-map"],
+  });
+  writeJson(join(repoRoot, "maps", "grid-refresh-map", "manifest.json"), {
+    schema_version: 1,
+    id: "grid-refresh-map",
+    name: "Grid Refresh",
+    author: "test",
+    github_id: 1,
+    description: "desc",
+    tags: ["europe"],
+    gallery: ["gallery/a.png"],
+    source: "https://example.com/source",
+    update: { type: "custom", url: "https://example.com/grid-refresh-update.json" },
+    city_code: "GRID",
+    country: "US",
+    population: 100,
+    residents_total: 100,
+    points_count: 1,
+    population_count: 1,
+    data_source: "LODES",
+    source_quality: "medium-quality",
+    level_of_detail: "medium-detail",
+    location: "europe",
+    special_demand: [],
+  });
+  writeDemandStatsCacheV2(repoRoot, {
+    "grid-refresh-map": {
+      source_fingerprint: "sha256:abc123",
+      last_checked_at: new Date().toISOString(),
+      stats: {
+        residents_total: 24,
+        points_count: 3,
+        population_count: 3,
+        initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+      },
+    },
+  });
+
+  const refreshZip = await makeDemandZip([7, 8, 9]);
+  const fetchMock = makeFetchRouter([
+    {
+      match: (url) => url === "https://example.com/grid-refresh-update.json",
+      handle: () => new Response(JSON.stringify({
+        schema_version: 1,
+        versions: [
+          {
+            version: "1.0.0",
+            sha256: "abc123",
+            download: "https://downloads.example.com/grid-refresh-map.zip",
+          },
+        ],
+      })),
+    },
+    {
+      match: (url) => url === "https://downloads.example.com/grid-refresh-map.zip",
+      handle: () => new Response(new Uint8Array(refreshZip)),
+    },
+  ]);
+
+  try {
+    const result = await generateMapDemandStats({
+      repoRoot,
+      fetchImpl: fetchMock,
+    });
+
+    assert.equal(result.processedMaps, 1);
+    assert.equal(result.updatedMaps, 1);
+    assert.equal(result.gridFilesWritten, 1);
+    assert.equal(result.skippedMaps, 0);
+    assert.equal(result.skippedUnchanged, 0);
+    assert.equal(result.extractionFailures, 0);
+    assert.equal(existsSync(join(repoRoot, "maps", "grid-refresh-map", "grid.geojson")), true);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("generateMapDemandStats treats legacy cache schema as invalid and rewrites v2 cache", async () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-legacy-cache-"));
   mkdirSync(join(repoRoot, "maps"), { recursive: true });
   mkdirSync(join(repoRoot, "maps", "legacy-map"), { recursive: true });
@@ -686,6 +810,7 @@ test("generateMapDemandStats recomputes unchanged sha fingerprint when cache has
 
     assert.equal(result.processedMaps, 1);
     assert.equal(result.updatedMaps, 1);
+    assert.equal(result.gridFilesWritten, 1);
     assert.equal(result.skippedMaps, 0);
     assert.equal(result.skippedUnchanged, 0);
     assert.equal(result.extractionFailures, 0);
@@ -695,6 +820,10 @@ test("generateMapDemandStats recomputes unchanged sha fingerprint when cache has
     assert.equal(manifest.residents_total, 24);
     assert.equal(manifest.points_count, 3);
     assert.equal(manifest.population_count, 3);
+
+    const cache = JSON.parse(readFileSync(join(repoRoot, "maps", "demand-stats-cache.json"), "utf-8"));
+    assert.equal(cache.schema_version, 2);
+    assert.equal(cache.listings["legacy-map"].grid.schema_version, 1);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
@@ -732,11 +861,25 @@ test("generateMapDemandStats force mode bypasses unchanged sha cache checks", as
     location: "europe",
     special_demand: [],
   });
-  writeJson(join(repoRoot, "maps", "demand-stats-cache.json"), {
+  writeDemandStatsCacheV2(repoRoot, {
     "force-map": {
       source_fingerprint: "sha256:abc123",
       last_checked_at: new Date().toISOString(),
+      stats: {
+        residents_total: 5,
+        points_count: 1,
+        population_count: 1,
+        initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+      },
+      grid: {
+        schema_version: 1,
+      },
     },
+  });
+  writeJson(join(repoRoot, "maps", "force-map", "grid.geojson"), {
+    type: "FeatureCollection",
+    features: [],
+    properties: {},
   });
 
   const forceZip = await makeDemandZip([7, 8, 9]);
@@ -769,6 +912,7 @@ test("generateMapDemandStats force mode bypasses unchanged sha cache checks", as
 
     assert.equal(result.processedMaps, 1);
     assert.equal(result.updatedMaps, 1);
+    assert.equal(result.gridFilesWritten, 1);
     assert.equal(result.skippedMaps, 0);
     assert.equal(result.skippedUnchanged, 0);
     assert.equal(result.extractionFailures, 0);
@@ -870,6 +1014,7 @@ test("generateMapDemandStats mapId option processes only the target map", async 
 
     assert.equal(result.processedMaps, 1);
     assert.equal(result.updatedMaps, 1);
+    assert.equal(result.gridFilesWritten, 1);
     assert.equal(result.skippedMaps, 0);
     assert.equal(result.extractionFailures, 0);
 
@@ -882,6 +1027,8 @@ test("generateMapDemandStats mapId option processes only the target map", async 
     assert.equal(otherManifest.residents_total, 9);
     assert.equal(otherManifest.points_count, 1);
     assert.equal(otherManifest.population_count, 1);
+    assert.equal(existsSync(join(repoRoot, "maps", "target-map", "grid.geojson")), true);
+    assert.equal(existsSync(join(repoRoot, "maps", "other-map", "grid.geojson")), false);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }

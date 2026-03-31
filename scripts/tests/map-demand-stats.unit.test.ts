@@ -1,7 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { gzipSync } from "node:zlib";
 import JSZip from "jszip";
+import { generateGrid } from "../lib/map-analytics-grid.js";
 import { extractDemandStatsFromZipBuffer } from "../lib/map-demand-stats.js";
 
 const DEFAULT_INITIAL_VIEW_STATE = {
@@ -10,6 +14,34 @@ const DEFAULT_INITIAL_VIEW_STATE = {
   zoom: 12,
   bearing: 0,
 };
+
+function buildDemandPayload(
+  pointResidents: Array<number | undefined>,
+  populationSizes: number[],
+): Record<string, unknown> {
+  return {
+    points: pointResidents.map((residents, index) => {
+      const point: Record<string, unknown> = {
+        id: `pt${index + 1}`,
+        location: [index * 0.03, index * 0.03],
+        jobs: index + 1,
+      };
+      if (residents !== undefined) {
+        point.residents = residents;
+      }
+      return point;
+    }),
+    pops_map: populationSizes.map((size, index) => ({
+      id: `pop${index + 1}`,
+      size,
+    })),
+    pops: pointResidents.map((_, index) => ({
+      residenceId: `pt${index + 1}`,
+      jobId: `pt${index + 1}`,
+      drivingDistance: (index + 1) * 10,
+    })),
+  };
+}
 
 async function makeZipBuffer(fileName: string, content: Buffer | string): Promise<Buffer> {
   const zip = new JSZip();
@@ -24,50 +56,76 @@ async function makeZipBuffer(fileName: string, content: Buffer | string): Promis
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
-test("extractDemandStatsFromZipBuffer parses demand_data.json", async () => {
-  const payload = {
-    points: {
-      a: { residents: 10, jobs: 1 },
-      b: { residents: 15, jobs: 2 },
-      c: { residents: 5, jobs: 0 },
-    },
-    pops_map: {
-      p1: { size: 10 },
-      p2: { size: 15 },
-      p3: { size: 5 },
-    },
+test("generateGrid aggregates commute metrics into populated and empty cells", async () => {
+  const grid = await generateGrid({
+    points: [
+      { id: "min-boundary", location: [0, 0], jobs: 0, residents: 0 },
+      { id: "pt1", location: [0.01, 0.01], jobs: 3, residents: 10 },
+      { id: "pt2", location: [0.0105, 0.0105], jobs: 5, residents: 20 },
+      { id: "pt3", location: [0.03, 0.03], jobs: 7, residents: 30 },
+      { id: "max-boundary", location: [0.04, 0.04], jobs: 0, residents: 0 },
+    ],
+    pops: [
+      { residenceId: "pt1", jobId: "pt2", drivingDistance: 5 },
+      { residenceId: "pt2", jobId: "pt1", drivingDistance: 10 },
+      { residenceId: "pt1", jobId: "pt1", drivingDistance: 15 },
+      { residenceId: "pt2", jobId: "pt2", drivingDistance: 20 },
+    ],
+  }, "sample-map");
+
+  const gridSummary = grid as typeof grid & {
+    properties?: { meanCommuteDistance?: number; medianCommuteDistance?: number };
   };
 
-  const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
-  const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
+  assert.equal(gridSummary.properties?.meanCommuteDistance, 12.5);
+  assert.equal(gridSummary.properties?.medianCommuteDistance, 15);
 
-  assert.deepEqual(stats, {
-    residents_total: 30,
-    points_count: 3,
-    population_count: 3,
-    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
-  });
+  const populatedCell = grid.features.find((feature: any) => feature.properties?.pointCount === 2);
+  assert.ok(populatedCell);
+  assert.equal(populatedCell.properties?.jobs, 8);
+  assert.equal(populatedCell.properties?.pop, 30);
+  assert.equal(populatedCell.properties?.homeWorkCommuteMedian, 15);
+  assert.equal(populatedCell.properties?.workHomeCommuteMedian, 15);
+
+  const emptyCommuteCell = grid.features.find((feature: any) => (
+    feature.properties?.pointCount === 1
+    && feature.properties?.jobs === 7
+    && feature.properties?.pop === 30
+  ));
+  assert.ok(emptyCommuteCell);
+  assert.equal(emptyCommuteCell.properties?.homeWorkCommuteMedian, -1);
+  assert.equal(emptyCommuteCell.properties?.workHomeCommuteMedian, -1);
+});
+
+test("extractDemandStatsFromZipBuffer returns stats and grid without writing files directly", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-unit-"));
+  mkdirSync(join(repoRoot, "maps", "sample-map"), { recursive: true });
+  const payload = buildDemandPayload([10, 15, 5], [10, 15, 5]);
+  const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
+
+  try {
+    const extraction = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
+
+    assert.deepEqual(extraction.stats, {
+      residents_total: 30,
+      points_count: 3,
+      population_count: 3,
+      initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+    });
+    assert.ok(extraction.grid.features.length > 0);
+    assert.equal(existsSync(join(repoRoot, "maps", "sample-map", "grid.geojson")), false);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
 });
 
 test("extractDemandStatsFromZipBuffer parses demand_data.json.gz", async () => {
-  const payload = {
-    points: {
-      a: { residents: 7 },
-      b: { residents: 8 },
-      c: { residents: 9 },
-    },
-    pops_map: {
-      p1: { size: 7 },
-      p2: { size: 8 },
-      p3: { size: 9 },
-    },
-  };
-
+  const payload = buildDemandPayload([7, 8, 9], [7, 8, 9]);
   const compressed = gzipSync(Buffer.from(JSON.stringify(payload), "utf-8"));
   const zipBuffer = await makeZipBuffer("demand_data.json.gz", compressed);
-  const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
+  const extraction = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
 
-  assert.deepEqual(stats, {
+  assert.deepEqual(extraction.stats, {
     residents_total: 24,
     points_count: 3,
     population_count: 3,
@@ -76,22 +134,12 @@ test("extractDemandStatsFromZipBuffer parses demand_data.json.gz", async () => {
 });
 
 test("extractDemandStatsFromZipBuffer warns and uses minimum when point/pop totals differ", async () => {
-  const payload = {
-    points: {
-      a: { residents: 100 },
-      b: { residents: 50 },
-    },
-    pops_map: {
-      p1: { size: 40 },
-      p2: { size: 30 },
-    },
-  };
-
+  const payload = buildDemandPayload([100, 50], [40, 30]);
   const warnings: string[] = [];
   const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
-  const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer, { warnings });
+  const extraction = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer, { warnings });
 
-  assert.deepEqual(stats, {
+  assert.deepEqual(extraction.stats, {
     residents_total: 70,
     points_count: 2,
     population_count: 2,
@@ -103,18 +151,9 @@ test("extractDemandStatsFromZipBuffer warns and uses minimum when point/pop tota
 });
 
 test("extractDemandStatsFromZipBuffer rejects mismatched residents totals when strict mode is enabled", async () => {
-  const payload = {
-    points: {
-      a: { residents: 100 },
-      b: { residents: 50 },
-    },
-    pops_map: {
-      p1: { size: 40 },
-      p2: { size: 30 },
-    },
-  };
-
+  const payload = buildDemandPayload([100, 50], [40, 30]);
   const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
+
   await assert.rejects(
     extractDemandStatsFromZipBuffer("sample-map", zipBuffer, { requireResidentTotalsMatch: true }),
     /resident totals mismatch/,
@@ -124,20 +163,23 @@ test("extractDemandStatsFromZipBuffer rejects mismatched residents totals when s
 test("extractDemandStatsFromZipBuffer derives residents from popIds when residents is missing", async () => {
   const payload = {
     points: [
-      { id: "p1", popIds: ["a", "b"] },
-      { id: "p2", popIds: ["c"] },
+      { id: "p1", location: [0, 0], jobs: 1, popIds: ["a", "b"] },
+      { id: "p2", location: [0.03, 0.03], jobs: 2, popIds: ["c"] },
     ],
-    pops: [
+    pops_map: [
       { id: "a", size: 3 },
       { id: "b", size: 4 },
       { id: "c", size: 5 },
     ],
+    pops: [
+      { residenceId: "p1", jobId: "p2", drivingDistance: 10 },
+      { residenceId: "p2", jobId: "p1", drivingDistance: 20 },
+    ],
   };
-
   const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
-  const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
+  const extraction = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
 
-  assert.deepEqual(stats, {
+  assert.deepEqual(extraction.stats, {
     residents_total: 12,
     points_count: 2,
     population_count: 3,
@@ -148,19 +190,22 @@ test("extractDemandStatsFromZipBuffer derives residents from popIds when residen
 test("extractDemandStatsFromZipBuffer does not mix residents fallback with explicit residents values", async () => {
   const payload = {
     points: [
-      { id: "p1", residents: 10, popIds: ["a"] },
-      { id: "p2", popIds: ["b"] },
+      { id: "p1", location: [0, 0], jobs: 1, residents: 10, popIds: ["a"] },
+      { id: "p2", location: [0.03, 0.03], jobs: 2, popIds: ["b"] },
     ],
-    pops: [
+    pops_map: [
       { id: "a", size: 10 },
       { id: "b", size: 50 },
     ],
+    pops: [
+      { residenceId: "p1", jobId: "p1", drivingDistance: 5 },
+      { residenceId: "p2", jobId: "p2", drivingDistance: 15 },
+    ],
   };
-
   const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
-  const stats = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
+  const extraction = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
 
-  assert.deepEqual(stats, {
+  assert.deepEqual(extraction.stats, {
     residents_total: 10,
     points_count: 2,
     population_count: 2,
@@ -170,15 +215,17 @@ test("extractDemandStatsFromZipBuffer does not mix residents fallback with expli
 
 test("extractDemandStatsFromZipBuffer rejects negative residents values", async () => {
   const payload = {
-    points: {
-      a: { residents: -3 },
-      b: { residents: 7 },
-    },
-    pops_map: {
-      p1: { size: 1 },
-    },
+    points: [
+      { id: "a", location: [0, 0], jobs: 1, residents: -3 },
+      { id: "b", location: [0.03, 0.03], jobs: 2, residents: 7 },
+    ],
+    pops_map: [
+      { id: "p1", size: 1 },
+    ],
+    pops: [
+      { residenceId: "a", jobId: "b", drivingDistance: 10 },
+    ],
   };
-
   const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
   await assert.rejects(
     extractDemandStatsFromZipBuffer("sample-map", zipBuffer),
@@ -189,14 +236,16 @@ test("extractDemandStatsFromZipBuffer rejects negative residents values", async 
 test("extractDemandStatsFromZipBuffer rejects negative population size using population id", async () => {
   const payload = {
     points: [
-      { id: "point-a", residents: 10 },
-      { id: "point-b", residents: 5 },
+      { id: "point-a", location: [0, 0], jobs: 1, residents: 10 },
+      { id: "point-b", location: [0.03, 0.03], jobs: 2, residents: 5 },
     ],
-    pops: [
+    pops_map: [
       { id: "pop-1329", size: -10 },
     ],
+    pops: [
+      { residenceId: "point-a", jobId: "point-b", drivingDistance: 10 },
+    ],
   };
-
   const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
   await assert.rejects(
     extractDemandStatsFromZipBuffer("sample-map", zipBuffer),
@@ -218,10 +267,7 @@ test("extractDemandStatsFromZipBuffer rejects missing initialViewState in config
   const zip = new JSZip();
   zip.file(
     "demand_data.json",
-    JSON.stringify({
-      points: [{ residents: 1 }],
-      pops_map: [{ size: 1 }],
-    }),
+    JSON.stringify(buildDemandPayload([1], [1])),
   );
   zip.file("config.json", JSON.stringify({ code: "TST" }));
   const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });

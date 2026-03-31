@@ -301,17 +301,18 @@ map-name.zip
 - `regenerate-downloads-hourly.yml` runs hourly and on manual dispatch.
 - It runs map/mod generation in download-only mode (no ZIP integrity pass) and commits updated `downloads.json` files if changed.
 - `regenerate-registry-analytics.yml` runs every 3 hours and on manual dispatch.
-- It runs map/mod generation in full mode and map demand stats generation, then commits updated `downloads.json` + `integrity.json` (+ integrity cache files), map manifests, and `maps/demand-stats-cache.json` if changed.
+- It runs map/mod generation in full mode and map demand stats generation, then commits updated `downloads.json` + `integrity.json` (+ integrity cache files), map manifests, `maps/*/grid.geojson`, and `maps/demand-stats-cache.json` if changed.
 - It also runs `sync-map-file-sizes` in commit stage so map manifests mirror latest complete integrity `file_sizes`.
 - It emits two Discord summaries in a single run (downloads/integrity and map demand stats).
 - Uses GitHub GraphQL `ReleaseAsset.downloadCount` with `GITHUB_TOKEN` by default (`GH_DOWNLOADS_TOKEN` optional override).
 - `cache-download-history.yml` runs daily and on manual dispatch.
 - It snapshots current `maps/downloads.json` + `mods/downloads.json` with indexes into `history/snapshot_YYYY_MM_DD.json`.
 - It computes `net_downloads` against the previous snapshot for trend and popularity analysis.
-- Map demand stats subflow (inside `regenerate-registry-analytics.yml`) refreshes demand-derived metadata in manifests and updates `maps/demand-stats-cache.json`.
+- Map demand stats subflow (inside `regenerate-registry-analytics.yml`) refreshes demand-derived metadata in manifests, regenerates `maps/*/grid.geojson`, and updates `maps/demand-stats-cache.json`.
 - It skips ZIP extraction when source fingerprints are unchanged:
 - For `sha256:*` fingerprints, skip regardless of age.
 - For other fingerprints, skip when last checked within 12 hours.
+- Cache validity also requires current grid metadata plus an existing `maps/<id>/grid.geojson`.
 - Reason for non-`sha256` fallback:
 - Tag/asset-name or URL-based fingerprints can remain unchanged while upstream ZIP content is replaced, so periodic rechecks prevent stale derived stats.
 
@@ -324,7 +325,7 @@ map-name.zip
 - `regenerate-indexes.ts`: reindexes listings.
 - `generate-downloads.ts`: generates downloads in `full` or `download-only` mode.
 - `generate-download-history.ts`: caches daily combined download snapshots in `history/`.
-- `generate-map-demand-stats.ts`: updates map `population`/`residents_total`/`points_count`/`population_count`.
+- `generate-map-demand-stats.ts`: updates map `population`/`residents_total`/`points_count`/`population_count`, writes `maps/<id>/grid.geojson`, and refreshes the versioned demand-stats cache.
 - `sync-map-file-sizes.ts`: syncs map manifest `file_sizes` from `maps/integrity.json` latest complete semver entries.
 - `generate-map-templates.ts`: generates and verifies map issue templates.
 - `notify-discord.ts`: shared Discord webhook notifier for workflow summaries.

@@ -127,6 +127,7 @@ jobs:
     outputs:
       processed_maps: ${{ steps.generate_map_demand_stats.outputs.processed_maps }}
       updated_maps: ${{ steps.generate_map_demand_stats.outputs.updated_maps }}
+      grid_files_written: ${{ steps.generate_map_demand_stats.outputs.grid_files_written }}
       skipped_maps: ${{ steps.generate_map_demand_stats.outputs.skipped_maps }}
       skipped_unchanged: ${{ steps.generate_map_demand_stats.outputs.skipped_unchanged }}
       extraction_failures: ${{ steps.generate_map_demand_stats.outputs.extraction_failures }}
@@ -166,7 +167,7 @@ jobs:
       - name: Build map demand stats artifact
         run: |
           set -euo pipefail
-          tar -cf /tmp/maps-demand-stats.tar maps/demand-stats-cache.json maps/*/manifest.json maps/demand-attribution-delta.json
+          tar -cf /tmp/maps-demand-stats.tar maps/demand-stats-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-attribution-delta.json
 
       - name: Upload map demand stats artifact
         uses: actions/upload-artifact@v4
@@ -403,7 +404,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/demand-stats-cache.json history/registry-download-attribution.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-stats-cache.json history/registry-download-attribution.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -641,6 +642,7 @@ jobs:
           DISCORD_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           PROCESSED_MAPS: ${{ needs.generate-map-demand-stats.outputs.processed_maps }}
           UPDATED_MAPS: ${{ needs.generate-map-demand-stats.outputs.updated_maps }}
+          GRID_FILES_WRITTEN: ${{ needs.generate-map-demand-stats.outputs.grid_files_written }}
           SKIPPED_MAPS: ${{ needs.generate-map-demand-stats.outputs.skipped_maps }}
           SKIPPED_UNCHANGED: ${{ needs.generate-map-demand-stats.outputs.skipped_unchanged }}
           EXTRACTION_FAILURES: ${{ needs.generate-map-demand-stats.outputs.extraction_failures }}
@@ -672,6 +674,7 @@ jobs:
           export DISCORD_LINES_JSON="$(jq -nc \
             --arg processed_maps "${PROCESSED_MAPS}" \
             --arg updated_maps "${UPDATED_MAPS}" \
+            --arg grid_files_written "${GRID_FILES_WRITTEN}" \
             --arg skipped_maps "${SKIPPED_MAPS}" \
             --arg skipped_unchanged "${SKIPPED_UNCHANGED}" \
             --arg extraction_failures "${EXTRACTION_FAILURES}" \
@@ -683,6 +686,7 @@ jobs:
             '[
               "- **Processed maps:** \($processed_maps)",
               "- **Manifests updated:** \($updated_maps)",
+              "- **Grid files written:** \($grid_files_written)",
               "- **Skipped maps:** \($skipped_maps)",
               "- **Skipped unchanged (sha match or <9h):** \($skipped_unchanged)",
               "- **Extraction failures:** \($extraction_failures)",

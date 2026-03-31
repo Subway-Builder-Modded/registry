@@ -33,10 +33,20 @@ interface ExtractDemandStatsOptions {
   warnings?: string[];
   requireResidentTotalsMatch?: boolean;
 }
+
+interface DemandStatsCacheGridEntry {
+  schema_version: number;
+}
+
 interface ParsedDemandDataPayloadResult {
   stats: Omit<DemandStats, "initial_view_state">;
   residentsTotalByPoint: number;
   residentsTotalByPop: number;
+}
+
+export interface MapDemandExtractionResult {
+  stats: DemandStats;
+  grid: FeatureCollection<Polygon, GeoJsonProperties>;
 }
 
 export interface GenerateMapDemandStatsOptions {
@@ -52,6 +62,7 @@ export interface GenerateMapDemandStatsOptions {
 export interface GenerateMapDemandStatsResult {
   processedMaps: number;
   updatedMaps: number;
+  gridFilesWritten: number;
   skippedMaps: number;
   skippedUnchanged: number;
   extractionFailures: number;
@@ -77,9 +88,15 @@ interface DemandStatsCacheEntry {
   source_fingerprint: string;
   last_checked_at: string;
   stats?: DemandStats;
+  grid?: DemandStatsCacheGridEntry;
 }
 
 type DemandStatsCache = Record<string, DemandStatsCacheEntry>;
+
+interface DemandStatsCacheFile {
+  schema_version: number;
+  listings: DemandStatsCache;
+}
 
 interface ResolvedInstallTarget {
   zipUrl: string;
@@ -88,6 +105,8 @@ interface ResolvedInstallTarget {
 }
 
 const CACHE_FILE_NAME = "demand-stats-cache.json";
+const DEMAND_STATS_CACHE_SCHEMA_VERSION = 2;
+const GRID_SCHEMA_VERSION = 1;
 // For non-sha fingerprints (e.g. tag+asset name), recheck periodically because
 // upstream ZIP content may change without a fingerprint change.
 const UNCHANGED_SKIP_WINDOW_MS = 12 * 60 * 60 * 1000;
@@ -440,7 +459,7 @@ function parseDemandDataPayload(payload: unknown): ParsedDemandDataPayloadResult
   }
 
   const points = payload.points;
-  const popsMap = isObject(payload.pops_map)
+  const popsMap = (isObject(payload.pops_map) || Array.isArray(payload.pops_map))
     ? payload.pops_map
     : payload.pops;
   if (!isObject(points) && !Array.isArray(points)) {
@@ -531,6 +550,132 @@ function getCachePath(repoRoot: string): string {
   return resolve(repoRoot, "maps", CACHE_FILE_NAME);
 }
 
+function getGridPath(repoRoot: string, listingId: string): string {
+  return resolve(repoRoot, "maps", listingId, "grid.geojson");
+}
+
+function parseDemandGridData(payload: unknown): DemandData {
+  if (!isObject(payload)) {
+    throw new Error("demand data payload must be an object");
+  }
+
+  const pointsRaw = payload.points;
+  const popsRaw = payload.pops;
+  if (!Array.isArray(pointsRaw)) {
+    throw new Error("demand data missing grid-compatible 'points' array");
+  }
+  if (!Array.isArray(popsRaw)) {
+    throw new Error("demand data missing grid-compatible 'pops' array");
+  }
+
+  const popSizeById = new Map<string, number>();
+  const popsMap = payload.pops_map;
+  if (isObject(popsMap) || Array.isArray(popsMap)) {
+    const popEntries = Array.isArray(popsMap)
+      ? popsMap.map((popValue, index) => [String(index), popValue] as const)
+      : Object.entries(popsMap);
+    for (const [popKey, popValue] of popEntries) {
+      if (!isObject(popValue)) continue;
+      const popId = typeof popValue.id === "string" && popValue.id.trim() !== ""
+        ? popValue.id.trim()
+        : popKey;
+      const size = typeof popValue.size === "number" && Number.isFinite(popValue.size)
+        ? popValue.size
+        : null;
+      if (!popId || size === null) continue;
+      popSizeById.set(popId, size);
+    }
+  }
+
+  const hasAnyExplicitResidents = pointsRaw.some((pointValue) => (
+    isObject(pointValue)
+    && typeof pointValue.residents === "number"
+    && Number.isFinite(pointValue.residents)
+  ));
+
+  const points = pointsRaw.map((pointValue, index): DemandData["points"][number] => {
+    if (!isObject(pointValue)) {
+      throw new Error(`grid point at index ${index} is malformed`);
+    }
+
+    const pointRef = getDemandPointRef(pointValue, `index ${index}`);
+    const locationRaw = pointValue.location;
+    if (!Array.isArray(locationRaw) || locationRaw.length < 2) {
+      throw new Error(`grid point '${pointRef}' missing valid location tuple`);
+    }
+    const longitude = toFiniteNumber(locationRaw[0]);
+    const latitude = toFiniteNumber(locationRaw[1]);
+    if (longitude === null || latitude === null) {
+      throw new Error(`grid point '${pointRef}' has non-numeric coordinates`);
+    }
+
+    const jobs = typeof pointValue.jobs === "number" && Number.isFinite(pointValue.jobs)
+      ? pointValue.jobs
+      : 0;
+    if (jobs < 0) {
+      throw new Error(`grid point '${pointRef}' has negative jobs value`);
+    }
+
+    let residents: number | null = null;
+    if (typeof pointValue.residents === "number" && Number.isFinite(pointValue.residents)) {
+      residents = pointValue.residents;
+    } else if (hasAnyExplicitResidents) {
+      residents = 0;
+    } else {
+      const popIdsRaw = Array.isArray(pointValue.popIds)
+        ? pointValue.popIds
+        : (Array.isArray(pointValue.pop_ids) ? pointValue.pop_ids : null);
+      if (popIdsRaw && popIdsRaw.every((value) => typeof value === "string")) {
+        residents = popIdsRaw.reduce((sum, popId) => sum + (popSizeById.get(popId) ?? 0), 0);
+      }
+    }
+
+    if (residents === null) {
+      throw new Error(`grid point '${pointRef}' missing numeric residents value`);
+    }
+    if (residents < 0) {
+      throw new Error(`grid point '${pointRef}' has negative residents value`);
+    }
+
+    return {
+      id: pointRef,
+      location: [longitude, latitude],
+      jobs,
+      residents,
+    };
+  });
+
+  const pops = popsRaw.map((popValue, index): DemandData["pops"][number] => {
+    if (!isObject(popValue)) {
+      throw new Error(`grid commute at index ${index} is malformed`);
+    }
+
+    const residenceIdValue = popValue.residenceId;
+    const jobIdValue = popValue.jobId;
+    const drivingDistanceValue = popValue.drivingDistance;
+    const residenceId = (
+      typeof residenceIdValue === "string"
+      || (typeof residenceIdValue === "number" && Number.isFinite(residenceIdValue))
+    ) ? String(residenceIdValue) : null;
+    const jobId = (
+      typeof jobIdValue === "string"
+      || (typeof jobIdValue === "number" && Number.isFinite(jobIdValue))
+    ) ? String(jobIdValue) : null;
+    const drivingDistance = typeof drivingDistanceValue === "number" && Number.isFinite(drivingDistanceValue)
+      ? drivingDistanceValue
+      : null;
+    if (!residenceId || !jobId || drivingDistance === null) {
+      throw new Error(`grid commute at index ${index} is missing residenceId/jobId/drivingDistance`);
+    }
+    if (drivingDistance < 0) {
+      throw new Error(`grid commute at index ${index} has negative drivingDistance`);
+    }
+    return { residenceId, jobId, drivingDistance };
+  });
+
+  return { points, pops };
+}
+
 function loadDemandStatsCache(repoRoot: string): DemandStatsCache {
   const cachePath = getCachePath(repoRoot);
   if (!existsSync(cachePath)) {
@@ -539,8 +684,10 @@ function loadDemandStatsCache(repoRoot: string): DemandStatsCache {
   try {
     const parsed = readJsonFile<unknown>(cachePath);
     if (!isObject(parsed)) return {};
+    if (parsed.schema_version !== DEMAND_STATS_CACHE_SCHEMA_VERSION) return {};
+    if (!isObject(parsed.listings)) return {};
     const entries: DemandStatsCache = {};
-    for (const [id, entry] of Object.entries(parsed)) {
+    for (const [id, entry] of Object.entries(parsed.listings)) {
       if (!isObject(entry)) continue;
       const sourceFingerprint = typeof entry.source_fingerprint === "string"
         ? entry.source_fingerprint
@@ -574,6 +721,9 @@ function loadDemandStatsCache(repoRoot: string): DemandStatsCache {
         source_fingerprint: sourceFingerprint,
         last_checked_at: lastCheckedAt,
         stats,
+        grid: isObject(entry.grid) && typeof entry.grid.schema_version === "number" && Number.isFinite(entry.grid.schema_version)
+          ? { schema_version: entry.grid.schema_version }
+          : undefined,
       };
     }
     return entries;
@@ -587,7 +737,11 @@ function writeDemandStatsCache(repoRoot: string, cache: DemandStatsCache): void 
   for (const key of Object.keys(cache).sort()) {
     sorted[key] = cache[key];
   }
-  writeFileSync(getCachePath(repoRoot), `${JSON.stringify(sorted, null, 2)}\n`, "utf-8");
+  const cacheFile: DemandStatsCacheFile = {
+    schema_version: DEMAND_STATS_CACHE_SCHEMA_VERSION,
+    listings: sorted,
+  };
+  writeFileSync(getCachePath(repoRoot), `${JSON.stringify(cacheFile, null, 2)}\n`, "utf-8");
 }
 
 function applyDerivedFieldDefaults(manifest: MapManifest): boolean {
@@ -628,6 +782,8 @@ function applyDerivedFieldDefaults(manifest: MapManifest): boolean {
 }
 
 function shouldSkipUnchanged(
+  repoRoot: string,
+  listingId: string,
   cacheEntry: DemandStatsCacheEntry | undefined,
   resolvedSource: ResolvedInstallTarget,
   now: Date,
@@ -635,7 +791,10 @@ function shouldSkipUnchanged(
 ): boolean {
   if (!cacheEntry) return false;
   if (!cacheEntry.stats) return false;
+  if (!cacheEntry.grid) return false;
+  if (cacheEntry.grid.schema_version !== GRID_SCHEMA_VERSION) return false;
   if (cacheEntry.source_fingerprint !== resolvedSource.sourceFingerprint) return false;
+  if (!existsSync(getGridPath(repoRoot, listingId))) return false;
   if (strictFingerprintCache || resolvedSource.sourceFingerprint.startsWith("sha256:")) {
     return true;
   }
@@ -644,12 +803,19 @@ function shouldSkipUnchanged(
   return now.getTime() - lastChecked <= UNCHANGED_SKIP_WINDOW_MS;
 }
 
+function writeGridFile(
+  repoRoot: string,
+  listingId: string,
+  grid: FeatureCollection<Polygon, GeoJsonProperties>,
+): void {
+  writeFileSync(getGridPath(repoRoot, listingId), `${JSON.stringify(grid, null, 2)}\n`, "utf-8");
+}
+
 export async function extractDemandStatsFromZipBuffer(
   listingId: string,
   zipBuffer: Buffer,
   options: ExtractDemandStatsOptions = {},
-  repoRoot: string
-): Promise<DemandStats> {
+): Promise<MapDemandExtractionResult> {
   const warnings = options.warnings;
   const requireResidentTotalsMatch = options.requireResidentTotalsMatch === true;
   let zip: JSZip;
@@ -681,19 +847,6 @@ export async function extractDemandStatsFromZipBuffer(
     payload = JSON.parse(rawText);
   } catch {
     throw new Error(`listing=${listingId}: demand data file is not valid JSON`);
-  }
-
-  let gridData: FeatureCollection<Polygon, GeoJsonProperties>;
-  try {
-    gridData = await generateGrid(payload as DemandData, listingId);
-  } catch (error) {
-    throw new Error(`listing=${listingId}: failed to generate grid data`);
-  }
-
-  try {
-    writeFileSync(resolve(repoRoot, "maps", listingId, "grid.geojson"), JSON.stringify(gridData, null, 2), "utf-8");
-  } catch (error) {
-    throw new Error(`listing=${listingId}: failed to write grid data to file (${(error as Error).message})`);
   }
 
   const configEntry = findConfigEntry(zip);
@@ -743,9 +896,19 @@ export async function extractDemandStatsFromZipBuffer(
     }
   }
 
+  let gridData: FeatureCollection<Polygon, GeoJsonProperties>;
+  try {
+    gridData = await generateGrid(parseDemandGridData(payload), listingId);
+  } catch (error) {
+    throw new Error(`listing=${listingId}: failed to generate grid data (${(error as Error).message})`);
+  }
+
   return {
-    ...parsed.stats,
-    initial_view_state: initialViewState,
+    stats: {
+      ...parsed.stats,
+      initial_view_state: initialViewState,
+    },
+    grid: gridData,
   };
 }
 
@@ -807,14 +970,14 @@ export async function resolveAndExtractDemandStatsForMapSource(
     throw new Error(warnings[0] ?? `listing=${listingId}: failed to fetch map ZIP`);
   }
 
-  const stats = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, {
+  const extraction = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, {
     warnings,
     requireResidentTotalsMatch: options.requireResidentTotalsMatch,
-  }, options.repoRoot!);
+  });
   for (const warning of warnings) {
     console.warn(`[map-demand-stats] ${warning}`);
   }
-  return stats;
+  return extraction.stats;
 }
 
 export async function generateMapDemandStats(
@@ -863,6 +1026,7 @@ export async function generateMapDemandStats(
 
   let processedMaps = 0;
   let updatedMaps = 0;
+  let gridFilesWritten = 0;
   let skippedMaps = 0;
   let skippedUnchanged = 0;
   let extractionFailures = 0;
@@ -905,7 +1069,7 @@ export async function generateMapDemandStats(
       continue;
     }
 
-    if (!force && shouldSkipUnchanged(cache[id], resolvedSource, now, strictFingerprintCache)) {
+    if (!force && shouldSkipUnchanged(repoRoot, id, cache[id], resolvedSource, now, strictFingerprintCache)) {
       skippedMaps += 1;
       skippedUnchanged += 1;
       const cachedStats = cache[id]?.stats;
@@ -979,9 +1143,11 @@ export async function generateMapDemandStats(
       continue;
     }
 
-    let stats: DemandStats;
+    let extraction: MapDemandExtractionResult;
     try {
-      stats = await extractDemandStatsFromZipBuffer(id, zipBuffer, { warnings }, repoRoot);
+      extraction = await extractDemandStatsFromZipBuffer(id, zipBuffer, { warnings });
+      writeGridFile(repoRoot, id, extraction.grid);
+      gridFilesWritten += 1;
     } catch (error) {
       warnListing(warnings, id, String((error as Error).message));
       skippedMaps += 1;
@@ -1000,6 +1166,7 @@ export async function generateMapDemandStats(
     const oldResidents = Number.isFinite(manifest.residents_total)
       ? manifest.residents_total
       : (Number.isFinite(manifest.population) ? manifest.population : 0);
+    const stats = extraction.stats;
 
     const changed = (
       manifest.population !== stats.residents_total
@@ -1018,6 +1185,7 @@ export async function generateMapDemandStats(
       source_fingerprint: resolvedSource.sourceFingerprint,
       last_checked_at: now.toISOString(),
       stats,
+      grid: { schema_version: GRID_SCHEMA_VERSION },
     };
 
     if (changed) {
@@ -1035,6 +1203,7 @@ export async function generateMapDemandStats(
   return {
     processedMaps,
     updatedMaps,
+    gridFilesWritten,
     skippedMaps,
     skippedUnchanged,
     extractionFailures,

@@ -37,7 +37,8 @@ const createHeartbeat = (label: string, mapId: string, total: number) => {
 export async function generateGrid(demandData: DemandData, cityCode: string): Promise<FeatureCollection<Polygon, GeoJsonProperties>> {
     let pointsCounter = 0;
     let pointsTotal = demandData.points.length;
-    const medianCommuteDistance = demandData.pops.map(pop => pop.drivingDistance).sort((a, b) => a - b)[Math.floor(demandData.pops.length / 2)];
+    const commuteDistances = demandData.pops.map((pop) => pop.drivingDistance).sort((a, b) => a - b);
+    const medianCommuteDistance = commuteDistances[Math.floor(demandData.pops.length / 2)];
     const meanCommuteDistance = demandData.pops.reduce((sum, pop) => sum + pop.drivingDistance, 0) / demandData.pops.length;
     const pointsHeartbeat = createHeartbeat("points", cityCode, pointsTotal);
     let points = turf.featureCollection(demandData.points.map((point) => {
@@ -57,26 +58,36 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
     let counter = 0;
     let total = grid.features.length;
     const cellsHeartbeat = createHeartbeat("cells", cityCode, total);
-    grid.features.forEach((feature) => {
+    grid.features.forEach((feature: any) => {
         counter += 1;
         const pointsInCell = turf.pointsWithinPolygon(points, feature);
-        const jobs = pointsInCell.features.reduce((sum, point) => sum + point.properties.jobs, 0);
-        const pop = pointsInCell.features.reduce((sum, point) => sum + point.properties.pop, 0);
+        const jobs = pointsInCell.features.reduce((sum: number, point: any) => sum + point.properties.jobs, 0);
+        const pop = pointsInCell.features.reduce((sum: number, point: any) => sum + point.properties.pop, 0);
+        const homeWorkCommuteDistances = pointsInCell.features.reduce(
+          (arr: number[], point: any) => arr.concat(point.properties!.homeWorkCommuteDistances as number[]),
+          [],
+        );
+        const workHomeCommuteDistances = pointsInCell.features.reduce(
+          (arr: number[], point: any) => arr.concat(point.properties!.workHomeCommuteDistances as number[]),
+          [],
+        );
 
         feature.properties!.jobs = jobs;
         feature.properties!.pop = pop;
 
         feature.properties!.pointCount = pointsInCell.features.length;
         
-        if(pointsInCell.features.reduce((arr, point) => arr.concat((point.properties!.homeWorkCommuteDistances) as never[]), []).length === 0) {
+        if(homeWorkCommuteDistances.length === 0) {
             feature.properties!.homeWorkCommuteMedian = -1;
         }
         else {
-            feature.properties!.homeWorkCommuteMedian = pointsInCell.features.reduce((arr, point) => arr.concat((point.properties!.homeWorkCommuteDistances) as never[]), []).sort((a, b) => a - b)[Math.floor(pointsInCell.features.reduce((arr, point) => arr.concat((point.properties!.homeWorkCommuteDistances) as never[]), []).length / 2)];
+            feature.properties!.homeWorkCommuteMedian = homeWorkCommuteDistances
+              .sort((a: number, b: number) => a - b)[Math.floor(homeWorkCommuteDistances.length / 2)];
         }
    
-        if(pointsInCell.features.reduce((arr, point) => arr.concat((point.properties!.workHomeCommuteDistances) as never[]), []).length > 0) {
-            feature.properties!.workHomeCommuteMedian = pointsInCell.features.reduce((arr, point) => arr.concat((point.properties!.workHomeCommuteDistances) as never[]), []).sort((a, b) => a - b)[Math.floor(pointsInCell.features.reduce((arr, point) => arr.concat((point.properties!.workHomeCommuteDistances) as never[]), []).length / 2)];
+        if(workHomeCommuteDistances.length > 0) {
+            feature.properties!.workHomeCommuteMedian = workHomeCommuteDistances
+              .sort((a: number, b: number) => a - b)[Math.floor(workHomeCommuteDistances.length / 2)];
         } else {
             feature.properties!.workHomeCommuteMedian = -1;
         }
