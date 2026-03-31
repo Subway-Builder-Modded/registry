@@ -2,7 +2,9 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { resolve } from "node:path";
 import type { DownloadsByListing } from "./download-definitions.js";
 import {
+  forEachLedgerAssetCountUpToCutoff,
   loadDownloadAttributionLedger,
+  sumLedgerTotalUpToCutoff,
   type DownloadAttributionLedger,
 } from "./download-attribution.js";
 import { getManifest } from "./downloads-support.js";
@@ -340,19 +342,6 @@ function computeTotalDownloads(downloads: DownloadsByListing): number {
   return total;
 }
 
-function sumLedgerTotalUpToDate(ledger: DownloadAttributionLedger, snapshotDate: string): number {
-  let total = 0;
-  for (const [dateKey, entry] of Object.entries(ledger.daily)) {
-    if (dateKey > snapshotDate) continue;
-    if (typeof entry.total === "number" && Number.isFinite(entry.total)) {
-      total += entry.total;
-      continue;
-    }
-    total += Object.values(entry.assets).reduce((sum, value) => sum + value, 0);
-  }
-  return total;
-}
-
 function cloneDownloads(downloads: DownloadsByListing): DownloadsByListing {
   const clone: DownloadsByListing = {};
   for (const listingId of Object.keys(downloads).sort()) {
@@ -514,6 +503,7 @@ function sumAttributedForIntegritySource(
   ledger: DownloadAttributionLedger,
   source: IntegritySource,
   snapshotDate: string,
+  generatedAtIso?: string | null,
 ): number {
   const repo = source.repo?.trim().toLowerCase();
   const tag = source.tag?.trim();
@@ -521,17 +511,14 @@ function sumAttributedForIntegritySource(
   if (!repo || !tag || !assetName) return 0;
 
   let total = 0;
-  for (const [dateKey, entry] of Object.entries(ledger.daily)) {
-    if (dateKey > snapshotDate) continue;
-    for (const [assetKey, count] of Object.entries(entry.assets)) {
-      const parsed = parseAttributionAssetKey(assetKey);
-      if (!parsed) continue;
-      if (parsed.repo !== repo) continue;
-      if (parsed.tag !== tag) continue;
-      if (parsed.assetName !== assetName) continue;
-      total += count;
-    }
-  }
+  forEachLedgerAssetCountUpToCutoff(ledger, snapshotDate, generatedAtIso, (assetKey, count) => {
+    const parsed = parseAttributionAssetKey(assetKey);
+    if (!parsed) return;
+    if (parsed.repo !== repo) return;
+    if (parsed.tag !== tag) return;
+    if (parsed.assetName !== assetName) return;
+    total += count;
+  });
   return total;
 }
 
@@ -541,11 +528,12 @@ function sumAttributedForVersion(
   listingId: string,
   version: string,
   snapshotDate: string,
+  generatedAtIso: string | null | undefined,
   repoRoot: string,
   exactSource?: IntegritySource | null,
 ): number {
   if (exactSource) {
-    return sumAttributedForIntegritySource(ledger, exactSource, snapshotDate);
+    return sumAttributedForIntegritySource(ledger, exactSource, snapshotDate, generatedAtIso);
   }
 
   const dir: ManifestDirectory = listingKind;
@@ -582,19 +570,19 @@ function sumAttributedForVersion(
 
   const normalizedVersion = normalizeTagForMatching(version);
   let total = 0;
-  for (const [dateKey, entry] of Object.entries(ledger.daily)) {
-    if (dateKey > snapshotDate) continue;
-    for (const [assetKey, count] of Object.entries(entry.assets)) {
-      const parsed = parseAttributionAssetKey(assetKey);
-      if (!parsed) continue;
-      if (parsed.repo !== repo) continue;
-      if (normalizeTagForMatching(parsed.tag) !== normalizedVersion && !normalizeTagForMatching(parsed.tag).includes(normalizedVersion)) {
-        continue;
-      }
-      if (!assetMatchesToken(parsed.assetName, assetMatcherToken)) continue;
-      total += count;
+  forEachLedgerAssetCountUpToCutoff(ledger, snapshotDate, generatedAtIso, (assetKey, count) => {
+    const parsed = parseAttributionAssetKey(assetKey);
+    if (!parsed) return;
+    if (parsed.repo !== repo) return;
+    if (
+      normalizeTagForMatching(parsed.tag) !== normalizedVersion
+      && !normalizeTagForMatching(parsed.tag).includes(normalizedVersion)
+    ) {
+      return;
     }
-  }
+    if (!assetMatchesToken(parsed.assetName, assetMatcherToken)) return;
+    total += count;
+  });
   return total;
 }
 
@@ -603,6 +591,7 @@ function buildAttributedDownloadsForSnapshot(
   listingKind: ListingKind,
   downloads: DownloadsByListing,
   snapshotDate: string,
+  generatedAtIso: string | null | undefined,
   ledger: DownloadAttributionLedger,
   integritySources: IntegritySourceByListingVersion,
 ): DownloadsByListing {
@@ -617,6 +606,7 @@ function buildAttributedDownloadsForSnapshot(
         listingId,
         version,
         snapshotDate,
+        generatedAtIso,
         repoRoot,
         integritySources[listingId]?.[version] ?? null,
       );
@@ -834,6 +824,7 @@ export function generateDownloadHistorySnapshot(
     "maps",
     mapsData.downloads,
     snapshotDate,
+    now.toISOString(),
     attributionLedger,
     mapsIntegritySources,
   );
@@ -842,6 +833,7 @@ export function generateDownloadHistorySnapshot(
     "mods",
     modsData.downloads,
     snapshotDate,
+    now.toISOString(),
     attributionLedger,
     modsIntegritySources,
   );
@@ -849,7 +841,7 @@ export function generateDownloadHistorySnapshot(
   const modsRawDownloads = addDownloads(modsData.downloads, modsAttributedDownloads);
   const mapsAttributedTotal = computeTotalDownloads(mapsAttributedDownloads);
   const modsAttributedTotal = computeTotalDownloads(modsAttributedDownloads);
-  const totalAttributedFetches = sumLedgerTotalUpToDate(attributionLedger, snapshotDate);
+  const totalAttributedFetches = sumLedgerTotalUpToCutoff(attributionLedger, snapshotDate, now.toISOString());
 
   const previousMapsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "maps", warnings);
   const previousModsTotal = resolvePreviousTotal(previous?.snapshot ?? null, "mods", warnings);
@@ -981,6 +973,7 @@ export function normalizeDownloadHistorySnapshot(
     "maps",
     mapsStoredDownloads,
     snapshot.snapshot_date,
+    snapshot.generated_at,
     attributionLedger,
     mapsIntegritySources,
   );
@@ -989,6 +982,7 @@ export function normalizeDownloadHistorySnapshot(
     "mods",
     modsStoredDownloads,
     snapshot.snapshot_date,
+    snapshot.generated_at,
     attributionLedger,
     modsIntegritySources,
   );
@@ -1066,7 +1060,11 @@ export function normalizeDownloadHistorySnapshot(
   const modsRawTotalDownloads = computeTotalDownloads(modsFilteredRawDownloads);
   const mapsAttributedTotal = computeTotalDownloads(mapsFilteredAttribution);
   const modsAttributedTotal = computeTotalDownloads(modsFilteredAttribution);
-  const totalAttributedFetches = sumLedgerTotalUpToDate(attributionLedger, snapshot.snapshot_date);
+  const totalAttributedFetches = sumLedgerTotalUpToCutoff(
+    attributionLedger,
+    snapshot.snapshot_date,
+    snapshot.generated_at,
+  );
 
   const mapsIndex = asIndexFileOrFallback(
     snapshot.maps?.index,

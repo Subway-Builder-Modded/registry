@@ -111,3 +111,64 @@ test("backfillDownloadAttributionHistorySnapshots writes files for existing snap
     rmSync(repoRoot, { recursive: true, force: true });
   }
 });
+
+test("backfillDownloadAttributionHistorySnapshots aligns totals to download snapshot generated_at", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-attr-history-backfill-cutoff-test-"));
+  mkdirSync(join(repoRoot, "history"), { recursive: true });
+  try {
+    writeJson(join(repoRoot, "history", "registry-download-attribution.json"), {
+      schema_version: 2,
+      updated_at: "2026-03-30T12:00:00.000Z",
+      assets: {
+        "owner/repo@v1.0.0/a.zip": {
+          count: 5,
+          updated_at: "2026-03-30T12:00:00.000Z",
+          by_source: { test: 5 },
+        },
+      },
+      applied_delta_ids: {},
+      daily: {
+        "2026_03_30": {
+          total: 5,
+          assets: {
+            "owner/repo@v1.0.0/a.zip": 5,
+          },
+        },
+      },
+      timeline: {
+        "2026-03-30T02:00:00.000Z": {
+          total: 2,
+          assets: {
+            "owner/repo@v1.0.0/a.zip": 2,
+          },
+        },
+        "2026-03-30T10:00:00.000Z": {
+          total: 3,
+          assets: {
+            "owner/repo@v1.0.0/a.zip": 3,
+          },
+        },
+      },
+    });
+    writeJson(join(repoRoot, "history", "snapshot_2026_03_30.json"), {
+      schema_version: 1,
+      snapshot_date: "2026_03_30",
+      generated_at: "2026-03-30T03:00:00.000Z",
+      maps: { downloads: {}, total_downloads: 0, net_downloads: 0, index: { schema_version: 1, maps: [] }, entries: 0 },
+      mods: { downloads: {}, total_downloads: 0, net_downloads: 0, index: { schema_version: 1, mods: [] }, entries: 0 },
+    });
+
+    const result = backfillDownloadAttributionHistorySnapshots({ repoRoot });
+    assert.equal(result.updatedFiles.length, 1);
+
+    const day = JSON.parse(readFileSync(join(repoRoot, "history", "download_attribution_2026_03_30.json"), "utf-8"));
+    assert.equal(day.daily_attributed_fetches, 2);
+    assert.equal(day.total_attributed_fetches, 2);
+    assert.equal(day.net_attributed_fetches, 2);
+    assert.deepEqual(day.assets_daily, {
+      "owner/repo@v1.0.0/a.zip": 2,
+    });
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});

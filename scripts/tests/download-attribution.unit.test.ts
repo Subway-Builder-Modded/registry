@@ -4,8 +4,11 @@ import {
   adjustDownloadCount,
   createDownloadAttributionDelta,
   createEmptyDownloadAttributionLedger,
+  getLedgerAssetsForDateCutoff,
   mergeDownloadAttributionDeltas,
   recordDownloadAttributionFetchByUrl,
+  sumLedgerDateTotalUpToCutoff,
+  sumLedgerTotalUpToCutoff,
   toDownloadAttributionAssetKey,
 } from "../lib/download-attribution.js";
 
@@ -55,4 +58,30 @@ test("mergeDownloadAttributionDeltas applies once per delta_id", () => {
   assert.equal(second.ledger.assets["owner/repo@v1.0.0/asset.zip"]?.count, 2);
   assert.equal(second.appliedDeltaIds.length, 0);
   assert.equal(second.skippedDeltaIds.length, 1);
+});
+
+test("mergeDownloadAttributionDeltas records timestamp buckets and honors cutoff time queries", () => {
+  const ledger = createEmptyDownloadAttributionLedger("2026-03-30T00:00:00.000Z");
+  const early = createDownloadAttributionDelta("workflow:test", "run-early", "2026-03-30T01:00:00.000Z");
+  const late = createDownloadAttributionDelta("workflow:test", "run-late", "2026-03-30T10:00:00.000Z");
+  early.assets["owner/repo@v1.0.0/asset.zip"] = 2;
+  late.assets["owner/repo@v1.0.0/asset.zip"] = 3;
+
+  const merged = mergeDownloadAttributionDeltas(ledger, [early, late], "2026-03-30T12:00:00.000Z");
+  assert.equal(merged.ledger.daily["2026_03_30"]?.total, 5);
+  assert.equal(merged.ledger.timeline["2026-03-30T01:00:00.000Z"]?.total, 2);
+  assert.equal(merged.ledger.timeline["2026-03-30T10:00:00.000Z"]?.total, 3);
+
+  assert.equal(
+    sumLedgerTotalUpToCutoff(merged.ledger, "2026_03_30", "2026-03-30T03:00:00.000Z"),
+    2,
+  );
+  assert.equal(
+    sumLedgerDateTotalUpToCutoff(merged.ledger, "2026_03_30", "2026-03-30T03:00:00.000Z"),
+    2,
+  );
+  assert.deepEqual(
+    getLedgerAssetsForDateCutoff(merged.ledger, "2026_03_30", "2026-03-30T03:00:00.000Z"),
+    { "owner/repo@v1.0.0/asset.zip": 2 },
+  );
 });
