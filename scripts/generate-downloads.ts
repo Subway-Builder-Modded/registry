@@ -20,6 +20,28 @@ import {
 import { compareStableSemverAsc, isStableSemverTag } from "./lib/semver.js";
 import { filterListingMessages, isTestListing } from "./lib/test-listings.js";
 
+export function getAnnouncementListingIds(
+  newIntegrity: IntegrityOutput,
+  previousIntegrity: IntegrityOutput,
+): string[] {
+  return Object.entries(newIntegrity.listings)
+    .filter(([, listing]) => listing.has_complete_version)
+    .filter(([id]) => !previousIntegrity.listings[id]?.has_complete_version)
+    .map(([id]) => id);
+}
+
+export function listZeroValidSemverListings(integrity: IntegrityOutput): string[] {
+  return Object.entries(integrity.listings)
+    .filter(([, listing]) => listing.latest_semver_version === null && Object.keys(listing.versions).length > 0)
+    .map(([id]) => id)
+    .sort();
+}
+
+export function buildZeroValidSemverWarnings(integrity: IntegrityOutput): string[] {
+  return listZeroValidSemverListings(integrity)
+    .map((listingId) => `listing=${listingId}: no valid semver release tags found`);
+}
+
 async function announceNewAssets(
   newIntegrity: IntegrityOutput,
   integrityPath: string,
@@ -38,14 +60,9 @@ async function announceNewAssets(
     // No prior integrity file is acceptable on first run.
   }
 
-  const newListings = Object.entries(newIntegrity.listings)
-    .filter(([id]) => !previousIntegrity.listings[id])
-    .map(([id]) => id);
+  const newListings = getAnnouncementListingIds(newIntegrity, previousIntegrity);
   for (const listingId of newListings) {
     if (isTestListing(repoRoot, listingType === "map" ? "maps" : "mods", listingId)) {
-      continue;
-    }
-    if (!newIntegrity.listings[listingId]?.has_complete_version) {
       continue;
     }
     const manifestPath = resolve(
@@ -323,10 +340,7 @@ async function run(): Promise<void> {
     `[downloads] Attribution stats: registryFetchesAdded=${stats.registry_fetches_added}, adjustedDeltaTotal=${stats.adjusted_delta_total}, clampedVersions=${stats.clamped_versions}`,
   );
 
-  const zeroValidSemverListings = Object.entries(downloads)
-    .filter(([, versions]) => Object.keys(versions).length === 0)
-    .map(([id]) => id)
-    .sort();
+  const zeroValidSemverListings = listZeroValidSemverListings(integrity);
   if (zeroValidSemverListings.length > 0) {
     console.warn(
       `[downloads] Listings with zero valid semver tags (${zeroValidSemverListings.length}): ${zeroValidSemverListings.join(", ")}`,
@@ -341,8 +355,12 @@ async function run(): Promise<void> {
       : `Generated ${outputDir}/downloads.json for ${Object.keys(downloads).length} listings (download-only mode)`,
   );
 
+  const warningsForOutput = [
+    ...warnings,
+    ...buildZeroValidSemverWarnings(integrity),
+  ];
   const warningsForGitHub = filterListingMessages(
-    filterWarningsForGitHub(warnings, integrity),
+    filterWarningsForGitHub(warningsForOutput, integrity),
     (listingId) => isTestListing(repoRoot, listingType === "map" ? "maps" : "mods", listingId),
   );
   const securityErrorsForOutput = filterListingMessages(
@@ -353,7 +371,7 @@ async function run(): Promise<void> {
     securityAlerts.warnings,
     (listingId) => isTestListing(repoRoot, "mods", listingId),
   );
-  const suppressedWarnings = warnings.length - warningsForGitHub.length;
+  const suppressedWarnings = warningsForOutput.length - warningsForGitHub.length;
   if (suppressedWarnings > 0) {
     console.log(
       `[downloads] Suppressed ${suppressedWarnings} older-version warnings from GitHub/Discord output`,
