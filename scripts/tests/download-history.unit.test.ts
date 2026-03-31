@@ -365,6 +365,110 @@ test("backfillDownloadHistorySnapshots caps legacy attributed downloads to store
   }
 });
 
+test("backfillDownloadHistorySnapshots uses snapshot generated_at to exclude later same-day attribution", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-download-history-"));
+  try {
+    setupBaseRepo(repoRoot);
+    writeIntegrity(repoRoot, "maps", {
+      "map-a": { "1.0.0": true },
+      "map-b": {},
+    });
+    writeIntegrity(repoRoot, "mods", {
+      "mod-a": { "1.0.0": true },
+    });
+    mkdirSync(join(repoRoot, "history"), { recursive: true });
+    mkdirSync(join(repoRoot, "maps", "map-a"), { recursive: true });
+
+    writeJson(join(repoRoot, "maps", "map-a", "manifest.json"), {
+      id: "map-a",
+      city_code: "MAPA",
+      update: {
+        type: "github",
+        repo: "example/map-a",
+      },
+    });
+    writeJson(join(repoRoot, "maps", "downloads.json"), {
+      "map-a": { "1.0.0": 20 },
+      "map-b": {},
+    });
+    writeJson(join(repoRoot, "mods", "downloads.json"), {
+      "mod-a": { "1.0.0": 0 },
+    });
+    writeJson(join(repoRoot, "history", "registry-download-attribution.json"), {
+      schema_version: 2,
+      updated_at: "2026-03-30T12:00:00.000Z",
+      assets: {
+        "example/map-a@1.0.0/MAPA.zip": {
+          count: 5,
+          updated_at: "2026-03-30T12:00:00.000Z",
+          by_source: { test: 5 },
+        },
+      },
+      applied_delta_ids: {},
+      daily: {
+        "2026_03_30": {
+          total: 5,
+          assets: {
+            "example/map-a@1.0.0/MAPA.zip": 5,
+          },
+        },
+      },
+      timeline: {
+        "2026-03-30T02:00:00.000Z": {
+          total: 2,
+          assets: {
+            "example/map-a@1.0.0/MAPA.zip": 2,
+          },
+        },
+        "2026-03-30T10:00:00.000Z": {
+          total: 3,
+          assets: {
+            "example/map-a@1.0.0/MAPA.zip": 3,
+          },
+        },
+      },
+    });
+
+    writeJson(join(repoRoot, "history", "snapshot_2026_03_30.json"), {
+      schema_version: 1,
+      snapshot_date: "2026_03_30",
+      generated_at: "2026-03-30T03:00:00.000Z",
+      maps: {
+        downloads: {
+          "map-a": { "1.0.0": 20 },
+        },
+        total_downloads: 20,
+        net_downloads: 20,
+        index: { schema_version: 1, maps: ["map-a"] },
+        entries: 1,
+      },
+      mods: {
+        downloads: {
+          "mod-a": { "1.0.0": 0 },
+        },
+        total_downloads: 0,
+        net_downloads: 0,
+        index: { schema_version: 1, mods: ["mod-a"] },
+        entries: 1,
+      },
+    });
+
+    backfillDownloadHistorySnapshots({ repoRoot });
+
+    const snapshot = JSON.parse(
+      readFileSync(join(repoRoot, "history", "snapshot_2026_03_30.json"), "utf-8"),
+    ) as Record<string, unknown>;
+    const maps = snapshot.maps as Record<string, unknown>;
+    assert.equal(snapshot.total_attributed_fetches, 2);
+    assert.equal(snapshot.total_attributed_downloads, 2);
+    assert.deepEqual(maps.attributed_downloads, { "map-a": { "1.0.0": 2 } });
+    assert.deepEqual(maps.downloads, { "map-a": { "1.0.0": 20 } });
+    assert.deepEqual(maps.raw_downloads, { "map-a": { "1.0.0": 22 } });
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
 test("generateDownloadHistorySnapshot filters github map attribution by city code asset token", () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-download-history-"));
   try {

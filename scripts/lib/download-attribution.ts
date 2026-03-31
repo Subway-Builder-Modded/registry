@@ -37,12 +37,18 @@ export interface DownloadAttributionDailyEntry {
   assets: Record<string, number>;
 }
 
+export interface DownloadAttributionTimelineEntry {
+  total: number;
+  assets: Record<string, number>;
+}
+
 export interface DownloadAttributionLedger {
   schema_version: 2;
   updated_at: string;
   assets: Record<string, DownloadAttributionEntry>;
   applied_delta_ids: Record<string, string>;
   daily: Record<string, DownloadAttributionDailyEntry>;
+  timeline: Record<string, DownloadAttributionTimelineEntry>;
 }
 
 export interface DownloadAttributionDelta {
@@ -86,6 +92,7 @@ export function createEmptyDownloadAttributionLedger(nowIso = new Date().toISOSt
     assets: {},
     applied_delta_ids: {},
     daily: {},
+    timeline: {},
   };
 }
 
@@ -125,9 +132,11 @@ export function normalizeDownloadAttributionLedger(
   const assetsRaw = value.assets;
   const appliedRaw = value.applied_delta_ids;
   const dailyRaw = value.daily;
+  const timelineRaw = value.timeline;
   const assets: Record<string, DownloadAttributionEntry> = {};
   const appliedDeltaIds: Record<string, string> = {};
   const daily: Record<string, DownloadAttributionDailyEntry> = {};
+  const timeline: Record<string, DownloadAttributionTimelineEntry> = {};
 
   if (isObject(assetsRaw)) {
     for (const [assetKey, rawEntry] of Object.entries(assetsRaw)) {
@@ -182,6 +191,26 @@ export function normalizeDownloadAttributionLedger(
     }
   }
 
+  if (isObject(timelineRaw)) {
+    for (const [timeKey, timeValue] of Object.entries(timelineRaw)) {
+      if (!isObject(timeValue)) continue;
+      const total = toFiniteNonNegativeNumber(timeValue.total);
+      if (total === null) continue;
+      const timelineAssets: Record<string, number> = {};
+      if (isObject(timeValue.assets)) {
+        for (const [assetKey, rawCount] of Object.entries(timeValue.assets)) {
+          const parsedCount = toFiniteNonNegativeNumber(rawCount);
+          if (parsedCount === null || parsedCount === 0) continue;
+          timelineAssets[assetKey] = parsedCount;
+        }
+      }
+      timeline[timeKey] = {
+        total,
+        assets: sortObjectByKeys(timelineAssets),
+      };
+    }
+  }
+
   return {
     schema_version: 2,
     updated_at: typeof value.updated_at === "string" && value.updated_at.trim() !== ""
@@ -190,6 +219,7 @@ export function normalizeDownloadAttributionLedger(
     assets: sortObjectByKeys(assets),
     applied_delta_ids: sortObjectByKeys(appliedDeltaIds),
     daily: sortObjectByKeys(daily),
+    timeline: sortObjectByKeys(timeline),
   };
 }
 
@@ -288,6 +318,120 @@ export function adjustDownloadCount(
   };
 }
 
+function toUtcDateKeyFromIso(isoLike: string): string | null {
+  const parsed = Date.parse(isoLike);
+  if (!Number.isFinite(parsed)) return null;
+  return new Date(parsed).toISOString().slice(0, 10).replaceAll("-", "_");
+}
+
+function hasTimelineEntries(ledger: DownloadAttributionLedger): boolean {
+  return Object.keys(ledger.timeline).length > 0;
+}
+
+export function forEachLedgerAssetCountUpToCutoff(
+  ledger: DownloadAttributionLedger,
+  snapshotDate: string,
+  generatedAtIso: string | null | undefined,
+  visit: (assetKey: string, count: number) => void,
+): void {
+  const cutoffIso = generatedAtIso?.trim() ? generatedAtIso : null;
+  const cutoffMs = cutoffIso ? Date.parse(cutoffIso) : Number.NaN;
+  if (hasTimelineEntries(ledger) && Number.isFinite(cutoffMs)) {
+    for (const [timeKey, entry] of Object.entries(ledger.timeline)) {
+      const entryMs = Date.parse(timeKey);
+      if (!Number.isFinite(entryMs) || entryMs > cutoffMs) continue;
+      for (const [assetKey, count] of Object.entries(entry.assets)) {
+        visit(assetKey, count);
+      }
+    }
+    return;
+  }
+
+  for (const [dateKey, entry] of Object.entries(ledger.daily)) {
+    if (dateKey > snapshotDate) continue;
+    for (const [assetKey, count] of Object.entries(entry.assets)) {
+      visit(assetKey, count);
+    }
+  }
+}
+
+export function sumLedgerTotalUpToCutoff(
+  ledger: DownloadAttributionLedger,
+  snapshotDate: string,
+  generatedAtIso: string | null | undefined,
+): number {
+  const cutoffIso = generatedAtIso?.trim() ? generatedAtIso : null;
+  const cutoffMs = cutoffIso ? Date.parse(cutoffIso) : Number.NaN;
+  if (hasTimelineEntries(ledger) && Number.isFinite(cutoffMs)) {
+    let total = 0;
+    for (const [timeKey, entry] of Object.entries(ledger.timeline)) {
+      const entryMs = Date.parse(timeKey);
+      if (!Number.isFinite(entryMs) || entryMs > cutoffMs) continue;
+      total += entry.total;
+    }
+    return total;
+  }
+
+  let total = 0;
+  for (const [dateKey, entry] of Object.entries(ledger.daily)) {
+    if (dateKey > snapshotDate) continue;
+    if (typeof entry.total === "number" && Number.isFinite(entry.total)) {
+      total += entry.total;
+      continue;
+    }
+    total += Object.values(entry.assets).reduce((sum, value) => sum + value, 0);
+  }
+  return total;
+}
+
+export function getLedgerAssetsForDateCutoff(
+  ledger: DownloadAttributionLedger,
+  snapshotDate: string,
+  generatedAtIso: string | null | undefined,
+): Record<string, number> {
+  const cutoffIso = generatedAtIso?.trim() ? generatedAtIso : null;
+  const cutoffMs = cutoffIso ? Date.parse(cutoffIso) : Number.NaN;
+  if (hasTimelineEntries(ledger) && Number.isFinite(cutoffMs)) {
+    const assets: Record<string, number> = {};
+    for (const [timeKey, entry] of Object.entries(ledger.timeline)) {
+      const entryMs = Date.parse(timeKey);
+      if (!Number.isFinite(entryMs) || entryMs > cutoffMs) continue;
+      if (toUtcDateKeyFromIso(timeKey) !== snapshotDate) continue;
+      for (const [assetKey, count] of Object.entries(entry.assets)) {
+        assets[assetKey] = (assets[assetKey] ?? 0) + count;
+      }
+    }
+    return sortObjectByKeys(assets);
+  }
+
+  return sortObjectByKeys(ledger.daily[snapshotDate]?.assets ?? {});
+}
+
+export function sumLedgerDateTotalUpToCutoff(
+  ledger: DownloadAttributionLedger,
+  snapshotDate: string,
+  generatedAtIso: string | null | undefined,
+): number {
+  const cutoffIso = generatedAtIso?.trim() ? generatedAtIso : null;
+  const cutoffMs = cutoffIso ? Date.parse(cutoffIso) : Number.NaN;
+  if (hasTimelineEntries(ledger) && Number.isFinite(cutoffMs)) {
+    let total = 0;
+    for (const [timeKey, entry] of Object.entries(ledger.timeline)) {
+      const entryMs = Date.parse(timeKey);
+      if (!Number.isFinite(entryMs) || entryMs > cutoffMs) continue;
+      if (toUtcDateKeyFromIso(timeKey) !== snapshotDate) continue;
+      total += entry.total;
+    }
+    return total;
+  }
+
+  const entry = ledger.daily[snapshotDate];
+  if (typeof entry?.total === "number" && Number.isFinite(entry.total)) {
+    return entry.total;
+  }
+  return Object.values(entry?.assets ?? {}).reduce((sum, value) => sum + value, 0);
+}
+
 export function recordDownloadAttributionFetchByAssetKey(
   delta: DownloadAttributionDelta,
   assetKey: string,
@@ -379,6 +523,13 @@ export function mergeDownloadAttributionDeltas(
         total: dailyEntry.total,
         assets: sortObjectByKeys(dailyEntry.assets),
       };
+      const timelineEntry = nextLedger.timeline[normalizedDelta.generated_at] ?? { total: 0, assets: {} };
+      timelineEntry.total += count;
+      timelineEntry.assets[assetKey] = (timelineEntry.assets[assetKey] ?? 0) + count;
+      nextLedger.timeline[normalizedDelta.generated_at] = {
+        total: timelineEntry.total,
+        assets: sortObjectByKeys(timelineEntry.assets),
+      };
       addedFetches += count;
       touchedAssetKeys.add(assetKey);
     }
@@ -388,6 +539,7 @@ export function mergeDownloadAttributionDeltas(
   nextLedger.assets = sortObjectByKeys(nextLedger.assets);
   nextLedger.applied_delta_ids = sortObjectByKeys(nextLedger.applied_delta_ids);
   nextLedger.daily = sortObjectByKeys(nextLedger.daily);
+  nextLedger.timeline = sortObjectByKeys(nextLedger.timeline);
 
   return {
     ledger: nextLedger,

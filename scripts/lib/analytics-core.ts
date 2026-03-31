@@ -140,12 +140,13 @@ interface MapStatisticsRow {
   population_count: number;
   points_count: number;
   n_cells: number;
-  median_point_density: number;
   mean_point_density: number;
   median_cell_resident_density: number;
   mean_cell_resident_density: number;
+  pct_cells_with_residents: number;
   median_cell_worker_density: number;
   mean_cell_worker_density: number;
+  pct_cells_with_workers: number;
   median_commute_distance: number;
   mean_commute_distance: number;
 }
@@ -478,12 +479,13 @@ interface GridCellFeatureProperties {
 
 interface GridSummary {
   n_cells: number;
-  median_point_density: number;
   mean_point_density: number;
   median_cell_resident_density: number;
   mean_cell_resident_density: number;
+  pct_cells_with_residents: number;
   median_cell_worker_density: number;
   mean_cell_worker_density: number;
+  pct_cells_with_workers: number;
   median_commute_distance: number;
   mean_commute_distance: number;
 }
@@ -491,15 +493,36 @@ interface GridSummary {
 function emptyGridSummary(): GridSummary {
   return {
     n_cells: 0,
-    median_point_density: 0,
     mean_point_density: 0,
     median_cell_resident_density: 0,
     mean_cell_resident_density: 0,
+    pct_cells_with_residents: 0,
     median_cell_worker_density: 0,
     mean_cell_worker_density: 0,
+    pct_cells_with_workers: 0,
     median_commute_distance: 0,
     mean_commute_distance: 0,
   };
+}
+
+function roundTo(value: number, decimalPlaces = 2): number {
+  const factor = 10 ** decimalPlaces;
+  return Math.round(value * factor) / factor;
+}
+
+function nonZeroMedian(values: number[]): number {
+  return medianOf(values.filter((value) => value > 0));
+}
+
+function nonZeroMean(values: number[]): number {
+  const filtered = values.filter((value) => value > 0);
+  if (filtered.length === 0) return 0;
+  return filtered.reduce((sum, value) => sum + value, 0) / filtered.length;
+}
+
+function percentNonZero(values: number[], totalCount: number): number {
+  if (totalCount <= 0) return 0;
+  return (values.filter((value) => value > 0).length / totalCount) * 100;
 }
 
 function loadGridSummary(repoRoot: string, id: string): GridSummary {
@@ -538,20 +561,19 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
     const residentCounts = populatedCells.map((cell) => cell.pop);
     const workerCounts = populatedCells.map((cell) => cell.jobs);
     const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
-    const totalResidents = residentCounts.reduce((sum, value) => sum + value, 0);
-    const totalWorkers = workerCounts.reduce((sum, value) => sum + value, 0);
     const gridProperties = isObject(grid.properties) ? grid.properties : {};
 
     return {
       n_cells: nCells,
-      median_point_density: medianOf(pointCounts),
-      mean_point_density: totalPoints / nCells,
-      median_cell_resident_density: medianOf(residentCounts),
-      mean_cell_resident_density: totalResidents / nCells,
-      median_cell_worker_density: medianOf(workerCounts),
-      mean_cell_worker_density: totalWorkers / nCells,
-      median_commute_distance: toNonNegativeNumber(gridProperties.medianCommuteDistance),
-      mean_commute_distance: toNonNegativeNumber(gridProperties.meanCommuteDistance),
+      mean_point_density: roundTo(totalPoints / nCells),
+      median_cell_resident_density: roundTo(nonZeroMedian(residentCounts)),
+      mean_cell_resident_density: roundTo(nonZeroMean(residentCounts)),
+      pct_cells_with_residents: roundTo(percentNonZero(residentCounts, nCells)),
+      median_cell_worker_density: roundTo(nonZeroMedian(workerCounts)),
+      mean_cell_worker_density: roundTo(nonZeroMean(workerCounts)),
+      pct_cells_with_workers: roundTo(percentNonZero(workerCounts, nCells)),
+      median_commute_distance: roundTo(toNonNegativeNumber(gridProperties.medianCommuteDistance)),
+      mean_commute_distance: roundTo(toNonNegativeNumber(gridProperties.meanCommuteDistance)),
     };
   } catch {
     return emptyGridSummary();
@@ -1398,12 +1420,13 @@ export function runGenerateAnalyticsCli(
       "population_count",
       "points_count",
       "n_cells",
-      "median_point_density",
       "mean_point_density",
       "median_cell_resident_density",
       "mean_cell_resident_density",
+      "pct_cells_with_residents",
       "median_cell_worker_density",
       "mean_cell_worker_density",
+      "pct_cells_with_workers",
       "median_commute_distance",
       "mean_commute_distance",
     ],

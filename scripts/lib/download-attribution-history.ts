@@ -1,7 +1,10 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import {
+  getLedgerAssetsForDateCutoff,
   loadDownloadAttributionLedger,
+  sumLedgerDateTotalUpToCutoff,
+  sumLedgerTotalUpToCutoff,
   type DownloadAttributionLedger,
 } from "./download-attribution.js";
 
@@ -39,6 +42,11 @@ export interface BackfillDownloadAttributionHistoryResult {
   warnings: string[];
 }
 
+interface DownloadSnapshotMeta {
+  snapshotDate: string;
+  generatedAtIso: string;
+}
+
 function toSnapshotDate(now: Date): string {
   return now.toISOString().slice(0, 10).replaceAll("-", "_");
 }
@@ -61,40 +69,6 @@ function hasDailyBuckets(ledger: DownloadAttributionLedger): boolean {
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf-8")) as T;
-}
-
-function sumLedgerTotal(ledger: DownloadAttributionLedger): number {
-  let total = 0;
-  for (const entry of Object.values(ledger.assets)) {
-    if (typeof entry.count === "number" && Number.isFinite(entry.count)) {
-      total += entry.count;
-    }
-  }
-  return total;
-}
-
-function sumLedgerTotalUpToDate(ledger: DownloadAttributionLedger, snapshotDate: string): number {
-  const dailyKeys = Object.keys(ledger.daily).sort();
-  if (dailyKeys.length === 0) {
-    return sumLedgerTotal(ledger);
-  }
-
-  let total = 0;
-  for (const dateKey of dailyKeys) {
-    if (dateKey > snapshotDate) {
-      break;
-    }
-    const entry = ledger.daily[dateKey];
-    if (typeof entry?.total === "number" && Number.isFinite(entry.total)) {
-      total += entry.total;
-      continue;
-    }
-    if (entry?.assets) {
-      total += Object.values(entry.assets).reduce((sum, value) => sum + value, 0);
-    }
-  }
-
-  return total;
 }
 
 function listAttributionSnapshotFiles(historyDir: string): string[] {
@@ -138,12 +112,9 @@ function buildSnapshotForDate(
   generatedAtIso: string,
   previousTotal: number | null,
 ): DownloadAttributionHistorySnapshot {
-  const total = sumLedgerTotalUpToDate(ledger, snapshotDate);
-  const daily = ledger.daily[snapshotDate];
-  const dailyAssets = sortObjectByKeys(daily?.assets ?? {});
-  const dailyTotal = typeof daily?.total === "number" && Number.isFinite(daily.total)
-    ? daily.total
-    : Object.values(dailyAssets).reduce((sum, value) => sum + value, 0);
+  const total = sumLedgerTotalUpToCutoff(ledger, snapshotDate, generatedAtIso);
+  const dailyAssets = getLedgerAssetsForDateCutoff(ledger, snapshotDate, generatedAtIso);
+  const dailyTotal = sumLedgerDateTotalUpToCutoff(ledger, snapshotDate, generatedAtIso);
   return {
     schema_version: 1,
     snapshot_date: snapshotDate,
@@ -196,13 +167,24 @@ function parseDateFromDownloadSnapshotFile(name: string): string | null {
   return match ? match[1] : null;
 }
 
-function readDownloadSnapshotDates(repoRoot: string): string[] {
+function readDownloadSnapshotMetas(repoRoot: string): DownloadSnapshotMeta[] {
   const historyDir = getHistoryDir(repoRoot);
   if (!existsSync(historyDir)) return [];
-  return readdirSync(historyDir)
-    .map((name) => parseDateFromDownloadSnapshotFile(name))
-    .filter((value): value is string => typeof value === "string")
-    .sort();
+  const metas: DownloadSnapshotMeta[] = [];
+  for (const name of readdirSync(historyDir).sort()) {
+    const snapshotDate = parseDateFromDownloadSnapshotFile(name);
+    if (!snapshotDate) continue;
+    try {
+      const raw = readJsonFile<{ generated_at?: unknown }>(resolve(historyDir, name));
+      const generatedAtIso = typeof raw.generated_at === "string" && raw.generated_at.trim() !== ""
+        ? raw.generated_at
+        : `${snapshotDate.replaceAll("_", "-")}T23:59:59.999Z`;
+      metas.push({ snapshotDate, generatedAtIso });
+    } catch {
+      metas.push({ snapshotDate, generatedAtIso: `${snapshotDate.replaceAll("_", "-")}T23:59:59.999Z` });
+    }
+  }
+  return metas;
 }
 
 export function backfillDownloadAttributionHistorySnapshots(
@@ -218,17 +200,18 @@ export function backfillDownloadAttributionHistorySnapshots(
   const historyDir = getHistoryDir(options.repoRoot);
   mkdirSync(historyDir, { recursive: true });
 
-  const snapshotDates = readDownloadSnapshotDates(options.repoRoot);
+  const snapshotMetas = readDownloadSnapshotMetas(options.repoRoot);
   const updatedFiles: string[] = [];
   let previousTotal: number | null = null;
 
-  for (const snapshotDate of snapshotDates) {
+  for (const snapshotMeta of snapshotMetas) {
+    const snapshotDate = snapshotMeta.snapshotDate;
     const fileName = `download_attribution_${snapshotDate}.json`;
     const filePath = resolve(historyDir, fileName);
     const snapshot = buildSnapshotForDate(
       ledger,
       snapshotDate,
-      new Date().toISOString(),
+      snapshotMeta.generatedAtIso,
       previousTotal,
     );
     previousTotal = snapshot.total_attributed_fetches;
@@ -241,7 +224,7 @@ export function backfillDownloadAttributionHistorySnapshots(
     }
   }
 
-  if (snapshotDates.length === 0) {
+  if (snapshotMetas.length === 0) {
     warnings.push("history: no download snapshots found; attribution backfill did nothing");
   }
 
