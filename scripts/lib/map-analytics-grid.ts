@@ -95,6 +95,8 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
     });
     cellsHeartbeat(counter, true);
 
+    grid.features = grid.features.filter(feature => feature.properties.pointCount > 0);
+
     return {
         ...grid,
         properties: {
