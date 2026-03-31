@@ -11,6 +11,9 @@ import {
   writeDownloadAttributionLedger,
   type DownloadAttributionDelta,
 } from "./download-attribution.js";
+import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
+import { getMapManifest } from "./map-demand-stats/repo.js";
+import { resolveZipUrlForMapSource } from "./map-demand-stats/source-resolution.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 
 const GITHUB_API_BASE = "https://api.github.com";
@@ -43,6 +46,26 @@ interface WorkflowBackfillStats {
   parsedLines: number;
   skippedLines: number;
 }
+
+export interface DownloadsFetchHit {
+  kind: "downloads";
+  listingId: string;
+  version: string;
+  assetName: string;
+  generatedAt: string;
+  dateKey: string;
+}
+
+export interface MapDemandFetchHit {
+  kind: "map-demand-stats";
+  listingId: string;
+  generatedAt: string;
+  dateKey: string;
+  assetKey?: string;
+  zipUrl?: string;
+}
+
+export type ParsedAttributionBackfillHit = DownloadsFetchHit | MapDemandFetchHit;
 
 interface IntegritySourceLike {
   repo?: unknown;
@@ -217,16 +240,16 @@ function toUtcDateKey(isoLike: string): string | null {
   return new Date(parsed).toISOString().slice(0, 10).replaceAll("-", "_");
 }
 
-function parseFetchZipHits(
+function parseDownloadsFetchZipHits(
   logContent: string,
   fallbackTimestamp: string,
-): Array<{ listingId: string; version: string; assetName: string; generatedAt: string; dateKey: string }> {
+): DownloadsFetchHit[] {
   const fallbackDateKey = toUtcDateKey(fallbackTimestamp);
   if (!fallbackDateKey) {
     throw new Error(`Invalid fallback timestamp '${fallbackTimestamp}'`);
   }
 
-  const hits: Array<{ listingId: string; version: string; assetName: string; generatedAt: string; dateKey: string }> = [];
+  const hits: DownloadsFetchHit[] = [];
 
   const timestampedRegex = /(\d{4}-\d{2}-\d{2}T[^\s]+Z)[^\n]*?\[downloads\]\s+heartbeat:end fetch-zip listing=([^ ]+) version=([^ ]+) asset=(.+?) status=200\b/g;
   for (;;) {
@@ -234,6 +257,7 @@ function parseFetchZipHits(
     if (!match) break;
     const generatedAt = match[1] ?? fallbackTimestamp;
     hits.push({
+      kind: "downloads",
       listingId: match[2]!,
       version: match[3]!,
       assetName: match[4]!,
@@ -252,6 +276,7 @@ function parseFetchZipHits(
     const match = legacyRegex.exec(logContent);
     if (!match) break;
     hits.push({
+      kind: "downloads",
       listingId: match[1]!,
       version: match[2]!,
       assetName: match[3]!,
@@ -261,6 +286,90 @@ function parseFetchZipHits(
   }
 
   return hits;
+}
+
+function parseMapDemandFetchZipHits(
+  logContent: string,
+  fallbackTimestamp: string,
+): MapDemandFetchHit[] {
+  const fallbackDateKey = toUtcDateKey(fallbackTimestamp);
+  if (!fallbackDateKey) {
+    throw new Error(`Invalid fallback timestamp '${fallbackTimestamp}'`);
+  }
+
+  const hits: MapDemandFetchHit[] = [];
+
+  const timestampedRegex = /(\d{4}-\d{2}-\d{2}T[^\s]+Z)[^\n]*?\[map-demand-stats\]\s+heartbeat:end fetch-zip listing=([^ ]+)(?: assetKey=([^ ]+))?(?: zipUrl=([^ ]+))? status=200\b/g;
+  for (;;) {
+    const match = timestampedRegex.exec(logContent);
+    if (!match) break;
+    const generatedAt = match[1] ?? fallbackTimestamp;
+    hits.push({
+      kind: "map-demand-stats",
+      listingId: match[2]!,
+      assetKey: match[3] ? match[3] : undefined,
+      zipUrl: match[4] ? match[4] : undefined,
+      generatedAt,
+      dateKey: toUtcDateKey(generatedAt) ?? fallbackDateKey,
+    });
+  }
+
+  if (hits.length > 0) {
+    return hits;
+  }
+
+  const legacyRegex = /\[map-demand-stats\]\s+heartbeat:end fetch-zip listing=([^ ]+)(?: assetKey=([^ ]+))?(?: zipUrl=([^ ]+))? status=200\b/g;
+  for (;;) {
+    const match = legacyRegex.exec(logContent);
+    if (!match) break;
+    hits.push({
+      kind: "map-demand-stats",
+      listingId: match[1]!,
+      assetKey: match[2] ? match[2] : undefined,
+      zipUrl: match[3] ? match[3] : undefined,
+      generatedAt: fallbackTimestamp,
+      dateKey: fallbackDateKey,
+    });
+  }
+
+  return hits;
+}
+
+export function parseAttributionBackfillLogHits(
+  logContent: string,
+  fallbackTimestamp: string,
+): ParsedAttributionBackfillHit[] {
+  return [
+    ...parseDownloadsFetchZipHits(logContent, fallbackTimestamp),
+    ...parseMapDemandFetchZipHits(logContent, fallbackTimestamp),
+  ];
+}
+
+export async function resolveMapDemandBackfillAssetKey(
+  listingId: string,
+  repoRoot: string,
+  token: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<string | null> {
+  try {
+    const manifest = getMapManifest(repoRoot, listingId);
+    const warnings: string[] = [];
+    const resolved = await resolveZipUrlForMapSource(
+      listingId,
+      manifest.source,
+      manifest.update,
+      fetchImpl,
+      token,
+      warnings,
+    );
+    if (!resolved) return null;
+    if (resolved.attributionAssetKey) return resolved.attributionAssetKey;
+    const parsed = parseGitHubReleaseAssetDownloadUrl(resolved.zipUrl);
+    if (!parsed) return null;
+    return toDownloadAttributionAssetKey(parsed.repo, parsed.tag, parsed.assetName);
+  } catch {
+    return null;
+  }
 }
 
 function workflowSourceLabel(workflowFile: string): string {
@@ -326,6 +435,7 @@ export async function runDownloadAttributionBackfillCli(
   const cutoffMs = Date.now() - (cli.lookbackDays * 24 * 60 * 60 * 1000);
   const lineIndex = buildLineToAssetKeyIndex(cli.repoRoot);
   const runs = await listWorkflowRuns(cli.repoFullName, cli.token, cutoffMs);
+  const demandBackfillAssetKeyCache = new Map<string, Promise<string | null>>();
 
   const deltas: DownloadAttributionDelta[] = [];
   let parsedRuns = 0;
@@ -365,13 +475,31 @@ export async function runDownloadAttributionBackfillCli(
       } catch {
         continue;
       }
-      const hits = parseFetchZipHits(content, runInfo.created_at);
+      const hits = parseAttributionBackfillLogHits(content, runInfo.created_at);
       for (const hit of hits) {
         parsedLines += 1;
         perWorkflow.parsedLines += 1;
-        const mapKeyExact = `${hit.listingId}::${hit.version}::${hit.assetName}`;
-        const mapKeyLower = `${hit.listingId}::${hit.version}::${hit.assetName.toLowerCase()}`;
-        const assetKey = lineIndex.get(mapKeyExact) ?? lineIndex.get(mapKeyLower);
+        let assetKey: string | null = null;
+
+        if (hit.kind === "downloads") {
+          const mapKeyExact = `${hit.listingId}::${hit.version}::${hit.assetName}`;
+          const mapKeyLower = `${hit.listingId}::${hit.version}::${hit.assetName.toLowerCase()}`;
+          assetKey = lineIndex.get(mapKeyExact) ?? lineIndex.get(mapKeyLower) ?? null;
+        } else {
+          assetKey = hit.assetKey ?? null;
+          if (!assetKey && hit.zipUrl) {
+            const parsed = parseGitHubReleaseAssetDownloadUrl(hit.zipUrl);
+            if (parsed) {
+              assetKey = toDownloadAttributionAssetKey(parsed.repo, parsed.tag, parsed.assetName);
+            }
+          }
+          if (!assetKey) {
+            const cached = demandBackfillAssetKeyCache.get(hit.listingId)
+              ?? resolveMapDemandBackfillAssetKey(hit.listingId, cli.repoRoot, cli.token);
+            demandBackfillAssetKeyCache.set(hit.listingId, cached);
+            assetKey = await cached;
+          }
+        }
         if (!assetKey) {
           skippedLines += 1;
           perWorkflow.skippedLines += 1;
