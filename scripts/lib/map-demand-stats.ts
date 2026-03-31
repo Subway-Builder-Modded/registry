@@ -19,6 +19,8 @@ import {
   type DownloadAttributionDelta,
 } from "./download-attribution.js";
 import { compareStableSemverDesc } from "./semver.js";
+import { DemandData, generateGrid } from "./map-analytics-grid.js";
+import { FeatureCollection, GeoJsonProperties, Polygon } from "geojson";
 
 export interface DemandStats {
   residents_total: number;
@@ -646,6 +648,7 @@ export async function extractDemandStatsFromZipBuffer(
   listingId: string,
   zipBuffer: Buffer,
   options: ExtractDemandStatsOptions = {},
+  repoRoot: string
 ): Promise<DemandStats> {
   const warnings = options.warnings;
   const requireResidentTotalsMatch = options.requireResidentTotalsMatch === true;
@@ -678,6 +681,19 @@ export async function extractDemandStatsFromZipBuffer(
     payload = JSON.parse(rawText);
   } catch {
     throw new Error(`listing=${listingId}: demand data file is not valid JSON`);
+  }
+
+  let gridData: FeatureCollection<Polygon, GeoJsonProperties>;
+  try {
+    gridData = await generateGrid(payload as DemandData, listingId);
+  } catch (error) {
+    throw new Error(`listing=${listingId}: failed to generate grid data`);
+  }
+
+  try {
+    writeFileSync(resolve(repoRoot, "maps", listingId, "grid.geojson"), JSON.stringify(gridData, null, 2), "utf-8");
+  } catch (error) {
+    throw new Error(`listing=${listingId}: failed to write grid data to file (${(error as Error).message})`);
   }
 
   const configEntry = findConfigEntry(zip);
@@ -769,6 +785,7 @@ export async function resolveAndExtractDemandStatsForMapSource(
     token?: string;
     requireResidentTotalsMatch?: boolean;
     sourceUrl?: string;
+    repoRoot?: string;
   } = {},
 ): Promise<DemandStats> {
   const warnings: string[] = [];
@@ -793,7 +810,7 @@ export async function resolveAndExtractDemandStatsForMapSource(
   const stats = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, {
     warnings,
     requireResidentTotalsMatch: options.requireResidentTotalsMatch,
-  });
+  }, options.repoRoot!);
   for (const warning of warnings) {
     console.warn(`[map-demand-stats] ${warning}`);
   }
@@ -964,7 +981,7 @@ export async function generateMapDemandStats(
 
     let stats: DemandStats;
     try {
-      stats = await extractDemandStatsFromZipBuffer(id, zipBuffer, { warnings });
+      stats = await extractDemandStatsFromZipBuffer(id, zipBuffer, { warnings }, repoRoot);
     } catch (error) {
       warnListing(warnings, id, String((error as Error).message));
       skippedMaps += 1;
