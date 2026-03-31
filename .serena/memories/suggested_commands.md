@@ -1,0 +1,11 @@
+# Suggested commands
+- List files: `Get-ChildItem`, `Get-ChildItem -Recurse`
+- Fast search: `rg pattern`, `rg --files`
+- Build tests: `pnpm --dir scripts run test:build`
+- Run tests: `pnpm --dir scripts run test:run`
+- Run one compiled test without worker isolation in sandboxed environments: `node --test --test-isolation=none scripts/.test-dist/tests/<file>.js`
+- Generate registry analytics CSVs: `pnpm --dir scripts run analytics -- --top-k-listings 0 --top-k-authors 0`
+- Generate registry download analytics: `pnpm --dir scripts run generate-registry-analytics`
+- Generate Railyard app analytics: `pnpm --dir scripts run generate-railyard-app-analytics`
+- Generate download history snapshot: `pnpm --dir scripts run generate-download-history`
+- Check git state: `git status --short`, `git diff -- <path>`

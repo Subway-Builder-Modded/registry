@@ -141,6 +141,16 @@ interface MapPopulationRow {
   points_count: number;
 }
 
+interface AssetByDayRow {
+  snapshot_date: string;
+  total_downloads: number;
+  maps: number;
+  mods: number;
+  cumulative_total: number;
+  cumulative_maps: number;
+  cumulative_mods: number;
+}
+
 type DailySeriesRow = Record<string, string | number>;
 type ListingKey = `${"maps" | "mods"}:${string}`;
 
@@ -668,6 +678,40 @@ function buildAuthorByDayRows(
     || String(a.author).localeCompare(String(b.author)));
 }
 
+function buildAssetsByDayRows(
+  snapshotDates: string[],
+  dailyDeltasBySnapshot: Map<string, ListingTotals>,
+): AssetByDayRow[] {
+  let cumulativeMaps = 0;
+  let cumulativeMods = 0;
+
+  return snapshotDates.map((snapshotDate) => {
+    let maps = 0;
+    let mods = 0;
+    const snapshotTotals = dailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)
+      ?? new Map<ListingKey, number>();
+
+    for (const [key, totalDownloads] of snapshotTotals.entries()) {
+      const [listingType] = key.split(":") as ["maps" | "mods", string];
+      if (listingType === "maps") maps += totalDownloads;
+      if (listingType === "mods") mods += totalDownloads;
+    }
+
+    cumulativeMaps += maps;
+    cumulativeMods += mods;
+
+    return {
+      snapshot_date: snapshotDate,
+      total_downloads: maps + mods,
+      maps,
+      mods,
+      cumulative_total: cumulativeMaps + cumulativeMods,
+      cumulative_maps: cumulativeMaps,
+      cumulative_mods: cumulativeMods,
+    };
+  });
+}
+
 export function runGenerateAnalyticsCli(
   argv = process.argv.slice(2),
   repoRoot?: string,
@@ -702,6 +746,16 @@ export function runGenerateAnalyticsCli(
   adjustedTotalsBySnapshot.set(latest.file, filterOutTestListingTotals(resolvedRepoRoot, toListingTotals(latestData)));
   const monotonicTotalsBySnapshot = buildMonotonicSnapshotTotals(snapshots, historyDir);
   const dailyDeltasBySnapshot = buildDailyDeltaSnapshotTotals(snapshots, monotonicTotalsBySnapshot);
+  const filteredDailyDeltasBySnapshot = new Map<string, ListingTotals>();
+  for (const snapshot of snapshots) {
+    filteredDailyDeltasBySnapshot.set(
+      snapshot.file,
+      filterOutTestListingTotals(
+        resolvedRepoRoot,
+        dailyDeltasBySnapshot.get(snapshot.file) ?? new Map<ListingKey, number>(),
+      ),
+    );
+  }
   const snapshotDates = snapshots.map((snapshot) => toSnapshotDateLabel(snapshot.file));
   const latestTotals = filterOutTestListingTotals(
     resolvedRepoRoot,
@@ -1001,23 +1055,24 @@ export function runGenerateAnalyticsCli(
   const listingByDayRows = buildListingByDayRows(
     snapshotDates,
     latestTotals,
-    dailyDeltasBySnapshot,
+    filteredDailyDeltasBySnapshot,
     listingMeta,
     listingProjectByKey,
   );
   const projectByDayRows = buildProjectByDayRows(
     snapshotDates,
     latestTotals,
-    dailyDeltasBySnapshot,
+    filteredDailyDeltasBySnapshot,
     listingMeta,
     listingProjectByKey,
   );
   const authorByDayRows = buildAuthorByDayRows(
     snapshotDates,
     latestTotals,
-    dailyDeltasBySnapshot,
+    filteredDailyDeltasBySnapshot,
     listingMeta,
   );
+  const assetsByDayRows = buildAssetsByDayRows(snapshotDates, filteredDailyDeltasBySnapshot);
 
   writeCsv<ListingWindowRow>(
     join(analyticsDir, "most_popular_last_1d.csv"),
@@ -1293,6 +1348,20 @@ export function runGenerateAnalyticsCli(
       ...snapshotDates,
     ],
     authorByDayRows,
+  );
+
+  writeCsv<AssetByDayRow>(
+    join(analyticsDir, "assets_by_day.csv"),
+    [
+      "snapshot_date",
+      "total_downloads",
+      "maps",
+      "mods",
+      "cumulative_total",
+      "cumulative_maps",
+      "cumulative_mods",
+    ],
+    assetsByDayRows,
   );
 
   console.log(`Generated analytics CSVs in ${analyticsDir}`);
