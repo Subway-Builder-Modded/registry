@@ -477,6 +477,14 @@ interface GridCellFeatureProperties {
   pointCount?: unknown;
 }
 
+interface GridMetricBundleProperties {
+  p10?: unknown;
+  p25?: unknown;
+  p50?: unknown;
+  p75?: unknown;
+  mean?: unknown;
+}
+
 interface GridSummary {
   n_cells: number;
   mean_point_density: number;
@@ -525,6 +533,20 @@ function percentNonZero(values: number[], totalCount: number): number {
   return (values.filter((value) => value > 0).length / totalCount) * 100;
 }
 
+function readGridMetricBundle(
+  properties: Record<string, unknown>,
+  key: string,
+): { p50: number; mean: number } {
+  const bundle = isObject(properties[key]) ? properties[key] as GridMetricBundleProperties : null;
+  if (!bundle) {
+    return { p50: 0, mean: 0 };
+  }
+  return {
+    p50: toNonNegativeNumber(bundle.p50),
+    mean: toNonNegativeNumber(bundle.mean),
+  };
+}
+
 function loadGridSummary(repoRoot: string, id: string): GridSummary {
   const gridPath = join(repoRoot, "maps", id, "grid.geojson");
   if (!existsSync(gridPath)) return emptyGridSummary();
@@ -550,10 +572,12 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
 
     const nCells = populatedCells.length;
     if (nCells === 0) {
+      const gridProperties = isObject(grid.properties) ? grid.properties : {};
+      const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
       return {
         ...emptyGridSummary(),
-        median_commute_distance: toNonNegativeNumber(isObject(grid.properties) ? grid.properties.medianCommuteDistance : undefined),
-        mean_commute_distance: toNonNegativeNumber(isObject(grid.properties) ? grid.properties.meanCommuteDistance : undefined),
+        median_commute_distance: commuteSummary.p50,
+        mean_commute_distance: commuteSummary.mean,
       };
     }
 
@@ -562,6 +586,7 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
     const workerCounts = populatedCells.map((cell) => cell.jobs);
     const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
     const gridProperties = isObject(grid.properties) ? grid.properties : {};
+    const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
 
     return {
       n_cells: nCells,
@@ -572,8 +597,8 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
       median_cell_worker_density: roundTo(nonZeroMedian(workerCounts)),
       mean_cell_worker_density: roundTo(nonZeroMean(workerCounts)),
       pct_cells_with_workers: roundTo(percentNonZero(workerCounts, nCells)),
-      median_commute_distance: roundTo(toNonNegativeNumber(gridProperties.medianCommuteDistance)),
-      mean_commute_distance: roundTo(toNonNegativeNumber(gridProperties.meanCommuteDistance)),
+      median_commute_distance: roundTo(commuteSummary.p50),
+      mean_commute_distance: roundTo(commuteSummary.mean),
     };
   } catch {
     return emptyGridSummary();

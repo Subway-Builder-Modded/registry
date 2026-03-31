@@ -19,8 +19,24 @@ export interface DemandData {
     pops: Pops[];
 }
 
+export interface MetricSummary {
+    p10: number;
+    p25: number;
+    p50: number;
+    p75: number;
+    mean: number;
+}
+
+export interface GridMetricsProperties {
+    residentWeightedNearestNeighborKm: MetricSummary;
+    workerWeightedNearestNeighborKm: MetricSummary;
+    commuteDistanceKm: MetricSummary;
+    residentCellDensity: MetricSummary;
+    workerCellDensity: MetricSummary;
+}
+
 const HEARTBEAT_INTERVAL_MS = Number.parseInt(process.env.CI_HEARTBEAT_MS ?? "5000", 10);
-const HEARTBEAT_ITEMS = Number.parseInt(process.env.CI_HEARTBEAT_ITEMS ?? "2500", 10);
+const HEARTBEAT_ITEMS = Number.parseInt(process.env.CI_HEARTBEAT_ITEMS ?? "500", 10);
 
 const createHeartbeat = (label: string, mapId: string, total: number) => {
     let lastLogTime = 0;
@@ -58,24 +74,102 @@ const createHeartbeat = (label: string, mapId: string, total: number) => {
     };
 };
 
+function emptyMetricSummary(): MetricSummary {
+    return {
+        p10: 0,
+        p25: 0,
+        p50: 0,
+        p75: 0,
+        mean: 0,
+    };
+}
+
+function pickWeightedPercentile(
+    sortedEntries: Array<{ value: number; weight: number }>,
+    totalWeight: number,
+    percentile: number,
+): number {
+    if (sortedEntries.length === 0 || totalWeight <= 0) return 0;
+    const targetWeight = totalWeight * percentile;
+    let cumulativeWeight = 0;
+    for (const entry of sortedEntries) {
+        cumulativeWeight += entry.weight;
+        if (cumulativeWeight >= targetWeight) {
+            return entry.value;
+        }
+    }
+    return sortedEntries[sortedEntries.length - 1]?.value ?? 0;
+}
+
+function summarizeMetric(values: number[], weights?: number[]): MetricSummary {
+    if (values.length === 0) return emptyMetricSummary();
+
+    const entries = values
+        .map((value, index) => ({
+            value,
+            weight: weights?.[index] ?? 1,
+        }))
+        .filter((entry) => Number.isFinite(entry.value) && Number.isFinite(entry.weight) && entry.weight > 0)
+        .sort((a, b) => a.value - b.value);
+
+    if (entries.length === 0) return emptyMetricSummary();
+
+    const totalWeight = entries.reduce((sum, entry) => sum + entry.weight, 0);
+    if (totalWeight <= 0) return emptyMetricSummary();
+
+    const weightedValueSum = entries.reduce((sum, entry) => sum + (entry.value * entry.weight), 0);
+    return {
+        p10: pickWeightedPercentile(entries, totalWeight, 0.10),
+        p25: pickWeightedPercentile(entries, totalWeight, 0.25),
+        p50: pickWeightedPercentile(entries, totalWeight, 0.50),
+        p75: pickWeightedPercentile(entries, totalWeight, 0.75),
+        mean: weightedValueSum / totalWeight,
+    };
+}
+
+function computeNearestNeighborDistances(points: Point[], cityCode: string): number[] {
+    if (points.length <= 1) {
+        return points.map(() => 0);
+    }
+
+    const heartbeat = createHeartbeat("nearest-neighbors", cityCode, points.length);
+    const distances = points.map((point, pointIndex) => {
+        let nearestDistanceKm = Number.POSITIVE_INFINITY;
+        for (let candidateIndex = 0; candidateIndex < points.length; candidateIndex += 1) {
+            if (candidateIndex === pointIndex) continue;
+            const candidate = points[candidateIndex]!;
+            const distanceKm = turf.distance(
+                turf.point(point.location),
+                turf.point(candidate.location),
+                { units: "kilometers" },
+            );
+            if (distanceKm < nearestDistanceKm) {
+                nearestDistanceKm = distanceKm;
+            }
+        }
+        heartbeat(pointIndex + 1);
+        return Number.isFinite(nearestDistanceKm) ? nearestDistanceKm : 0;
+    });
+    heartbeat(points.length, true);
+    return distances;
+}
+
 export async function generateGrid(demandData: DemandData, cityCode: string): Promise<FeatureCollection<Polygon, GeoJsonProperties>> {
     let pointsCounter = 0;
-    let pointsTotal = demandData.points.length;
-    const commuteDistances = demandData.pops.map((pop) => pop.drivingDistance).sort((a, b) => a - b);
-    const medianCommuteDistance = commuteDistances[Math.floor(demandData.pops.length / 2)];
-    const meanCommuteDistance = demandData.pops.reduce((sum, pop) => sum + pop.drivingDistance, 0) / demandData.pops.length;
+    const pointsTotal = demandData.points.length;
     const pointsHeartbeat = createHeartbeat("points", cityCode, pointsTotal);
-    let points = turf.featureCollection(demandData.points.map((point) => {
+    const pointFeatures = demandData.points.map((point) => {
         pointsCounter += 1;
         pointsHeartbeat(pointsCounter);
         return turf.point(point.location, {
             jobs: point.jobs,
             pop: point.residents,
-            homeWorkCommuteDistances: demandData.pops.filter(pop => pop.residenceId === point.id).map(pop => pop.drivingDistance),
-            workHomeCommuteDistances: demandData.pops.filter(pop => pop.jobId === point.id).map(pop => pop.drivingDistance)
-        })
-    }))
+        });
+    });
     pointsHeartbeat(pointsCounter, true);
+
+    const points = turf.featureCollection(pointFeatures);
+    const nearestNeighborDistancesKm = computeNearestNeighborDistances(demandData.points, cityCode);
 
     const grid = turf.squareGrid(turf.bbox(points), 1, { units: "kilometers" });
 
@@ -87,45 +181,37 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
         const pointsInCell = turf.pointsWithinPolygon(points, feature);
         const jobs = pointsInCell.features.reduce((sum: number, point: any) => sum + point.properties.jobs, 0);
         const pop = pointsInCell.features.reduce((sum: number, point: any) => sum + point.properties.pop, 0);
-        const homeWorkCommuteDistances = pointsInCell.features.reduce(
-            (arr: number[], point: any) => arr.concat(point.properties!.homeWorkCommuteDistances as number[]),
-            [],
-        );
-        const workHomeCommuteDistances = pointsInCell.features.reduce(
-            (arr: number[], point: any) => arr.concat(point.properties!.workHomeCommuteDistances as number[]),
-            [],
-        );
 
         feature.properties!.jobs = jobs;
         feature.properties!.pop = pop;
-
         feature.properties!.pointCount = pointsInCell.features.length;
-
-        if (homeWorkCommuteDistances.length === 0) {
-            feature.properties!.homeWorkCommuteMedian = -1;
-        }
-        else {
-            feature.properties!.homeWorkCommuteMedian = homeWorkCommuteDistances
-                .sort((a: number, b: number) => a - b)[Math.floor(homeWorkCommuteDistances.length / 2)];
-        }
-
-        if (workHomeCommuteDistances.length > 0) {
-            feature.properties!.workHomeCommuteMedian = workHomeCommuteDistances
-                .sort((a: number, b: number) => a - b)[Math.floor(workHomeCommuteDistances.length / 2)];
-        } else {
-            feature.properties!.workHomeCommuteMedian = -1;
-        }
         cellsHeartbeat(counter);
     });
     cellsHeartbeat(counter, true);
 
     grid.features = grid.features.filter(feature => feature.properties!.pointCount > 0);
 
+    const populatedResidentCellCounts = grid.features
+        .map((feature) => Number(feature.properties?.pop ?? 0))
+        .filter((value) => Number.isFinite(value) && value > 0);
+    const populatedWorkerCellCounts = grid.features
+        .map((feature) => Number(feature.properties?.jobs ?? 0))
+        .filter((value) => Number.isFinite(value) && value > 0);
+    const commuteDistances = demandData.pops
+        .map((pop) => pop.drivingDistance)
+        .filter((value) => Number.isFinite(value) && value >= 0);
+    const residentWeights = demandData.points.map((point) => point.residents);
+    const workerWeights = demandData.points.map((point) => point.jobs);
+    const gridMetrics: GridMetricsProperties = {
+        residentWeightedNearestNeighborKm: summarizeMetric(nearestNeighborDistancesKm, residentWeights),
+        workerWeightedNearestNeighborKm: summarizeMetric(nearestNeighborDistancesKm, workerWeights),
+        commuteDistanceKm: summarizeMetric(commuteDistances),
+        residentCellDensity: summarizeMetric(populatedResidentCellCounts),
+        workerCellDensity: summarizeMetric(populatedWorkerCellCounts),
+    };
+
     return {
         ...grid,
-        properties: {
-            meanCommuteDistance: meanCommuteDistance,
-            medianCommuteDistance: medianCommuteDistance
-        }
+        properties: gridMetrics,
     } as FeatureCollection<Polygon, GeoJsonProperties>;
 }

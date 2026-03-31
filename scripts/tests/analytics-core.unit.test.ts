@@ -162,8 +162,13 @@ test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and r
         },
       ],
       properties: {
-        meanCommuteDistance: 15,
-        medianCommuteDistance: 12,
+        commuteDistanceKm: {
+          p10: 9,
+          p25: 10,
+          p50: 12,
+          p75: 14,
+          mean: 15,
+        },
       },
     });
     writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
@@ -269,8 +274,13 @@ test("runGenerateAnalyticsCli computes resident and worker densities from non-ze
         },
       ],
       properties: {
-        meanCommuteDistance: 15.126,
-        medianCommuteDistance: 12.994,
+        commuteDistanceKm: {
+          p10: 8.111,
+          p25: 10.222,
+          p50: 12.994,
+          p75: 14.555,
+          mean: 15.126,
+        },
       },
     });
     writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
