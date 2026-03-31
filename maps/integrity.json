@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-03-31T16:28:29.630Z",
+  "generated_at": "2026-03-31T16:57:42.842Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -551,10 +551,12 @@
       }
     },
     "bucharest-medium": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "v1.1.1",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.1.1"
+      ],
       "incomplete_versions": [],
       "versions": {
         "BUC-1.0": {
@@ -570,7 +572,8 @@
             "tag": "BUC-1.0"
           },
           "fingerprint": "rules:v4:github:metatablestudios/subwaybuilder-romania:BUC-1.0:BUC.zip",
-          "checked_at": "2026-03-31T16:28:29.630Z"
+          "checked_at": "2026-03-31T16:28:29.630Z",
+          "release_size": 40.39
         },
         "BUC-1.1": {
           "is_complete": false,
@@ -585,7 +588,8 @@
             "tag": "BUC-1.1"
           },
           "fingerprint": "rules:v4:github:metatablestudios/subwaybuilder-romania:BUC-1.1:BUC.zip",
-          "checked_at": "2026-03-31T16:28:29.630Z"
+          "checked_at": "2026-03-31T16:28:29.630Z",
+          "release_size": 39.15
         },
         "IAS-0.1": {
           "is_complete": false,
@@ -600,7 +604,8 @@
             "tag": "IAS-0.1"
           },
           "fingerprint": "rules:v4:github:metatablestudios/subwaybuilder-romania:IAS-0.1:IAS.zip",
-          "checked_at": "2026-03-31T16:28:29.630Z"
+          "checked_at": "2026-03-31T16:28:29.630Z",
+          "release_size": 6.59
         },
         "v1.0": {
           "is_complete": false,
@@ -631,6 +636,44 @@
           },
           "fingerprint": "rules:v4:github:metatablestudios/subwaybuilder-romania:v1.1:BUC.zip|CLJ.zip|GLT.zip|IAS.zip",
           "checked_at": "2026-03-31T16:28:29.630Z"
+        },
+        "v1.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "BUC.pmtiles"
+          },
+          "release_size": 39.13,
+          "file_sizes": {
+            "BUC.pmtiles": 23.43,
+            "buildings_index.json": 51.37,
+            "config.json": 0,
+            "demand_data.json": 9.09,
+            "roads.geojson": 9.86,
+            "runways_taxiways.geojson": 0.33
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "metatablestudios/subwaybuilder-romania",
+            "tag": "v1.1.1",
+            "asset_name": "BUC.zip",
+            "download_url": "https://github.com/metatablestudios/subwaybuilder-romania/releases/download/v1.1.1/BUC.zip"
+          },
+          "fingerprint": "rules:v4:github:metatablestudios/subwaybuilder-romania:v1.1.1:BUC.zip|CLJ.zip|GLT.zip|IAS.zip",
+          "checked_at": "2026-03-31T16:57:42.842Z"
         }
       }
     },
