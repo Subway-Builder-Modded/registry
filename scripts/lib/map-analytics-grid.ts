@@ -37,6 +37,8 @@ const createHeartbeat = (label: string, mapId: string, total: number) => {
 export async function generateGrid(demandData: DemandData, cityCode: string): Promise<FeatureCollection<Polygon, GeoJsonProperties>> {
     let pointsCounter = 0;
     let pointsTotal = demandData.points.length;
+    const medianCommuteDistance = demandData.pops.map(pop => pop.drivingDistance).sort((a, b) => a - b)[Math.floor(demandData.pops.length / 2)];
+    const meanCommuteDistance = demandData.pops.reduce((sum, pop) => sum + pop.drivingDistance, 0) / demandData.pops.length;
     const pointsHeartbeat = createHeartbeat("points", cityCode, pointsTotal);
     let points = turf.featureCollection(demandData.points.map((point) => {
         pointsCounter += 1;
@@ -80,5 +82,13 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
         }
     cellsHeartbeat(counter);
     });
-    return grid;
+    cellsHeartbeat(counter, true);
+
+    return {
+        ...grid,
+        properties: {
+            meanCommuteDistance: meanCommuteDistance,
+            medianCommuteDistance: medianCommuteDistance
+        }
+    } as FeatureCollection<Polygon, GeoJsonProperties>;
 }
