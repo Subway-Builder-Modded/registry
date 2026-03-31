@@ -4,3 +4,8 @@
 - Key runtime areas: `scripts/lib/*.ts` for reusable logic, `scripts/tests/*.ts` for `node:test` coverage, top-level `maps/`, `mods/`, `history/`, `analytics/`, `authors/` for repo data.
 - Important analytics entrypoints: `scripts/generate-analytics.ts` -> `scripts/lib/analytics-core.ts`; `scripts/generate-railyard-app-analytics.ts` for app download analytics.
 - Scheduled automation: cache/history and analytics workflows in `.github/workflows`, notably `cache-download-history.yml` and `regenerate-registry-analytics.yml`.
+- Submission flow: contributors submit via GitHub issue templates; CI validates and opens PRs automatically.
+- Registry assets: metadata only lives in-repo; actual mod/map payloads stay on GitHub Releases or other external hosts referenced by manifests.
+- Download history flow: `cache-download-history.yml` writes `history/snapshot_YYYY_MM_DD.json` daily and regenerates analytics CSVs from those snapshots.
+- Separate app analytics flow: `capture-railyard-app-downloads` stores hourly release history for `Subway-Builder-Modded/railyard`, and `generate-railyard-app-analytics` builds the analytics artifacts under `analytics/`.
+- Map demand stats are a first-class subflow in the full registry analytics workflow and update both manifests and `maps/demand-stats-cache.json`.

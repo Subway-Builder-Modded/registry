@@ -9,3 +9,10 @@
 - Generate Railyard app analytics: `pnpm --dir scripts run generate-railyard-app-analytics`
 - Generate download history snapshot: `pnpm --dir scripts run generate-download-history`
 - Check git state: `git status --short`, `git diff -- <path>`
+- Refresh map demand stats: `pnpm --dir scripts run generate-registry-demand-stats`
+- Refresh one map demand record: `pnpm --dir scripts run generate-registry-demand-stats -- --id <map-id>`
+- Force map demand refresh ignoring cache: `pnpm --dir scripts run generate-registry-demand-stats -- --force`
+- Generate daily registry history snapshot: `pnpm --dir scripts run generate-download-history`
+- Capture Railyard app hourly release history: `pnpm --dir scripts run capture-railyard-app-downloads`
+- Generate Railyard app analytics artifacts: `pnpm --dir scripts run generate-railyard-app-analytics`
+- Sync map manifest file sizes from integrity: `pnpm --dir scripts run sync-map-file-sizes`
