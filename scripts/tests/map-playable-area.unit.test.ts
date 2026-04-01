@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { computePlayableAreaMetrics } from "../lib/map-playable-area.js";
+import {
+  computePlayableAreaDebugGeoJson,
+  computePlayableAreaMetrics,
+} from "../lib/map-playable-area.js";
 
 function kmToLongitudeDegrees(km: number): number {
   return km / 111.32;
@@ -61,4 +64,21 @@ test("computePlayableAreaMetrics stays bounded for zero and one-point inputs", (
   assert.equal(single.playableAreaPerPointKm2, 1);
   assert.ok(single.playableCatchmentRadiusKm > 0);
   assert.ok(single.playableCatchmentRadiusKm < 1);
+});
+
+test("computePlayableAreaDebugGeoJson exposes the final playable raster cells as GeoJSON", () => {
+  const debug = computePlayableAreaDebugGeoJson([
+    { longitude: kmToLongitudeDegrees(0), latitude: 0 },
+    { longitude: kmToLongitudeDegrees(1.6), latitude: 0 },
+    { longitude: kmToLongitudeDegrees(3.2), latitude: 0 },
+    { longitude: kmToLongitudeDegrees(4.8), latitude: 0 },
+  ]);
+
+  assert.equal(debug.finalPlayableArea.type, "FeatureCollection");
+  assert.equal(debug.finalPlayableArea.features.length, debug.metrics.playableAreaKm2);
+  assert.ok(debug.stagedCells.features.length > debug.finalPlayableArea.features.length);
+  assert.ok(debug.finalPlayableArea.features.every((feature) => (
+    feature.properties?.isFinalPlayableArea === true
+    && feature.properties?.cellSizeKm === 1
+  )));
 });

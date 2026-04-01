@@ -1,3 +1,5 @@
+import type { Feature, FeatureCollection, GeoJsonProperties, Polygon } from "geojson";
+
 export interface PlayableAreaMetrics {
   playableAreaKm2: number;
   playableAreaPerPointKm2: number;
@@ -9,9 +11,40 @@ export interface PlayableAreaLocation {
   latitude: number;
 }
 
+export interface PlayableAreaDebugProperties {
+  stage: "raw" | "closed";
+  cellSizeKm: number;
+  isFinalPlayableArea: boolean;
+}
+
+export interface PlayableAreaDebugResult {
+  metrics: PlayableAreaMetrics;
+  finalPlayableArea: FeatureCollection<Polygon, PlayableAreaDebugProperties>;
+  stagedCells: FeatureCollection<Polygon, PlayableAreaDebugProperties>;
+}
+
 interface ProjectedPoint {
   xKm: number;
   yKm: number;
+}
+
+interface ProjectionContext {
+  originXKm: number;
+  originYKm: number;
+  lonScaleKm: number;
+  latScaleKm: number;
+}
+
+interface PlayableAreaState {
+  metrics: PlayableAreaMetrics;
+  projection: ProjectionContext;
+  finalCellSizeKm: number;
+  finalCells: Set<string>;
+  stagedCells: Array<{
+    stage: "raw" | "closed";
+    cellSizeKm: number;
+    cells: Set<string>;
+  }>;
 }
 
 const DEGREES_TO_RADIANS = Math.PI / 180;
@@ -38,19 +71,47 @@ function intersectSets(a: Set<string>, b: Set<string>): Set<string> {
   return intersection;
 }
 
-function projectLocations(locations: PlayableAreaLocation[]): ProjectedPoint[] {
-  if (locations.length === 0) return [];
+function projectLocations(
+  locations: PlayableAreaLocation[],
+): {
+  points: ProjectedPoint[];
+  projection: ProjectionContext;
+} {
+  if (locations.length === 0) {
+    return {
+      points: [],
+      projection: {
+        originXKm: 0,
+        originYKm: 0,
+        lonScaleKm: KILOMETERS_PER_DEGREE,
+        latScaleKm: KILOMETERS_PER_DEGREE,
+      },
+    };
+  }
 
   const meanLatitudeRadians = (
     locations.reduce((sum, location) => sum + location.latitude, 0) / locations.length
   ) * DEGREES_TO_RADIANS;
-  const lonScaleKm = KILOMETERS_PER_DEGREE * Math.cos(meanLatitudeRadians);
+  const lonScaleKm = Math.max(
+    KILOMETERS_PER_DEGREE * Math.cos(meanLatitudeRadians),
+    KILOMETERS_PER_DEGREE * 1e-6,
+  );
   const latScaleKm = KILOMETERS_PER_DEGREE;
 
-  return locations.map((location) => ({
+  const points = locations.map((location) => ({
     xKm: location.longitude * lonScaleKm,
     yKm: location.latitude * latScaleKm,
   }));
+
+  return {
+    points,
+    projection: {
+      originXKm: Math.min(...points.map((point) => point.xKm)),
+      originYKm: Math.min(...points.map((point) => point.yKm)),
+      lonScaleKm,
+      latScaleKm,
+    },
+  };
 }
 
 function buildOccupiedCells(
@@ -132,30 +193,68 @@ function buildChildCellUniverse(
   return universe;
 }
 
-export function computePlayableAreaMetrics(locations: PlayableAreaLocation[]): PlayableAreaMetrics {
+function computePlayableAreaState(locations: PlayableAreaLocation[]): PlayableAreaState {
   const pointCount = locations.length;
   if (pointCount === 0) {
     return {
-      playableAreaKm2: 0,
-      playableAreaPerPointKm2: 0,
-      playableCatchmentRadiusKm: 0,
+      metrics: {
+        playableAreaKm2: 0,
+        playableAreaPerPointKm2: 0,
+        playableCatchmentRadiusKm: 0,
+      },
+      projection: {
+        originXKm: 0,
+        originYKm: 0,
+        lonScaleKm: KILOMETERS_PER_DEGREE,
+        latScaleKm: KILOMETERS_PER_DEGREE,
+      },
+      finalCellSizeKm: PLAYABLE_AREA_CELL_SIZES_KM[PLAYABLE_AREA_CELL_SIZES_KM.length - 1]!,
+      finalCells: new Set<string>(),
+      stagedCells: [],
     };
   }
 
-  const projectedPoints = projectLocations(locations);
-  const minXKm = Math.min(...projectedPoints.map((point) => point.xKm));
-  const minYKm = Math.min(...projectedPoints.map((point) => point.yKm));
+  const { points: projectedPoints, projection } = projectLocations(locations);
+  const stagedCells: PlayableAreaState["stagedCells"] = [];
 
-  let occupiedCells = closeOccupiedCells(
-    buildOccupiedCells(projectedPoints, minXKm, minYKm, PLAYABLE_AREA_CELL_SIZES_KM[0]),
+  const coarseCellSizeKm = PLAYABLE_AREA_CELL_SIZES_KM[0]!;
+  let occupiedCells = buildOccupiedCells(
+    projectedPoints,
+    projection.originXKm,
+    projection.originYKm,
+    coarseCellSizeKm,
   );
+  stagedCells.push({
+    stage: "raw",
+    cellSizeKm: coarseCellSizeKm,
+    cells: new Set(occupiedCells),
+  });
+  occupiedCells = closeOccupiedCells(occupiedCells);
+  stagedCells.push({
+    stage: "closed",
+    cellSizeKm: coarseCellSizeKm,
+    cells: new Set(occupiedCells),
+  });
 
   for (let index = 1; index < PLAYABLE_AREA_CELL_SIZES_KM.length; index += 1) {
     const parentSizeKm = PLAYABLE_AREA_CELL_SIZES_KM[index - 1]!;
     const childSizeKm = PLAYABLE_AREA_CELL_SIZES_KM[index]!;
     const allowedCells = buildChildCellUniverse(occupiedCells, parentSizeKm, childSizeKm);
-    const rawChildCells = buildOccupiedCells(projectedPoints, minXKm, minYKm, childSizeKm);
-    occupiedCells = closeOccupiedCells(intersectSets(rawChildCells, allowedCells), allowedCells);
+    const rawChildCells = intersectSets(
+      buildOccupiedCells(projectedPoints, projection.originXKm, projection.originYKm, childSizeKm),
+      allowedCells,
+    );
+    stagedCells.push({
+      stage: "raw",
+      cellSizeKm: childSizeKm,
+      cells: new Set(rawChildCells),
+    });
+    occupiedCells = closeOccupiedCells(rawChildCells, allowedCells);
+    stagedCells.push({
+      stage: "closed",
+      cellSizeKm: childSizeKm,
+      cells: new Set(occupiedCells),
+    });
   }
 
   const finalCellSizeKm = PLAYABLE_AREA_CELL_SIZES_KM[PLAYABLE_AREA_CELL_SIZES_KM.length - 1]!;
@@ -164,8 +263,106 @@ export function computePlayableAreaMetrics(locations: PlayableAreaLocation[]): P
   const playableCatchmentRadiusKm = Math.sqrt(playableAreaPerPointKm2 / Math.PI);
 
   return {
-    playableAreaKm2,
-    playableAreaPerPointKm2,
-    playableCatchmentRadiusKm,
+    metrics: {
+      playableAreaKm2,
+      playableAreaPerPointKm2,
+      playableCatchmentRadiusKm,
+    },
+    projection,
+    finalCellSizeKm,
+    finalCells: occupiedCells,
+    stagedCells,
+  };
+}
+
+function buildCellPolygon(
+  key: string,
+  cellSizeKm: number,
+  projection: ProjectionContext,
+): Feature<Polygon, PlayableAreaDebugProperties>["geometry"] {
+  const [cellX, cellY] = parseCellKey(key);
+  const minXKm = projection.originXKm + (cellX * cellSizeKm);
+  const maxXKm = minXKm + cellSizeKm;
+  const minYKm = projection.originYKm + (cellY * cellSizeKm);
+  const maxYKm = minYKm + cellSizeKm;
+
+  const minLon = minXKm / projection.lonScaleKm;
+  const maxLon = maxXKm / projection.lonScaleKm;
+  const minLat = minYKm / projection.latScaleKm;
+  const maxLat = maxYKm / projection.latScaleKm;
+
+  return {
+    type: "Polygon",
+    coordinates: [[
+      [minLon, minLat],
+      [minLon, maxLat],
+      [maxLon, maxLat],
+      [maxLon, minLat],
+      [minLon, minLat],
+    ]],
+  };
+}
+
+function buildDebugFeatureCollection(
+  cells: Set<string>,
+  cellSizeKm: number,
+  stage: PlayableAreaDebugProperties["stage"],
+  isFinalPlayableArea: boolean,
+  projection: ProjectionContext,
+): FeatureCollection<Polygon, PlayableAreaDebugProperties> {
+  return {
+    type: "FeatureCollection",
+    features: [...cells].map((key) => ({
+      type: "Feature",
+      properties: {
+        stage,
+        cellSizeKm,
+        isFinalPlayableArea,
+      },
+      geometry: buildCellPolygon(key, cellSizeKm, projection),
+    })),
+  };
+}
+
+function mergeFeatureCollections(
+  collections: Array<FeatureCollection<Polygon, PlayableAreaDebugProperties>>,
+): FeatureCollection<Polygon, PlayableAreaDebugProperties> {
+  return {
+    type: "FeatureCollection",
+    features: collections.flatMap((collection) => collection.features),
+  };
+}
+
+export function computePlayableAreaMetrics(locations: PlayableAreaLocation[]): PlayableAreaMetrics {
+  return computePlayableAreaState(locations).metrics;
+}
+
+export function computePlayableAreaDebugGeoJson(
+  locations: PlayableAreaLocation[],
+): PlayableAreaDebugResult {
+  const state = computePlayableAreaState(locations);
+
+  const finalPlayableArea = buildDebugFeatureCollection(
+    state.finalCells,
+    state.finalCellSizeKm,
+    "closed",
+    true,
+    state.projection,
+  );
+
+  const stagedCells = mergeFeatureCollections(
+    state.stagedCells.map((entry) => buildDebugFeatureCollection(
+      entry.cells,
+      entry.cellSizeKm,
+      entry.stage,
+      entry.stage === "closed" && entry.cellSizeKm === state.finalCellSizeKm,
+      state.projection,
+    )),
+  );
+
+  return {
+    metrics: state.metrics,
+    finalPlayableArea,
+    stagedCells,
   };
 }
