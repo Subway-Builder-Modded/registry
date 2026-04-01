@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
 
 export type AttributionMethod = "github" | "discord";
 
@@ -22,6 +22,11 @@ export interface ResolvedAuthorPresentation {
   author: string;
   author_alias: string;
   attribution_link: string;
+}
+
+export interface EnsureAuthorAliasPrefillResult {
+  created: boolean;
+  path: string;
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -109,4 +114,42 @@ export function resolveAuthorPresentation(
     author_alias: aliasEntry.author_alias ?? aliasEntry.author_id ?? author,
     attribution_link: aliasEntry.attribution_link ?? `https://github.com/${aliasEntry.author_id ?? author}`,
   };
+}
+
+export function ensureAuthorAliasPrefill(
+  repoRoot: string,
+  githubId: number,
+  authorLogin: string,
+): EnsureAuthorAliasPrefillResult {
+  const path = getAuthorAliasIndexPath(repoRoot);
+  const normalizedAuthorLogin = authorLogin.trim();
+  if (!Number.isFinite(githubId) || githubId <= 0 || normalizedAuthorLogin === "") {
+    return { created: false, path };
+  }
+
+  const index = loadAuthorAliasIndex(repoRoot);
+  const existing = index.authors.find((entry) => entry.github_id === githubId);
+  if (existing) {
+    return { created: false, path };
+  }
+
+  const authors: AuthorAliasEntry[] = [
+    ...index.authors,
+    {
+      github_id: githubId,
+      author_id: normalizedAuthorLogin,
+      author_alias: normalizedAuthorLogin,
+      attribution_method: "github" as AttributionMethod,
+      attribution_link: `https://github.com/${normalizedAuthorLogin}`,
+    },
+  ].sort((a, b) => a.github_id - b.github_id);
+
+  mkdirSync(dirname(path), { recursive: true });
+  writeFileSync(
+    path,
+    `${JSON.stringify({ schema_version: 1, authors }, null, 2)}\n`,
+    "utf-8",
+  );
+
+  return { created: true, path };
 }
