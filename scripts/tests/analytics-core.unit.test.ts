@@ -9,6 +9,13 @@ function writeJson(path: string, value: unknown): void {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, "utf-8");
 }
 
+function findCsvRow(csv: string, id: string): string | undefined {
+  return csv
+    .trim()
+    .split(/\r?\n/)
+    .find((line, index) => index > 0 && line.split(",")[1] === id);
+}
+
 test("runGenerateAnalyticsCli writes assets_by_day.csv grouped by listing type", () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-analytics-core-"));
   mkdirSync(join(repoRoot, "history"), { recursive: true });
@@ -162,6 +169,22 @@ test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and r
         },
       ],
       properties: {
+        residentWeightedNearestNeighborKm: {
+          p10: 0.1,
+          p25: 0.15,
+          p50: 0.2,
+          p75: 0.25,
+          p90: 0.3,
+          mean: 0.25,
+        },
+        workerWeightedNearestNeighborKm: {
+          p10: 0.2,
+          p25: 0.3,
+          p50: 0.4,
+          p75: 0.5,
+          p90: 0.6,
+          mean: 0.45,
+        },
         commuteDistanceKm: {
           p10: 9,
           p25: 10,
@@ -205,8 +228,8 @@ test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and r
     assert.equal(
       mapsStatisticsCsv,
       [
-        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
-        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,200,200,100,20,20,100,12,15,2,0.68",
+        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_resident_weighted_nn_km,mean_resident_weighted_nn_km,median_worker_weighted_nn_km,mean_worker_weighted_nn_km,detail_radius_km,detail_score,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.2,0.25,0.4,0.45,0.283,0.55,200,200,100,20,20,100,12,15,2,0.68",
         "",
       ].join("\n"),
     );
@@ -281,6 +304,22 @@ test("runGenerateAnalyticsCli computes resident and worker densities from non-ze
         },
       ],
       properties: {
+        residentWeightedNearestNeighborKm: {
+          p10: 0.2,
+          p25: 0.25,
+          p50: 0.3,
+          p75: 0.4,
+          p90: 0.5,
+          mean: 0.35,
+        },
+        workerWeightedNearestNeighborKm: {
+          p10: 0.3,
+          p25: 0.35,
+          p50: 0.5,
+          p75: 0.6,
+          p90: 0.7,
+          mean: 0.55,
+        },
         commuteDistanceKm: {
           p10: 8.111,
           p25: 10.222,
@@ -319,11 +358,162 @@ test("runGenerateAnalyticsCli computes resident and worker densities from non-ze
     assert.equal(
       mapsStatisticsCsv,
       [
-        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
-        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,200,150,66.67,30,25,66.67,12.99,15.13,3,0.44",
+        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_resident_weighted_nn_km,mean_resident_weighted_nn_km,median_worker_weighted_nn_km,mean_worker_weighted_nn_km,detail_radius_km,detail_score,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.3,0.35,0.5,0.55,0.387,0.3,200,150,66.67,30,25,66.67,12.99,15.13,3,0.44",
         "",
       ].join("\n"),
     );
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("runGenerateAnalyticsCli keeps detail_score stable regardless of other map rows", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-detail-score-stable-"));
+  mkdirSync(join(repoRoot, "analytics"), { recursive: true });
+  mkdirSync(join(repoRoot, "history"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "sample-map"), { recursive: true });
+
+  try {
+    writeJson(join(repoRoot, "maps", "index.json"), {
+      schema_version: 1,
+      maps: ["sample-map"],
+    });
+    writeJson(join(repoRoot, "maps", "sample-map", "manifest.json"), {
+      schema_version: 1,
+      id: "sample-map",
+      name: "Sample Map",
+      author: "mapmaker",
+      github_id: 1,
+      source: "https://github.com/example/sample-map",
+      city_code: "ABC",
+      country: "US",
+      population: 600,
+      population_count: 9,
+      points_count: 12,
+    });
+    writeJson(join(repoRoot, "maps", "sample-map", "grid.geojson"), {
+      type: "FeatureCollection",
+      features: [],
+      properties: {
+        residentWeightedNearestNeighborKm: { p10: 0.1, p25: 0.15, p50: 0.2, p75: 0.25, p90: 0.3, mean: 0.25 },
+        workerWeightedNearestNeighborKm: { p10: 0.2, p25: 0.3, p50: 0.4, p75: 0.5, p90: 0.6, mean: 0.45 },
+        commuteDistanceKm: { p10: 1, p25: 2, p50: 3, p75: 4, p90: 5, mean: 3 },
+        polycentrism: { activity: { detectedCenterCount: 1, continuousScore: 0.2 } },
+      },
+    });
+    writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
+      schema_version: 2,
+      snapshot_date: "2026_03_31",
+      generated_at: "2026-03-31T00:00:00.000Z",
+      maps: { downloads: { "sample-map": { "1.0.0": 1 } } },
+      mods: { downloads: {} },
+    });
+
+    runGenerateAnalyticsCli([], repoRoot);
+    const beforeCsv = readFileSync(join(repoRoot, "analytics", "maps_statistics.csv"), "utf-8");
+    const beforeRow = findCsvRow(beforeCsv, "sample-map");
+
+    mkdirSync(join(repoRoot, "maps", "coarse-map"), { recursive: true });
+    writeJson(join(repoRoot, "maps", "index.json"), {
+      schema_version: 1,
+      maps: ["sample-map", "coarse-map"],
+    });
+    writeJson(join(repoRoot, "maps", "coarse-map", "manifest.json"), {
+      schema_version: 1,
+      id: "coarse-map",
+      name: "Coarse Map",
+      author: "othermaker",
+      github_id: 2,
+      source: "https://github.com/example/coarse-map",
+      city_code: "DEF",
+      country: "US",
+      population: 300,
+      population_count: 4,
+      points_count: 6,
+    });
+    writeJson(join(repoRoot, "maps", "coarse-map", "grid.geojson"), {
+      type: "FeatureCollection",
+      features: [],
+      properties: {
+        residentWeightedNearestNeighborKm: { p10: 0.7, p25: 0.8, p50: 0.9, p75: 1.0, p90: 1.1, mean: 0.95 },
+        workerWeightedNearestNeighborKm: { p10: 0.8, p25: 0.9, p50: 1.0, p75: 1.1, p90: 1.2, mean: 1.05 },
+        commuteDistanceKm: { p10: 1, p25: 2, p50: 3, p75: 4, p90: 5, mean: 3 },
+        polycentrism: { activity: { detectedCenterCount: 1, continuousScore: 0.1 } },
+      },
+    });
+    writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
+      schema_version: 2,
+      snapshot_date: "2026_03_31",
+      generated_at: "2026-03-31T00:00:00.000Z",
+      maps: { downloads: { "sample-map": { "1.0.0": 1 }, "coarse-map": { "1.0.0": 1 } } },
+      mods: { downloads: {} },
+    });
+
+    runGenerateAnalyticsCli([], repoRoot);
+    const afterCsv = readFileSync(join(repoRoot, "analytics", "maps_statistics.csv"), "utf-8");
+    const afterRow = findCsvRow(afterCsv, "sample-map");
+
+    assert.equal(afterRow, beforeRow);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("runGenerateAnalyticsCli defaults to full listing and author outputs and still honors explicit top-k limits", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-analytics-topk-defaults-"));
+  mkdirSync(join(repoRoot, "analytics"), { recursive: true });
+  mkdirSync(join(repoRoot, "history"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "sample-map"), { recursive: true });
+  mkdirSync(join(repoRoot, "mods", "sample-mod"), { recursive: true });
+
+  try {
+    writeJson(join(repoRoot, "maps", "index.json"), {
+      schema_version: 1,
+      maps: ["sample-map"],
+    });
+    writeJson(join(repoRoot, "mods", "sample-mod", "manifest.json"), {
+      schema_version: 1,
+      id: "sample-mod",
+      name: "Sample Mod",
+      author: "modder",
+      github_id: 2,
+      source: "https://github.com/example/sample-mod",
+    });
+    writeJson(join(repoRoot, "maps", "sample-map", "manifest.json"), {
+      schema_version: 1,
+      id: "sample-map",
+      name: "Sample Map",
+      author: "mapmaker",
+      github_id: 1,
+      source: "https://github.com/example/sample-map",
+      city_code: "ABC",
+      country: "US",
+      population: 0,
+      population_count: 0,
+      points_count: 0,
+    });
+    writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
+      schema_version: 2,
+      snapshot_date: "2026_03_31",
+      generated_at: "2026-03-31T00:00:00.000Z",
+      maps: { downloads: { "sample-map": { "1.0.0": 10 } } },
+      mods: { downloads: { "sample-mod": { "1.0.0": 5 } } },
+    });
+
+    runGenerateAnalyticsCli([], repoRoot);
+
+    const allTimeRows = readFileSync(join(repoRoot, "analytics", "most_popular_all_time.csv"), "utf-8").trim().split(/\r?\n/);
+    const authorRows = readFileSync(join(repoRoot, "analytics", "authors_by_total_downloads.csv"), "utf-8").trim().split(/\r?\n/);
+    assert.equal(allTimeRows.length, 3);
+    assert.equal(authorRows.length, 3);
+
+    runGenerateAnalyticsCli(["--top-k-listings", "1", "--top-k-authors", "1"], repoRoot);
+
+    const limitedAllTimeRows = readFileSync(join(repoRoot, "analytics", "most_popular_all_time.csv"), "utf-8").trim().split(/\r?\n/);
+    const limitedAuthorRows = readFileSync(join(repoRoot, "analytics", "authors_by_total_downloads.csv"), "utf-8").trim().split(/\r?\n/);
+    assert.equal(limitedAllTimeRows.length, 2);
+    assert.equal(limitedAuthorRows.length, 2);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }

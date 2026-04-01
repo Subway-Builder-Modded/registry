@@ -58,6 +58,48 @@ jobs:
         id: generate_history
         run: pnpm --dir scripts run generate-download-history
 
+      - name: Validate generated snapshot totals against current downloads
+        env:
+          SNAPSHOT_FILE: ${{ steps.generate_history.outputs.snapshot_file }}
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          function readJson(path) {
+            return JSON.parse(fs.readFileSync(path, "utf8"));
+          }
+
+          function sumDownloads(downloads) {
+            let total = 0;
+            for (const versions of Object.values(downloads ?? {})) {
+              if (!versions || typeof versions !== "object") continue;
+              for (const count of Object.values(versions)) {
+                if (typeof count === "number" && Number.isFinite(count)) {
+                  total += count;
+                }
+              }
+            }
+            return total;
+          }
+
+          const snapshot = readJson(process.env.SNAPSHOT_FILE);
+          const mapsDownloads = readJson("maps/downloads.json");
+          const modsDownloads = readJson("mods/downloads.json");
+          const mapsTotal = sumDownloads(mapsDownloads);
+          const modsTotal = sumDownloads(modsDownloads);
+          const total = mapsTotal + modsTotal;
+
+          if (snapshot.maps?.total_downloads !== mapsTotal) {
+            throw new Error(`Snapshot maps total mismatch: snapshot=${snapshot.maps?.total_downloads} current=${mapsTotal}`);
+          }
+          if (snapshot.mods?.total_downloads !== modsTotal) {
+            throw new Error(`Snapshot mods total mismatch: snapshot=${snapshot.mods?.total_downloads} current=${modsTotal}`);
+          }
+          if (snapshot.total_downloads !== total) {
+            throw new Error(`Snapshot overall total mismatch: snapshot=${snapshot.total_downloads} current=${total}`);
+          }
+          NODE
+
       - name: Validate only today's history snapshots changed
         run: |
           EXPECTED_DOWNLOAD_SNAPSHOT="${{ steps.generate_history.outputs.snapshot_file }}"

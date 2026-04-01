@@ -162,6 +162,17 @@ jobs:
       - name: Generate Railyard app analytics
         run: pnpm --dir scripts run generate-railyard-app-analytics
 
+      - name: Validate hourly workflow history scope
+        run: |
+          set -euo pipefail
+          mapfile -t CHANGED_HISTORY < <(git diff --name-only -- history)
+          for path in "${CHANGED_HISTORY[@]}"; do
+            if [ "$path" != "history/railyard_app_downloads.json" ]; then
+              echo "Unexpected history change detected in hourly workflow: $path"
+              exit 1
+            fi
+          done
+
       - name: Compute download change stats
         id: download_stats
         run: |
