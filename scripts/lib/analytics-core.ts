@@ -149,6 +149,8 @@ interface MapStatisticsRow {
   pct_cells_with_workers: number;
   median_commute_distance: number;
   mean_commute_distance: number;
+  detected_center_count: number;
+  polycentrism_score: number;
 }
 
 interface AssetByDayRow {
@@ -486,6 +488,15 @@ interface GridMetricBundleProperties {
   mean?: unknown;
 }
 
+interface GridPolycentrismActivityProperties {
+  continuousScore?: unknown;
+  detectedCenterCount?: unknown;
+}
+
+interface GridPolycentrismProperties {
+  activity?: unknown;
+}
+
 interface GridSummary {
   n_cells: number;
   mean_point_density: number;
@@ -497,6 +508,8 @@ interface GridSummary {
   pct_cells_with_workers: number;
   median_commute_distance: number;
   mean_commute_distance: number;
+  detected_center_count: number;
+  polycentrism_score: number;
 }
 
 function emptyGridSummary(): GridSummary {
@@ -511,6 +524,8 @@ function emptyGridSummary(): GridSummary {
     pct_cells_with_workers: 0,
     median_commute_distance: 0,
     mean_commute_distance: 0,
+    detected_center_count: 0,
+    polycentrism_score: 0,
   };
 }
 
@@ -548,6 +563,22 @@ function readGridMetricBundle(
   };
 }
 
+function readGridPolycentrismSummary(
+  properties: Record<string, unknown>,
+): { detectedCenterCount: number; continuousScore: number } {
+  const polycentrism = isObject(properties.polycentrism)
+    ? properties.polycentrism as GridPolycentrismProperties
+    : null;
+  const activity = polycentrism && isObject(polycentrism.activity)
+    ? polycentrism.activity as GridPolycentrismActivityProperties
+    : null;
+
+  return {
+    detectedCenterCount: toNonNegativeNumber(activity?.detectedCenterCount),
+    continuousScore: toNonNegativeNumber(activity?.continuousScore),
+  };
+}
+
 function loadGridSummary(repoRoot: string, id: string): GridSummary {
   const gridPath = join(repoRoot, "maps", id, "grid.geojson");
   if (!existsSync(gridPath)) return emptyGridSummary();
@@ -575,10 +606,13 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
     if (nCells === 0) {
       const gridProperties = isObject(grid.properties) ? grid.properties : {};
       const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
+      const polycentrismSummary = readGridPolycentrismSummary(gridProperties);
       return {
         ...emptyGridSummary(),
         median_commute_distance: commuteSummary.p50,
         mean_commute_distance: commuteSummary.mean,
+        detected_center_count: polycentrismSummary.detectedCenterCount,
+        polycentrism_score: roundTo(polycentrismSummary.continuousScore),
       };
     }
 
@@ -588,6 +622,7 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
     const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
     const gridProperties = isObject(grid.properties) ? grid.properties : {};
     const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
+    const polycentrismSummary = readGridPolycentrismSummary(gridProperties);
 
     return {
       n_cells: nCells,
@@ -600,6 +635,8 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
       pct_cells_with_workers: roundTo(percentNonZero(workerCounts, nCells)),
       median_commute_distance: roundTo(commuteSummary.p50),
       mean_commute_distance: roundTo(commuteSummary.mean),
+      detected_center_count: polycentrismSummary.detectedCenterCount,
+      polycentrism_score: roundTo(polycentrismSummary.continuousScore),
     };
   } catch {
     return emptyGridSummary();
@@ -1455,6 +1492,8 @@ export function runGenerateAnalyticsCli(
       "pct_cells_with_workers",
       "median_commute_distance",
       "mean_commute_distance",
+      "detected_center_count",
+      "polycentrism_score",
     ],
     mapStatisticsRows,
   );

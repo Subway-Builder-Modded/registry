@@ -170,6 +170,12 @@ test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and r
           p90: 16,
           mean: 15,
         },
+        polycentrism: {
+          activity: {
+            detectedCenterCount: 2,
+            continuousScore: 0.678,
+          },
+        },
       },
     });
     writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
@@ -199,8 +205,8 @@ test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and r
     assert.equal(
       mapsStatisticsCsv,
       [
-        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance",
-        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,200,200,100,20,20,100,12,15",
+        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,200,200,100,20,20,100,12,15,2,0.68",
         "",
       ].join("\n"),
     );
@@ -283,6 +289,12 @@ test("runGenerateAnalyticsCli computes resident and worker densities from non-ze
           p90: 16.777,
           mean: 15.126,
         },
+        polycentrism: {
+          activity: {
+            detectedCenterCount: 3,
+            continuousScore: 0.444,
+          },
+        },
       },
     });
     writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
@@ -307,8 +319,8 @@ test("runGenerateAnalyticsCli computes resident and worker densities from non-ze
     assert.equal(
       mapsStatisticsCsv,
       [
-        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance",
-        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,200,150,66.67,30,25,66.67,12.99,15.13",
+        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,200,150,66.67,30,25,66.67,12.99,15.13,3,0.44",
         "",
       ].join("\n"),
     );
