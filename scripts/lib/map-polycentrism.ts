@@ -60,22 +60,11 @@ const MAX_TOP_CENTERS = 5;
 const EARTH_RADIUS_KM = 6371.0088;
 const DEGREES_TO_RADIANS = Math.PI / 180;
 const KILOMETERS_PER_DEGREE = (Math.PI * EARTH_RADIUS_KM) / 180;
-// Below this point count, treat the map as low-detail and require a stronger
-// secondary centre share before we recognize additional centres.
-const LOW_DETAIL_POINT_THRESHOLD = 25;
-// Mid-detail maps can admit secondary centres more easily than sparse maps,
-// but still need a meaningful share to avoid promoting noise.
-const MEDIUM_DETAIL_POINT_THRESHOLD = 100;
-// Minimum assigned mass share for non-primary centres in low / medium / high
-// detail layouts respectively.
-const LOW_DETAIL_MIN_CENTER_SHARE = 0.18;
-const MEDIUM_DETAIL_MIN_CENTER_SHARE = 0.1;
-const HIGH_DETAIL_MIN_CENTER_SHARE = 0.07;
-// Very small point clouds can only support single-point secondary centres; once
-// the layout is larger, require at least two assigned points for a stable peak.
-const SINGLE_POINT_CENTER_THRESHOLD = 30;
-const MIN_POINTS_PER_CENTER_SMALL = 1;
-const MIN_POINTS_PER_CENTER_DEFAULT = 2;
+// Minimum assigned mass share for non-primary centres. This keeps tiny stray
+// clusters from being promoted into full centres.
+const MIN_CENTER_SHARE = 0.07;
+// Require at least two assigned points for a stable secondary centre.
+const MIN_POINTS_PER_CENTER = 2;
 
 function clamp(value: number, minValue: number, maxValue: number): number {
   return Math.max(minValue, Math.min(value, maxValue));
@@ -477,14 +466,8 @@ function buildVariantMetrics(
   const initialAssignments = assignPointsToPeaks(points, effectivePeaks, bandwidthKm)
     .sort((a, b) => b.assignedMass - a.assignedMass);
 
-  const minShare = points.length < LOW_DETAIL_POINT_THRESHOLD
-    ? LOW_DETAIL_MIN_CENTER_SHARE
-    : points.length < MEDIUM_DETAIL_POINT_THRESHOLD
-      ? MEDIUM_DETAIL_MIN_CENTER_SHARE
-      : HIGH_DETAIL_MIN_CENTER_SHARE;
-  const minPointCount = points.length < SINGLE_POINT_CENTER_THRESHOLD
-    ? MIN_POINTS_PER_CENTER_SMALL
-    : MIN_POINTS_PER_CENTER_DEFAULT;
+  const minShare = MIN_CENTER_SHARE;
+  const minPointCount = MIN_POINTS_PER_CENTER;
 
   // Drop weak secondary peaks so tiny stray clusters do not get promoted into
   // full centres on low-detail or noisy maps.
