@@ -70,6 +70,15 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
         p75?: number;
         mean?: number;
       };
+      detail?: {
+        radiusKm?: number;
+        expectedPointSpacingKm?: number;
+        normalizedRadius?: number;
+        activityPerPoint?: number;
+        localityScore?: number;
+        deaggregationScore?: number;
+        score?: number;
+      };
       polycentrism?: {
         activity?: {
           detectedCenterCount?: number;
@@ -119,6 +128,16 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p50 ?? 0, 3.93);
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p75 ?? 0, 3.93);
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.mean ?? 0, 2.53);
+  assert.ok((gridSummary.properties?.detail?.radiusKm ?? 0) > 0);
+  assert.ok((gridSummary.properties?.detail?.expectedPointSpacingKm ?? 0) > 0);
+  assert.ok((gridSummary.properties?.detail?.normalizedRadius ?? 0) > 0);
+  assert.ok((gridSummary.properties?.detail?.activityPerPoint ?? 0) > 0);
+  assert.ok((gridSummary.properties?.detail?.localityScore ?? 0) >= 0);
+  assert.ok((gridSummary.properties?.detail?.localityScore ?? 0) <= 1);
+  assert.ok((gridSummary.properties?.detail?.deaggregationScore ?? 0) >= 0);
+  assert.ok((gridSummary.properties?.detail?.deaggregationScore ?? 0) <= 1);
+  assert.ok((gridSummary.properties?.detail?.score ?? 0) >= 0);
+  assert.ok((gridSummary.properties?.detail?.score ?? 0) <= 1);
   assert.ok((gridSummary.properties?.polycentrism?.activity?.detectedCenterCount ?? 0) >= 1);
   assert.ok((gridSummary.properties?.polycentrism?.activity?.score ?? 0) >= 0);
   assert.ok((gridSummary.properties?.polycentrism?.activity?.score ?? 0) <= 1);
@@ -157,6 +176,7 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
       commuteDistanceKm?: unknown;
       residentCellDensity?: unknown;
       workerCellDensity?: unknown;
+      detail?: unknown;
     };
   };
 
@@ -199,6 +219,15 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
     p75: 0,
     p90: 0,
     mean: 0,
+  });
+  assert.deepEqual(gridSummary.properties?.detail, {
+    radiusKm: 0,
+    expectedPointSpacingKm: 0,
+    normalizedRadius: 0,
+    activityPerPoint: 0,
+    localityScore: 0,
+    deaggregationScore: 0,
+    score: 0,
   });
 });
 
