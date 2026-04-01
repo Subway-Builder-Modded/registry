@@ -14,7 +14,7 @@ interface CliOptions {
 
 function parseCliArgs(argv: string[], repoRoot: string): CliOptions {
   let inputDir: string | null = null;
-  let outputPath = resolve(repoRoot, "analytics", "local_grid_statistics.json");
+  let outputPath = resolve(repoRoot, "tmp", "local-grid-statistics", "local_grid_statistics.json");
   const cityCodes: string[] = [];
 
   for (let index = 0; index < argv.length; index += 1) {

@@ -19,6 +19,43 @@ function buildDemandData(points: Array<{
   };
 }
 
+function buildCluster(
+  center: [number, number],
+  count: number,
+  residents: number,
+  jobs: number,
+): Array<{
+  location: [number, number];
+  residents: number;
+  jobs: number;
+}> {
+  const offsets: Array<[number, number]> = [
+    [0, 0],
+    [0.002, 0.001],
+    [-0.002, 0.001],
+    [0.001, -0.002],
+    [-0.001, -0.002],
+    [0.003, 0],
+    [-0.003, 0],
+    [0, 0.003],
+    [0, -0.003],
+    [0.0025, -0.0015],
+    [-0.0025, 0.0015],
+    [0.0015, 0.0025],
+  ];
+
+  return Array.from({ length: count }, (_, index) => {
+    const [offsetLon, offsetLat] = offsets[index % offsets.length]!;
+    const residentAdjustment = index % 3;
+    const jobAdjustment = index % 2;
+    return {
+      location: [center[0] + offsetLon, center[1] + offsetLat],
+      residents: residents - residentAdjustment,
+      jobs: jobs - jobAdjustment,
+    };
+  });
+}
+
 test("computePolycentrismMetrics returns a near-monocentric score for a single dense basin", () => {
   const demandData = buildDemandData([
     { location: [0, 0], residents: 40, jobs: 20 },
@@ -27,73 +64,68 @@ test("computePolycentrismMetrics returns a near-monocentric score for a single d
     { location: [-0.005, 0.001], residents: 20, jobs: 8 },
   ]);
 
-  const polycentrism = computePolycentrismMetrics(demandData, {
-    residentWeightedNearestNeighborKm: { p50: 0.8 },
-    workerWeightedNearestNeighborKm: { p50: 0.8 },
-  });
+  const polycentrism = computePolycentrismMetrics(demandData);
 
-  assert.equal(polycentrism.residents.detectedCenterCount, 1);
   assert.equal(polycentrism.activity.detectedCenterCount, 1);
-  assert.equal(polycentrism.residents.score, 0);
   assert.equal(polycentrism.activity.score, 0);
+  assert.equal(polycentrism.activity.continuousScore, 0);
 });
 
 test("computePolycentrismMetrics detects two balanced centres", () => {
   const demandData = buildDemandData([
-    { location: [0, 0], residents: 30, jobs: 10 },
-    { location: [0.004, 0.002], residents: 25, jobs: 12 },
-    { location: [-0.004, -0.001], residents: 28, jobs: 8 },
-    { location: [0.08, 0.08], residents: 32, jobs: 11 },
-    { location: [0.084, 0.082], residents: 26, jobs: 10 },
-    { location: [0.076, 0.079], residents: 29, jobs: 9 },
+    ...buildCluster([0, 0], 12, 30, 10),
+    ...buildCluster([0.08, 0.08], 12, 30, 10),
   ]);
 
-  const polycentrism = computePolycentrismMetrics(demandData, {
-    residentWeightedNearestNeighborKm: { p50: 0.7 },
-    workerWeightedNearestNeighborKm: { p50: 0.7 },
-  });
+  const polycentrism = computePolycentrismMetrics(demandData);
 
-  assert.equal(polycentrism.residents.detectedCenterCount, 2);
-  assert.ok(polycentrism.residents.score > 0.8);
-  assert.ok(polycentrism.residents.effectiveCenterCount > 1.8);
-  assert.ok(Math.abs((polycentrism.residents.topCenters[0]?.massShare ?? 0) - 0.5) < 0.2);
+  assert.equal(polycentrism.activity.detectedCenterCount, 2);
+  assert.ok(polycentrism.activity.score > 0.8);
+  assert.ok(polycentrism.activity.continuousScore > 0.5);
+  assert.ok(polycentrism.activity.effectiveCenterCount > 1.8);
+  assert.ok(Math.abs((polycentrism.activity.topCenters[0]?.massShare ?? 0) - 0.5) < 0.2);
 });
 
-test("computePolycentrismMetrics scores a Nakaumi-style three-centre layout above monocentric and below balanced two-centre", () => {
+test("computePolycentrismMetrics scores a three-centre layout above monocentric and below balanced two-centre", () => {
   const monocentric = computePolycentrismMetrics(buildDemandData([
     { location: [0, 0], residents: 50, jobs: 20 },
     { location: [0.004, 0.002], residents: 30, jobs: 10 },
     { location: [-0.004, -0.002], residents: 20, jobs: 8 },
-  ]), {
-    residentWeightedNearestNeighborKm: { p50: 0.8 },
-    workerWeightedNearestNeighborKm: { p50: 0.8 },
-  });
+  ]));
 
   const balanced = computePolycentrismMetrics(buildDemandData([
-    { location: [0, 0], residents: 30, jobs: 10 },
-    { location: [0.004, 0.002], residents: 25, jobs: 12 },
-    { location: [0.08, 0.08], residents: 32, jobs: 11 },
-    { location: [0.084, 0.082], residents: 26, jobs: 10 },
-  ]), {
-    residentWeightedNearestNeighborKm: { p50: 0.8 },
-    workerWeightedNearestNeighborKm: { p50: 0.8 },
-  });
+    ...buildCluster([0, 0], 12, 30, 10),
+    ...buildCluster([0.08, 0.08], 12, 30, 10),
+  ]));
 
   const nakaumiStyle = computePolycentrismMetrics(buildDemandData([
-    { location: [0, 0], residents: 26, jobs: 10 },
-    { location: [0.005, 0.003], residents: 20, jobs: 8 },
-    { location: [0.06, 0.02], residents: 24, jobs: 9 },
-    { location: [0.064, 0.023], residents: 19, jobs: 7 },
-    { location: [0.03, 0.07], residents: 18, jobs: 6 },
-    { location: [0.034, 0.074], residents: 15, jobs: 5 },
-  ]), {
-    residentWeightedNearestNeighborKm: { p50: 0.8 },
-    workerWeightedNearestNeighborKm: { p50: 0.8 },
-  });
+    ...buildCluster([0, 0], 12, 26, 10),
+    ...buildCluster([0.08, 0.02], 12, 24, 9),
+    ...buildCluster([0.03, 0.09], 12, 18, 6),
+  ]));
 
-  assert.ok(nakaumiStyle.residents.detectedCenterCount >= 3);
-  assert.ok(nakaumiStyle.residents.score > monocentric.residents.score + 0.3);
-  assert.ok(nakaumiStyle.residents.score < balanced.residents.score);
+  assert.ok(nakaumiStyle.activity.detectedCenterCount >= 3);
+  assert.ok(nakaumiStyle.activity.score > monocentric.activity.score + 0.3);
+  assert.ok(nakaumiStyle.activity.score < balanced.activity.score);
+  assert.ok(nakaumiStyle.activity.continuousScore > monocentric.activity.continuousScore + 0.2);
+  assert.ok(nakaumiStyle.activity.continuousScore < balanced.activity.continuousScore);
+});
+
+test("computePolycentrismMetrics consolidates fragmented nearby basins into two centers", () => {
+  const fragmentedDemandData = buildDemandData([
+    ...buildCluster([0, 0], 10, 20, 8),
+    ...buildCluster([0.012, 0.004], 8, 14, 6),
+    ...buildCluster([0.085, 0.085], 10, 20, 8),
+    ...buildCluster([0.098, 0.092], 8, 14, 6),
+    { location: [0.22, 0.22], residents: 1, jobs: 0 },
+    { location: [-0.2, 0.18], residents: 1, jobs: 0 },
+  ]);
+
+  const polycentrism = computePolycentrismMetrics(fragmentedDemandData);
+
+  assert.equal(polycentrism.activity.detectedCenterCount, 2);
+  assert.ok(polycentrism.activity.topCenters.every((center) => center.massShare > 0.3));
+  assert.ok(polycentrism.activity.continuousScore > 0.5);
 });
 
 test("computePolycentrismMetrics collapses widely separated low-mass noise centres and reports lower support", () => {
@@ -106,17 +138,15 @@ test("computePolycentrismMetrics collapses widely separated low-mass noise centr
     { location: [0.25, -0.26], residents: 2, jobs: 0 },
   ]);
 
-  const polycentrism = computePolycentrismMetrics(noisyDemandData, {
-    residentWeightedNearestNeighborKm: { p50: 4 },
-    workerWeightedNearestNeighborKm: { p50: 4 },
-  });
+  const polycentrism = computePolycentrismMetrics(noisyDemandData);
 
-  assert.ok(polycentrism.residents.detectedCenterCount <= 2);
-  assert.ok(polycentrism.residents.reliabilityScore < 0.7);
-  assert.ok(["low", "medium"].includes(polycentrism.residents.supportLevel));
+  assert.ok(polycentrism.activity.detectedCenterCount <= 2);
+  assert.ok(polycentrism.activity.reliabilityScore < 0.7);
+  assert.ok(["low", "medium"].includes(polycentrism.activity.supportLevel));
+  assert.ok(polycentrism.activity.continuousScore < 0.2);
 });
 
-test("computePolycentrismMetrics uses detail metrics to widen adaptive bandwidth on sparse layouts", () => {
+test("computePolycentrismMetrics uses the fixed activity bandwidth", () => {
   const sparseDemandData = buildDemandData([
     { location: [0, 0], residents: 20, jobs: 5 },
     { location: [0.12, 0.12], residents: 18, jobs: 4 },
@@ -124,10 +154,32 @@ test("computePolycentrismMetrics uses detail metrics to widen adaptive bandwidth
   ]);
 
   const defaultPolycentrism = computePolycentrismMetrics(sparseDemandData);
-  const widenedPolycentrism = computePolycentrismMetrics(sparseDemandData, {
-    residentWeightedNearestNeighborKm: { p50: 6 },
-    workerWeightedNearestNeighborKm: { p50: 6 },
-  });
 
-  assert.ok(widenedPolycentrism.residents.bandwidthKm > defaultPolycentrism.residents.bandwidthKm);
+  assert.equal(defaultPolycentrism.activity.bandwidthKm, 1.3);
+  assert.ok(defaultPolycentrism.activity.continuousScore >= 0);
+  assert.ok(defaultPolycentrism.activity.continuousScore <= 1);
+});
+
+test("computePolycentrismMetrics annotates centres and rejected noise with prominence diagnostics", () => {
+  const demandData = buildDemandData([
+    ...buildCluster([0, 0], 16, 32, 10),
+    ...buildCluster([0.09, 0.09], 12, 29, 10),
+    { location: [0.3, 0.3], residents: 2, jobs: 0 },
+    { location: [-0.28, 0.27], residents: 2, jobs: 0 },
+    { location: [0.25, -0.26], residents: 2, jobs: 0 },
+  ]);
+
+  const polycentrism = computePolycentrismMetrics(demandData);
+
+  assert.equal(polycentrism.activity.detectedCenterCount, 2);
+  assert.ok(polycentrism.activity.topCenters.every((center) => center.prominenceRatio >= 0.22));
+  assert.ok(polycentrism.activity.continuousScore >= 0);
+  assert.ok(polycentrism.activity.continuousScore <= 1);
+  assert.ok(polycentrism.activity.debug.rejectedCenters.length > 0);
+  assert.ok(polycentrism.activity.debug.rejectedCenters.every((center) => (
+    center.strongestCompetitorDistanceKm !== null
+    && center.strongestCompetitorPotential !== null
+    && center.prominenceRatio >= 0
+    && center.prominenceRatio <= 1
+  )));
 });

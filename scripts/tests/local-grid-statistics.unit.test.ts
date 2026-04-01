@@ -56,7 +56,7 @@ test("collectLocalGridStatistics reads city folders and synthesizes missing conf
     assert.ok(ccc);
     assert.match(ccc.error, /demand_data\.json/);
 
-    const outputPath = join(root, "analytics", "local_grid_statistics.json");
+    const outputPath = join(root, "tmp", "local-grid-statistics", "local_grid_statistics.json");
     writeLocalGridStatisticsReport(outputPath, report);
     const persisted = JSON.parse(readFileSync(outputPath, "utf-8")) as { processedCount: number };
     assert.equal(persisted.processedCount, 2);
