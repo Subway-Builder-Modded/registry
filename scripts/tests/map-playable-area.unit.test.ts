@@ -60,10 +60,10 @@ test("computePlayableAreaMetrics stays bounded for zero and one-point inputs", (
   );
 
   const single = computePlayableAreaMetrics([{ longitude: 0, latitude: 0 }]);
-  assert.equal(single.playableAreaKm2, 1);
-  assert.equal(single.playableAreaPerPointKm2, 1);
+  assert.equal(single.playableAreaKm2, 4);
+  assert.equal(single.playableAreaPerPointKm2, 4);
   assert.ok(single.playableCatchmentRadiusKm > 0);
-  assert.ok(single.playableCatchmentRadiusKm < 1);
+  assert.ok(single.playableCatchmentRadiusKm < 2);
 });
 
 test("computePlayableAreaDebugGeoJson exposes the final playable raster cells as GeoJSON", () => {

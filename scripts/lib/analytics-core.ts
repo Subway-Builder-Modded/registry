@@ -5,8 +5,6 @@ import { writeCsv } from "./csv.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 import { isTestListing } from "./test-listings.js";
 import { loadAuthorAliasIndex, resolveAuthorPresentation, type AuthorAliasIndex } from "./author-aliases.js";
-import { computeDetailRadiusKm, computeGridDetailMetrics } from "./map-detail-metrics.js";
-import { computePlayableAreaMetrics } from "./map-playable-area.js";
 
 interface SnapshotEntry {
   file: string;
@@ -149,6 +147,7 @@ interface MapStatisticsRow {
   mean_worker_weighted_nn_km: number;
   detail_radius_km: number;
   detail_score: number;
+  playable_area_cells: number;
   median_cell_resident_density: number;
   mean_cell_resident_density: number;
   pct_cells_with_residents: number;
@@ -522,6 +521,7 @@ interface GridSummary {
   mean_worker_weighted_nn_km: number;
   detail_radius_km: number;
   detail_score: number;
+  playable_area_cells: number;
   median_cell_resident_density: number;
   mean_cell_resident_density: number;
   pct_cells_with_residents: number;
@@ -544,6 +544,7 @@ function emptyGridSummary(): GridSummary {
     mean_worker_weighted_nn_km: 0,
     detail_radius_km: 0,
     detail_score: 0,
+    playable_area_cells: 0,
     median_cell_resident_density: 0,
     mean_cell_resident_density: 0,
     pct_cells_with_residents: 0,
@@ -635,43 +636,6 @@ function readGridDetailSummary(
   };
 }
 
-function readGridFeatureCenter(feature: Record<string, unknown>): { longitude: number; latitude: number } | null {
-  const geometry = isObject(feature.geometry) ? feature.geometry : null;
-  if (!geometry || geometry.type !== "Polygon" || !Array.isArray(geometry.coordinates)) return null;
-  const firstRing = geometry.coordinates[0];
-  if (!Array.isArray(firstRing) || firstRing.length === 0) return null;
-
-  let minLongitude = Number.POSITIVE_INFINITY;
-  let maxLongitude = Number.NEGATIVE_INFINITY;
-  let minLatitude = Number.POSITIVE_INFINITY;
-  let maxLatitude = Number.NEGATIVE_INFINITY;
-
-  for (const coordinate of firstRing) {
-    if (!Array.isArray(coordinate) || coordinate.length < 2) continue;
-    const longitude = coordinate[0];
-    const latitude = coordinate[1];
-    if (!isFiniteNumber(longitude) || !isFiniteNumber(latitude)) continue;
-    minLongitude = Math.min(minLongitude, longitude);
-    maxLongitude = Math.max(maxLongitude, longitude);
-    minLatitude = Math.min(minLatitude, latitude);
-    maxLatitude = Math.max(maxLatitude, latitude);
-  }
-
-  if (
-    !Number.isFinite(minLongitude)
-    || !Number.isFinite(maxLongitude)
-    || !Number.isFinite(minLatitude)
-    || !Number.isFinite(maxLatitude)
-  ) {
-    return null;
-  }
-
-  return {
-    longitude: (minLongitude + maxLongitude) / 2,
-    latitude: (minLatitude + maxLatitude) / 2,
-  };
-}
-
 function readGridPolycentrismSummary(
   properties: Record<string, unknown>,
 ): { detectedCenterCount: number; continuousScore: number } {
@@ -709,39 +673,22 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
           : {};
         const pointCount = toNonNegativeNumber(properties.pointCount);
         if (pointCount <= 0) return null;
-        const center = readGridFeatureCenter(feature);
         return {
           pointCount,
           pop: toNonNegativeNumber(properties.pop),
           jobs: toNonNegativeNumber(properties.jobs),
-          center,
         };
       })
-      .filter((feature): feature is { pointCount: number; pop: number; jobs: number; center: { longitude: number; latitude: number } | null } => feature !== null);
+      .filter((feature): feature is { pointCount: number; pop: number; jobs: number } => feature !== null);
 
     const nCells = populatedCells.length;
     const pointCounts = populatedCells.map((cell) => cell.pointCount);
     const residentCounts = populatedCells.map((cell) => cell.pop);
     const workerCounts = populatedCells.map((cell) => cell.jobs);
     const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
-    const residentsTotal = residentCounts.reduce((sum, value) => sum + value, 0);
-    const jobsTotal = workerCounts.reduce((sum, value) => sum + value, 0);
-    const playableArea = computePlayableAreaMetrics(
-      populatedCells
-        .map((cell) => cell.center)
-        .filter((center): center is { longitude: number; latitude: number } => center !== null),
-    );
-    const fallbackDetail = computeGridDetailMetrics({
-      residentMedianWeightedNearestNeighborKm: residentWeightedNearestNeighborSummary.p50,
-      workerMedianWeightedNearestNeighborKm: workerWeightedNearestNeighborSummary.p50,
-      populatedCellCount: nCells,
-      pointCount: totalPoints,
-      residentsTotal,
-      jobsTotal,
-      playableArea,
-    });
-    const detailRadiusKm = detailSummary.present ? detailSummary.radiusKm : fallbackDetail.radiusKm;
-    const detailScore = detailSummary.present ? detailSummary.score : fallbackDetail.score;
+    const detailRadiusKm = detailSummary.present ? detailSummary.radiusKm : 0;
+    const detailScore = detailSummary.present ? detailSummary.score : 0;
+    const playableAreaCellCount = detailSummary.present ? detailSummary.playableAreaKm2 : 0;
     if (nCells === 0) {
       return {
         ...emptyGridSummary(),
@@ -751,6 +698,7 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
         mean_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.mean, 3),
         detail_radius_km: roundTo(detailRadiusKm, 3),
         detail_score: roundTo(detailScore),
+        playable_area_cells: Math.round(playableAreaCellCount),
         median_commute_distance: commuteSummary.p50,
         mean_commute_distance: commuteSummary.mean,
         detected_center_count: polycentrismSummary.detectedCenterCount,
@@ -767,6 +715,7 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
       mean_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.mean, 3),
       detail_radius_km: roundTo(detailRadiusKm, 3),
       detail_score: roundTo(detailScore),
+      playable_area_cells: Math.round(playableAreaCellCount),
       median_cell_resident_density: roundTo(nonZeroMedian(residentCounts)),
       mean_cell_resident_density: roundTo(nonZeroMean(residentCounts)),
       pct_cells_with_residents: roundTo(percentNonZero(residentCounts, nCells)),
@@ -1630,6 +1579,7 @@ export function runGenerateAnalyticsCli(
       "mean_worker_weighted_nn_km",
       "detail_radius_km",
       "detail_score",
+      "playable_area_cells",
       "median_cell_resident_density",
       "mean_cell_resident_density",
       "pct_cells_with_residents",
