@@ -482,6 +482,7 @@ interface GridMetricBundleProperties {
   p25?: unknown;
   p50?: unknown;
   p75?: unknown;
+  p90?: unknown;
   mean?: unknown;
 }
 

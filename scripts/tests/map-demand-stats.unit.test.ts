@@ -70,6 +70,10 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
         p75?: number;
         mean?: number;
       };
+      polycentrism?: {
+        residents?: { detectedCenterCount?: number; score?: number; topCenters?: Array<{ massShare?: number }> };
+        activity?: { detectedCenterCount?: number; score?: number; topCenters?: Array<{ massShare?: number }> };
+      };
       meanCommuteDistance?: number;
       medianCommuteDistance?: number;
     };
@@ -82,6 +86,7 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
     p25: 5,
     p50: 10,
     p75: 15,
+    p90: 20,
     mean: 12.5,
   });
   assert.deepEqual(gridSummary.properties?.residentCellDensity, {
@@ -89,6 +94,7 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
     p25: 30,
     p50: 30,
     p75: 30,
+    p90: 30,
     mean: 30,
   });
   assert.deepEqual(gridSummary.properties?.workerCellDensity, {
@@ -96,6 +102,7 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
     p25: 4,
     p50: 4,
     p75: 5,
+    p90: 5,
     mean: 4.5,
   });
   assertClose(gridSummary.properties?.residentWeightedNearestNeighborKm?.p10 ?? 0, 0.79);
@@ -108,6 +115,12 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p50 ?? 0, 3.93);
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p75 ?? 0, 3.93);
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.mean ?? 0, 2.53);
+  assert.ok((gridSummary.properties?.polycentrism?.residents?.detectedCenterCount ?? 0) >= 1);
+  assert.ok((gridSummary.properties?.polycentrism?.residents?.score ?? 0) >= 0);
+  assert.ok((gridSummary.properties?.polycentrism?.residents?.score ?? 0) <= 1);
+  assert.ok((gridSummary.properties?.polycentrism?.activity?.detectedCenterCount ?? 0) >= 1);
+  assert.ok((gridSummary.properties?.polycentrism?.activity?.topCenters?.length ?? 0) >= 1);
+  assert.ok((gridSummary.properties?.polycentrism?.activity?.topCenters?.[0]?.massShare ?? 0) > 0);
 
   const populatedCell = grid.features.find((feature: any) => feature.properties?.pointCount === 2);
   assert.ok(populatedCell);
@@ -147,6 +160,7 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
     p25: 0,
     p50: 0,
     p75: 0,
+    p90: 0,
     mean: 0,
   });
   assert.deepEqual(gridSummary.properties?.workerWeightedNearestNeighborKm, {
@@ -154,6 +168,7 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
     p25: 0,
     p50: 0,
     p75: 0,
+    p90: 0,
     mean: 0,
   });
   assert.deepEqual(gridSummary.properties?.commuteDistanceKm, {
@@ -161,6 +176,7 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
     p25: 0,
     p50: 0,
     p75: 0,
+    p90: 0,
     mean: 0,
   });
   assert.deepEqual(gridSummary.properties?.residentCellDensity, {
@@ -168,6 +184,7 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
     p25: 0,
     p50: 0,
     p75: 0,
+    p90: 0,
     mean: 0,
   });
   assert.deepEqual(gridSummary.properties?.workerCellDensity, {
@@ -175,6 +192,7 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
     p25: 0,
     p50: 0,
     p75: 0,
+    p90: 0,
     mean: 0,
   });
 });
@@ -196,13 +214,14 @@ test("extractDemandStatsFromZipBuffer returns stats and grid without writing fil
     });
     assert.deepEqual((extraction.grid as typeof extraction.grid & {
       properties?: {
-        commuteDistanceKm?: { p10?: number; p25?: number; p50?: number; p75?: number; mean?: number };
+        commuteDistanceKm?: { p10?: number; p25?: number; p50?: number; p75?: number; p90?: number; mean?: number };
       };
     }).properties?.commuteDistanceKm, {
       p10: 10,
       p25: 10,
       p50: 20,
       p75: 30,
+      p90: 30,
       mean: 20,
     });
     assert.ok(extraction.grid.features.length > 0);

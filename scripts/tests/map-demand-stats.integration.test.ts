@@ -161,12 +161,18 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     assert.equal(githubManifest.residents_total, 66);
     assert.equal(githubManifest.points_count, 3);
     assert.equal(githubManifest.population_count, 3);
+    assert.ok(githubManifest.grid_statistics);
+    assert.ok(githubManifest.grid_statistics.commuteDistanceKm);
+    assert.ok(githubManifest.grid_statistics.polycentrism);
 
     const customManifest = JSON.parse(readFileSync(join(repoRoot, "maps", "custom-map", "manifest.json"), "utf-8"));
     assert.equal(customManifest.population, 11);
     assert.equal(customManifest.residents_total, 11);
     assert.equal(customManifest.points_count, 2);
     assert.equal(customManifest.population_count, 2);
+    assert.ok(customManifest.grid_statistics);
+    assert.ok(customManifest.grid_statistics.commuteDistanceKm);
+    assert.ok(customManifest.grid_statistics.polycentrism);
 
     assert.equal(existsSync(join(repoRoot, "maps", "github-map", "grid.geojson")), true);
     assert.equal(existsSync(join(repoRoot, "maps", "custom-map", "grid.geojson")), true);
@@ -603,6 +609,162 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
     assert.equal(result.skippedMaps, 1);
     assert.equal(result.skippedUnchanged, 1);
     assert.equal(result.extractionFailures, 0);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("generateMapDemandStats syncs grid_statistics from existing grid.geojson on unchanged cache hits", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-demand-grid-statistics-sync-"));
+  mkdirSync(join(repoRoot, "maps"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "cached-grid-map"), { recursive: true });
+
+  writeJson(join(repoRoot, "maps", "index.json"), {
+    schema_version: 1,
+    maps: ["cached-grid-map"],
+  });
+  writeJson(join(repoRoot, "maps", "cached-grid-map", "manifest.json"), {
+    schema_version: 1,
+    id: "cached-grid-map",
+    name: "Cached Grid Map",
+    author: "test",
+    github_id: 1,
+    description: "desc",
+    tags: ["europe"],
+    gallery: ["gallery/a.png"],
+    source: "https://example.com/source",
+    update: { type: "custom", url: "https://example.com/cached-grid-update.json" },
+    city_code: "CGRD",
+    country: "US",
+    population: 12,
+    residents_total: 12,
+    points_count: 3,
+    population_count: 12,
+    initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+    data_source: "LODES",
+    source_quality: "medium-quality",
+    level_of_detail: "medium-detail",
+    location: "europe",
+    special_demand: [],
+  });
+  writeDemandStatsCacheV2(repoRoot, {
+    "cached-grid-map": {
+      source_fingerprint: "sha256:gridstats",
+      last_checked_at: new Date().toISOString(),
+      stats: {
+        residents_total: 12,
+        points_count: 3,
+        population_count: 12,
+        initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+      },
+      grid: {
+        schema_version: 1,
+      },
+    },
+  });
+  writeJson(join(repoRoot, "maps", "cached-grid-map", "grid.geojson"), {
+    type: "FeatureCollection",
+    features: [],
+    properties: {
+      commuteDistanceKm: {
+        p10: 1,
+        p25: 2,
+        p50: 3,
+        p75: 4,
+        p90: 4,
+        mean: 2.5,
+      },
+      polycentrism: {
+        residents: {
+          score: 0.5,
+          detectedCenterCount: 2,
+          effectiveCenterCount: 1.8,
+          largestCenterShare: 0.6,
+          bandwidthKm: 2,
+          reliabilityScore: 0.7,
+          supportLevel: "high",
+          usedFallback: false,
+          topCenters: [],
+        },
+        activity: {
+          score: 0.4,
+          detectedCenterCount: 2,
+          effectiveCenterCount: 1.7,
+          largestCenterShare: 0.65,
+          bandwidthKm: 2,
+          reliabilityScore: 0.6,
+          supportLevel: "medium",
+          usedFallback: false,
+          topCenters: [],
+        },
+      },
+    },
+  });
+
+  const fetchMock = makeFetchRouter([
+    {
+      match: (url) => url === "https://example.com/cached-grid-update.json",
+      handle: () => new Response(JSON.stringify({
+        schema_version: 1,
+        versions: [
+          {
+            version: "1.0.0",
+            sha256: "gridstats",
+            download: "https://downloads.example.com/should-not-be-fetched.zip",
+          },
+        ],
+      })),
+    },
+  ]);
+
+  try {
+    const result = await generateMapDemandStats({
+      repoRoot,
+      fetchImpl: fetchMock,
+    });
+
+    assert.equal(result.processedMaps, 1);
+    assert.equal(result.updatedMaps, 1);
+    assert.equal(result.gridFilesWritten, 0);
+    assert.equal(result.skippedMaps, 1);
+    assert.equal(result.skippedUnchanged, 1);
+    assert.equal(result.extractionFailures, 0);
+
+    const manifest = JSON.parse(readFileSync(join(repoRoot, "maps", "cached-grid-map", "manifest.json"), "utf-8"));
+    assert.deepEqual(manifest.grid_statistics, {
+      commuteDistanceKm: {
+        p10: 1,
+        p25: 2,
+        p50: 3,
+        p75: 4,
+        p90: 4,
+        mean: 2.5,
+      },
+      polycentrism: {
+        residents: {
+          score: 0.5,
+          detectedCenterCount: 2,
+          effectiveCenterCount: 1.8,
+          largestCenterShare: 0.6,
+          bandwidthKm: 2,
+          reliabilityScore: 0.7,
+          supportLevel: "high",
+          usedFallback: false,
+          topCenters: [],
+        },
+        activity: {
+          score: 0.4,
+          detectedCenterCount: 2,
+          effectiveCenterCount: 1.7,
+          largestCenterShare: 0.65,
+          bandwidthKm: 2,
+          reliabilityScore: 0.6,
+          supportLevel: "medium",
+          usedFallback: false,
+          topCenters: [],
+        },
+      },
+    });
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
