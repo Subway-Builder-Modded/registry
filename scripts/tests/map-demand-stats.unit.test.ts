@@ -75,6 +75,9 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
         expectedPointSpacingKm?: number;
         normalizedRadius?: number;
         activityPerPoint?: number;
+        playableAreaKm2?: number;
+        playableAreaPerPointKm2?: number;
+        playableCatchmentRadiusKm?: number;
         localityScore?: number;
         deaggregationScore?: number;
         score?: number;
@@ -132,6 +135,9 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
   assert.ok((gridSummary.properties?.detail?.expectedPointSpacingKm ?? 0) > 0);
   assert.ok((gridSummary.properties?.detail?.normalizedRadius ?? 0) > 0);
   assert.ok((gridSummary.properties?.detail?.activityPerPoint ?? 0) > 0);
+  assert.ok((gridSummary.properties?.detail?.playableAreaKm2 ?? 0) > 0);
+  assert.ok((gridSummary.properties?.detail?.playableAreaPerPointKm2 ?? 0) > 0);
+  assert.ok((gridSummary.properties?.detail?.playableCatchmentRadiusKm ?? 0) > 0);
   assert.ok((gridSummary.properties?.detail?.localityScore ?? 0) >= 0);
   assert.ok((gridSummary.properties?.detail?.localityScore ?? 0) <= 1);
   assert.ok((gridSummary.properties?.detail?.deaggregationScore ?? 0) >= 0);
@@ -150,8 +156,8 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
   assert.ok(populatedCell);
   assert.equal(populatedCell.properties?.jobs, 4);
   assert.equal(populatedCell.properties?.pop, 30);
-  assert.equal(populatedCell.properties?.homeWorkCommuteMedian, undefined);
-  assert.equal(populatedCell.properties?.workHomeCommuteMedian, undefined);
+  assert.equal(populatedCell.properties?.homeWorkCommuteMedian, 15);
+  assert.equal(populatedCell.properties?.workHomeCommuteMedian, 15);
 
   const secondCell = grid.features.find((feature: any) => (
     feature.properties?.pointCount === 1
@@ -159,6 +165,8 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
     && feature.properties?.pop === 30
   ));
   assert.ok(secondCell);
+  assert.equal(secondCell.properties?.homeWorkCommuteMedian, -1);
+  assert.equal(secondCell.properties?.workHomeCommuteMedian, -1);
 });
 
 test("generateGrid returns zeroed metric bundles when commute and density samples are empty", async () => {
@@ -225,8 +233,11 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
     expectedPointSpacingKm: 0,
     normalizedRadius: 0,
     activityPerPoint: 0,
+    playableAreaKm2: 1,
+    playableAreaPerPointKm2: 1,
+    playableCatchmentRadiusKm: Math.sqrt(1 / Math.PI),
     localityScore: 0,
-    deaggregationScore: 0,
+    deaggregationScore: 1,
     score: 0,
   });
 });

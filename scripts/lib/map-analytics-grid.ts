@@ -2,6 +2,7 @@ import * as turf from "@turf/turf";
 import { FeatureCollection, GeoJsonProperties, Polygon } from "geojson";
 import { computePolycentrismMetrics, type PolycentrismMetrics } from "./map-polycentrism.js";
 import { computeGridDetailMetrics, type GridDetailProperties } from "./map-detail-metrics.js";
+import { computePlayableAreaMetrics } from "./map-playable-area.js";
 
 export interface Point {
     location: [number, number];
@@ -134,6 +135,37 @@ function summarizeMetric(values: number[], weights?: number[]): MetricSummary {
     };
 }
 
+function computeLegacyMedian(values: number[]): number {
+    if (values.length === 0) return -1;
+    const sortedValues = [...values].sort((a, b) => a - b);
+    return sortedValues[Math.floor(sortedValues.length / 2)] ?? -1;
+}
+
+function buildCommuteDistanceLookup(
+    pops: Pops[],
+): {
+    homeWorkByPointId: Map<string, number[]>;
+    workHomeByPointId: Map<string, number[]>;
+} {
+    const homeWorkByPointId = new Map<string, number[]>();
+    const workHomeByPointId = new Map<string, number[]>();
+
+    for (const pop of pops) {
+        const homeWorkDistances = homeWorkByPointId.get(pop.residenceId) ?? [];
+        homeWorkDistances.push(pop.drivingDistance);
+        homeWorkByPointId.set(pop.residenceId, homeWorkDistances);
+
+        const workHomeDistances = workHomeByPointId.get(pop.jobId) ?? [];
+        workHomeDistances.push(pop.drivingDistance);
+        workHomeByPointId.set(pop.jobId, workHomeDistances);
+    }
+
+    return {
+        homeWorkByPointId,
+        workHomeByPointId,
+    };
+}
+
 function computeNearestNeighborDistances(points: Point[], cityCode: string): number[] {
     if (points.length <= 1) {
         return points.map(() => 0);
@@ -164,13 +196,17 @@ function computeNearestNeighborDistances(points: Point[], cityCode: string): num
 export async function generateGrid(demandData: DemandData, cityCode: string): Promise<FeatureCollection<Polygon, GeoJsonProperties>> {
     let pointsCounter = 0;
     const pointsTotal = demandData.points.length;
+    const { homeWorkByPointId, workHomeByPointId } = buildCommuteDistanceLookup(demandData.pops);
     const pointsHeartbeat = createHeartbeat("points", cityCode, pointsTotal);
     const pointFeatures = demandData.points.map((point) => {
         pointsCounter += 1;
         pointsHeartbeat(pointsCounter);
         return turf.point(point.location, {
+            id: point.id,
             jobs: point.jobs,
             pop: point.residents,
+            homeWorkCommuteDistances: homeWorkByPointId.get(point.id) ?? [],
+            workHomeCommuteDistances: workHomeByPointId.get(point.id) ?? [],
         });
     });
     pointsHeartbeat(pointsCounter, true);
@@ -188,10 +224,22 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
         const pointsInCell = turf.pointsWithinPolygon(points, feature);
         const jobs = pointsInCell.features.reduce((sum: number, point: any) => sum + point.properties.jobs, 0);
         const pop = pointsInCell.features.reduce((sum: number, point: any) => sum + point.properties.pop, 0);
+        const homeWorkCommuteDistances = pointsInCell.features.flatMap((point: any) => (
+            Array.isArray(point.properties?.homeWorkCommuteDistances)
+                ? point.properties.homeWorkCommuteDistances as number[]
+                : []
+        ));
+        const workHomeCommuteDistances = pointsInCell.features.flatMap((point: any) => (
+            Array.isArray(point.properties?.workHomeCommuteDistances)
+                ? point.properties.workHomeCommuteDistances as number[]
+                : []
+        ));
 
         feature.properties!.jobs = jobs;
         feature.properties!.pop = pop;
         feature.properties!.pointCount = pointsInCell.features.length;
+        feature.properties!.homeWorkCommuteMedian = computeLegacyMedian(homeWorkCommuteDistances);
+        feature.properties!.workHomeCommuteMedian = computeLegacyMedian(workHomeCommuteDistances);
         cellsHeartbeat(counter);
     });
     cellsHeartbeat(counter, true);
@@ -216,6 +264,12 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
     const workerCellDensity = summarizeMetric(populatedWorkerCellCounts);
     const residentsTotal = demandData.points.reduce((sum, point) => sum + point.residents, 0);
     const jobsTotal = demandData.points.reduce((sum, point) => sum + point.jobs, 0);
+    const playableArea = computePlayableAreaMetrics(
+        demandData.points.map((point) => ({
+            longitude: point.location[0],
+            latitude: point.location[1],
+        })),
+    );
     const detail = computeGridDetailMetrics({
         residentMedianWeightedNearestNeighborKm: residentWeightedNearestNeighborKm.p50,
         workerMedianWeightedNearestNeighborKm: workerWeightedNearestNeighborKm.p50,
@@ -223,6 +277,7 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
         pointCount: demandData.points.length,
         residentsTotal,
         jobsTotal,
+        playableArea,
     });
     const gridMetrics: GridMetricsProperties = {
         residentWeightedNearestNeighborKm,

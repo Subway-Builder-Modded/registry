@@ -6,6 +6,7 @@ import { resolveRepoRoot } from "./script-runtime.js";
 import { isTestListing } from "./test-listings.js";
 import { loadAuthorAliasIndex, resolveAuthorPresentation, type AuthorAliasIndex } from "./author-aliases.js";
 import { computeDetailRadiusKm, computeGridDetailMetrics } from "./map-detail-metrics.js";
+import { computePlayableAreaMetrics } from "./map-playable-area.js";
 
 interface SnapshotEntry {
   file: string;
@@ -506,6 +507,9 @@ interface GridPolycentrismProperties {
 
 interface GridDetailProperties {
   radiusKm?: unknown;
+  playableAreaKm2?: unknown;
+  playableAreaPerPointKm2?: unknown;
+  playableCatchmentRadiusKm?: unknown;
   score?: unknown;
 }
 
@@ -589,7 +593,14 @@ function readGridMetricBundle(
 
 function readGridDetailSummary(
   properties: Record<string, unknown>,
-): { present: boolean; radiusKm: number; score: number } {
+): {
+  present: boolean;
+  radiusKm: number;
+  playableAreaKm2: number;
+  playableAreaPerPointKm2: number;
+  playableCatchmentRadiusKm: number;
+  score: number;
+} {
   const detail = isObject(properties.detail)
     ? properties.detail as GridDetailProperties
     : null;
@@ -598,14 +609,66 @@ function readGridDetailSummary(
     return {
       present: false,
       radiusKm: 0,
+      playableAreaKm2: 0,
+      playableAreaPerPointKm2: 0,
+      playableCatchmentRadiusKm: 0,
       score: 0,
     };
   }
 
+  const playableAreaKm2 = toNonNegativeNumber(detail.playableAreaKm2);
+  const playableAreaPerPointKm2 = toNonNegativeNumber(detail.playableAreaPerPointKm2);
+  const playableCatchmentRadiusKm = toNonNegativeNumber(detail.playableCatchmentRadiusKm);
+  const hasPlayableAreaShape = (
+    playableAreaKm2 > 0
+    || playableAreaPerPointKm2 > 0
+    || playableCatchmentRadiusKm > 0
+  );
+
   return {
-    present: true,
+    present: hasPlayableAreaShape,
     radiusKm: toNonNegativeNumber(detail.radiusKm),
+    playableAreaKm2,
+    playableAreaPerPointKm2,
+    playableCatchmentRadiusKm,
     score: toNonNegativeNumber(detail.score),
+  };
+}
+
+function readGridFeatureCenter(feature: Record<string, unknown>): { longitude: number; latitude: number } | null {
+  const geometry = isObject(feature.geometry) ? feature.geometry : null;
+  if (!geometry || geometry.type !== "Polygon" || !Array.isArray(geometry.coordinates)) return null;
+  const firstRing = geometry.coordinates[0];
+  if (!Array.isArray(firstRing) || firstRing.length === 0) return null;
+
+  let minLongitude = Number.POSITIVE_INFINITY;
+  let maxLongitude = Number.NEGATIVE_INFINITY;
+  let minLatitude = Number.POSITIVE_INFINITY;
+  let maxLatitude = Number.NEGATIVE_INFINITY;
+
+  for (const coordinate of firstRing) {
+    if (!Array.isArray(coordinate) || coordinate.length < 2) continue;
+    const longitude = coordinate[0];
+    const latitude = coordinate[1];
+    if (!isFiniteNumber(longitude) || !isFiniteNumber(latitude)) continue;
+    minLongitude = Math.min(minLongitude, longitude);
+    maxLongitude = Math.max(maxLongitude, longitude);
+    minLatitude = Math.min(minLatitude, latitude);
+    maxLatitude = Math.max(maxLatitude, latitude);
+  }
+
+  if (
+    !Number.isFinite(minLongitude)
+    || !Number.isFinite(maxLongitude)
+    || !Number.isFinite(minLatitude)
+    || !Number.isFinite(maxLatitude)
+  ) {
+    return null;
+  }
+
+  return {
+    longitude: (minLongitude + maxLongitude) / 2,
+    latitude: (minLatitude + maxLatitude) / 2,
   };
 }
 
@@ -646,13 +709,15 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
           : {};
         const pointCount = toNonNegativeNumber(properties.pointCount);
         if (pointCount <= 0) return null;
+        const center = readGridFeatureCenter(feature);
         return {
           pointCount,
           pop: toNonNegativeNumber(properties.pop),
           jobs: toNonNegativeNumber(properties.jobs),
+          center,
         };
       })
-      .filter((feature): feature is { pointCount: number; pop: number; jobs: number } => feature !== null);
+      .filter((feature): feature is { pointCount: number; pop: number; jobs: number; center: { longitude: number; latitude: number } | null } => feature !== null);
 
     const nCells = populatedCells.length;
     const pointCounts = populatedCells.map((cell) => cell.pointCount);
@@ -661,6 +726,11 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
     const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
     const residentsTotal = residentCounts.reduce((sum, value) => sum + value, 0);
     const jobsTotal = workerCounts.reduce((sum, value) => sum + value, 0);
+    const playableArea = computePlayableAreaMetrics(
+      populatedCells
+        .map((cell) => cell.center)
+        .filter((center): center is { longitude: number; latitude: number } => center !== null),
+    );
     const fallbackDetail = computeGridDetailMetrics({
       residentMedianWeightedNearestNeighborKm: residentWeightedNearestNeighborSummary.p50,
       workerMedianWeightedNearestNeighborKm: workerWeightedNearestNeighborSummary.p50,
@@ -668,6 +738,7 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
       pointCount: totalPoints,
       residentsTotal,
       jobsTotal,
+      playableArea,
     });
     const detailRadiusKm = detailSummary.present ? detailSummary.radiusKm : fallbackDetail.radiusKm;
     const detailScore = detailSummary.present ? detailSummary.score : fallbackDetail.score;
