@@ -55,7 +55,1268 @@
     "runways_taxiways.geojson": 0.93
   },
   "grid_statistics": {
-    "meanCommuteDistance": 22181.437722695584,
-    "medianCommuteDistance": 20399
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.4298366119346118,
+      "p25": 0.534920751606699,
+      "p50": 0.7039256661302449,
+      "p75": 0.9258967625450386,
+      "p90": 1.3354978348497168,
+      "mean": 0.7921469855656339
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.29704931224027875,
+      "p25": 0.4227633195623222,
+      "p50": 0.5610490880101511,
+      "p75": 0.7444442839473548,
+      "p90": 1.01720117631358,
+      "mean": 0.6169116259243727
+    },
+    "commuteDistanceKm": {
+      "p10": 5692,
+      "p25": 11492,
+      "p50": 20398,
+      "p75": 30510,
+      "p90": 41089,
+      "mean": 22181.437722695584
+    },
+    "residentCellDensity": {
+      "p10": 13,
+      "p25": 37,
+      "p50": 111,
+      "p75": 288,
+      "p90": 535,
+      "mean": 219.96473354231975
+    },
+    "workerCellDensity": {
+      "p10": 4,
+      "p25": 16,
+      "p50": 98,
+      "p75": 234,
+      "p90": 557,
+      "mean": 239.8327615780446
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.4809872326616013,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -84.18247743871085,
+            "latitude": 39.719156821093435,
+            "massShare": 1,
+            "assignedMass": 561608,
+            "assignedPointCount": 1541,
+            "prominenceRatio": 1
+          }
+        ],
+        "debug": {
+          "rawPeakCount": 76,
+          "mergedPeakCount": 71,
+          "filteredPeakCount": 1,
+          "prominenceThreshold": 0.22,
+          "minPointsPerCenter": 10,
+          "rejectedCenters": [
+            {
+              "longitude": -84.05900136942348,
+              "latitude": 39.76887407220974,
+              "massShare": 0.11074450506403043,
+              "assignedMass": 62195,
+              "assignedPointCount": 124,
+              "prominenceRatio": 0.9999999999999999,
+              "strongestCompetitorDistanceKm": 11.333656861952408,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.11074450506403043,
+              "localConsolidatedMass": 62195,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "not_dominant_local_peak",
+                "too_close_for_low_share_center"
+              ]
+            },
+            {
+              "longitude": -84.23044720893,
+              "latitude": 39.622206513325494,
+              "massShare": 0.11418996880386319,
+              "assignedMass": 64130,
+              "assignedPointCount": 134,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 13.436487980834393,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.11418996880386319,
+              "localConsolidatedMass": 64130,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "not_dominant_local_peak"
+              ]
+            },
+            {
+              "longitude": -84.19226677917399,
+              "latitude": 39.697420930588514,
+              "massShare": 0.058022677739633335,
+              "assignedMass": 32586,
+              "assignedPointCount": 72,
+              "prominenceRatio": 0.9999592248170538,
+              "strongestCompetitorDistanceKm": 6.203276209849391,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.058022677739633335,
+              "localConsolidatedMass": 32586,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.127458699254,
+              "latitude": 39.8525526902995,
+              "massShare": 0.05084329283058646,
+              "assignedMass": 28554,
+              "assignedPointCount": 63,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 12.760079755394644,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.05084329283058646,
+              "localConsolidatedMass": 28554,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.13010594662464,
+              "latitude": 39.66025623286934,
+              "massShare": 0.1095835529408413,
+              "assignedMass": 61543,
+              "assignedPointCount": 129,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 12.159535984856886,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.1095835529408413,
+              "localConsolidatedMass": 61543,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "not_dominant_local_peak"
+              ]
+            },
+            {
+              "longitude": -84.20369362255956,
+              "latitude": 39.871809043272975,
+              "massShare": 0.04183701086879104,
+              "assignedMass": 23496,
+              "assignedPointCount": 55,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 13.545723410701177,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.04183701086879104,
+              "localConsolidatedMass": 23496,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -83.95770124041037,
+              "latitude": 39.68641252523638,
+              "massShare": 0.028507428669107278,
+              "assignedMass": 16010,
+              "assignedPointCount": 48,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 22.27634472398016,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.028507428669107278,
+              "localConsolidatedMass": 16010,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.31042409341619,
+              "latitude": 39.870233305858,
+              "massShare": 0.025617512571045997,
+              "assignedMass": 14387,
+              "assignedPointCount": 36,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 15.856427852789695,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.025617512571045997,
+              "localConsolidatedMass": 14387,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.26016320741392,
+              "latitude": 39.74957920159047,
+              "massShare": 0.01867850885315024,
+              "assignedMass": 10490,
+              "assignedPointCount": 29,
+              "prominenceRatio": 0.9999444745874982,
+              "strongestCompetitorDistanceKm": 6.312014930791938,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.01867850885315024,
+              "localConsolidatedMass": 10490,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.34932737857217,
+              "latitude": 39.51742811077272,
+              "massShare": 0.046580533040839874,
+              "assignedMass": 26160,
+              "assignedPointCount": 75,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 31.47749823819345,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.046580533040839874,
+              "localConsolidatedMass": 26160,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.26181297570189,
+              "latitude": 39.81922557532598,
+              "massShare": 0.04143103374595804,
+              "assignedMass": 23268,
+              "assignedPointCount": 49,
+              "prominenceRatio": 0.9999999999999911,
+              "strongestCompetitorDistanceKm": 10.77608648118512,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.04143103374595804,
+              "localConsolidatedMass": 23268,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.19493295405739,
+              "latitude": 39.955662553670976,
+              "massShare": 0.013076736798621102,
+              "assignedMass": 7344,
+              "assignedPointCount": 31,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 22.889292906365544,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.013076736798621102,
+              "localConsolidatedMass": 7344,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.20357694528767,
+              "latitude": 39.44597186303875,
+              "massShare": 0.01266897907437216,
+              "assignedMass": 7115,
+              "assignedPointCount": 27,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 34.330038717630146,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.01266897907437216,
+              "localConsolidatedMass": 7115,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.40922896483322,
+              "latitude": 39.84011664626937,
+              "massShare": 0.009050796997193772,
+              "assignedMass": 5083,
+              "assignedPointCount": 26,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 21.09269270333279,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.009050796997193772,
+              "localConsolidatedMass": 5083,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.40514642402418,
+              "latitude": 39.452675811136224,
+              "massShare": 0.00801804817595191,
+              "assignedMass": 4503,
+              "assignedPointCount": 15,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 38.56566702470655,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00801804817595191,
+              "localConsolidatedMass": 4503,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.34974439517093,
+              "latitude": 39.614063019283634,
+              "massShare": 0.009885899061266934,
+              "assignedMass": 5552,
+              "assignedPointCount": 25,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 20.29915718457244,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.009885899061266934,
+              "localConsolidatedMass": 5552,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.34348452934175,
+              "latitude": 39.44742620715802,
+              "massShare": 0.007441133317189214,
+              "assignedMass": 4179,
+              "assignedPointCount": 15,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 36.57033380238998,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.007441133317189214,
+              "localConsolidatedMass": 4179,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.45864120024437,
+              "latitude": 39.48552873323121,
+              "massShare": 0.007223899944445236,
+              "assignedMass": 4057,
+              "assignedPointCount": 22,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 38.429975986846074,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.007223899944445236,
+              "localConsolidatedMass": 4057,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.39091897854168,
+              "latitude": 39.74459618225637,
+              "massShare": 0.006159100297716557,
+              "assignedMass": 3459,
+              "assignedPointCount": 25,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 17.21267412782359,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.006159100297716557,
+              "localConsolidatedMass": 3459,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.04059412916914,
+              "latitude": 39.86554805208742,
+              "massShare": 0.00864303927294483,
+              "assignedMass": 4854,
+              "assignedPointCount": 20,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 17.430929714823506,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00864303927294483,
+              "localConsolidatedMass": 4854,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -83.90311920654295,
+              "latitude": 39.80546613638286,
+              "massShare": 0.004248514978419111,
+              "assignedMass": 2386,
+              "assignedPointCount": 14,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 25.81503756045786,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.004248514978419111,
+              "localConsolidatedMass": 2386,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.11955941743382,
+              "latitude": 39.5498772867497,
+              "massShare": 0.007969971937721684,
+              "assignedMass": 4476,
+              "assignedPointCount": 31,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 25.619296353727783,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.007969971937721684,
+              "localConsolidatedMass": 4476,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -83.94150676943714,
+              "latitude": 39.87038054204454,
+              "massShare": 0.006239227361433597,
+              "assignedMass": 3504,
+              "assignedPointCount": 19,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 26.501810696206952,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.006239227361433597,
+              "localConsolidatedMass": 3504,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.02713264713925,
+              "latitude": 39.942843699699424,
+              "massShare": 0.003570105838948163,
+              "assignedMass": 2005,
+              "assignedPointCount": 18,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 25.29927376380165,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.003570105838948163,
+              "localConsolidatedMass": 2005,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.03848900239848,
+              "latitude": 39.91153136104441,
+              "massShare": 0.003705431546559166,
+              "assignedMass": 2081,
+              "assignedPointCount": 12,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 22.00275464626289,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.003705431546559166,
+              "localConsolidatedMass": 2081,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.31901808828339,
+              "latitude": 39.944123361812885,
+              "massShare": 0.0037321405677981797,
+              "assignedMass": 2096,
+              "assignedPointCount": 18,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 24.683155849152058,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0037321405677981797,
+              "localConsolidatedMass": 2096,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.28911222797959,
+              "latitude": 39.46539372861062,
+              "massShare": 0.004658053304083988,
+              "assignedMass": 2616,
+              "assignedPointCount": 12,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 34.170080289175054,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.004658053304083988,
+              "localConsolidatedMass": 2616,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -84.22668475790094,
+              "latitude": 39.537915377411494,
+              "massShare": 0.012483796527114998,
+              "assignedMass": 7011,
+              "assignedPointCount": 33,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 28.971715330639448,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.012483796527114998,
+              "localConsolidatedMass": 7011,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -83.94397031092261,
+              "latitude": 39.92173122386502,
+              "massShare": 0.0009722083731000982,
+              "assignedMass": 546,
+              "assignedPointCount": 4,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 27.905616762245405,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0009722083731000982,
+              "localConsolidatedMass": 546,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.4223374729619,
+              "latitude": 39.67922289563166,
+              "massShare": 0.0009615247646044928,
+              "assignedMass": 540,
+              "assignedPointCount": 8,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 22.21603546121198,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0009615247646044928,
+              "localConsolidatedMass": 540,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.40013622598907,
+              "latitude": 39.906251693496884,
+              "massShare": 0.0010363100240737312,
+              "assignedMass": 582,
+              "assignedPointCount": 12,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 25.02882317269741,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0010363100240737312,
+              "localConsolidatedMass": 582,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -83.91687496171127,
+              "latitude": 39.94087774938833,
+              "massShare": 0.0004522727596472985,
+              "assignedMass": 254,
+              "assignedPointCount": 5,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 30.381108259063918,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0004522727596472985,
+              "localConsolidatedMass": 254,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.01472948573573,
+              "latitude": 39.64070901775253,
+              "massShare": 0.0012072477600034188,
+              "assignedMass": 678,
+              "assignedPointCount": 8,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 22.012289602028662,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0012072477600034188,
+              "localConsolidatedMass": 678,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.45875176625886,
+              "latitude": 39.568924876471506,
+              "massShare": 0.000753194398940186,
+              "assignedMass": 423,
+              "assignedPointCount": 11,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 29.800355417815872,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.000753194398940186,
+              "localConsolidatedMass": 423,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_secondary_share_floor"
+              ]
+            },
+            {
+              "longitude": -83.9581864226757,
+              "latitude": 39.75996936778191,
+              "massShare": 0.00089742311363086,
+              "assignedMass": 504,
+              "assignedPointCount": 8,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 21.582404745384288,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00089742311363086,
+              "localConsolidatedMass": 504,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.3545671863272,
+              "latitude": 39.68509692948799,
+              "massShare": 0.0004772011794703779,
+              "assignedMass": 268,
+              "assignedPointCount": 6,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 18.129105392501295,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0004772011794703779,
+              "localConsolidatedMass": 268,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.977206343326,
+              "latitude": 39.45364783594489,
+              "massShare": 0.0003739262973461916,
+              "assignedMass": 210,
+              "assignedPointCount": 8,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 38.24470429946625,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0003739262973461916,
+              "localConsolidatedMass": 210,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.05959875250265,
+              "latitude": 39.61084198415017,
+              "massShare": 0.0005680118516830244,
+              "assignedMass": 319,
+              "assignedPointCount": 6,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 21.507607297321336,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0005680118516830244,
+              "localConsolidatedMass": 319,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.47466474514732,
+              "latitude": 39.60715400435764,
+              "massShare": 0.00022257517699178074,
+              "assignedMass": 125,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 27.875643919011104,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00022257517699178074,
+              "localConsolidatedMass": 125,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.4638038139415,
+              "latitude": 39.63323460081487,
+              "massShare": 0.00036324268885058617,
+              "assignedMass": 204,
+              "assignedPointCount": 8,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 27.18778959904084,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00036324268885058617,
+              "localConsolidatedMass": 204,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.02206647990855,
+              "latitude": 39.56454294889381,
+              "massShare": 0.0005466446346918135,
+              "assignedMass": 307,
+              "assignedPointCount": 7,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 24.02371777395231,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0005466446346918135,
+              "localConsolidatedMass": 307,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.41460695152703,
+              "latitude": 39.59171984174127,
+              "massShare": 0.00026887081380607113,
+              "assignedMass": 151,
+              "assignedPointCount": 4,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 26.518722119940442,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00026887081380607113,
+              "localConsolidatedMass": 151,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.90893539272831,
+              "latitude": 39.46174659877583,
+              "massShare": 0.00018162134442529308,
+              "assignedMass": 102,
+              "assignedPointCount": 4,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 40.06878678010008,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00018162134442529308,
+              "localConsolidatedMass": 102,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.4605749688404,
+              "latitude": 39.76454720094385,
+              "massShare": 0.0003151664506203615,
+              "assignedMass": 177,
+              "assignedPointCount": 6,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 23.770385923578246,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0003151664506203615,
+              "localConsolidatedMass": 177,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.48720818883947,
+              "latitude": 39.9334815235478,
+              "massShare": 0.00016025412743408214,
+              "assignedMass": 90,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 32.05983548244415,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00016025412743408214,
+              "localConsolidatedMass": 90,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.92138530932347,
+              "latitude": 39.973805038661666,
+              "massShare": 0.00022257517699178074,
+              "assignedMass": 125,
+              "assignedPointCount": 7,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 32.6315717548078,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00022257517699178074,
+              "localConsolidatedMass": 125,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.49547511832445,
+              "latitude": 39.90297202749576,
+              "massShare": 0.0000925912736285808,
+              "assignedMass": 52,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 30.810355177441398,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0000925912736285808,
+              "localConsolidatedMass": 52,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.00425113870895,
+              "latitude": 39.498236169076634,
+              "massShare": 0.00019586615575276705,
+              "assignedMass": 110,
+              "assignedPointCount": 4,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 32.22616961399978,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00019586615575276705,
+              "localConsolidatedMass": 110,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.91416957432652,
+              "latitude": 39.49161218057161,
+              "massShare": 0.00010149428070825201,
+              "assignedMass": 57,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 38.00115451914373,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00010149428070825201,
+              "localConsolidatedMass": 57,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.49159172008729,
+              "latitude": 39.9590700218165,
+              "massShare": 0.00009437187504451503,
+              "assignedMass": 53,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 34.27393055902123,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00009437187504451503,
+              "localConsolidatedMass": 53,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.48616050621682,
+              "latitude": 39.98244151985804,
+              "massShare": 0.00009793307787638352,
+              "assignedMass": 55,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 35.8026563271833,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00009793307787638352,
+              "localConsolidatedMass": 55,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.4650811387224,
+              "latitude": 39.89794817559206,
+              "massShare": 0.0001353257076110027,
+              "assignedMass": 76,
+              "assignedPointCount": 5,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 28.816619549356734,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0001353257076110027,
+              "localConsolidatedMass": 76,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.9603676445762,
+              "latitude": 39.548398401382954,
+              "massShare": 0.0001744989387615561,
+              "assignedMass": 98,
+              "assignedPointCount": 5,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 30.26332654348234,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0001744989387615561,
+              "localConsolidatedMass": 98,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.93787063694171,
+              "latitude": 39.6206510791506,
+              "massShare": 0.00018340194584122734,
+              "assignedMass": 103,
+              "assignedPointCount": 6,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 26.002790085407575,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00018340194584122734,
+              "localConsolidatedMass": 103,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.49043333117218,
+              "latitude": 39.86442786321783,
+              "massShare": 0.00014600931610660818,
+              "assignedMass": 82,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 29.667842807217042,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00014600931610660818,
+              "localConsolidatedMass": 82,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.5006001198882,
+              "latitude": 39.74765683046934,
+              "massShare": 0.0001121778892038575,
+              "assignedMass": 63,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 26.61109900538976,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0001121778892038575,
+              "localConsolidatedMass": 63,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.979627496055,
+              "latitude": 39.521362617048936,
+              "massShare": 0.00009615247646044928,
+              "assignedMass": 54,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 32.107727405706974,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00009615247646044928,
+              "localConsolidatedMass": 54,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.9285833915349,
+              "latitude": 39.440670660944306,
+              "massShare": 0.00007122405663736984,
+              "assignedMass": 40,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 40.36740388095036,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00007122405663736984,
+              "localConsolidatedMass": 40,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.94474895061721,
+              "latitude": 39.4944666021011,
+              "massShare": 0.00008190766513297531,
+              "assignedMass": 46,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 36.720298108200055,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00008190766513297531,
+              "localConsolidatedMass": 46,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.49445998810317,
+              "latitude": 39.80817829246114,
+              "massShare": 0.00011573909203572599,
+              "assignedMass": 65,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 27.927458191006668,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00011573909203572599,
+              "localConsolidatedMass": 65,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.49327918433934,
+              "latitude": 39.83702253786848,
+              "massShare": 0.00019052435150496432,
+              "assignedMass": 107,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 29.141319810361107,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00019052435150496432,
+              "localConsolidatedMass": 107,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.40216028625613,
+              "latitude": 39.969469203433675,
+              "massShare": 0.00014244811327473967,
+              "assignedMass": 80,
+              "assignedPointCount": 6,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 30.61637161187428,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00014244811327473967,
+              "localConsolidatedMass": 80,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.10529946815174,
+              "latitude": 39.460552454777606,
+              "massShare": 0.00014066751185880542,
+              "assignedMass": 79,
+              "assignedPointCount": 6,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 34.71192691365501,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00014066751185880542,
+              "localConsolidatedMass": 79,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.90541336091405,
+              "latitude": 39.57862800561918,
+              "massShare": 0.0000925912736285808,
+              "assignedMass": 52,
+              "assignedPointCount": 4,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 30.885538904958903,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.0000925912736285808,
+              "localConsolidatedMass": 52,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.4841087183989,
+              "latitude": 39.71203131928833,
+              "massShare": 0.00009615247646044928,
+              "assignedMass": 54,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 26.986348065766965,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00009615247646044928,
+              "localConsolidatedMass": 54,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.94840009719168,
+              "latitude": 39.58696330176128,
+              "massShare": 0.00004807623823022464,
+              "assignedMass": 27,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 27.949807676721626,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00004807623823022464,
+              "localConsolidatedMass": 27,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.06373032761176,
+              "latitude": 39.43696246179451,
+              "massShare": 0.00005519864389396162,
+              "assignedMass": 31,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 36.68156901478696,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00005519864389396162,
+              "localConsolidatedMass": 31,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.05033084500363,
+              "latitude": 39.463116828017434,
+              "massShare": 0.00004807623823022464,
+              "assignedMass": 27,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 34.29598182628611,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00004807623823022464,
+              "localConsolidatedMass": 27,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -84.49752973305554,
+              "latitude": 39.678350722603874,
+              "massShare": 0.00003561202831868492,
+              "assignedMass": 20,
+              "assignedPointCount": 3,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 27.548594959864623,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00003561202831868492,
+              "localConsolidatedMass": 20,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            },
+            {
+              "longitude": -83.90769614907855,
+              "latitude": 39.53841410355235,
+              "massShare": 0.00002136721699121095,
+              "assignedMass": 12,
+              "assignedPointCount": 2,
+              "prominenceRatio": 1,
+              "strongestCompetitorDistanceKm": 34.27229368396177,
+              "strongestCompetitorPotential": 38641.74442044168,
+              "localConsolidatedShare": 0.00002136721699121095,
+              "localConsolidatedMass": 12,
+              "localContributorCount": 1,
+              "localContributorDistancesKm": [],
+              "rejectionReasons": [
+                "below_min_points_per_center"
+              ]
+            }
+          ]
+        }
+      }
+    }
   }
 }
