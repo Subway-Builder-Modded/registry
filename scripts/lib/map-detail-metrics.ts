@@ -1,19 +1,38 @@
+// The generated detail metrics that are written into grid.geojson properties
+// and mirrored into manifest grid_statistics for app/analytics consumption.
 export interface GridDetailProperties {
+  // Geometric mean of resident and worker weighted nearest-neighbor medians.
   radiusKm: number;
+  // Expected spacing proxy derived from occupied grid cells relative to points.
   expectedPointSpacingKm: number;
+  // Radius normalized against occupied-footprint spacing so broad maps are not
+  // punished purely for spanning more territory.
   normalizedRadius: number;
+  // Geometric mean demand carried per point across residents and jobs.
   activityPerPoint: number;
+  // How locally fine-grained the map is after adjusting for occupied footprint.
   localityScore: number;
+  // How deaggregated the demand representation is per point.
   deaggregationScore: number;
+  // Final hybrid detail score, using the geometric mean of locality and
+  // deaggregation so both dimensions must be strong.
   score: number;
 }
 
+// Raw inputs needed to compute the hybrid detail metrics from the generated
+// demand/grid analysis, before any repo-level CSV formatting or rounding.
 export interface GridDetailMetricInputs {
+  // Median resident-weighted nearest-neighbor spacing in kilometers.
   residentMedianWeightedNearestNeighborKm: number;
+  // Median worker-weighted nearest-neighbor spacing in kilometers.
   workerMedianWeightedNearestNeighborKm: number;
+  // Number of populated grid cells after empty cells are filtered out.
   populatedCellCount: number;
+  // Number of demand points in the map.
   pointCount: number;
+  // Total residents represented by the demand payload.
   residentsTotal: number;
+  // Total jobs represented by the demand payload.
   jobsTotal: number;
 }
 
