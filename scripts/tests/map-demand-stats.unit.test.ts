@@ -71,8 +71,12 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
         mean?: number;
       };
       polycentrism?: {
-        residents?: { detectedCenterCount?: number; score?: number; topCenters?: Array<{ massShare?: number }> };
-        activity?: { detectedCenterCount?: number; score?: number; topCenters?: Array<{ massShare?: number }> };
+        activity?: {
+          detectedCenterCount?: number;
+          score?: number;
+          continuousScore?: number;
+          topCenters?: Array<{ massShare?: number }>;
+        };
       };
       meanCommuteDistance?: number;
       medianCommuteDistance?: number;
@@ -115,10 +119,11 @@ test("generateGrid emits percentile metric bundles and aggregated cell counts", 
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p50 ?? 0, 3.93);
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.p75 ?? 0, 3.93);
   assertClose(gridSummary.properties?.workerWeightedNearestNeighborKm?.mean ?? 0, 2.53);
-  assert.ok((gridSummary.properties?.polycentrism?.residents?.detectedCenterCount ?? 0) >= 1);
-  assert.ok((gridSummary.properties?.polycentrism?.residents?.score ?? 0) >= 0);
-  assert.ok((gridSummary.properties?.polycentrism?.residents?.score ?? 0) <= 1);
   assert.ok((gridSummary.properties?.polycentrism?.activity?.detectedCenterCount ?? 0) >= 1);
+  assert.ok((gridSummary.properties?.polycentrism?.activity?.score ?? 0) >= 0);
+  assert.ok((gridSummary.properties?.polycentrism?.activity?.score ?? 0) <= 1);
+  assert.ok((gridSummary.properties?.polycentrism?.activity?.continuousScore ?? 0) >= 0);
+  assert.ok((gridSummary.properties?.polycentrism?.activity?.continuousScore ?? 0) <= 1);
   assert.ok((gridSummary.properties?.polycentrism?.activity?.topCenters?.length ?? 0) >= 1);
   assert.ok((gridSummary.properties?.polycentrism?.activity?.topCenters?.[0]?.massShare ?? 0) > 0);
 

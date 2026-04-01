@@ -1,4 +1,7 @@
-import type { DemandData, MetricSummary } from "./map-analytics-grid.js";
+import type { DemandData } from "./map-analytics-grid.js";
+
+// This module is mostly for fun attempt at polycentrism metrics, and is not currently wired into the app. The main exported function computePolycentrismMetrics takes the same demand data as the grid metrics and produces a set of metrics about how polycentric the overall activity pattern is, based on spatial clustering of demand points. 
+// The core logic identifies local peaks in a smoothed potential surface derived from the demand points, then applies a series of gates to determine which peaks count as distinct centers based on their relative prominence, mass, and spacing. 
 
 export interface PolycentrismCenter {
   longitude: number;
@@ -6,10 +9,31 @@ export interface PolycentrismCenter {
   massShare: number;
   assignedMass: number;
   assignedPointCount: number;
+  prominenceRatio: number;
+}
+
+export interface PolycentrismRejectedCenter extends PolycentrismCenter {
+  strongestCompetitorDistanceKm: number | null;
+  strongestCompetitorPotential: number | null;
+  localConsolidatedShare: number;
+  localConsolidatedMass: number;
+  localContributorCount: number;
+  localContributorDistancesKm: number[];
+  rejectionReasons: string[];
+}
+
+export interface PolycentrismDebugMetrics {
+  rawPeakCount: number;
+  mergedPeakCount: number;
+  filteredPeakCount: number;
+  prominenceThreshold: number;
+  minPointsPerCenter: number;
+  rejectedCenters: PolycentrismRejectedCenter[];
 }
 
 export interface PolycentrismVariantMetrics {
   score: number;
+  continuousScore: number;
   detectedCenterCount: number;
   effectiveCenterCount: number;
   largestCenterShare: number;
@@ -18,10 +42,10 @@ export interface PolycentrismVariantMetrics {
   supportLevel: "low" | "medium" | "high";
   usedFallback: boolean;
   topCenters: PolycentrismCenter[];
+  debug: PolycentrismDebugMetrics;
 }
 
 export interface PolycentrismMetrics {
-  residents: PolycentrismVariantMetrics;
   activity: PolycentrismVariantMetrics;
 }
 
@@ -50,21 +74,79 @@ interface CenterAssignment {
   latitudeMass: number;
 }
 
-export interface PolycentrismDetailMetrics {
-  residentWeightedNearestNeighborKm?: Partial<MetricSummary>;
-  workerWeightedNearestNeighborKm?: Partial<MetricSummary>;
+interface ProminenceAssessment {
+  prominenceRatio: number;
+  strongestCompetitorDistanceKm: number | null;
+  strongestCompetitorPotential: number | null;
 }
 
+interface CenterDistanceAssessment {
+  nearestKeptDistanceKm: number | null;
+}
+
+interface CenterGateConfig {
+  // Centers at or above this share are treated as major centers and only fail
+  // if they are implausibly close to a stronger kept center.
+  protectedCenterShareFloor: number;
+  // Minimum spacing required for a major center to survive; prevents obvious
+  // duplicate cores from both being kept.
+  protectedCenterCloseDistanceKm: number;
+  // Centers above this share pass once they meet prominence and point-count
+  // requirements, even if they are not in the fully protected tier.
+  strongCenterShareFloor: number;
+  // Minimum standalone share for a smaller secondary center to be considered by
+  // the low-share branch at all.
+  lowShareCenterFloor: number;
+  // Lower bound relative to the weakest already-kept center; stops the tail
+  // from growing with many much smaller follow-on centers.
+  lowShareRelativeToSmallestKept: number;
+  // Minimum separation required for a smaller center; low-share centers are
+  // only kept when they are meaningfully distinct in space.
+  lowShareMinDistanceToKeptKm: number;
+}
+
+const FIXED_POLYCENTRISM_BANDWIDTH_KM = 1.3;
 const GAUSSIAN_DISTANCE_MULTIPLIER = 3;
-const MAX_TOP_CENTERS = 5;
+const MAX_TOP_CENTERS = 8;
 const EARTH_RADIUS_KM = 6371.0088;
 const DEGREES_TO_RADIANS = Math.PI / 180;
 const KILOMETERS_PER_DEGREE = (Math.PI * EARTH_RADIUS_KM) / 180;
-// Minimum assigned mass share for non-primary centres. This keeps tiny stray
-// clusters from being promoted into full centres.
-const MIN_CENTER_SHARE = 0.07;
-// Require at least two assigned points for a stable secondary centre.
-const MIN_POINTS_PER_CENTER = 2;
+// Secondary centres must retain enough local independence from stronger kept
+// peaks to survive the final prominence-based cull.
+const MIN_PROMINENCE_RATIO = 0.22;
+// Require at least ten assigned points for a stable secondary centre.
+const MIN_POINTS_PER_CENTER = 10;
+// When a metro is split into several nearby fragments, accumulate neighboring
+// post-merge basins within this radius before evaluating the low-share gate.
+const LOCAL_CONSOLIDATION_RADIUS_KM = 15;
+// Ignore tiny local fragments during consolidation so the low-share branch does
+// not sweep in noise just because it is spatially nearby.
+const LOCAL_CONSOLIDATION_MIN_NEIGHBOR_SHARE = 0.02;
+const CONTINUOUS_SCORE_DISTANCE_SCALE_KM = 15;
+const MAX_LOCAL_CONTRIBUTOR_DISTANCES = 6;
+const ACTIVITY_CENTER_GATE: CenterGateConfig = {
+  protectedCenterShareFloor: 0.15,
+  protectedCenterCloseDistanceKm: 8,
+  strongCenterShareFloor: 0.14,
+  lowShareCenterFloor: 0.06,
+  lowShareRelativeToSmallestKept: 0.42,
+  lowShareMinDistanceToKeptKm: 12,
+};
+// Base comparison radius for deciding whether a local maximum is genuinely
+// distinct from a nearby stronger potential peak.
+const BASE_COMPARISON_RADIUS_MULTIPLIER = 1.5;
+// Weaker candidate peaks should be suppressed across a wider neighborhood when
+// a much stronger peak is nearby, while similarly strong peaks only compare at
+// roughly the base radius.
+const COMPARISON_RADIUS_EXPANSION_FACTOR = 1.25;
+const COMPARISON_RADIUS_EXPONENTIAL_ALPHA = 3;
+// Base merge radius for nearby local maxima before dominance-aware expansion.
+const BASE_MERGE_DISTANCE_MULTIPLIER = 1.5;
+// Weaker peaks merge more aggressively into stronger peaks. Comparable peaks
+// keep a radius near the base value, while weak bumps near a dominant centre
+// get a substantially larger merge radius.
+const MERGE_RADIUS_EXPANSION_FACTOR = 1.25;
+const MERGE_RADIUS_EXPONENTIAL_ALPHA = 3;
 
 function clamp(value: number, minValue: number, maxValue: number): number {
   return Math.max(minValue, Math.min(value, maxValue));
@@ -73,6 +155,7 @@ function clamp(value: number, minValue: number, maxValue: number): number {
 function emptyVariantMetrics(): PolycentrismVariantMetrics {
   return {
     score: 0,
+    continuousScore: 0,
     detectedCenterCount: 0,
     effectiveCenterCount: 0,
     largestCenterShare: 0,
@@ -81,13 +164,53 @@ function emptyVariantMetrics(): PolycentrismVariantMetrics {
     supportLevel: "low",
     usedFallback: false,
     topCenters: [],
+    debug: {
+      rawPeakCount: 0,
+      mergedPeakCount: 0,
+      filteredPeakCount: 0,
+      prominenceThreshold: MIN_PROMINENCE_RATIO,
+      minPointsPerCenter: MIN_POINTS_PER_CENTER,
+      rejectedCenters: [],
+    },
   };
 }
 
-function readMetricP50(metric: Partial<MetricSummary> | undefined): number {
-  return typeof metric?.p50 === "number" && Number.isFinite(metric.p50) && metric.p50 > 0
-    ? metric.p50
-    : 0;
+function computeAdaptiveMergeRadiusKm(
+  strongerPeak: PeakSeed,
+  weakerPeak: PeakSeed,
+  bandwidthKm: number,
+): number {
+  const baseMergeRadiusKm = bandwidthKm * BASE_MERGE_DISTANCE_MULTIPLIER;
+  if (strongerPeak.potential <= 0 || weakerPeak.potential <= 0) {
+    return baseMergeRadiusKm;
+  }
+
+  const weakerToStrongerRatio = clamp(weakerPeak.potential / strongerPeak.potential, 0, 1);
+  const expansionMultiplier = 1 + (
+    MERGE_RADIUS_EXPANSION_FACTOR
+    * Math.exp(-MERGE_RADIUS_EXPONENTIAL_ALPHA * weakerToStrongerRatio)
+  );
+  return baseMergeRadiusKm * expansionMultiplier;
+}
+
+function computeAdaptiveComparisonRadiusKm(
+  firstPotential: number,
+  secondPotential: number,
+  bandwidthKm: number,
+): number {
+  const baseComparisonRadiusKm = bandwidthKm * BASE_COMPARISON_RADIUS_MULTIPLIER;
+  if (firstPotential <= 0 || secondPotential <= 0) {
+    return baseComparisonRadiusKm;
+  }
+
+  const strongerPotential = Math.max(firstPotential, secondPotential);
+  const weakerPotential = Math.min(firstPotential, secondPotential);
+  const weakerToStrongerRatio = clamp(weakerPotential / strongerPotential, 0, 1);
+  const expansionMultiplier = 1 + (
+    COMPARISON_RADIUS_EXPANSION_FACTOR
+    * Math.exp(-COMPARISON_RADIUS_EXPONENTIAL_ALPHA * weakerToStrongerRatio)
+  );
+  return baseComparisonRadiusKm * expansionMultiplier;
 }
 
 function buildProjectedPoints(
@@ -177,7 +300,7 @@ function getNeighborIndexes(
 // Compute a smoothed potential field by summing Gaussian-weighted mass from nearby points.
 function computePotentials(points: ProjectedPoint[], bandwidthKm: number): number[] {
   if (points.length === 0) return [];
-  const cellSizeKm = Math.max(bandwidthKm, 0.5);
+  const cellSizeKm = bandwidthKm;
   const radiusKm = bandwidthKm * GAUSSIAN_DISTANCE_MULTIPLIER;
   const radiusSquaredKm = radiusKm * radiusKm;
   const index = buildSpatialIndex(points, cellSizeKm);
@@ -200,21 +323,26 @@ function computePotentials(points: ProjectedPoint[], bandwidthKm: number): numbe
 // A point is a peak if no nearby point has a significantly higher potential, or a similar potential but higher mass. 
 function detectPointPeaks(points: ProjectedPoint[], potentials: number[], bandwidthKm: number): PeakSeed[] {
   if (points.length === 0) return [];
-  const cellSizeKm = Math.max(bandwidthKm, 0.5);
-  const comparisonRadiusKm = Math.max(bandwidthKm * 1.5, 1);
-  const comparisonRadiusSquaredKm = comparisonRadiusKm * comparisonRadiusKm;
+  const cellSizeKm = bandwidthKm;
+  const baseComparisonRadiusKm = bandwidthKm * BASE_COMPARISON_RADIUS_MULTIPLIER;
+  const maxComparisonRadiusKm = baseComparisonRadiusKm * (1 + COMPARISON_RADIUS_EXPANSION_FACTOR);
   const index = buildSpatialIndex(points, cellSizeKm);
 
   const peaks: PeakSeed[] = [];
   points.forEach((point, pointIndex) => {
-    const neighborIndexes = getNeighborIndexes(point, cellSizeKm, comparisonRadiusKm, index);
+    const neighborIndexes = getNeighborIndexes(point, cellSizeKm, maxComparisonRadiusKm, index);
     const pointPotential = potentials[pointIndex] ?? 0;
     let isPeak = true;
     for (const neighborIndex of neighborIndexes) {
       if (neighborIndex === pointIndex) continue;
       const neighbor = points[neighborIndex]!;
-      if (squaredDistanceKm(point, neighbor) > comparisonRadiusSquaredKm) continue;
       const neighborPotential = potentials[neighborIndex] ?? 0;
+      const comparisonRadiusKm = computeAdaptiveComparisonRadiusKm(
+        pointPotential,
+        neighborPotential,
+        bandwidthKm,
+      );
+      if (squaredDistanceKm(point, neighbor) > comparisonRadiusKm * comparisonRadiusKm) continue;
       if (neighborPotential > pointPotential * 1.01) {
         isPeak = false;
         break;
@@ -243,9 +371,9 @@ function detectPointPeaks(points: ProjectedPoint[], potentials: number[], bandwi
 
 function detectFallbackGridPeaks(points: ProjectedPoint[], bandwidthKm: number): PeakSeed[] {
   if (points.length === 0) return [];
-  // For sparse/unstable point clouds, coarsen the space into broader cells and
-  // detect peaks on that aggregated surface instead of raw point potentials.
-  const cellSizeKm = Math.max(bandwidthKm, 1);
+  // Coarsen the space into broader cells and detect peaks on that aggregated
+  // surface instead of raw point potentials when the raw peak field is noisy.
+  const cellSizeKm = bandwidthKm;
   const cells = new Map<string, {
     mass: number;
     xKmMass: number;
@@ -290,20 +418,25 @@ function detectFallbackGridPeaks(points: ProjectedPoint[], bandwidthKm: number):
 
   if (coarsePoints.length === 0) return [];
 
-  const potentials = computePotentials(coarsePoints, Math.max(bandwidthKm * 1.15, 1));
-  return detectPointPeaks(coarsePoints, potentials, Math.max(bandwidthKm * 1.15, 1));
+  const fallbackBandwidthKm = bandwidthKm * 1.15;
+  const potentials = computePotentials(coarsePoints, fallbackBandwidthKm);
+  return detectPointPeaks(coarsePoints, potentials, fallbackBandwidthKm);
 }
 
 function mergePeaks(peaks: PeakSeed[], bandwidthKm: number): PeakSeed[] {
   if (peaks.length <= 1) return peaks;
-  const mergeDistanceKm = Math.max(bandwidthKm * 1.5, 1.5);
   const sortedPeaks = [...peaks].sort((a, b) => b.potential - a.potential);
   const merged: PeakSeed[] = [];
 
   // Nearby local maxima usually belong to the same centre; keep the strongest
   // one so downstream centre counts are not inflated by tiny local wiggles.
   for (const peak of sortedPeaks) {
-    const overlaps = merged.some((existingPeak) => distanceKm(peak, existingPeak) <= mergeDistanceKm);
+    const overlaps = merged.some((existingPeak) => {
+      const strongerPeak = existingPeak.potential >= peak.potential ? existingPeak : peak;
+      const weakerPeak = strongerPeak === existingPeak ? peak : existingPeak;
+      const adaptiveMergeRadiusKm = computeAdaptiveMergeRadiusKm(strongerPeak, weakerPeak, bandwidthKm);
+      return distanceKm(peak, existingPeak) <= adaptiveMergeRadiusKm;
+    });
     if (!overlaps) {
       merged.push(peak);
     }
@@ -325,7 +458,7 @@ function assignPointsToPeaks(
     longitudeMass: 0,
     latitudeMass: 0,
   }));
-  const assignmentBandwidthKm = Math.max(bandwidthKm * 1.2, 1);
+  const assignmentBandwidthKm = bandwidthKm * 1.2;
 
   // Assign each point to the peak whose decayed potential dominates at that
   // location. Centre shares are then computed from these raw point assignments.
@@ -349,6 +482,217 @@ function assignPointsToPeaks(
   return centers;
 }
 
+function assessPeakProminence(
+  candidatePeak: PeakSeed,
+  keptPeaks: PeakSeed[],
+  bandwidthKm: number,
+): ProminenceAssessment {
+  if (keptPeaks.length === 0 || candidatePeak.potential <= 0) {
+    return {
+      prominenceRatio: 1,
+      strongestCompetitorDistanceKm: null,
+      strongestCompetitorPotential: null,
+    };
+  }
+
+  let strongestCompetitorInfluence = 0;
+  let strongestCompetitorDistanceKm: number | null = null;
+  let strongestCompetitorPotential: number | null = null;
+
+  for (const keptPeak of keptPeaks) {
+    const competitorDistanceKm = distanceKm(candidatePeak, keptPeak);
+    const competitorInfluence = keptPeak.potential * gaussianWeight(competitorDistanceKm, bandwidthKm);
+    if (competitorInfluence <= strongestCompetitorInfluence) {
+      continue;
+    }
+    strongestCompetitorInfluence = competitorInfluence;
+    strongestCompetitorDistanceKm = competitorDistanceKm;
+    strongestCompetitorPotential = keptPeak.potential;
+  }
+
+  return {
+    prominenceRatio: clamp(1 - (strongestCompetitorInfluence / candidatePeak.potential), 0, 1),
+    strongestCompetitorDistanceKm,
+    strongestCompetitorPotential,
+  };
+}
+
+function assessDistanceToKeptCenters(
+  candidatePeak: PeakSeed,
+  keptPeaks: PeakSeed[],
+): CenterDistanceAssessment {
+  if (keptPeaks.length === 0) {
+    return {
+      nearestKeptDistanceKm: null,
+    };
+  }
+
+  let nearestKeptDistanceKm = Number.POSITIVE_INFINITY;
+  for (const keptPeak of keptPeaks) {
+    nearestKeptDistanceKm = Math.min(
+      nearestKeptDistanceKm,
+      distanceKm(candidatePeak, keptPeak),
+    );
+  }
+
+  return {
+    nearestKeptDistanceKm: Number.isFinite(nearestKeptDistanceKm)
+      ? nearestKeptDistanceKm
+      : null,
+  };
+}
+
+interface LocalConsolidationAssessment {
+  consolidatedMass: number;
+  consolidatedShare: number;
+  contributorCount: number;
+  contributorDistancesKm: number[];
+  isDominantLocalPeak: boolean;
+}
+
+function assessLocalConsolidation(
+  candidateAssignment: CenterAssignment,
+  allAssignments: CenterAssignment[],
+  keptAssignments: CenterAssignment[],
+  totalMass: number,
+): LocalConsolidationAssessment {
+  let isDominantLocalPeak = true;
+  for (const neighborAssignment of allAssignments) {
+    if (neighborAssignment === candidateAssignment) continue;
+    if (neighborAssignment.assignedPointCount < MIN_POINTS_PER_CENTER) continue;
+
+    const neighborShare = neighborAssignment.assignedMass / totalMass;
+    if (neighborShare < LOCAL_CONSOLIDATION_MIN_NEIGHBOR_SHARE) continue;
+
+    const candidateDistanceKm = distanceKm(candidateAssignment.seed, neighborAssignment.seed);
+    if (candidateDistanceKm > LOCAL_CONSOLIDATION_RADIUS_KM) continue;
+
+    if (neighborAssignment.assignedMass > candidateAssignment.assignedMass) {
+      isDominantLocalPeak = false;
+      break;
+    }
+    if (
+      neighborAssignment.assignedMass === candidateAssignment.assignedMass
+      && neighborAssignment.seed.potential > candidateAssignment.seed.potential
+    ) {
+      isDominantLocalPeak = false;
+      break;
+    }
+  }
+
+  if (!isDominantLocalPeak) {
+    return {
+      consolidatedMass: candidateAssignment.assignedMass,
+      consolidatedShare: totalMass > 0 ? candidateAssignment.assignedMass / totalMass : 0,
+      contributorCount: 1,
+      contributorDistancesKm: [],
+      isDominantLocalPeak: false,
+    };
+  }
+
+  let consolidatedMass = candidateAssignment.assignedMass;
+  const contributorDistancesKm: number[] = [];
+
+  for (const neighborAssignment of allAssignments) {
+    if (neighborAssignment === candidateAssignment) continue;
+    if (neighborAssignment.assignedPointCount < MIN_POINTS_PER_CENTER) continue;
+
+    const neighborShare = neighborAssignment.assignedMass / totalMass;
+    if (neighborShare < LOCAL_CONSOLIDATION_MIN_NEIGHBOR_SHARE) continue;
+
+    const candidateDistanceKm = distanceKm(candidateAssignment.seed, neighborAssignment.seed);
+    if (candidateDistanceKm > LOCAL_CONSOLIDATION_RADIUS_KM) continue;
+
+    let blockedByKeptCenter = false;
+    for (const keptAssignment of keptAssignments) {
+      const keptDistanceKm = distanceKm(keptAssignment.seed, neighborAssignment.seed);
+      if (keptDistanceKm < candidateDistanceKm) {
+        blockedByKeptCenter = true;
+        break;
+      }
+    }
+
+    if (blockedByKeptCenter) continue;
+
+    consolidatedMass += neighborAssignment.assignedMass;
+    contributorDistancesKm.push(candidateDistanceKm);
+  }
+
+  contributorDistancesKm.sort((a, b) => a - b);
+  return {
+    consolidatedMass,
+    consolidatedShare: totalMass > 0 ? consolidatedMass / totalMass : 0,
+    contributorCount: 1 + contributorDistancesKm.length,
+    contributorDistancesKm: contributorDistancesKm.slice(0, MAX_LOCAL_CONTRIBUTOR_DISTANCES),
+    isDominantLocalPeak: true,
+  };
+}
+
+function getAssignmentLongitude(assignment: CenterAssignment): number {
+  return assignment.assignedMass > 0
+    ? assignment.longitudeMass / assignment.assignedMass
+    : assignment.seed.longitude;
+}
+
+function getAssignmentLatitude(assignment: CenterAssignment): number {
+  return assignment.assignedMass > 0
+    ? assignment.latitudeMass / assignment.assignedMass
+    : assignment.seed.latitude;
+}
+
+function computeContinuousPolycentrismScore(
+  assignments: CenterAssignment[],
+  totalMass: number,
+): number {
+  const qualifyingAssignments = assignments.filter((assignment) => (
+    assignment.assignedPointCount >= MIN_POINTS_PER_CENTER
+    && totalMass > 0
+    && (assignment.assignedMass / totalMass) >= LOCAL_CONSOLIDATION_MIN_NEIGHBOR_SHARE
+  ));
+
+  if (qualifyingAssignments.length < 2) {
+    return 0;
+  }
+
+  const qualifyingMass = qualifyingAssignments.reduce(
+    (sum, assignment) => sum + assignment.assignedMass,
+    0,
+  );
+  if (qualifyingMass <= 0) {
+    return 0;
+  }
+
+  const normalizedShares = qualifyingAssignments.map((assignment) => assignment.assignedMass / qualifyingMass);
+  const hhi = normalizedShares.reduce((sum, share) => sum + (share * share), 0);
+  const effectiveCenterCount = hhi > 0 ? 1 / hhi : 0;
+  const effectiveCountTerm = effectiveCenterCount > 0
+    ? clamp((effectiveCenterCount - 1) / (effectiveCenterCount + 1), 0, 1)
+    : 0;
+
+  let weightedSeparationSum = 0;
+  let pairWeightSum = 0;
+  for (let firstIndex = 0; firstIndex < qualifyingAssignments.length; firstIndex += 1) {
+    for (let secondIndex = firstIndex + 1; secondIndex < qualifyingAssignments.length; secondIndex += 1) {
+      const firstAssignment = qualifyingAssignments[firstIndex]!;
+      const secondAssignment = qualifyingAssignments[secondIndex]!;
+      const pairWeight = normalizedShares[firstIndex]! * normalizedShares[secondIndex]!;
+      const pairDistanceKm = distanceKm(firstAssignment.seed, secondAssignment.seed);
+      const separationDiscount = 1 - Math.exp(
+        -((pairDistanceKm / CONTINUOUS_SCORE_DISTANCE_SCALE_KM) ** 2),
+      );
+      weightedSeparationSum += pairWeight * separationDiscount;
+      pairWeightSum += pairWeight;
+    }
+  }
+
+  if (pairWeightSum <= 0) {
+    return 0;
+  }
+
+  const weightedSeparation = weightedSeparationSum / pairWeightSum;
+  return clamp(effectiveCountTerm * weightedSeparation, 0, 1);
+}
+
 function computeEffectivePointCount(points: ProjectedPoint[]): number {
   if (points.length === 0) return 0;
   const totalMass = points.reduce((sum, point) => sum + point.mass, 0);
@@ -363,89 +707,31 @@ function classifySupportLevel(reliabilityScore: number): "low" | "medium" | "hig
   return "low";
 }
 
-function computeBoundingExtentKm(points: ProjectedPoint[]): number {
-  if (points.length <= 1) return 1;
-  const minX = Math.min(...points.map((point) => point.xKm));
-  const maxX = Math.max(...points.map((point) => point.xKm));
-  const minY = Math.min(...points.map((point) => point.yKm));
-  const maxY = Math.max(...points.map((point) => point.yKm));
-  return Math.max(maxX - minX, maxY - minY, 1);
-}
-
-function estimateBaseSpacingKm(
-  variant: "residents" | "activity",
-  demandData: DemandData,
-  detailMetrics: PolycentrismDetailMetrics | undefined,
-): number {
-  // Reuse the previously computed nearest-neighbor spacing as an anchor so
-  // sparse maps smooth more aggressively and dense maps preserve finer centres.
-  const residentP50 = readMetricP50(detailMetrics?.residentWeightedNearestNeighborKm);
-  const workerP50 = readMetricP50(detailMetrics?.workerWeightedNearestNeighborKm);
-  if (variant === "residents") {
-    return residentP50 > 0 ? residentP50 : Math.max(workerP50, 1);
-  }
-
-  const totalResidents = demandData.points.reduce((sum, point) => sum + Math.max(point.residents, 0), 0);
-  const totalJobs = demandData.points.reduce((sum, point) => sum + Math.max(point.jobs, 0), 0);
-  const totalMass = totalResidents + totalJobs;
-  if (totalMass <= 0) {
-    return Math.max(residentP50, workerP50, 1);
-  }
-  const weightedSpacing = (
-    (residentP50 * totalResidents)
-    + ((workerP50 > 0 ? workerP50 : residentP50) * totalJobs)
-  ) / totalMass;
-  return weightedSpacing > 0 ? weightedSpacing : Math.max(residentP50, workerP50, 1);
-}
-
-function computeBandwidthKm(
-  points: ProjectedPoint[],
-  baseSpacingKm: number,
-): number {
-  const effectivePointCount = computeEffectivePointCount(points);
-  const pointCount = points.length;
-  let sparsityMultiplier = 1.3;
-  if (pointCount < 15 || effectivePointCount < 6) {
-    sparsityMultiplier = 2.5;
-  } else if (pointCount < 50 || effectivePointCount < 15) {
-    sparsityMultiplier = 2;
-  } else if (pointCount < 200 || effectivePointCount < 50) {
-    sparsityMultiplier = 1.6;
-  }
-
-  const extentKm = computeBoundingExtentKm(points);
-  const unclampedBandwidth = Math.max(baseSpacingKm, 1) * sparsityMultiplier;
-  // Keep the kernel large enough to regularize sparse layouts, but cap it so
-  // very wide maps do not collapse into a single over-smoothed centre.
-  return clamp(unclampedBandwidth, 1, Math.max(3, extentKm * 0.35));
+function computeBandwidthKm(): number {
+  return FIXED_POLYCENTRISM_BANDWIDTH_KM;
 }
 
 function buildVariantMetrics(
   demandData: DemandData,
-  detailMetrics: PolycentrismDetailMetrics | undefined,
-  variant: "residents" | "activity",
+  massForPoint: (point: DemandData["points"][number]) => number,
 ): PolycentrismVariantMetrics {
-  // Build one variant at a time so resident-only and combined activity
-  // polycentrism can be compared directly from the same spatial layout.
-  const points = buildProjectedPoints(demandData, (point) => (
-    variant === "residents"
-      ? point.residents
-      : point.residents + point.jobs
-  ));
+  // Polycentrism is now tracked only for overall activity so the center model
+  // stays focused on the mixed resident/job structure the app actually uses.
+  const points = buildProjectedPoints(demandData, massForPoint);
   if (points.length === 0) return emptyVariantMetrics();
 
   const totalMass = points.reduce((sum, point) => sum + point.mass, 0);
   if (totalMass <= 0) return emptyVariantMetrics();
 
-  const baseSpacingKm = estimateBaseSpacingKm(variant, demandData, detailMetrics);
-  const bandwidthKm = computeBandwidthKm(points, baseSpacingKm);
+  const bandwidthKm = computeBandwidthKm();
+  const centerGateConfig = ACTIVITY_CENTER_GATE;
   const potentials = computePotentials(points, bandwidthKm);
   const rawPeaks = detectPointPeaks(points, potentials, bandwidthKm);
 
-  // For very sparse or noisy point clouds, the above peak detection can fail to find meaningful centres. In that case, fallback to a coarser grid-based peak detection to ensure the algorithm still produces a reasonable result instead of zero centres.
+  // If the raw peak field is empty or excessively noisy, fallback to a coarser
+  // grid-based peak detection instead of trusting the raw local maxima.
   const needsFallback = (
-    points.length < 12
-    || rawPeaks.length === 0
+    rawPeaks.length === 0
     || rawPeaks.length > Math.max(4, Math.floor(points.length / 2))
   );
   const fallbackPeaks = needsFallback ? detectFallbackGridPeaks(points, bandwidthKm) : [];
@@ -463,21 +749,98 @@ function buildVariantMetrics(
       potential: potentials[0] ?? points[0]!.mass,
     }];
 
-  const initialAssignments = assignPointsToPeaks(points, effectivePeaks, bandwidthKm)
-    .sort((a, b) => b.assignedMass - a.assignedMass);
-
-  const minShare = MIN_CENTER_SHARE;
+  const initialAssignments = assignPointsToPeaks(points, effectivePeaks, bandwidthKm);
+  const continuousScore = computeContinuousPolycentrismScore(initialAssignments, totalMass);
   const minPointCount = MIN_POINTS_PER_CENTER;
 
-  // Drop weak secondary peaks so tiny stray clusters do not get promoted into
-  // full centres on low-detail or noisy maps.
-  const filteredPeaks = initialAssignments
-    .filter((assignment, assignmentIndex) => {
-      if (assignmentIndex === 0) return true;
-      const share = assignment.assignedMass / totalMass;
-      return share >= minShare && assignment.assignedPointCount >= minPointCount;
-    })
-    .map((assignment) => assignment.seed);
+  // Keep the strongest peak, then only accept later peaks if they remain
+  // locally prominent against the already-kept stronger centres.
+  const rejectedCenters: PolycentrismRejectedCenter[] = [];
+  const filteredAssignments: Array<CenterAssignment & { prominence: ProminenceAssessment }> = [];
+  for (const [assignmentIndex, assignment] of initialAssignments.entries()) {
+    const keptSeeds = filteredAssignments.map((keptAssignment) => keptAssignment.seed);
+    const prominence = assessPeakProminence(
+      assignment.seed,
+      keptSeeds,
+      bandwidthKm,
+    );
+    const distanceAssessment = assessDistanceToKeptCenters(assignment.seed, keptSeeds);
+    if (assignmentIndex === 0) {
+      filteredAssignments.push({ ...assignment, prominence });
+      continue;
+    }
+
+    const share = assignment.assignedMass / totalMass;
+    const localConsolidation = assessLocalConsolidation(
+      assignment,
+      initialAssignments,
+      filteredAssignments,
+      totalMass,
+    );
+    const rejectionReasons: string[] = [];
+    if (assignment.assignedPointCount < minPointCount) {
+      rejectionReasons.push("below_min_points_per_center");
+    }
+    if (prominence.prominenceRatio < MIN_PROMINENCE_RATIO) {
+      rejectionReasons.push("below_prominence_threshold");
+    }
+    if (rejectionReasons.length === 0) {
+      if (share >= centerGateConfig.protectedCenterShareFloor) {
+        if (
+          distanceAssessment.nearestKeptDistanceKm !== null
+          && distanceAssessment.nearestKeptDistanceKm < centerGateConfig.protectedCenterCloseDistanceKm
+        ) {
+          rejectionReasons.push("too_close_for_protected_share_center");
+        }
+      }
+      else if (share >= centerGateConfig.strongCenterShareFloor) {
+        // Strong prominent centers pass the hybrid gate directly.
+      }
+      else if (localConsolidation.consolidatedShare >= centerGateConfig.lowShareCenterFloor) {
+        if (!localConsolidation.isDominantLocalPeak) {
+          rejectionReasons.push("not_dominant_local_peak");
+        }
+        const smallestKeptShare = Math.min(
+          ...filteredAssignments.map((keptAssignment) => keptAssignment.assignedMass / totalMass),
+        );
+        if (
+          localConsolidation.consolidatedShare
+          < (smallestKeptShare * centerGateConfig.lowShareRelativeToSmallestKept)
+        ) {
+          rejectionReasons.push("below_relative_share_floor");
+        }
+        if (
+          distanceAssessment.nearestKeptDistanceKm !== null
+          && distanceAssessment.nearestKeptDistanceKm < centerGateConfig.lowShareMinDistanceToKeptKm
+        ) {
+          rejectionReasons.push("too_close_for_low_share_center");
+        }
+      }
+      else {
+        rejectionReasons.push("below_secondary_share_floor");
+      }
+    }
+    if (rejectionReasons.length > 0) {
+      rejectedCenters.push({
+        longitude: getAssignmentLongitude(assignment),
+        latitude: getAssignmentLatitude(assignment),
+        massShare: share,
+        assignedMass: assignment.assignedMass,
+        assignedPointCount: assignment.assignedPointCount,
+        prominenceRatio: prominence.prominenceRatio,
+        strongestCompetitorDistanceKm: distanceAssessment.nearestKeptDistanceKm,
+        strongestCompetitorPotential: prominence.strongestCompetitorPotential,
+        localConsolidatedShare: localConsolidation.consolidatedShare,
+        localConsolidatedMass: localConsolidation.consolidatedMass,
+        localContributorCount: localConsolidation.contributorCount,
+        localContributorDistancesKm: localConsolidation.contributorDistancesKm,
+        rejectionReasons,
+      });
+      continue;
+    }
+    filteredAssignments.push({ ...assignment, prominence });
+  }
+  const filteredPeaks = filteredAssignments.map((assignment) => assignment.seed);
 
   const finalAssignments = assignPointsToPeaks(
     points,
@@ -517,7 +880,7 @@ function buildVariantMetrics(
   const sampleScore = clamp((points.length - 4) / 40, 0, 1);
   const effectivePointScore = clamp((effectivePointCount - 2) / 18, 0, 1);
   const separationScore = clamp(minimumCenterSeparationKm / (bandwidthKm * 2), 0, 1);
-  const bandwidthScore = clamp(baseSpacingKm > 0 ? (baseSpacingKm / bandwidthKm) * 2 : 0.5, 0, 1);
+  const bandwidthScore = 1;
   const fallbackPenalty = needsFallback ? 0.85 : 1;
   // Reliability is a support signal, not the polycentrism score itself. It
   // indicates how much trust to place in the detected centre structure.
@@ -529,6 +892,7 @@ function buildVariantMetrics(
 
   return {
     score,
+    continuousScore,
     detectedCenterCount,
     effectiveCenterCount,
     largestCenterShare,
@@ -536,27 +900,37 @@ function buildVariantMetrics(
     reliabilityScore,
     supportLevel: classifySupportLevel(reliabilityScore),
     usedFallback: needsFallback,
-    topCenters: finalAssignments.slice(0, MAX_TOP_CENTERS).map((assignment) => ({
-      longitude: assignment.assignedMass > 0
-        ? assignment.longitudeMass / assignment.assignedMass
-        : assignment.seed.longitude,
-      latitude: assignment.assignedMass > 0
-        ? assignment.latitudeMass / assignment.assignedMass
-        : assignment.seed.latitude,
-      massShare: assignment.assignedMass / totalMass,
-      assignedMass: assignment.assignedMass,
-      assignedPointCount: assignment.assignedPointCount,
-    })),
+    topCenters: finalAssignments.slice(0, MAX_TOP_CENTERS).map((assignment) => {
+      const prominence = assessPeakProminence(
+        assignment.seed,
+        finalAssignments
+          .filter((candidate) => candidate.seed.potential > assignment.seed.potential)
+          .map((candidate) => candidate.seed),
+        bandwidthKm,
+      );
+      return {
+        longitude: getAssignmentLongitude(assignment),
+        latitude: getAssignmentLatitude(assignment),
+        massShare: assignment.assignedMass / totalMass,
+        assignedMass: assignment.assignedMass,
+        assignedPointCount: assignment.assignedPointCount,
+        prominenceRatio: prominence.prominenceRatio,
+      };
+    }),
+    debug: {
+      rawPeakCount: rawPeaks.length,
+      mergedPeakCount: peakSeeds.length,
+      filteredPeakCount: filteredPeaks.length > 0 ? filteredPeaks.length : 1,
+      prominenceThreshold: MIN_PROMINENCE_RATIO,
+      minPointsPerCenter: minPointCount,
+      rejectedCenters,
+    },
   };
 }
 
-// Compute polycentrism metrics for a given demand data set for both residents and overall activity (residents + jobs).
-export function computePolycentrismMetrics(
-  demandData: DemandData,
-  detailMetrics?: PolycentrismDetailMetrics,
-): PolycentrismMetrics {
+// Compute polycentrism metrics for overall activity (residents + jobs).
+export function computePolycentrismMetrics(demandData: DemandData): PolycentrismMetrics {
   return {
-    residents: buildVariantMetrics(demandData, detailMetrics, "residents"),
-    activity: buildVariantMetrics(demandData, detailMetrics, "activity"),
+    activity: buildVariantMetrics(demandData, (point) => point.residents + point.jobs),
   };
 }

@@ -218,10 +218,7 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
         commuteDistanceKm,
         residentCellDensity,
         workerCellDensity,
-        polycentrism: computePolycentrismMetrics(demandData, {
-            residentWeightedNearestNeighborKm,
-            workerWeightedNearestNeighborKm,
-        }),
+        polycentrism: computePolycentrismMetrics(demandData),
     };
 
     return {
