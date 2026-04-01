@@ -240,8 +240,8 @@ test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and r
     assert.equal(
       mapsStatisticsCsv,
       [
-        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_resident_weighted_nn_km,mean_resident_weighted_nn_km,median_worker_weighted_nn_km,mean_worker_weighted_nn_km,detail_radius_km,detail_score,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
-        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.2,0.25,0.4,0.45,0.283,0.73,200,200,100,20,20,100,12,15,2,0.68",
+        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_resident_weighted_nn_km,mean_resident_weighted_nn_km,median_worker_weighted_nn_km,mean_worker_weighted_nn_km,detail_radius_km,detail_score,playable_area_cells,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.2,0.25,0.4,0.45,0.283,0.73,18,200,200,100,20,20,100,12,15,2,0.68",
         "",
       ].join("\n"),
     );
@@ -382,8 +382,8 @@ test("runGenerateAnalyticsCli computes resident and worker densities from non-ze
     assert.equal(
       mapsStatisticsCsv,
       [
-        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_resident_weighted_nn_km,mean_resident_weighted_nn_km,median_worker_weighted_nn_km,mean_worker_weighted_nn_km,detail_radius_km,detail_score,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
-        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.3,0.35,0.5,0.55,0.387,0.34,200,150,66.67,30,25,66.67,12.99,15.13,3,0.44",
+        "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_resident_weighted_nn_km,mean_resident_weighted_nn_km,median_worker_weighted_nn_km,mean_worker_weighted_nn_km,detail_radius_km,detail_score,playable_area_cells,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.3,0.35,0.5,0.55,0.387,0.34,24,200,150,66.67,30,25,66.67,12.99,15.13,3,0.44",
         "",
       ].join("\n"),
     );
@@ -437,6 +437,10 @@ test("runGenerateAnalyticsCli keeps detail_score stable regardless of other map 
     runGenerateAnalyticsCli([], repoRoot);
     const beforeCsv = readFileSync(join(repoRoot, "analytics", "maps_statistics.csv"), "utf-8");
     const beforeRow = findCsvRow(beforeCsv, "sample-map");
+    assert.equal(
+      beforeRow,
+      "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,0,0,0.2,0.25,0.4,0.45,0,0,0,0,0,0,0,0,0,3,3,1,0.2",
+    );
 
     mkdirSync(join(repoRoot, "maps", "coarse-map"), { recursive: true });
     writeJson(join(repoRoot, "maps", "index.json"), {
