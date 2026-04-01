@@ -1,3 +1,5 @@
+import type { PlayableAreaMetrics } from "./map-playable-area.js";
+
 // The generated detail metrics that are written into grid.geojson properties
 // and mirrored into manifest grid_statistics for app/analytics consumption.
 export interface GridDetailProperties {
@@ -10,9 +12,15 @@ export interface GridDetailProperties {
   normalizedRadius: number;
   // Geometric mean demand carried per point across residents and jobs.
   activityPerPoint: number;
+  // Estimated playable area after the demand-only raster refinement pass.
+  playableAreaKm2: number;
+  // Estimated playable area allocated to each demand point.
+  playableAreaPerPointKm2: number;
+  // Circular-equivalent radius of the playable area assigned to each point.
+  playableCatchmentRadiusKm: number;
   // How locally fine-grained the map is after adjusting for occupied footprint.
   localityScore: number;
-  // How deaggregated the demand representation is per point.
+  // How deaggregated the demand representation is across playable area.
   deaggregationScore: number;
   // Final hybrid detail score, using the geometric mean of locality and
   // deaggregation so both dimensions must be strong.
@@ -34,14 +42,16 @@ export interface GridDetailMetricInputs {
   residentsTotal: number;
   // Total jobs represented by the demand payload.
   jobsTotal: number;
+  // Estimated playable area metrics derived from demand geometry.
+  playableArea: PlayableAreaMetrics;
 }
 
 // Fixed anchors keep the score stable across analytics runs instead of
 // re-normalizing against whatever subset of maps happens to be present.
 export const DETAIL_LOCALITY_R10_REF = 0.3432329744;
 export const DETAIL_LOCALITY_R99_REF = 0.8885200016;
-export const DETAIL_DEAGGREGATION_A50_REF = 232.1246833;
-export const DETAIL_DEAGGREGATION_A99_REF = 3426.9280920;
+export const DETAIL_PLAYABLE_CATCHMENT_LOW_REF = 0.5874427119765672;
+export const DETAIL_PLAYABLE_CATCHMENT_HIGH_REF = 1.0245426434374099;
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
@@ -70,17 +80,18 @@ export function computeGridDetailMetrics(inputs: GridDetailMetricInputs): GridDe
     inputs.residentMedianWeightedNearestNeighborKm,
     inputs.workerMedianWeightedNearestNeighborKm,
   );
-  // Expected point spacing is a proxy for how finely the demand is grained across the map footprint, which penalizes maps that have broad coverage but sparse demand representation. 
+  // Expected point spacing is still the locality-side footprint proxy.
   const expectedPointSpacingKm = (
-    // TODO: This should likely be playable area if possible
     inputs.populatedCellCount > 0 && inputs.pointCount > 0
       ? Math.sqrt(inputs.populatedCellCount / inputs.pointCount)
       : 0
   );
-  // Normalizing the radius by expected point spacing means that maps with broad coverage aren't punished for having higher absolute nearest-neighbor distances if they also have a sparser expected spacing between points. 
+  // Normalizing the radius by expected point spacing means that broad maps are
+  // not punished purely for having larger absolute nearest-neighbor distances.
   const normalizedRadius = radiusKm > 0 && expectedPointSpacingKm > 0
     ? radiusKm / expectedPointSpacingKm
     : 0;
+  // This stays in the output as a diagnostic, but is no longer part of the score.
   const activityPerPoint = (
     inputs.pointCount > 0 && inputs.residentsTotal > 0 && inputs.jobsTotal > 0
       ? Math.sqrt(
@@ -95,9 +106,9 @@ export function computeGridDetailMetrics(inputs: GridDetailMetricInputs): GridDe
     DETAIL_LOCALITY_R99_REF,
   );
   const deaggregationScore = computeInverseLogScaledScore(
-    activityPerPoint,
-    DETAIL_DEAGGREGATION_A50_REF,
-    DETAIL_DEAGGREGATION_A99_REF,
+    inputs.playableArea.playableCatchmentRadiusKm,
+    DETAIL_PLAYABLE_CATCHMENT_LOW_REF,
+    DETAIL_PLAYABLE_CATCHMENT_HIGH_REF,
   );
   const score = localityScore > 0 && deaggregationScore > 0
     ? Math.sqrt(localityScore * deaggregationScore)
@@ -108,6 +119,9 @@ export function computeGridDetailMetrics(inputs: GridDetailMetricInputs): GridDe
     expectedPointSpacingKm,
     normalizedRadius,
     activityPerPoint,
+    playableAreaKm2: inputs.playableArea.playableAreaKm2,
+    playableAreaPerPointKm2: inputs.playableArea.playableAreaPerPointKm2,
+    playableCatchmentRadiusKm: inputs.playableArea.playableCatchmentRadiusKm,
     localityScore,
     deaggregationScore,
     score,
