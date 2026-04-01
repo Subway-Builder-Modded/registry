@@ -19,6 +19,7 @@ import {
 } from "./lib/manifests.js";
 import { resolveAndExtractDemandStatsForMapSource } from "./lib/map-demand-stats.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
+import { ensureAuthorAliasPrefill } from "./lib/author-aliases.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");
 
@@ -105,6 +106,10 @@ async function main() {
     console.error("ISSUE_JSON, ISSUE_AUTHOR_ID, and ISSUE_AUTHOR_LOGIN are required");
     process.exit(1);
   }
+  const issueAuthorGithubId = Number.parseInt(issueAuthorId, 10);
+  if (!Number.isFinite(issueAuthorGithubId) || issueAuthorGithubId <= 0) {
+    throw new Error(`Invalid ISSUE_AUTHOR_ID '${issueAuthorId}'`);
+  }
 
   const data = JSON.parse(issueJson) as Record<string, unknown>;
   const { id, dir } = resolveListingIdAndDir(manifestType, data);
@@ -135,7 +140,7 @@ async function main() {
     id,
     name: String(data.name),
     author: issueAuthorLogin,
-    github_id: parseInt(issueAuthorId, 10),
+    github_id: issueAuthorGithubId,
     description,
     tags,
     gallery: galleryPaths,
@@ -144,6 +149,15 @@ async function main() {
     update: buildUpdate(data),
     ...(mapData ? mapData.mapFields : {}),
   };
+
+  const authorPrefillResult = ensureAuthorAliasPrefill(
+    REPO_ROOT,
+    issueAuthorGithubId,
+    issueAuthorLogin,
+  );
+  if (authorPrefillResult.created) {
+    console.log(`Updated ${authorPrefillResult.path} with author '${issueAuthorLogin}'`);
+  }
 
   assertValidRegistryManifest(
     manifest,
