@@ -49,5 +49,143 @@
     "roads.geojson": 16.65,
     "runways_taxiways.geojson": 1.61
   },
-  "is_test": false
+  "is_test": false,
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.0835052728871792,
+      "p25": 0.12478910243577299,
+      "p50": 0.2113199106418999,
+      "p75": 0.31530680500063557,
+      "p90": 0.4630273397563962,
+      "mean": 0.26349877148582806
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.05122812159823613,
+      "p25": 0.08370649072881103,
+      "p50": 0.18853541061655432,
+      "p75": 0.7185039523840105,
+      "p90": 1.035960867914332,
+      "mean": 0.5318878498403881
+    },
+    "commuteDistanceKm": {
+      "p10": 4470,
+      "p25": 8762,
+      "p50": 15305,
+      "p75": 28326,
+      "p90": 36539,
+      "mean": 18626.92759780417
+    },
+    "residentCellDensity": {
+      "p10": 784,
+      "p25": 1404,
+      "p50": 3355,
+      "p75": 13723,
+      "p90": 27958,
+      "mean": 9169.154545454545
+    },
+    "workerCellDensity": {
+      "p10": 966,
+      "p25": 3030,
+      "p50": 12389,
+      "p75": 27119,
+      "p90": 53891,
+      "mean": 22530.24431818182
+    },
+    "polycentrism": {
+      "residents": {
+        "score": 0.9736766621060857,
+        "detectedCenterCount": 5,
+        "effectiveCenterCount": 4.52368594533951,
+        "largestCenterShare": 0.32029235898168623,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 0.831276888708423,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 114.17137680503001,
+            "latitude": 22.32494357212089,
+            "massShare": 0.32029235898168623,
+            "assignedMass": 1293444,
+            "assignedPointCount": 682
+          },
+          {
+            "longitude": 114.13166341722606,
+            "latitude": 22.39926403345788,
+            "massShare": 0.18786907337526,
+            "assignedMass": 758676,
+            "assignedPointCount": 297
+          },
+          {
+            "longitude": 114.0104949264809,
+            "latitude": 22.4261214470767,
+            "massShare": 0.18590043441299767,
+            "assignedMass": 750726,
+            "assignedPointCount": 295
+          },
+          {
+            "longitude": 114.23893451301522,
+            "latitude": 22.334873896726936,
+            "massShare": 0.18312403440735175,
+            "assignedMass": 739514,
+            "assignedPointCount": 213
+          },
+          {
+            "longitude": 114.20188134236675,
+            "latitude": 22.270698882439017,
+            "massShare": 0.12281409882270437,
+            "assignedMass": 495963,
+            "assignedPointCount": 267
+          }
+        ]
+      },
+      "activity": {
+        "score": 0.9185174843565793,
+        "detectedCenterCount": 5,
+        "effectiveCenterCount": 3.7709379560297496,
+        "largestCenterShare": 0.4139355618656556,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 0.8268952540881642,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 114.06675984707519,
+            "latitude": 22.42395489849663,
+            "massShare": 0.4139355618656556,
+            "assignedMass": 3343211,
+            "assignedPointCount": 687
+          },
+          {
+            "longitude": 114.17493452315048,
+            "latitude": 22.325606064688845,
+            "massShare": 0.21313129237062017,
+            "assignedMass": 1721386,
+            "assignedPointCount": 548
+          },
+          {
+            "longitude": 114.23357675313179,
+            "latitude": 22.334342783488697,
+            "massShare": 0.16075757189308532,
+            "assignedMass": 1298382,
+            "assignedPointCount": 256
+          },
+          {
+            "longitude": 114.1424351645155,
+            "latitude": 22.269811785890806,
+            "massShare": 0.11184023665268975,
+            "assignedMass": 903294,
+            "assignedPointCount": 248
+          },
+          {
+            "longitude": 114.21985316247317,
+            "latitude": 22.27699141388803,
+            "massShare": 0.10033533721794913,
+            "assignedMass": 810373,
+            "assignedPointCount": 226
+          }
+        ]
+      }
+    }
+  }
 }
