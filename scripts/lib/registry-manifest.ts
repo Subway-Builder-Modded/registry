@@ -87,6 +87,9 @@ const MAP_MANIFEST_PROPERTIES = {
       bearing: { type: "number" },
     },
   },
+  grid_statistics: {
+    type: "object",
+  },
   data_source: { type: "string", minLength: 1 },
   source_quality: { enum: SOURCE_QUALITY_VALUES },
   level_of_detail: { enum: LEVEL_OF_DETAIL_VALUES },

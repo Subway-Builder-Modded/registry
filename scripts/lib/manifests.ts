@@ -12,6 +12,18 @@ export interface InitialViewState {
   bearing: number;
 }
 
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonObject
+  | JsonValue[];
+
+export interface JsonObject {
+  [key: string]: JsonValue;
+}
+
 export interface ModManifest {
   schema_version: number;
   id: string;
@@ -34,6 +46,7 @@ export interface MapManifest extends ModManifest {
   points_count: number;
   population_count: number;
   initial_view_state: InitialViewState;
+  grid_statistics?: JsonObject;
   data_source: string;
   source_quality: string;
   level_of_detail: string;

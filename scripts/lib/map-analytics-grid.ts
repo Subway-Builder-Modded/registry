@@ -1,5 +1,6 @@
 import * as turf from "@turf/turf";
 import { FeatureCollection, GeoJsonProperties, Polygon } from "geojson";
+import { computePolycentrismMetrics, type PolycentrismMetrics } from "./map-polycentrism.js";
 
 export interface Point {
     location: [number, number];
@@ -24,6 +25,7 @@ export interface MetricSummary {
     p25: number;
     p50: number;
     p75: number;
+    p90: number;
     mean: number;
 }
 
@@ -33,6 +35,7 @@ export interface GridMetricsProperties {
     commuteDistanceKm: MetricSummary;
     residentCellDensity: MetricSummary;
     workerCellDensity: MetricSummary;
+    polycentrism: PolycentrismMetrics;
 }
 
 const HEARTBEAT_INTERVAL_MS = Number.parseInt(process.env.CI_HEARTBEAT_MS ?? "5000", 10);
@@ -80,6 +83,7 @@ function emptyMetricSummary(): MetricSummary {
         p25: 0,
         p50: 0,
         p75: 0,
+        p90: 0,
         mean: 0,
     };
 }
@@ -123,6 +127,7 @@ function summarizeMetric(values: number[], weights?: number[]): MetricSummary {
         p25: pickWeightedPercentile(entries, totalWeight, 0.25),
         p50: pickWeightedPercentile(entries, totalWeight, 0.50),
         p75: pickWeightedPercentile(entries, totalWeight, 0.75),
+        p90: pickWeightedPercentile(entries, totalWeight, 0.90),
         mean: weightedValueSum / totalWeight,
     };
 }
@@ -202,12 +207,21 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
         .filter((value) => Number.isFinite(value) && value >= 0);
     const residentWeights = demandData.points.map((point) => point.residents);
     const workerWeights = demandData.points.map((point) => point.jobs);
+    const residentWeightedNearestNeighborKm = summarizeMetric(nearestNeighborDistancesKm, residentWeights);
+    const workerWeightedNearestNeighborKm = summarizeMetric(nearestNeighborDistancesKm, workerWeights);
+    const commuteDistanceKm = summarizeMetric(commuteDistances);
+    const residentCellDensity = summarizeMetric(populatedResidentCellCounts);
+    const workerCellDensity = summarizeMetric(populatedWorkerCellCounts);
     const gridMetrics: GridMetricsProperties = {
-        residentWeightedNearestNeighborKm: summarizeMetric(nearestNeighborDistancesKm, residentWeights),
-        workerWeightedNearestNeighborKm: summarizeMetric(nearestNeighborDistancesKm, workerWeights),
-        commuteDistanceKm: summarizeMetric(commuteDistances),
-        residentCellDensity: summarizeMetric(populatedResidentCellCounts),
-        workerCellDensity: summarizeMetric(populatedWorkerCellCounts),
+        residentWeightedNearestNeighborKm,
+        workerWeightedNearestNeighborKm,
+        commuteDistanceKm,
+        residentCellDensity,
+        workerCellDensity,
+        polycentrism: computePolycentrismMetrics(demandData, {
+            residentWeightedNearestNeighborKm,
+            workerWeightedNearestNeighborKm,
+        }),
     };
 
     return {
