@@ -10,6 +10,12 @@ import {
 import { resolveRepoRoot } from "./lib/script-runtime.js";
 
 const ATTRIBUTION_ROLLOUT_COMMIT = "60e49f4cb10e6900e12bfaf3b48a06a27eb48f85";
+const DOWNLOAD_SOURCE_PATHS = [
+  "maps/downloads.json",
+  "mods/downloads.json",
+  "maps/index.json",
+  "mods/index.json",
+] as const;
 
 interface HistoricalSnapshotSource {
   fileName: string;
@@ -135,21 +141,35 @@ function resolveSourceCommitAtTime(repoRoot: string, timestamp: string): string 
   return commit;
 }
 
+function resolveHistoricalSourceCommit(repoRoot: string, generatedAt: string): string {
+  const commit = runGit(repoRoot, [
+    "log",
+    "-1",
+    "--first-parent",
+    "--format=%H",
+    `--before=${generatedAt}`,
+    "--",
+    ...DOWNLOAD_SOURCE_PATHS,
+  ]);
+  return commit !== "" ? commit : resolveSourceCommitAtTime(repoRoot, generatedAt);
+}
+
 function buildHistoricalSources(repoRoot: string): HistoricalSnapshotSource[] {
   return listSnapshotFiles(repoRoot).map((fileName) => {
     const { commit: botCommit, timestamp: botTimestamp } = resolveLatestBotCommitForSnapshot(repoRoot, fileName);
-    const sourceCommit = resolveSourceCommitAtTime(repoRoot, botTimestamp);
     const originalSnapshot = readJsonFromCommit<{ generated_at?: string }>(
       repoRoot,
       botCommit,
       `history/${fileName}`,
     );
+    const generatedAt = typeof originalSnapshot.generated_at === "string" ? originalSnapshot.generated_at : botTimestamp;
+    const sourceCommit = resolveHistoricalSourceCommit(repoRoot, generatedAt);
     return {
       fileName,
       botCommit,
       botTimestamp,
       sourceCommit,
-      generatedAt: typeof originalSnapshot.generated_at === "string" ? originalSnapshot.generated_at : botTimestamp,
+      generatedAt,
     };
   });
 }
