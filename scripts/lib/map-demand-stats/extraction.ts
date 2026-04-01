@@ -129,7 +129,7 @@ function parseDemandDataPayload(payload: unknown): ParsedDemandDataPayloadResult
   };
 }
 
-function parseDemandGridData(payload: unknown): DemandData {
+export function parseDemandGridData(payload: unknown): DemandData {
   if (!isObject(payload)) {
     throw new Error("demand data payload must be an object");
   }
