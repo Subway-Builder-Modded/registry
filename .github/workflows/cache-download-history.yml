@@ -21,11 +21,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Restore latest cached history from bot branch
+      - name: Restore missing cached snapshots from bot branch
         run: |
           if git ls-remote --exit-code --heads origin bot/cache-download-history >/dev/null 2>&1; then
             git fetch origin bot/cache-download-history:refs/remotes/origin/bot/cache-download-history
-            git checkout origin/bot/cache-download-history -- history
+            while IFS= read -r path; do
+              if [ -f "$path" ]; then
+                continue
+              fi
+              mkdir -p "$(dirname "$path")"
+              git show "origin/bot/cache-download-history:$path" > "$path"
+            done < <(
+              git ls-tree -r --name-only origin/bot/cache-download-history -- \
+                'history/snapshot_*.json' \
+                'history/download_attribution_*.json'
+            )
           else
             echo "No bot/cache-download-history branch found; using history from checked out ref."
           fi
@@ -47,6 +57,18 @@ jobs:
       - name: Generate download history snapshot
         id: generate_history
         run: pnpm --dir scripts run generate-download-history
+
+      - name: Validate only today's history snapshots changed
+        run: |
+          EXPECTED_DOWNLOAD_SNAPSHOT="${{ steps.generate_history.outputs.snapshot_file }}"
+          EXPECTED_ATTRIBUTION_SNAPSHOT="${{ steps.generate_history.outputs.attribution_snapshot_file }}"
+          mapfile -t CHANGED_HISTORY < <(git diff --name-only -- history)
+          for path in "${CHANGED_HISTORY[@]}"; do
+            if [ "$path" != "$EXPECTED_DOWNLOAD_SNAPSHOT" ] && [ "$path" != "$EXPECTED_ATTRIBUTION_SNAPSHOT" ]; then
+              echo "Unexpected history change detected: $path"
+              exit 1
+            fi
+          done
 
       - name: Generate analytics CSVs
         run: pnpm --dir scripts run analytics -- --top-k-listings 0 --top-k-authors 0
@@ -74,6 +96,10 @@ jobs:
           commit-message: "chore: cache download history snapshot"
           branch: bot/cache-download-history
           delete-branch: true
+          add-paths: |
+            history/snapshot_*.json
+            history/download_attribution_*.json
+            analytics/*.csv
           title: "chore: cache download history snapshot"
           body: "Automated update from cache-download-history workflow."
 
