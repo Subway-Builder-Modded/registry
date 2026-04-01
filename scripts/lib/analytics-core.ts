@@ -141,6 +141,12 @@ interface MapStatisticsRow {
   points_count: number;
   n_cells: number;
   mean_point_density: number;
+  median_resident_weighted_nn_km: number;
+  mean_resident_weighted_nn_km: number;
+  median_worker_weighted_nn_km: number;
+  mean_worker_weighted_nn_km: number;
+  detail_radius_km: number;
+  detail_score: number;
   median_cell_resident_density: number;
   mean_cell_resident_density: number;
   pct_cells_with_residents: number;
@@ -166,9 +172,11 @@ interface AssetByDayRow {
 type DailySeriesRow = Record<string, string | number>;
 type ListingKey = `${"maps" | "mods"}:${string}`;
 
-const DEFAULT_TOP_LISTINGS = 30;
-const DEFAULT_TOP_AUTHORS = 20;
+const DEFAULT_TOP_LISTINGS: number | null = null;
+const DEFAULT_TOP_AUTHORS: number | null = null;
 const WINDOWS = [1, 3, 7, 14] as const;
+const DETAIL_RADIUS_SCORE_P10_REF_KM = 0.1610903632;
+const DETAIL_RADIUS_SCORE_P90_REF_KM = 0.5610800414;
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -209,7 +217,7 @@ function validateArgs(argv: string[]): void {
   }
 }
 
-function parseTopK(rawValue: string | undefined, fallback: number, label: string): number | null {
+function parseTopK(rawValue: string | undefined, fallback: number | null, label: string): number | null {
   if (!rawValue || rawValue.trim() === "") return fallback;
   if (!/^\d+$/.test(rawValue.trim())) {
     throw new Error(`Invalid ${label} value '${rawValue}'. Expected a non-negative integer.`);
@@ -500,6 +508,12 @@ interface GridPolycentrismProperties {
 interface GridSummary {
   n_cells: number;
   mean_point_density: number;
+  median_resident_weighted_nn_km: number;
+  mean_resident_weighted_nn_km: number;
+  median_worker_weighted_nn_km: number;
+  mean_worker_weighted_nn_km: number;
+  detail_radius_km: number;
+  detail_score: number;
   median_cell_resident_density: number;
   mean_cell_resident_density: number;
   pct_cells_with_residents: number;
@@ -516,6 +530,12 @@ function emptyGridSummary(): GridSummary {
   return {
     n_cells: 0,
     mean_point_density: 0,
+    median_resident_weighted_nn_km: 0,
+    mean_resident_weighted_nn_km: 0,
+    median_worker_weighted_nn_km: 0,
+    mean_worker_weighted_nn_km: 0,
+    detail_radius_km: 0,
+    detail_score: 0,
     median_cell_resident_density: 0,
     mean_cell_resident_density: 0,
     pct_cells_with_residents: 0,
@@ -563,6 +583,24 @@ function readGridMetricBundle(
   };
 }
 
+function computeDetailRadiusKm(
+  residentMedianWeightedNearestNeighborKm: number,
+  workerMedianWeightedNearestNeighborKm: number,
+): number {
+  if (residentMedianWeightedNearestNeighborKm <= 0 || workerMedianWeightedNearestNeighborKm <= 0) {
+    return 0;
+  }
+  return Math.sqrt(residentMedianWeightedNearestNeighborKm * workerMedianWeightedNearestNeighborKm);
+}
+
+function computeDetailScore(detailRadiusKm: number): number {
+  if (detailRadiusKm <= 0) return 0;
+  const numerator = Math.log(DETAIL_RADIUS_SCORE_P90_REF_KM) - Math.log(detailRadiusKm);
+  const denominator = Math.log(DETAIL_RADIUS_SCORE_P90_REF_KM) - Math.log(DETAIL_RADIUS_SCORE_P10_REF_KM);
+  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator <= 0) return 0;
+  return Math.max(0, Math.min(1, numerator / denominator));
+}
+
 function readGridPolycentrismSummary(
   properties: Record<string, unknown>,
 ): { detectedCenterCount: number; continuousScore: number } {
@@ -606,9 +644,21 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
     if (nCells === 0) {
       const gridProperties = isObject(grid.properties) ? grid.properties : {};
       const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
+      const residentWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "residentWeightedNearestNeighborKm");
+      const workerWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "workerWeightedNearestNeighborKm");
+      const detailRadiusKm = computeDetailRadiusKm(
+        residentWeightedNearestNeighborSummary.p50,
+        workerWeightedNearestNeighborSummary.p50,
+      );
       const polycentrismSummary = readGridPolycentrismSummary(gridProperties);
       return {
         ...emptyGridSummary(),
+        median_resident_weighted_nn_km: roundTo(residentWeightedNearestNeighborSummary.p50, 3),
+        mean_resident_weighted_nn_km: roundTo(residentWeightedNearestNeighborSummary.mean, 3),
+        median_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.p50, 3),
+        mean_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.mean, 3),
+        detail_radius_km: roundTo(detailRadiusKm, 3),
+        detail_score: roundTo(computeDetailScore(detailRadiusKm)),
         median_commute_distance: commuteSummary.p50,
         mean_commute_distance: commuteSummary.mean,
         detected_center_count: polycentrismSummary.detectedCenterCount,
@@ -622,11 +672,23 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
     const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
     const gridProperties = isObject(grid.properties) ? grid.properties : {};
     const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
+    const residentWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "residentWeightedNearestNeighborKm");
+    const workerWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "workerWeightedNearestNeighborKm");
+    const detailRadiusKm = computeDetailRadiusKm(
+      residentWeightedNearestNeighborSummary.p50,
+      workerWeightedNearestNeighborSummary.p50,
+    );
     const polycentrismSummary = readGridPolycentrismSummary(gridProperties);
 
     return {
       n_cells: nCells,
       mean_point_density: roundTo(totalPoints / nCells),
+      median_resident_weighted_nn_km: roundTo(residentWeightedNearestNeighborSummary.p50, 3),
+      mean_resident_weighted_nn_km: roundTo(residentWeightedNearestNeighborSummary.mean, 3),
+      median_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.p50, 3),
+      mean_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.mean, 3),
+      detail_radius_km: roundTo(detailRadiusKm, 3),
+      detail_score: roundTo(computeDetailScore(detailRadiusKm)),
       median_cell_resident_density: roundTo(nonZeroMedian(residentCounts)),
       mean_cell_resident_density: roundTo(nonZeroMean(residentCounts)),
       pct_cells_with_residents: roundTo(percentNonZero(residentCounts, nCells)),
@@ -1484,6 +1546,12 @@ export function runGenerateAnalyticsCli(
       "points_count",
       "n_cells",
       "mean_point_density",
+      "median_resident_weighted_nn_km",
+      "mean_resident_weighted_nn_km",
+      "median_worker_weighted_nn_km",
+      "mean_worker_weighted_nn_km",
+      "detail_radius_km",
+      "detail_score",
       "median_cell_resident_density",
       "mean_cell_resident_density",
       "pct_cells_with_residents",

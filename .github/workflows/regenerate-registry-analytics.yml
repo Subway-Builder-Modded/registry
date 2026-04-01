@@ -296,6 +296,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run reconcile-attributed-downloads -- --no-refresh-history
 
+      - name: Validate attribution reconciliation outputs
+        run: |
+          set -euo pipefail
+
+          if git diff --name-only -- history | grep -v '^history/registry-download-attribution\.json$' >/dev/null 2>&1; then
+            echo "Unexpected history file changes detected during full regeneration:"
+            git diff --name-only -- history
+            exit 1
+          fi
+
+          if [ "${{ steps.merge_attribution.outputs.registry_fetches_added_total }}" != "0" ] && git diff --quiet -- maps/downloads.json mods/downloads.json; then
+            echo "Merged attribution fetches were added, but downloads.json did not change after reconciliation."
+            exit 1
+          fi
+
       - name: Sync map manifest file sizes from integrity
         run: pnpm --dir scripts run sync-map-file-sizes
 
