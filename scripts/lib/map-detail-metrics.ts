@@ -70,11 +70,14 @@ export function computeGridDetailMetrics(inputs: GridDetailMetricInputs): GridDe
     inputs.residentMedianWeightedNearestNeighborKm,
     inputs.workerMedianWeightedNearestNeighborKm,
   );
+  // Expected point spacing is a proxy for how finely the demand is grained across the map footprint, which penalizes maps that have broad coverage but sparse demand representation. 
   const expectedPointSpacingKm = (
+    // TODO: This should likely be playable area if possible
     inputs.populatedCellCount > 0 && inputs.pointCount > 0
       ? Math.sqrt(inputs.populatedCellCount / inputs.pointCount)
       : 0
   );
+  // Normalizing the radius by expected point spacing means that maps with broad coverage aren't punished for having higher absolute nearest-neighbor distances if they also have a sparser expected spacing between points. 
   const normalizedRadius = radiusKm > 0 && expectedPointSpacingKm > 0
     ? radiusKm / expectedPointSpacingKm
     : 0;
