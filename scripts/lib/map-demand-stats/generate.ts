@@ -44,11 +44,27 @@ function writeManifest(repoRoot: string, id: string, manifest: MapManifest): voi
   );
 }
 
+function stripDebugProperties(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((entry) => stripDebugProperties(entry));
+  }
+  if (!value || typeof value !== "object") {
+    return value;
+  }
+
+  const result: Record<string, unknown> = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (key === "debug") continue;
+    result[key] = stripDebugProperties(entry);
+  }
+  return result;
+}
+
 function cloneGridStatistics(value: unknown): JsonObject {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return {};
   }
-  return JSON.parse(JSON.stringify(value)) as JsonObject;
+  return stripDebugProperties(JSON.parse(JSON.stringify(value))) as JsonObject;
 }
 
 function readGridStatisticsFromGridFile(repoRoot: string, id: string): JsonObject {
