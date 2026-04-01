@@ -48,10 +48,30 @@ export interface GridDetailMetricInputs {
 
 // Fixed anchors keep the score stable across analytics runs instead of
 // re-normalizing against whatever subset of maps happens to be present.
-export const DETAIL_LOCALITY_R10_REF = 0.3432329744;
-export const DETAIL_LOCALITY_R99_REF = 0.8885200016;
-export const DETAIL_PLAYABLE_CATCHMENT_LOW_REF = 0.5874427119765672;
-export const DETAIL_PLAYABLE_CATCHMENT_HIGH_REF = 1.0245426434374099;
+//
+// Locality uses a low/high reference rather than exact dynamic percentiles:
+// - `HIGH_DETAIL` is the higher-detail (10th percentile) side of the normalized-radius distribution.
+//   Maps at or below this are already locally fine-grained, so they should
+//   score near the top on locality.
+// - `LOW_DETAIL` is the coarse tail of the normalized-radius distribution. Using the
+//   far upper end (99th percentile) to avoids over-penalizing broad
+//   but still reasonable maps.
+//
+// Playable catchment uses the same pattern:
+// - `LOW_REF` is the tighter, more deaggregated end of the per-point playable
+//   catchment distribution. Maps around here are assigning each point to a
+//   relatively small, realistic area.
+// - `HIGH_REF` is the loose/aggregated end. Maps around or above this are
+//   asking each point to stand in for too much playable territory, so the
+//   deaggregation score should trend toward zero.
+//
+// We use a low/high anchor pair instead of recomputing per-run percentiles so
+// the score remains interpretable and comparable over time.
+export const DETAIL_LOCALITY_HIGH_DETAIL_REF = 0.35;
+export const DETAIL_LOCALITY_LOW_DETAIL_REF = 0.9;
+// TODO: Adjust these as needed once we have more map data to analyze the playable catchment distribution.
+export const DETAIL_PLAYABLE_CATCHMENT_LOW_REF = 0.6;
+export const DETAIL_PLAYABLE_CATCHMENT_HIGH_REF = 1.0;
 
 function clamp01(value: number): number {
   return Math.max(0, Math.min(1, value));
@@ -102,8 +122,8 @@ export function computeGridDetailMetrics(inputs: GridDetailMetricInputs): GridDe
   );
   const localityScore = computeInverseLogScaledScore(
     normalizedRadius,
-    DETAIL_LOCALITY_R10_REF,
-    DETAIL_LOCALITY_R99_REF,
+    DETAIL_LOCALITY_HIGH_DETAIL_REF,
+    DETAIL_LOCALITY_LOW_DETAIL_REF,
   );
   const deaggregationScore = computeInverseLogScaledScore(
     inputs.playableArea.playableCatchmentRadiusKm,
