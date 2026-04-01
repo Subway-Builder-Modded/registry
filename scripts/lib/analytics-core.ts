@@ -5,6 +5,7 @@ import { writeCsv } from "./csv.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 import { isTestListing } from "./test-listings.js";
 import { loadAuthorAliasIndex, resolveAuthorPresentation, type AuthorAliasIndex } from "./author-aliases.js";
+import { computeDetailRadiusKm, computeGridDetailMetrics } from "./map-detail-metrics.js";
 
 interface SnapshotEntry {
   file: string;
@@ -175,8 +176,6 @@ type ListingKey = `${"maps" | "mods"}:${string}`;
 const DEFAULT_TOP_LISTINGS: number | null = null;
 const DEFAULT_TOP_AUTHORS: number | null = null;
 const WINDOWS = [1, 3, 7, 14] as const;
-const DETAIL_RADIUS_SCORE_P10_REF_KM = 0.1610903632;
-const DETAIL_RADIUS_SCORE_P90_REF_KM = 0.5610800414;
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -505,6 +504,11 @@ interface GridPolycentrismProperties {
   activity?: unknown;
 }
 
+interface GridDetailProperties {
+  radiusKm?: unknown;
+  score?: unknown;
+}
+
 interface GridSummary {
   n_cells: number;
   mean_point_density: number;
@@ -583,22 +587,26 @@ function readGridMetricBundle(
   };
 }
 
-function computeDetailRadiusKm(
-  residentMedianWeightedNearestNeighborKm: number,
-  workerMedianWeightedNearestNeighborKm: number,
-): number {
-  if (residentMedianWeightedNearestNeighborKm <= 0 || workerMedianWeightedNearestNeighborKm <= 0) {
-    return 0;
-  }
-  return Math.sqrt(residentMedianWeightedNearestNeighborKm * workerMedianWeightedNearestNeighborKm);
-}
+function readGridDetailSummary(
+  properties: Record<string, unknown>,
+): { present: boolean; radiusKm: number; score: number } {
+  const detail = isObject(properties.detail)
+    ? properties.detail as GridDetailProperties
+    : null;
 
-function computeDetailScore(detailRadiusKm: number): number {
-  if (detailRadiusKm <= 0) return 0;
-  const numerator = Math.log(DETAIL_RADIUS_SCORE_P90_REF_KM) - Math.log(detailRadiusKm);
-  const denominator = Math.log(DETAIL_RADIUS_SCORE_P90_REF_KM) - Math.log(DETAIL_RADIUS_SCORE_P10_REF_KM);
-  if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator <= 0) return 0;
-  return Math.max(0, Math.min(1, numerator / denominator));
+  if (!detail) {
+    return {
+      present: false,
+      radiusKm: 0,
+      score: 0,
+    };
+  }
+
+  return {
+    present: true,
+    radiusKm: toNonNegativeNumber(detail.radiusKm),
+    score: toNonNegativeNumber(detail.score),
+  };
 }
 
 function readGridPolycentrismSummary(
@@ -624,6 +632,12 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
   try {
     const grid = loadJsonFile<Record<string, unknown>>(gridPath);
     const features = Array.isArray(grid.features) ? grid.features : [];
+    const gridProperties = isObject(grid.properties) ? grid.properties : {};
+    const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
+    const residentWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "residentWeightedNearestNeighborKm");
+    const workerWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "workerWeightedNearestNeighborKm");
+    const detailSummary = readGridDetailSummary(gridProperties);
+    const polycentrismSummary = readGridPolycentrismSummary(gridProperties);
     const populatedCells = features
       .map((feature) => {
         if (!isObject(feature)) return null;
@@ -641,16 +655,23 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
       .filter((feature): feature is { pointCount: number; pop: number; jobs: number } => feature !== null);
 
     const nCells = populatedCells.length;
+    const pointCounts = populatedCells.map((cell) => cell.pointCount);
+    const residentCounts = populatedCells.map((cell) => cell.pop);
+    const workerCounts = populatedCells.map((cell) => cell.jobs);
+    const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
+    const residentsTotal = residentCounts.reduce((sum, value) => sum + value, 0);
+    const jobsTotal = workerCounts.reduce((sum, value) => sum + value, 0);
+    const fallbackDetail = computeGridDetailMetrics({
+      residentMedianWeightedNearestNeighborKm: residentWeightedNearestNeighborSummary.p50,
+      workerMedianWeightedNearestNeighborKm: workerWeightedNearestNeighborSummary.p50,
+      populatedCellCount: nCells,
+      pointCount: totalPoints,
+      residentsTotal,
+      jobsTotal,
+    });
+    const detailRadiusKm = detailSummary.present ? detailSummary.radiusKm : fallbackDetail.radiusKm;
+    const detailScore = detailSummary.present ? detailSummary.score : fallbackDetail.score;
     if (nCells === 0) {
-      const gridProperties = isObject(grid.properties) ? grid.properties : {};
-      const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
-      const residentWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "residentWeightedNearestNeighborKm");
-      const workerWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "workerWeightedNearestNeighborKm");
-      const detailRadiusKm = computeDetailRadiusKm(
-        residentWeightedNearestNeighborSummary.p50,
-        workerWeightedNearestNeighborSummary.p50,
-      );
-      const polycentrismSummary = readGridPolycentrismSummary(gridProperties);
       return {
         ...emptyGridSummary(),
         median_resident_weighted_nn_km: roundTo(residentWeightedNearestNeighborSummary.p50, 3),
@@ -658,27 +679,13 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
         median_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.p50, 3),
         mean_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.mean, 3),
         detail_radius_km: roundTo(detailRadiusKm, 3),
-        detail_score: roundTo(computeDetailScore(detailRadiusKm)),
+        detail_score: roundTo(detailScore),
         median_commute_distance: commuteSummary.p50,
         mean_commute_distance: commuteSummary.mean,
         detected_center_count: polycentrismSummary.detectedCenterCount,
         polycentrism_score: roundTo(polycentrismSummary.continuousScore),
       };
     }
-
-    const pointCounts = populatedCells.map((cell) => cell.pointCount);
-    const residentCounts = populatedCells.map((cell) => cell.pop);
-    const workerCounts = populatedCells.map((cell) => cell.jobs);
-    const totalPoints = pointCounts.reduce((sum, value) => sum + value, 0);
-    const gridProperties = isObject(grid.properties) ? grid.properties : {};
-    const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
-    const residentWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "residentWeightedNearestNeighborKm");
-    const workerWeightedNearestNeighborSummary = readGridMetricBundle(gridProperties, "workerWeightedNearestNeighborKm");
-    const detailRadiusKm = computeDetailRadiusKm(
-      residentWeightedNearestNeighborSummary.p50,
-      workerWeightedNearestNeighborSummary.p50,
-    );
-    const polycentrismSummary = readGridPolycentrismSummary(gridProperties);
 
     return {
       n_cells: nCells,
@@ -688,7 +695,7 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
       median_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.p50, 3),
       mean_worker_weighted_nn_km: roundTo(workerWeightedNearestNeighborSummary.mean, 3),
       detail_radius_km: roundTo(detailRadiusKm, 3),
-      detail_score: roundTo(computeDetailScore(detailRadiusKm)),
+      detail_score: roundTo(detailScore),
       median_cell_resident_density: roundTo(nonZeroMedian(residentCounts)),
       mean_cell_resident_density: roundTo(nonZeroMean(residentCounts)),
       pct_cells_with_residents: roundTo(percentNonZero(residentCounts, nCells)),

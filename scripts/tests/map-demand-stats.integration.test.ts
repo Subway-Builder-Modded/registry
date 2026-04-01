@@ -4,6 +4,7 @@ import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { generateMapDemandStats } from "../lib/map-demand-stats.js";
+import { GRID_SCHEMA_VERSION } from "../lib/map-demand-stats/constants.js";
 import { createDownloadAttributionDelta } from "../lib/download-attribution.js";
 import { DEFAULT_INITIAL_VIEW_STATE, makeDemandZip, makeFetchRouter, writeJson } from "./map-demand-stats/helpers.js";
 
@@ -163,6 +164,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     assert.equal(githubManifest.population_count, 3);
     assert.ok(githubManifest.grid_statistics);
     assert.ok(githubManifest.grid_statistics.commuteDistanceKm);
+    assert.ok(githubManifest.grid_statistics.detail);
     assert.ok(githubManifest.grid_statistics.polycentrism);
 
     const customManifest = JSON.parse(readFileSync(join(repoRoot, "maps", "custom-map", "manifest.json"), "utf-8"));
@@ -172,6 +174,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     assert.equal(customManifest.population_count, 2);
     assert.ok(customManifest.grid_statistics);
     assert.ok(customManifest.grid_statistics.commuteDistanceKm);
+    assert.ok(customManifest.grid_statistics.detail);
     assert.ok(customManifest.grid_statistics.polycentrism);
 
     assert.equal(existsSync(join(repoRoot, "maps", "github-map", "grid.geojson")), true);
@@ -379,7 +382,7 @@ test("generateMapDemandStats prefers the github asset named by manifest source f
     const cache = JSON.parse(readFileSync(join(repoRoot, "maps", "demand-stats-cache.json"), "utf-8"));
     assert.equal(cache.schema_version, 2);
     assert.equal(cache.listings["bucharest-medium"].source_fingerprint, "github:v1.1.1|BUC.zip");
-    assert.equal(cache.listings["bucharest-medium"].grid.schema_version, 1);
+    assert.equal(cache.listings["bucharest-medium"].grid.schema_version, GRID_SCHEMA_VERSION);
     assert.equal(existsSync(join(repoRoot, "maps", "bucharest-medium", "grid.geojson")), true);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
@@ -571,7 +574,7 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
         initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
       },
       grid: {
-        schema_version: 1,
+        schema_version: GRID_SCHEMA_VERSION,
       },
     },
   });
@@ -658,7 +661,7 @@ test("generateMapDemandStats syncs grid_statistics from existing grid.geojson on
         initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
       },
       grid: {
-        schema_version: 1,
+        schema_version: GRID_SCHEMA_VERSION,
       },
     },
   });
@@ -674,6 +677,15 @@ test("generateMapDemandStats syncs grid_statistics from existing grid.geojson on
         p90: 4,
         mean: 2.5,
       },
+      detail: {
+        radiusKm: 0.42,
+        expectedPointSpacingKm: 0.7,
+        normalizedRadius: 0.6,
+        activityPerPoint: 180,
+        localityScore: 0.8,
+        deaggregationScore: 0.9,
+        score: 0.85,
+      },
       polycentrism: {
         activity: {
           score: 0.4,
@@ -686,14 +698,6 @@ test("generateMapDemandStats syncs grid_statistics from existing grid.geojson on
           supportLevel: "medium",
           usedFallback: false,
           topCenters: [],
-          debug: {
-            rawPeakCount: 3,
-            mergedPeakCount: 2,
-            filteredPeakCount: 2,
-            prominenceThreshold: 0.22,
-            minPointsPerCenter: 2,
-            rejectedCenters: [],
-          },
         },
       },
     },
@@ -738,6 +742,15 @@ test("generateMapDemandStats syncs grid_statistics from existing grid.geojson on
         p90: 4,
         mean: 2.5,
       },
+      detail: {
+        radiusKm: 0.42,
+        expectedPointSpacingKm: 0.7,
+        normalizedRadius: 0.6,
+        activityPerPoint: 180,
+        localityScore: 0.8,
+        deaggregationScore: 0.9,
+        score: 0.85,
+      },
       polycentrism: {
         activity: {
           score: 0.4,
@@ -750,14 +763,6 @@ test("generateMapDemandStats syncs grid_statistics from existing grid.geojson on
           supportLevel: "medium",
           usedFallback: false,
           topCenters: [],
-          debug: {
-            rawPeakCount: 3,
-            mergedPeakCount: 2,
-            filteredPeakCount: 2,
-            prominenceThreshold: 0.22,
-            minPointsPerCenter: 2,
-            rejectedCenters: [],
-          },
         },
       },
     });
@@ -931,7 +936,7 @@ test("generateMapDemandStats treats legacy cache schema as invalid and rewrites 
 
     const cache = JSON.parse(readFileSync(join(repoRoot, "maps", "demand-stats-cache.json"), "utf-8"));
     assert.equal(cache.schema_version, 2);
-    assert.equal(cache.listings["legacy-map"].grid.schema_version, 1);
+    assert.equal(cache.listings["legacy-map"].grid.schema_version, GRID_SCHEMA_VERSION);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
@@ -980,7 +985,7 @@ test("generateMapDemandStats force mode bypasses unchanged sha cache checks", as
         initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
       },
       grid: {
-        schema_version: 1,
+        schema_version: GRID_SCHEMA_VERSION,
       },
     },
   });

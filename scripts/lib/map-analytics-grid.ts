@@ -1,6 +1,7 @@
 import * as turf from "@turf/turf";
 import { FeatureCollection, GeoJsonProperties, Polygon } from "geojson";
 import { computePolycentrismMetrics, type PolycentrismMetrics } from "./map-polycentrism.js";
+import { computeGridDetailMetrics, type GridDetailProperties } from "./map-detail-metrics.js";
 
 export interface Point {
     location: [number, number];
@@ -35,6 +36,7 @@ export interface GridMetricsProperties {
     commuteDistanceKm: MetricSummary;
     residentCellDensity: MetricSummary;
     workerCellDensity: MetricSummary;
+    detail: GridDetailProperties;
     polycentrism: PolycentrismMetrics;
 }
 
@@ -212,12 +214,23 @@ export async function generateGrid(demandData: DemandData, cityCode: string): Pr
     const commuteDistanceKm = summarizeMetric(commuteDistances);
     const residentCellDensity = summarizeMetric(populatedResidentCellCounts);
     const workerCellDensity = summarizeMetric(populatedWorkerCellCounts);
+    const residentsTotal = demandData.points.reduce((sum, point) => sum + point.residents, 0);
+    const jobsTotal = demandData.points.reduce((sum, point) => sum + point.jobs, 0);
+    const detail = computeGridDetailMetrics({
+        residentMedianWeightedNearestNeighborKm: residentWeightedNearestNeighborKm.p50,
+        workerMedianWeightedNearestNeighborKm: workerWeightedNearestNeighborKm.p50,
+        populatedCellCount: grid.features.length,
+        pointCount: demandData.points.length,
+        residentsTotal,
+        jobsTotal,
+    });
     const gridMetrics: GridMetricsProperties = {
         residentWeightedNearestNeighborKm,
         workerWeightedNearestNeighborKm,
         commuteDistanceKm,
         residentCellDensity,
         workerCellDensity,
+        detail,
         polycentrism: computePolycentrismMetrics(demandData),
     };
 

@@ -185,6 +185,15 @@ test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and r
           p90: 0.6,
           mean: 0.45,
         },
+        detail: {
+          radiusKm: 0.283,
+          expectedPointSpacingKm: 0.5,
+          normalizedRadius: 0.566,
+          activityPerPoint: 160,
+          localityScore: 0.82,
+          deaggregationScore: 0.66,
+          score: 0.73,
+        },
         commuteDistanceKm: {
           p10: 9,
           p25: 10,
@@ -229,7 +238,7 @@ test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and r
       mapsStatisticsCsv,
       [
         "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_resident_weighted_nn_km,mean_resident_weighted_nn_km,median_worker_weighted_nn_km,mean_worker_weighted_nn_km,detail_radius_km,detail_score,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
-        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.2,0.25,0.4,0.45,0.283,0.55,200,200,100,20,20,100,12,15,2,0.68",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.2,0.25,0.4,0.45,0.283,0.73,200,200,100,20,20,100,12,15,2,0.68",
         "",
       ].join("\n"),
     );
@@ -320,6 +329,15 @@ test("runGenerateAnalyticsCli computes resident and worker densities from non-ze
           p90: 0.7,
           mean: 0.55,
         },
+        detail: {
+          radiusKm: 0.387,
+          expectedPointSpacingKm: 0.45,
+          normalizedRadius: 0.86,
+          activityPerPoint: 420,
+          localityScore: 0.12,
+          deaggregationScore: 0.94,
+          score: 0.34,
+        },
         commuteDistanceKm: {
           p10: 8.111,
           p25: 10.222,
@@ -359,7 +377,7 @@ test("runGenerateAnalyticsCli computes resident and worker densities from non-ze
       mapsStatisticsCsv,
       [
         "rank,id,name,author,author_alias,attribution_link,city_code,country,population,population_count,points_count,n_cells,mean_point_density,median_resident_weighted_nn_km,mean_resident_weighted_nn_km,median_worker_weighted_nn_km,mean_worker_weighted_nn_km,detail_radius_km,detail_score,median_cell_resident_density,mean_cell_resident_density,pct_cells_with_residents,median_cell_worker_density,mean_cell_worker_density,pct_cells_with_workers,median_commute_distance,mean_commute_distance,detected_center_count,polycentrism_score",
-        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.3,0.35,0.5,0.55,0.387,0.3,200,150,66.67,30,25,66.67,12.99,15.13,3,0.44",
+        "1,sample-map,Sample Map,mapmaker,mapmaker,https://github.com/mapmaker,ABC,US,600,9,12,3,4,0.3,0.35,0.5,0.55,0.387,0.34,200,150,66.67,30,25,66.67,12.99,15.13,3,0.44",
         "",
       ].join("\n"),
     );
