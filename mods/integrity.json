@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-02T17:02:58.871Z",
+  "generated_at": "2026-04-02T20:42:09.324Z",
   "listings": {
     "advanced-analytics": {
       "has_complete_version": true,
@@ -39,7 +39,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v4:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-02T17:02:58.871Z"
+          "checked_at": "2026-04-02T20:42:09.324Z"
         },
         "v0.9.1": {
           "is_complete": false,
@@ -1037,27 +1037,25 @@
       }
     },
     "simple-trains": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "v1.0.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
+      "latest_semver_complete": true,
+      "complete_versions": [
         "v1.0.0"
       ],
+      "incomplete_versions": [],
       "versions": {
         "v1.0.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'Simple.Trains.zip': missing top-level manifest.json in ZIP"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "release_manifest_asset": true,
-            "zip_manifest_json": false,
+            "zip_manifest_json": true,
             "security_scan_passed": true
           },
           "matched_files": {
             "release_manifest_asset": "manifest.json",
-            "zip_manifest_json": null,
+            "zip_manifest_json": "manifest.json",
             "security_scan_passed": "passed"
           },
           "release_size": 0,
@@ -1065,11 +1063,11 @@
             "update_type": "github",
             "repo": "bobby-047/some-new-trains",
             "tag": "v1.0.0",
-            "asset_name": "Simple.Trains.zip",
-            "download_url": "https://github.com/Bobby-047/Some-new-Trains/releases/download/v1.0.0/Simple.Trains.zip"
+            "asset_name": "Simple.trains.zip",
+            "download_url": "https://github.com/Bobby-047/Some-new-Trains/releases/download/v1.0.0/Simple.trains.zip"
           },
-          "fingerprint": "rules:v4:github:bobby-047/some-new-trains:v1.0.0:Simple.Trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-03-31T16:28:29.179Z"
+          "fingerprint": "rules:v4:github:bobby-047/some-new-trains:v1.0.0:Simple.trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-04-02T20:42:09.324Z"
         }
       }
     },
@@ -1358,7 +1356,7 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v4:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-02T17:02:58.871Z"
+          "checked_at": "2026-04-02T20:42:09.324Z"
         },
         "v1.1": {
           "is_complete": false,
@@ -1373,7 +1371,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v4:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-02T17:02:58.871Z"
+          "checked_at": "2026-04-02T20:42:09.324Z"
         }
       }
     }
