@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-03T16:51:11.642Z",
+  "generated_at": "2026-04-03T20:44:28.815Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -171,6 +171,59 @@
           },
           "fingerprint": "rules:v4:sha256:c9fd2cca033d35a5617fe2a41543cb2a9cddaea464908545de83ec7fcc308aaf",
           "checked_at": "2026-03-29T19:34:38.670Z"
+        }
+      }
+    },
+    "anchorage-ak": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ANC.pmtiles"
+          },
+          "release_size": 33.36,
+          "file_sizes": {
+            "ANC.pmtiles": 25.36,
+            "__MACOSX/._config.json": 0,
+            "buildings_index.json": 24.67,
+            "config.json": 0,
+            "demand_data.json": 3.15,
+            "ocean_depth_index.json": 3.66,
+            "roads.geojson": 6.28,
+            "runways_taxiways.geojson": 3.84
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "pswbsf/anchorage-ak",
+            "tag": "1.0.0",
+            "asset_name": "Anchorage.zip",
+            "download_url": "https://github.com/PSWBSF/anchorage-ak/releases/download/1.0.0/Anchorage.zip"
+          },
+          "fingerprint": "rules:v4:github:pswbsf/anchorage-ak:1.0.0:Anchorage.zip",
+          "checked_at": "2026-04-03T20:44:28.815Z"
         }
       }
     },
@@ -2523,6 +2576,57 @@
           },
           "fingerprint": "rules:v4:sha256:4efc7f7986a0a1e920e479e956170ba0015fe50934c061bebbfe10a0a31b1026",
           "checked_at": "2026-03-29T19:34:38.670Z"
+        }
+      }
+    },
+    "monterrey": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "MTY.pmtiles"
+          },
+          "release_size": 348.81,
+          "file_sizes": {
+            "MTY.pmtiles": 254.5,
+            "buildings_index.json": 400.89,
+            "config.json": 0,
+            "demand_data.json": 6.35,
+            "roads.geojson": 34.54,
+            "runways_taxiways.geojson": 0.48
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.1",
+            "asset_name": "MTY.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.1/MTY.zip"
+          },
+          "fingerprint": "rules:v4:sha256:260a804d985ebc7028c3b55548f54f9bcab07dc286ed29fd306970a864603feb",
+          "checked_at": "2026-04-03T20:44:28.815Z"
         }
       }
     },
