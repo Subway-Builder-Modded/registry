@@ -315,7 +315,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   textarea(
     "description",
     "Description",
-    "A short description of what your map offers. This is shown in the map browser. Mention data quality, notable features, or coverage area.",
+    "A short description of what your map offers. This is shown in the map browser. Mention data quality, notable features, or coverage area. To properly format your description, you can use the Subway Builder Modded markdown playground (https://subwaybuildermodded.com//tools/md-playground).",
     {
       placeholder:
         "Custom map of the Raleigh-Durham metropolitan area with good demand data quality.",
