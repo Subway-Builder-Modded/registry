@@ -20,8 +20,10 @@ test("ensureAuthorAliasPrefill appends new github author with github defaults", 
           github_id: 10,
           author_id: "existing",
           author_alias: "Existing",
-          attribution_method: "github",
-          attribution_link: "https://github.com/existing",
+          attribution_method: "custom",
+          attribution_link: "https://example.com/existing",
+          ko_fi_username: "existing-kofi",
+          contributor_tier: "developer",
         },
       ],
     });
@@ -37,6 +39,13 @@ test("ensureAuthorAliasPrefill appends new github author with github defaults", 
     assert.equal(added.author_alias, "newauthor");
     assert.equal(added.attribution_method, "github");
     assert.equal(added.attribution_link, "https://github.com/newauthor");
+
+    const existing = aliases.authors.find((entry) => entry.github_id === 10);
+    assert.ok(existing);
+    assert.equal(existing.attribution_method, "custom");
+    assert.equal(existing.attribution_link, "https://example.com/existing");
+    assert.equal(existing.ko_fi_username, "existing-kofi");
+    assert.equal(existing.contributor_tier, "developer");
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
