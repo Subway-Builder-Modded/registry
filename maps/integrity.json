@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-04T02:43:48.218Z",
+  "generated_at": "2026-04-04T04:42:01.573Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -2626,9 +2626,10 @@
     },
     "monterrey": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.0",
+      "latest_semver_version": "1.0.1",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.0.1",
         "1.0.0"
       ],
       "incomplete_versions": [],
@@ -2672,6 +2673,46 @@
           },
           "fingerprint": "rules:v4:sha256:260a804d985ebc7028c3b55548f54f9bcab07dc286ed29fd306970a864603feb",
           "checked_at": "2026-04-03T20:44:28.815Z"
+        },
+        "1.0.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "MTY.pmtiles"
+          },
+          "release_size": 348.8,
+          "file_sizes": {
+            "MTY.pmtiles": 254.5,
+            "buildings_index.json": 400.89,
+            "config.json": 0,
+            "demand_data.json": 6.41,
+            "roads.geojson": 34.54,
+            "runways_taxiways.geojson": 0.48
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.2",
+            "asset_name": "MTY.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.2/MTY.zip"
+          },
+          "fingerprint": "rules:v4:sha256:4c03f41bf27988e6499ec24e32573a9baa8f4cb9b7a24cc78e62d0b28a8c8822",
+          "checked_at": "2026-04-04T04:42:01.573Z"
         }
       }
     },
