@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-03T20:44:28.815Z",
+  "generated_at": "2026-04-04T02:43:48.218Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -952,6 +952,51 @@
           },
           "fingerprint": "rules:v4:sha256:1225725bebdbd10d01fe58ec72c7ab734f576d2df5da7753789ed8d386bfadf1",
           "checked_at": "2026-03-29T19:34:38.670Z"
+        }
+      }
+    },
+    "charleston-huntington-wv": {
+      "has_complete_version": false,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": false,
+      "complete_versions": [],
+      "incomplete_versions": [
+        "1.0.0"
+      ],
+      "versions": {
+        "1.0.0": {
+          "is_complete": false,
+          "errors": [
+            "asset 'CHAI.zip': missing top-level CHAI.pmtiles (config code 'CHAI', registry city_code 'CHAI')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": null
+          },
+          "release_size": 38.19,
+          "source": {
+            "update_type": "github",
+            "repo": "pswbsf/charleston-huntington-wv",
+            "tag": "1.0.0",
+            "asset_name": "CHAI.zip",
+            "download_url": "https://github.com/PSWBSF/charleston-huntington-wv/releases/download/1.0.0/CHAI.zip"
+          },
+          "fingerprint": "rules:v4:github:pswbsf/charleston-huntington-wv:1.0.0:CHAI.zip",
+          "checked_at": "2026-04-04T02:43:48.218Z"
         }
       }
     },
@@ -3951,6 +3996,57 @@
           },
           "fingerprint": "rules:v4:sha256:12878f405a49d47e51726d0a80144fa89fa41d92707b94557e8141ab2f94d88a",
           "checked_at": "2026-03-29T19:34:38.670Z"
+        }
+      }
+    },
+    "south-florida": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SFL.pmtiles"
+          },
+          "release_size": 185.39,
+          "file_sizes": {
+            "SFL.pmtiles": 98.87,
+            "buildings_index.json": 365.21,
+            "config.json": 0,
+            "demand_data.json": 90.38,
+            "roads.geojson": 58.73,
+            "runways_taxiways.geojson": 4.79
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "kaicardenas0618/subway-builder-sfl",
+            "tag": "v1.0.0",
+            "asset_name": "SFL.zip",
+            "download_url": "https://github.com/kaicardenas0618/subway-builder-sfl/releases/download/v1.0.0/SFL.zip"
+          },
+          "fingerprint": "rules:v4:github:kaicardenas0618/subway-builder-sfl:v1.0.0:SFL.zip",
+          "checked_at": "2026-04-04T02:43:48.218Z"
         }
       }
     },
