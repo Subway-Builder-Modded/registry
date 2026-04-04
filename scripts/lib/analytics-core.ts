@@ -168,6 +168,18 @@ interface AssetByDayRow {
   cumulative_total: number;
   cumulative_maps: number;
   cumulative_mods: number;
+  total_new_assets: number;
+  new_maps: number;
+  new_mods: number;
+  cumulative_assets: number;
+  cumulative_maps_assets: number;
+  cumulative_mods_assets: number;
+  total_new_assets_versions: number;
+  new_maps_versions: number;
+  new_mods_versions: number;
+  cumulative_asset_versions: number;
+  cumulative_maps_versions: number;
+  cumulative_mods_versions: number;
 }
 
 type DailySeriesRow = Record<string, string | number>;
@@ -269,6 +281,73 @@ function toListingTotals(snapshot: SnapshotData): ListingTotals {
     }
   }
   return totals;
+}
+
+function toListingIdSet(
+  snapshot: SnapshotData,
+  repoRoot: string,
+  listingType: "maps" | "mods",
+): Set<string> {
+  const ids = new Set<string>();
+  const downloads = snapshot?.[listingType]?.downloads;
+  if (!downloads || typeof downloads !== "object") return ids;
+  for (const id of Object.keys(downloads)) {
+    if (isTestListing(repoRoot, listingType, id)) continue;
+    ids.add(id);
+  }
+  return ids;
+}
+
+function buildListingIdsBySnapshot(
+  snapshots: SnapshotEntry[],
+  historyDir: string,
+  repoRoot: string,
+): Map<string, { maps: Set<string>; mods: Set<string> }> {
+  const bySnapshot = new Map<string, { maps: Set<string>; mods: Set<string> }>();
+  for (const snapshot of snapshots) {
+    const snapshotData = loadJsonFile<SnapshotData>(join(historyDir, snapshot.file));
+    bySnapshot.set(snapshot.file, {
+      maps: toListingIdSet(snapshotData, repoRoot, "maps"),
+      mods: toListingIdSet(snapshotData, repoRoot, "mods"),
+    });
+  }
+  return bySnapshot;
+}
+
+function toListingVersionSet(
+  snapshot: SnapshotData,
+  repoRoot: string,
+  listingType: "maps" | "mods",
+): Set<string> {
+  const versions = new Set<string>();
+  const downloads = snapshot?.[listingType]?.downloads;
+  if (!downloads || typeof downloads !== "object") return versions;
+
+  for (const [id, versionMap] of Object.entries(downloads)) {
+    if (isTestListing(repoRoot, listingType, id)) continue;
+    if (!versionMap || typeof versionMap !== "object") continue;
+    for (const version of Object.keys(versionMap)) {
+      versions.add(`${id}@@${version}`);
+    }
+  }
+
+  return versions;
+}
+
+function buildListingVersionsBySnapshot(
+  snapshots: SnapshotEntry[],
+  historyDir: string,
+  repoRoot: string,
+): Map<string, { maps: Set<string>; mods: Set<string> }> {
+  const bySnapshot = new Map<string, { maps: Set<string>; mods: Set<string> }>();
+  for (const snapshot of snapshots) {
+    const snapshotData = loadJsonFile<SnapshotData>(join(historyDir, snapshot.file));
+    bySnapshot.set(snapshot.file, {
+      maps: toListingVersionSet(snapshotData, repoRoot, "maps"),
+      mods: toListingVersionSet(snapshotData, repoRoot, "mods"),
+    });
+  }
+  return bySnapshot;
 }
 
 function buildMonotonicSnapshotTotals(
@@ -962,20 +1041,63 @@ function buildAuthorByDayRows(
 function buildAssetsByDayRows(
   snapshotDates: string[],
   dailyDeltasBySnapshot: Map<string, ListingTotals>,
+  listingIdsBySnapshot: Map<string, { maps: Set<string>; mods: Set<string> }>,
+  listingVersionsBySnapshot: Map<string, { maps: Set<string>; mods: Set<string> }>,
 ): AssetByDayRow[] {
   let cumulativeMaps = 0;
   let cumulativeMods = 0;
+  const seenMaps = new Set<string>();
+  const seenMods = new Set<string>();
+  const seenMapVersions = new Set<string>();
+  const seenModVersions = new Set<string>();
 
   return snapshotDates.map((snapshotDate) => {
     let maps = 0;
     let mods = 0;
+    let newMaps = 0;
+    let newMods = 0;
+    let newMapVersions = 0;
+    let newModVersions = 0;
     const snapshotTotals = dailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)
       ?? new Map<ListingKey, number>();
+    const listingIds = listingIdsBySnapshot.get(`snapshot_${snapshotDate}.json`) ?? {
+      maps: new Set<string>(),
+      mods: new Set<string>(),
+    };
+    const listingVersions = listingVersionsBySnapshot.get(`snapshot_${snapshotDate}.json`) ?? {
+      maps: new Set<string>(),
+      mods: new Set<string>(),
+    };
 
     for (const [key, totalDownloads] of snapshotTotals.entries()) {
       const [listingType] = key.split(":") as ["maps" | "mods", string];
       if (listingType === "maps") maps += totalDownloads;
       if (listingType === "mods") mods += totalDownloads;
+    }
+
+    for (const id of listingIds.maps) {
+      if (!seenMaps.has(id)) {
+        newMaps += 1;
+      }
+      seenMaps.add(id);
+    }
+    for (const id of listingIds.mods) {
+      if (!seenMods.has(id)) {
+        newMods += 1;
+      }
+      seenMods.add(id);
+    }
+    for (const versionKey of listingVersions.maps) {
+      if (!seenMapVersions.has(versionKey)) {
+        newMapVersions += 1;
+      }
+      seenMapVersions.add(versionKey);
+    }
+    for (const versionKey of listingVersions.mods) {
+      if (!seenModVersions.has(versionKey)) {
+        newModVersions += 1;
+      }
+      seenModVersions.add(versionKey);
     }
 
     cumulativeMaps += maps;
@@ -989,6 +1111,18 @@ function buildAssetsByDayRows(
       cumulative_total: cumulativeMaps + cumulativeMods,
       cumulative_maps: cumulativeMaps,
       cumulative_mods: cumulativeMods,
+      total_new_assets: newMaps + newMods,
+      new_maps: newMaps,
+      new_mods: newMods,
+      cumulative_assets: seenMaps.size + seenMods.size,
+      cumulative_maps_assets: seenMaps.size,
+      cumulative_mods_assets: seenMods.size,
+      total_new_assets_versions: newMapVersions + newModVersions,
+      new_maps_versions: newMapVersions,
+      new_mods_versions: newModVersions,
+      cumulative_asset_versions: seenMapVersions.size + seenModVersions.size,
+      cumulative_maps_versions: seenMapVersions.size,
+      cumulative_mods_versions: seenModVersions.size,
     };
   });
 }
@@ -1037,6 +1171,12 @@ export function runGenerateAnalyticsCli(
       ),
     );
   }
+  const listingIdsBySnapshot = buildListingIdsBySnapshot(snapshots, historyDir, resolvedRepoRoot);
+  const listingVersionsBySnapshot = buildListingVersionsBySnapshot(
+    snapshots,
+    historyDir,
+    resolvedRepoRoot,
+  );
   const snapshotDates = snapshots.map((snapshot) => toSnapshotDateLabel(snapshot.file));
   const latestTotals = filterOutTestListingTotals(
     resolvedRepoRoot,
@@ -1353,7 +1493,12 @@ export function runGenerateAnalyticsCli(
     filteredDailyDeltasBySnapshot,
     listingMeta,
   );
-  const assetsByDayRows = buildAssetsByDayRows(snapshotDates, filteredDailyDeltasBySnapshot);
+  const assetsByDayRows = buildAssetsByDayRows(
+    snapshotDates,
+    filteredDailyDeltasBySnapshot,
+    listingIdsBySnapshot,
+    listingVersionsBySnapshot,
+  );
 
   writeCsv<ListingWindowRow>(
     join(analyticsDir, "most_popular_last_1d.csv"),
@@ -1663,6 +1808,18 @@ export function runGenerateAnalyticsCli(
       "cumulative_total",
       "cumulative_maps",
       "cumulative_mods",
+      "total_new_assets",
+      "new_maps",
+      "new_mods",
+      "cumulative_assets",
+      "cumulative_maps_assets",
+      "cumulative_mods_assets",
+      "total_new_assets_versions",
+      "new_maps_versions",
+      "new_mods_versions",
+      "cumulative_asset_versions",
+      "cumulative_maps_versions",
+      "cumulative_mods_versions",
     ],
     assetsByDayRows,
   );
