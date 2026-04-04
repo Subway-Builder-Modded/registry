@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 
-export type AttributionMethod = "github" | "discord";
+export type AttributionMethod = "github" | "discord" | "custom";
+export type ContributorTier = "developer" | "executive" | "engineer";
 
 export interface AuthorAliasEntry {
   github_id: number;
@@ -11,6 +12,8 @@ export interface AuthorAliasEntry {
   discord_username?: string;
   discord_id?: string;
   attribution_link?: string;
+  ko_fi_username?: string;
+  contributor_tier?: ContributorTier;
 }
 
 export interface AuthorAliasIndex {
@@ -31,6 +34,18 @@ export interface EnsureAuthorAliasPrefillResult {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function parseAttributionMethod(value: unknown): AttributionMethod {
+  if (value === "discord" || value === "custom") return value;
+  return "github";
+}
+
+function parseContributorTier(value: unknown): ContributorTier | undefined {
+  if (value === "developer" || value === "executive" || value === "engineer") {
+    return value;
+  }
+  return undefined;
 }
 
 export function getAuthorAliasIndexPath(repoRoot: string): string {
@@ -57,7 +72,7 @@ export function loadAuthorAliasIndex(repoRoot: string): AuthorAliasIndex {
         author_alias: typeof entry.author_alias === "string" && entry.author_alias.trim() !== ""
           ? entry.author_alias.trim()
           : undefined,
-        attribution_method: (entry.attribution_method === "discord" ? "discord" : "github") as AttributionMethod,
+        attribution_method: parseAttributionMethod(entry.attribution_method),
         discord_username: typeof entry.discord_username === "string" && entry.discord_username.trim() !== ""
           ? entry.discord_username.trim()
           : undefined,
@@ -65,6 +80,10 @@ export function loadAuthorAliasIndex(repoRoot: string): AuthorAliasIndex {
         attribution_link: typeof entry.attribution_link === "string" && entry.attribution_link.trim() !== ""
           ? entry.attribution_link.trim()
           : undefined,
+        ko_fi_username: typeof entry.ko_fi_username === "string" && entry.ko_fi_username.trim() !== ""
+          ? entry.ko_fi_username.trim()
+          : undefined,
+        contributor_tier: parseContributorTier(entry.contributor_tier),
       }))
       .filter((entry) => entry.github_id > 0)
       .sort((a, b) => a.github_id - b.github_id);
@@ -106,6 +125,14 @@ export function resolveAuthorPresentation(
       author,
       author_alias: aliasEntry.author_alias ?? aliasEntry.author_id ?? author,
       attribution_link: aliasEntry.attribution_link ?? `https://discord.com/users/${aliasEntry.discord_id}`,
+    };
+  }
+
+  if (aliasEntry.attribution_method === "custom") {
+    return {
+      author,
+      author_alias: aliasEntry.author_alias ?? aliasEntry.author_id ?? author,
+      attribution_link: aliasEntry.attribution_link ?? fallbackLink,
     };
   }
 
