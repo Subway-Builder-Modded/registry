@@ -49,18 +49,25 @@ import {
   type DownloadAttributionDelta,
   type DownloadAttributionLedger,
 } from "./download-attribution.js";
+import { toDownloadAssetBucketKey } from "./download-version-buckets.js";
 
 interface AdjustedVersionCount {
   adjustedCount: number;
   subtractedTotal: number;
   clamped: boolean;
+  bucketInputs: D.DownloadVersionBucketInput[];
 }
 
 function getAdjustedGithubZipTotal(params: {
   listingId: string;
   version: string;
   repo: string;
-  assets: Map<string, { downloadCount: number; downloadUrl: string | null; sizeBytes: number | null }>;
+  assets: Map<string, {
+    assetNodeId: string | null;
+    downloadCount: number;
+    downloadUrl: string | null;
+    sizeBytes: number | null;
+  }>;
   attributionLedger: DownloadAttributionLedger;
   attributionDelta: DownloadAttributionDelta;
   warnings: string[];
@@ -77,14 +84,19 @@ function getAdjustedGithubZipTotal(params: {
   let adjustedCount = 0;
   let subtractedTotal = 0;
   let clamped = false;
+  const bucketInputs: D.DownloadVersionBucketInput[] = [];
 
   for (const [assetName, asset] of assets.entries()) {
     if (!assetName.toLowerCase().endsWith(".zip")) continue;
-    const key = toDownloadAttributionAssetKey(repo, version, assetName);
+    const key = toDownloadAttributionAssetKey(repo, version, assetName, asset.assetNodeId);
     const attributed = getAttributedCountForAssetKey(attributionLedger, attributionDelta, key);
     const adjusted = adjustDownloadCount(asset.downloadCount, attributed);
     adjustedCount += adjusted.adjusted;
     subtractedTotal += adjusted.subtracted;
+    bucketInputs.push({
+      bucketKey: toDownloadAssetBucketKey(repo, version, assetName, asset.assetNodeId),
+      adjustedCount: adjusted.adjusted,
+    });
     if (adjusted.clamped) {
       clamped = true;
       warnListing(
@@ -100,6 +112,7 @@ function getAdjustedGithubZipTotal(params: {
     adjustedCount,
     subtractedTotal,
     clamped,
+    bucketInputs,
   };
 }
 
@@ -110,6 +123,7 @@ function getAdjustedSingleAssetCount(params: {
   tag: string;
   assetName: string;
   rawCount: number;
+  assetNodeId?: string | null;
   attributionLedger: DownloadAttributionLedger;
   attributionDelta: DownloadAttributionDelta;
   warnings: string[];
@@ -121,11 +135,12 @@ function getAdjustedSingleAssetCount(params: {
     tag,
     assetName,
     rawCount,
+    assetNodeId,
     attributionLedger,
     attributionDelta,
     warnings,
   } = params;
-  const key = toDownloadAttributionAssetKey(repo, tag, assetName);
+  const key = toDownloadAttributionAssetKey(repo, tag, assetName, assetNodeId);
   const attributed = getAttributedCountForAssetKey(attributionLedger, attributionDelta, key);
   const adjusted = adjustDownloadCount(rawCount, attributed);
   if (adjusted.clamped) {
@@ -140,6 +155,10 @@ function getAdjustedSingleAssetCount(params: {
     adjustedCount: adjusted.adjusted,
     subtractedTotal: adjusted.subtracted,
     clamped: adjusted.clamped,
+    bucketInputs: [{
+      bucketKey: toDownloadAssetBucketKey(repo, tag, assetName, assetNodeId),
+      adjustedCount: adjusted.adjusted,
+    }],
   };
 }
 
@@ -225,6 +244,7 @@ export async function generateDownloadsDataFull(
   });
 
   const integrityListings: Record<string, ListingIntegrityEntry> = {};
+  const versionBucketInputs: D.VersionBucketInputsByListing = {};
   let versionsChecked = 0;
   let completeVersions = 0;
   let incompleteVersions = 0;
@@ -235,6 +255,7 @@ export async function generateDownloadsDataFull(
 
   for (const id of [...ids].sort()) {
     console.log(`[downloads] heartbeat:listing mode=full listing=${id}`);
+    versionBucketInputs[id] = {};
     const context = listingContexts.get(id);
     if (!context) {
       integrityListings[id] = createListingIntegrityEntry({});
@@ -365,10 +386,10 @@ export async function generateDownloadsDataFull(
               attemptedErrors.push(`asset '${assetName}': ${inspected.error}`);
               continue;
             }
-            if (!inspected.value.fromMemo) {
-              const key = toDownloadAttributionAssetKey(repo, tag, assetName);
-              recordDownloadAttributionFetchByAssetKey(attributionDelta, key);
-            }
+                  if (!inspected.value.fromMemo) {
+                    const key = toDownloadAttributionAssetKey(repo, tag, assetName, asset.assetNodeId);
+                    recordDownloadAttributionFetchByAssetKey(attributionDelta, key);
+                  }
             const { check, releaseSizeMiB } = inspected.value;
             attemptedReleaseSizeMiB = releaseSizeMiB;
             for (const warning of check.warnings) {
@@ -442,6 +463,8 @@ export async function generateDownloadsDataFull(
           });
           if (!included) {
             filteredVersions += 1;
+          } else {
+            versionBucketInputs[id][tag] = adjusted.bucketInputs;
           }
         }
       }
@@ -635,6 +658,7 @@ export async function generateDownloadsDataFull(
                       candidate.parsed.repo,
                       candidate.parsed.tag,
                       candidate.parsed.assetName,
+                      asset.assetNodeId,
                     );
                     recordDownloadAttributionFetchByAssetKey(attributionDelta, key);
                   }
@@ -668,14 +692,15 @@ export async function generateDownloadsDataFull(
         if (candidate.semver) {
           const result = versionEntries[versionKey];
           let downloadCount: number | undefined;
+          let versionBucketsForVersion: D.DownloadVersionBucketInput[] = [];
           if (candidate.parsed) {
-            const rawCount = repoIndexes
+            const asset = repoIndexes
               .get(candidate.parsed.repo)
               ?.byTag
               .get(candidate.parsed.tag)
               ?.assets
-              .get(candidate.parsed.assetName)
-              ?.downloadCount;
+              .get(candidate.parsed.assetName);
+            const rawCount = asset?.downloadCount;
             if (typeof rawCount === "number") {
               const adjusted = getAdjustedSingleAssetCount({
                 listingId: id,
@@ -684,6 +709,7 @@ export async function generateDownloadsDataFull(
                 tag: candidate.parsed.tag,
                 assetName: candidate.parsed.assetName,
                 rawCount,
+                assetNodeId: asset?.assetNodeId ?? null,
                 attributionLedger,
                 attributionDelta,
                 warnings,
@@ -693,6 +719,7 @@ export async function generateDownloadsDataFull(
                 clampedVersions += 1;
               }
               downloadCount = adjusted.adjustedCount;
+              versionBucketsForVersion = adjusted.bucketInputs;
             }
           }
           const included = applyDownloadCountForVersion({
@@ -705,6 +732,8 @@ export async function generateDownloadsDataFull(
           });
           if (!included) {
             filteredVersions += 1;
+          } else {
+            versionBucketInputs[id][versionKey] = versionBucketsForVersion;
           }
         }
       }
@@ -729,6 +758,7 @@ export async function generateDownloadsDataFull(
 
   return {
     downloads: sortedDownloads,
+    versionBucketInputs,
     integrity: {
       schema_version: 1,
       generated_at: nowIso,

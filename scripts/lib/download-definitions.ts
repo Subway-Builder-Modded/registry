@@ -1,6 +1,7 @@
 import type { ManifestType } from "./manifests.js";
 import type { IntegrityOutput, IntegrityCache } from "./integrity.js";
 import type { DownloadAttributionDelta, DownloadAttributionLedger } from "./download-attribution.js";
+import type { DownloadVersionBucketLedger } from "./download-version-buckets.js";
 
 export interface ParsedReleaseAssetUrl {
   repo: string;
@@ -11,6 +12,7 @@ export interface ParsedReleaseAssetUrl {
 }
 
 export interface GraphqlReleaseAssetNode {
+  id: string;
   name: string;
   downloadCount: number;
   downloadUrl: string;
@@ -53,6 +55,7 @@ export interface GraphqlReleasesResponse {
 export interface RepoReleaseTagData {
   zipTotal: number;
   assets: Map<string, {
+    assetNodeId: string | null;
     downloadCount: number;
     downloadUrl: string | null;
     sizeBytes: number | null;
@@ -99,12 +102,23 @@ export interface GenerateDownloadsOptions {
     ledger: DownloadAttributionLedger;
     delta: DownloadAttributionDelta;
   };
+  versionBuckets?: {
+    ledger: DownloadVersionBucketLedger;
+  };
   token?: string;
   fetchImpl?: typeof fetch;
 }
 
+export interface DownloadVersionBucketInput {
+  bucketKey: string;
+  adjustedCount: number;
+}
+
+export type VersionBucketInputsByListing = Record<string, Record<string, DownloadVersionBucketInput[]>>;
+
 export interface GenerateDownloadsResult {
   downloads: DownloadsByListing;
+  versionBucketInputs: VersionBucketInputsByListing;
   integrity: IntegrityOutput;
   integrityCache: IntegrityCache;
   stats: {
@@ -155,6 +169,7 @@ export const REPO_RELEASES_QUERY = `
           tagName
           releaseAssets(first: 100) {
             nodes {
+              id
               name
               downloadCount
               downloadUrl

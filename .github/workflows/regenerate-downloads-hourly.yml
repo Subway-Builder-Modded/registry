@@ -48,7 +48,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: maps-downloads-hourly
-          path: maps/downloads.json
+          path: |
+            maps/downloads.json
+            maps/download-version-buckets.json
           if-no-files-found: error
 
   generate-mods:
@@ -85,7 +87,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mods-downloads-hourly
-          path: mods/downloads.json
+          path: |
+            mods/downloads.json
+            mods/download-version-buckets.json
           if-no-files-found: error
 
   commit:
@@ -141,6 +145,8 @@ jobs:
 
           MAP_ARTIFACT_FILE="$(find /tmp/download-artifacts/maps -type f -name downloads.json | head -n 1 || true)"
           MOD_ARTIFACT_FILE="$(find /tmp/download-artifacts/mods -type f -name downloads.json | head -n 1 || true)"
+          MAP_BUCKETS_FILE="$(find /tmp/download-artifacts/maps -type f -name download-version-buckets.json | head -n 1 || true)"
+          MOD_BUCKETS_FILE="$(find /tmp/download-artifacts/mods -type f -name download-version-buckets.json | head -n 1 || true)"
 
           if [ -z "${MAP_ARTIFACT_FILE}" ]; then
             echo "Failed to locate map downloads.json in downloaded artifact."
@@ -150,9 +156,19 @@ jobs:
             echo "Failed to locate mod downloads.json in downloaded artifact."
             exit 1
           fi
+          if [ -z "${MAP_BUCKETS_FILE}" ]; then
+            echo "Failed to locate map download-version-buckets.json in downloaded artifact."
+            exit 1
+          fi
+          if [ -z "${MOD_BUCKETS_FILE}" ]; then
+            echo "Failed to locate mod download-version-buckets.json in downloaded artifact."
+            exit 1
+          fi
 
           cp "${MAP_ARTIFACT_FILE}" maps/downloads.json
           cp "${MOD_ARTIFACT_FILE}" mods/downloads.json
+          cp "${MAP_BUCKETS_FILE}" maps/download-version-buckets.json
+          cp "${MOD_BUCKETS_FILE}" mods/download-version-buckets.json
 
       - name: Capture Railyard app download history
         env:
@@ -278,7 +294,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json history/railyard_app_downloads.json analytics/railyard_app_downloads.json analytics/railyard_app_downloads.csv 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json history/railyard_app_downloads.json analytics/railyard_app_downloads.json analytics/railyard_app_downloads.csv 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No download changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
