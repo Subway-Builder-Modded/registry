@@ -14,7 +14,7 @@ import type { ManifestDirectory } from "./manifests.js";
 type ListingKind = "maps" | "mods";
 type ValidVersionsByListing = Record<string, Set<string>>;
 type IntegritySourceByListingVersion = Record<string, Record<string, IntegritySource | null>>;
-type SourceDownloadsMode = "already_adjusted";
+type SourceDownloadsMode = "already_adjusted" | "legacy_unadjusted";
 
 interface IndexFile {
   schema_version?: number;
@@ -94,6 +94,7 @@ export interface NormalizeDownloadHistorySnapshotOptions {
 
 const SNAPSHOT_PATTERN = /^snapshot_(\d{4}_\d{2}_\d{2})\.json$/;
 const DOWNLOAD_HISTORY_SCHEMA_VERSION = 2;
+const ATTRIBUTION_ADJUSTED_SNAPSHOT_START_DATE = "2026_03_30";
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf-8")) as T;
@@ -341,6 +342,56 @@ function computeTotalDownloads(downloads: DownloadsByListing): number {
   return total;
 }
 
+function subtractDownloadsWithClamp(
+  raw: DownloadsByListing,
+  attributed: DownloadsByListing,
+): DownloadsByListing {
+  const adjusted: DownloadsByListing = {};
+  const listingIds = new Set<string>([...Object.keys(raw), ...Object.keys(attributed)]);
+  for (const listingId of [...listingIds].sort()) {
+    const rawVersions = raw[listingId] ?? {};
+    const attributedVersions = attributed[listingId] ?? {};
+    const versions = new Set<string>([...Object.keys(rawVersions), ...Object.keys(attributedVersions)]);
+    const adjustedVersions: Record<string, number> = {};
+    for (const version of [...versions].sort()) {
+      const rawCount = rawVersions[version] ?? 0;
+      const attributedCount = attributedVersions[version] ?? 0;
+      adjustedVersions[version] = Math.max(0, rawCount - attributedCount);
+    }
+    adjusted[listingId] = adjustedVersions;
+  }
+  return adjusted;
+}
+
+function capAttributedDownloadsToRaw(
+  raw: DownloadsByListing,
+  attributed: DownloadsByListing,
+  warnings: string[],
+  sourceLabel: string,
+): DownloadsByListing {
+  const capped: DownloadsByListing = {};
+  const listingIds = new Set<string>([...Object.keys(raw), ...Object.keys(attributed)]);
+  for (const listingId of [...listingIds].sort()) {
+    const rawVersions = raw[listingId] ?? {};
+    const attributedVersions = attributed[listingId] ?? {};
+    const versions = new Set<string>([...Object.keys(rawVersions), ...Object.keys(attributedVersions)]);
+    const cappedVersions: Record<string, number> = {};
+    for (const version of [...versions].sort()) {
+      const rawCount = rawVersions[version] ?? 0;
+      const attributedCount = attributedVersions[version] ?? 0;
+      const cappedCount = Math.min(rawCount, attributedCount);
+      if (cappedCount !== attributedCount) {
+        warnings.push(
+          `${sourceLabel}: listing='${listingId}' version='${version}' attributed downloads exceeded stored raw downloads (${attributedCount} > ${rawCount}); capping attribution to raw count`,
+        );
+      }
+      cappedVersions[version] = cappedCount;
+    }
+    capped[listingId] = cappedVersions;
+  }
+  return capped;
+}
+
 function addDownloads(a: DownloadsByListing, b: DownloadsByListing): DownloadsByListing {
   const merged: DownloadsByListing = {};
   const listingIds = new Set<string>([...Object.keys(a), ...Object.keys(b)]);
@@ -451,7 +502,7 @@ function sumAttributedForIntegritySource(
 ): number {
   const repo = source.repo?.trim().toLowerCase();
   const tag = source.tag?.trim();
-  const assetName = source.asset_name?.trim();
+  const assetName = source.asset_name?.trim().toLowerCase();
   if (!repo || !tag || !assetName) return 0;
 
   let total = 0;
@@ -460,7 +511,7 @@ function sumAttributedForIntegritySource(
     if (!parsed) return;
     if (parsed.repo !== repo) return;
     if (parsed.tag !== tag) return;
-    if (parsed.assetName !== assetName) return;
+    if (parsed.assetName.toLowerCase() !== assetName) return;
     total += count;
   });
   return total;
@@ -711,17 +762,51 @@ function normalizeSnapshotDownloadsOrEmpty(
 }
 
 function resolveStoredDownloadsForBackfill(
+  snapshotDate: string,
   section: DownloadHistorySection | undefined,
   listingKind: ListingKind,
   warnings: string[],
   sourceLabel: string,
 ): DownloadsByListing {
+  const sourceMode = resolveSourceDownloadsMode(
+    section?.source_downloads_mode,
+    snapshotDate,
+    warnings,
+    `${sourceLabel}.source_downloads_mode`,
+  );
+  if (sourceMode === "legacy_unadjusted" && section?.raw_downloads) {
+    return normalizeSnapshotDownloadsOrEmpty(
+      section.raw_downloads,
+      listingKind,
+      warnings,
+      `${sourceLabel}.raw_downloads`,
+    );
+  }
   return normalizeSnapshotDownloadsOrEmpty(
     section?.downloads,
     listingKind,
     warnings,
     `${sourceLabel}.downloads`,
   );
+}
+
+function resolveSourceDownloadsMode(
+  raw: unknown,
+  snapshotDate: string,
+  warnings: string[],
+  sourceLabel: string,
+): SourceDownloadsMode {
+  if (raw === "already_adjusted" || raw === "legacy_unadjusted") {
+    return raw;
+  }
+  if (typeof raw === "string" && raw.trim() !== "") {
+    warnings.push(
+      `${sourceLabel} has invalid source_downloads_mode='${raw}'; defaulting by snapshot date boundary`,
+    );
+  }
+  return snapshotDate >= ATTRIBUTION_ADJUSTED_SNAPSHOT_START_DATE
+    ? "already_adjusted"
+    : "legacy_unadjusted";
 }
 
 export function generateDownloadHistorySnapshot(
@@ -875,13 +960,30 @@ export function normalizeDownloadHistorySnapshot(
   const mapsIntegritySources = readIntegritySourcesFromIntegrity(repoRoot, "maps", warnings);
   const modsIntegritySources = readIntegritySourcesFromIntegrity(repoRoot, "mods", warnings);
 
+  const mapsSourceMode = resolveSourceDownloadsMode(
+    snapshot.maps?.source_downloads_mode,
+    snapshot.snapshot_date,
+    warnings,
+    `history/${fileName}:maps.source_downloads_mode`,
+  );
+  const modsSourceMode = resolveSourceDownloadsMode(
+    snapshot.mods?.source_downloads_mode,
+    snapshot.snapshot_date,
+    warnings,
+    `history/${fileName}:mods.source_downloads_mode`,
+  );
+  const mapsAttributionCutoffIso = mapsSourceMode === "legacy_unadjusted" ? null : snapshot.generated_at;
+  const modsAttributionCutoffIso = modsSourceMode === "legacy_unadjusted" ? null : snapshot.generated_at;
+
   const mapsStoredDownloads = resolveStoredDownloadsForBackfill(
+    snapshot.snapshot_date,
     snapshot.maps,
     "maps",
     warnings,
     `history/${fileName}:maps`,
   );
   const modsStoredDownloads = resolveStoredDownloadsForBackfill(
+    snapshot.snapshot_date,
     snapshot.mods,
     "mods",
     warnings,
@@ -892,7 +994,7 @@ export function normalizeDownloadHistorySnapshot(
     "maps",
     mapsStoredDownloads,
     snapshot.snapshot_date,
-    snapshot.generated_at,
+    mapsAttributionCutoffIso,
     attributionLedger,
     mapsIntegritySources,
   );
@@ -901,25 +1003,47 @@ export function normalizeDownloadHistorySnapshot(
     "mods",
     modsStoredDownloads,
     snapshot.snapshot_date,
-    snapshot.generated_at,
+    modsAttributionCutoffIso,
     attributionLedger,
     modsIntegritySources,
   );
-  const mapsSourceMode: SourceDownloadsMode = "already_adjusted";
-  const modsSourceMode: SourceDownloadsMode = "already_adjusted";
-  const mapsAttribution = mapsAttributionUncapped;
-  const modsAttribution = modsAttributionUncapped;
-  const mapsRawDownloads = addDownloads(mapsStoredDownloads, mapsAttribution);
-  const modsRawDownloads = addDownloads(modsStoredDownloads, modsAttribution);
+  const mapsAttribution = mapsSourceMode === "legacy_unadjusted"
+    ? capAttributedDownloadsToRaw(
+      mapsStoredDownloads,
+      mapsAttributionUncapped,
+      warnings,
+      `history/${fileName}:maps.attributed_downloads`,
+    )
+    : mapsAttributionUncapped;
+  const modsAttribution = modsSourceMode === "legacy_unadjusted"
+    ? capAttributedDownloadsToRaw(
+      modsStoredDownloads,
+      modsAttributionUncapped,
+      warnings,
+      `history/${fileName}:mods.attributed_downloads`,
+    )
+    : modsAttributionUncapped;
+  const mapsRawDownloads = mapsSourceMode === "legacy_unadjusted"
+    ? mapsStoredDownloads
+    : addDownloads(mapsStoredDownloads, mapsAttribution);
+  const modsRawDownloads = modsSourceMode === "legacy_unadjusted"
+    ? modsStoredDownloads
+    : addDownloads(modsStoredDownloads, modsAttribution);
+  const mapsEffectiveDownloads = mapsSourceMode === "legacy_unadjusted"
+    ? subtractDownloadsWithClamp(mapsStoredDownloads, mapsAttribution)
+    : mapsStoredDownloads;
+  const modsEffectiveDownloads = modsSourceMode === "legacy_unadjusted"
+    ? subtractDownloadsWithClamp(modsStoredDownloads, modsAttribution)
+    : modsStoredDownloads;
 
   const mapsDownloads = filterDownloadsByIntegrity(
-    mapsStoredDownloads,
+    mapsEffectiveDownloads,
     mapsValidVersions,
     `history/${fileName}:maps.downloads`,
     warnings,
   );
   const modsDownloads = filterDownloadsByIntegrity(
-    modsStoredDownloads,
+    modsEffectiveDownloads,
     modsValidVersions,
     `history/${fileName}:mods.downloads`,
     warnings,
@@ -958,7 +1082,9 @@ export function normalizeDownloadHistorySnapshot(
   const totalAttributedFetches = sumLedgerTotalUpToCutoff(
     attributionLedger,
     snapshot.snapshot_date,
-    snapshot.generated_at,
+    mapsSourceMode === "legacy_unadjusted" && modsSourceMode === "legacy_unadjusted"
+      ? null
+      : snapshot.generated_at,
   );
 
   const mapsIndex = asIndexFileOrFallback(
