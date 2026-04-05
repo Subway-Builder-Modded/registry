@@ -774,7 +774,7 @@ function resolveStoredDownloadsForBackfill(
     warnings,
     `${sourceLabel}.source_downloads_mode`,
   );
-  if (sourceMode === "legacy_unadjusted" && section?.raw_downloads) {
+  if (section?.raw_downloads) {
     return normalizeSnapshotDownloadsOrEmpty(
       section.raw_downloads,
       listingKind,
@@ -782,8 +782,31 @@ function resolveStoredDownloadsForBackfill(
       `${sourceLabel}.raw_downloads`,
     );
   }
-  return normalizeSnapshotDownloadsOrEmpty(
+  const adjustedDownloads = normalizeSnapshotDownloadsOrEmpty(
     section?.downloads,
+    listingKind,
+    warnings,
+    `${sourceLabel}.downloads`,
+  );
+  if (sourceMode === "already_adjusted" && section?.attributed_downloads) {
+    const attributedDownloads = normalizeSnapshotDownloadsOrEmpty(
+      section.attributed_downloads,
+      listingKind,
+      warnings,
+      `${sourceLabel}.attributed_downloads`,
+    );
+    warnings.push(
+      `${sourceLabel}: missing raw_downloads; reconstructed raw_downloads as downloads + attributed_downloads`,
+    );
+    return addDownloads(adjustedDownloads, attributedDownloads);
+  }
+  if (sourceMode === "already_adjusted") {
+    warnings.push(
+      `${sourceLabel}: missing raw_downloads for already_adjusted snapshot; using downloads as fallback raw baseline`,
+    );
+  }
+  return normalizeSnapshotDownloadsOrEmpty(
+    adjustedDownloads,
     listingKind,
     warnings,
     `${sourceLabel}.downloads`,
@@ -972,17 +995,17 @@ export function normalizeDownloadHistorySnapshot(
     warnings,
     `history/${fileName}:mods.source_downloads_mode`,
   );
-  const mapsAttributionCutoffIso = mapsSourceMode === "legacy_unadjusted" ? null : snapshot.generated_at;
-  const modsAttributionCutoffIso = modsSourceMode === "legacy_unadjusted" ? null : snapshot.generated_at;
+  const mapsAttributionCutoffIso = snapshot.generated_at;
+  const modsAttributionCutoffIso = snapshot.generated_at;
 
-  const mapsStoredDownloads = resolveStoredDownloadsForBackfill(
+  const mapsStoredRawDownloads = resolveStoredDownloadsForBackfill(
     snapshot.snapshot_date,
     snapshot.maps,
     "maps",
     warnings,
     `history/${fileName}:maps`,
   );
-  const modsStoredDownloads = resolveStoredDownloadsForBackfill(
+  const modsStoredRawDownloads = resolveStoredDownloadsForBackfill(
     snapshot.snapshot_date,
     snapshot.mods,
     "mods",
@@ -992,7 +1015,7 @@ export function normalizeDownloadHistorySnapshot(
   const mapsAttributionUncapped = buildAttributedDownloadsForSnapshot(
     repoRoot,
     "maps",
-    mapsStoredDownloads,
+    mapsStoredRawDownloads,
     snapshot.snapshot_date,
     mapsAttributionCutoffIso,
     attributionLedger,
@@ -1001,40 +1024,34 @@ export function normalizeDownloadHistorySnapshot(
   const modsAttributionUncapped = buildAttributedDownloadsForSnapshot(
     repoRoot,
     "mods",
-    modsStoredDownloads,
+    modsStoredRawDownloads,
     snapshot.snapshot_date,
     modsAttributionCutoffIso,
     attributionLedger,
     modsIntegritySources,
   );
-  const mapsAttribution = mapsSourceMode === "legacy_unadjusted"
-    ? capAttributedDownloadsToRaw(
-      mapsStoredDownloads,
-      mapsAttributionUncapped,
-      warnings,
-      `history/${fileName}:maps.attributed_downloads`,
-    )
-    : mapsAttributionUncapped;
-  const modsAttribution = modsSourceMode === "legacy_unadjusted"
-    ? capAttributedDownloadsToRaw(
-      modsStoredDownloads,
-      modsAttributionUncapped,
-      warnings,
-      `history/${fileName}:mods.attributed_downloads`,
-    )
-    : modsAttributionUncapped;
-  const mapsRawDownloads = mapsSourceMode === "legacy_unadjusted"
-    ? mapsStoredDownloads
-    : addDownloads(mapsStoredDownloads, mapsAttribution);
-  const modsRawDownloads = modsSourceMode === "legacy_unadjusted"
-    ? modsStoredDownloads
-    : addDownloads(modsStoredDownloads, modsAttribution);
-  const mapsEffectiveDownloads = mapsSourceMode === "legacy_unadjusted"
-    ? subtractDownloadsWithClamp(mapsStoredDownloads, mapsAttribution)
-    : mapsStoredDownloads;
-  const modsEffectiveDownloads = modsSourceMode === "legacy_unadjusted"
-    ? subtractDownloadsWithClamp(modsStoredDownloads, modsAttribution)
-    : modsStoredDownloads;
+  const mapsAttribution = capAttributedDownloadsToRaw(
+    mapsStoredRawDownloads,
+    mapsAttributionUncapped,
+    warnings,
+    `history/${fileName}:maps.attributed_downloads`,
+  );
+  const modsAttribution = capAttributedDownloadsToRaw(
+    modsStoredRawDownloads,
+    modsAttributionUncapped,
+    warnings,
+    `history/${fileName}:mods.attributed_downloads`,
+  );
+  const mapsRawDownloads = mapsStoredRawDownloads;
+  const modsRawDownloads = modsStoredRawDownloads;
+  const mapsEffectiveDownloads = subtractDownloadsWithClamp(
+    mapsStoredRawDownloads,
+    mapsAttribution,
+  );
+  const modsEffectiveDownloads = subtractDownloadsWithClamp(
+    modsStoredRawDownloads,
+    modsAttribution,
+  );
 
   const mapsDownloads = filterDownloadsByIntegrity(
     mapsEffectiveDownloads,
@@ -1082,9 +1099,7 @@ export function normalizeDownloadHistorySnapshot(
   const totalAttributedFetches = sumLedgerTotalUpToCutoff(
     attributionLedger,
     snapshot.snapshot_date,
-    mapsSourceMode === "legacy_unadjusted" && modsSourceMode === "legacy_unadjusted"
-      ? null
-      : snapshot.generated_at,
+    snapshot.generated_at,
   );
 
   const mapsIndex = asIndexFileOrFallback(

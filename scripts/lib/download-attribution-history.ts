@@ -111,8 +111,22 @@ function buildSnapshotForDate(
   snapshotDate: string,
   generatedAtIso: string,
   previousTotal: number | null,
+  clampToPreviousTotal: boolean,
+  warnings?: string[],
 ): DownloadAttributionHistorySnapshot {
-  const total = sumLedgerTotalUpToCutoff(ledger, snapshotDate, generatedAtIso);
+  const computedTotal = sumLedgerTotalUpToCutoff(ledger, snapshotDate, generatedAtIso);
+  const total = (
+    clampToPreviousTotal
+    && previousTotal !== null
+    && computedTotal < previousTotal
+  )
+    ? previousTotal
+    : computedTotal;
+  if (warnings && clampToPreviousTotal && previousTotal !== null && computedTotal < previousTotal) {
+    warnings.push(
+      `history: clamped attribution total to monotonic value for '${snapshotDate}' (${computedTotal} -> ${previousTotal})`,
+    );
+  }
   const dailyAssets = getLedgerAssetsForDateCutoff(ledger, snapshotDate, generatedAtIso);
   const dailyTotal = sumLedgerDateTotalUpToCutoff(ledger, snapshotDate, generatedAtIso);
   return {
@@ -125,6 +139,55 @@ function buildSnapshotForDate(
     daily_attributed_fetches: dailyTotal,
     assets_daily: dailyAssets,
   };
+}
+
+function buildStrictBackfillSnapshotForDate(
+  ledger: DownloadAttributionLedger,
+  snapshotDate: string,
+  generatedAtIso: string,
+  previousTotal: number | null,
+): DownloadAttributionHistorySnapshot {
+  const computedTotal = sumLedgerTotalUpToCutoff(ledger, snapshotDate, generatedAtIso);
+  const dailyAssets = getLedgerAssetsForDateCutoff(ledger, snapshotDate, generatedAtIso);
+  const dailyTotal = sumLedgerDateTotalUpToCutoff(ledger, snapshotDate, generatedAtIso);
+  return {
+    schema_version: 1,
+    snapshot_date: snapshotDate,
+    generated_at: generatedAtIso,
+    source_ledger_updated_at: ledger.updated_at,
+    total_attributed_fetches: computedTotal,
+    net_attributed_fetches: previousTotal === null ? computedTotal : computedTotal - previousTotal,
+    daily_attributed_fetches: dailyTotal,
+    assets_daily: dailyAssets,
+  };
+}
+
+export function buildAttributionHistorySnapshot(
+  ledger: DownloadAttributionLedger,
+  snapshotDate: string,
+  generatedAtIso: string,
+  previousTotal: number | null,
+  options?: {
+    clampToPreviousTotal?: boolean;
+    warnings?: string[];
+  },
+): DownloadAttributionHistorySnapshot {
+  if (options?.clampToPreviousTotal === false) {
+    return buildStrictBackfillSnapshotForDate(
+      ledger,
+      snapshotDate,
+      generatedAtIso,
+      previousTotal,
+    );
+  }
+  return buildSnapshotForDate(
+    ledger,
+    snapshotDate,
+    generatedAtIso,
+    previousTotal,
+    true,
+    options?.warnings,
+  );
 }
 
 export function generateDownloadAttributionHistorySnapshot(
@@ -142,11 +205,15 @@ export function generateDownloadAttributionHistorySnapshot(
     );
   }
 
-  const snapshot = buildSnapshotForDate(
+  const snapshot = buildAttributionHistorySnapshot(
     ledger,
     snapshotDate,
     now.toISOString(),
     previous?.snapshot.total_attributed_fetches ?? null,
+    {
+      clampToPreviousTotal: true,
+      warnings,
+    },
   );
 
   const historyDir = getHistoryDir(options.repoRoot);
@@ -208,11 +275,17 @@ export function backfillDownloadAttributionHistorySnapshots(
     const snapshotDate = snapshotMeta.snapshotDate;
     const fileName = `download_attribution_${snapshotDate}.json`;
     const filePath = resolve(historyDir, fileName);
-    const snapshot = buildSnapshotForDate(
+    const snapshot = buildAttributionHistorySnapshot(
       ledger,
       snapshotDate,
       snapshotMeta.generatedAtIso,
       previousTotal,
+      {
+        // Backfill should strictly reflect the current reconstructed ledger
+        // so stricter retroactive filtering can lower inflated historical totals.
+        clampToPreviousTotal: false,
+        warnings,
+      },
     );
     previousTotal = snapshot.total_attributed_fetches;
 

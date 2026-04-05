@@ -108,7 +108,14 @@ export async function resolveAndExtractDemandStatsForMapSource(
     throw new Error(warnings[0] ?? `listing=${listingId}: failed to resolve map ZIP URL`);
   }
 
-  const zipBuffer = await fetchZipBuffer(listingId, resolvedSource.zipUrl, fetchImpl, warnings);
+  const zipBuffer = await fetchZipBuffer(
+    listingId,
+    resolvedSource.zipUrl,
+    fetchImpl,
+    warnings,
+    undefined,
+    `fetch-zip listing=${listingId}${resolvedSource.attributionAssetKey ? ` assetKey=${resolvedSource.attributionAssetKey}` : ""} zipUrl=${resolvedSource.zipUrl}`,
+  );
   if (!zipBuffer) {
     throw new Error(warnings[0] ?? `listing=${listingId}: failed to fetch map ZIP`);
   }
