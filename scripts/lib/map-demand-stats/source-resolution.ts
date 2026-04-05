@@ -127,7 +127,12 @@ export function getLatestGithubZipUrl(
       return {
         zipUrl: asset.downloadUrl,
         sourceFingerprint: `github:${tag}|${assetName}`,
-        attributionAssetKey: toDownloadAttributionAssetKey(repo.toLowerCase(), tag, assetName),
+        attributionAssetKey: toDownloadAttributionAssetKey(
+          repo.toLowerCase(),
+          tag,
+          assetName,
+          asset.assetNodeId,
+        ),
       };
     }
     warnListing(
@@ -146,7 +151,12 @@ export function getLatestGithubZipUrl(
     return {
       zipUrl: asset.downloadUrl,
       sourceFingerprint: `github:${tag}|${assetName}`,
-      attributionAssetKey: toDownloadAttributionAssetKey(repo.toLowerCase(), tag, assetName),
+      attributionAssetKey: toDownloadAttributionAssetKey(
+        repo.toLowerCase(),
+        tag,
+        assetName,
+        asset.assetNodeId,
+      ),
     };
   }
 

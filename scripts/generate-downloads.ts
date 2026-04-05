@@ -8,6 +8,12 @@ import {
   loadDownloadAttributionLedger,
   writeDownloadAttributionDeltaFile,
 } from "./lib/download-attribution.js";
+import {
+  applyVersionBucketMonotonicCounts,
+  loadDownloadVersionBucketLedger,
+  seedVersionBucketLedgerFromDownloads,
+  writeDownloadVersionBucketLedger,
+} from "./lib/download-version-buckets.js";
 import type { IntegrityOutput } from "./lib/integrity.js";
 import type { ManifestType } from "./lib/manifests.js";
 import type { SecurityFinding } from "./lib/mod-security.js";
@@ -255,7 +261,16 @@ async function run(): Promise<void> {
   const jobId = getNonEmptyEnv("GITHUB_JOB") ?? "manual";
   const workflowName = getNonEmptyEnv("GITHUB_WORKFLOW") ?? "local";
   const attributionLedger = loadDownloadAttributionLedger(repoRoot);
+  const versionBucketLedger = loadDownloadVersionBucketLedger(repoRoot, listingType);
   const outputDir = listingType === "map" ? "maps" : "mods";
+  const outputPath = resolve(repoRoot, outputDir, "downloads.json");
+  const existingDownloads = (() => {
+    try {
+      return JSON.parse(readFileSync(outputPath, "utf8")) as Record<string, Record<string, number>>;
+    } catch {
+      return {} as Record<string, Record<string, number>>;
+    }
+  })();
   const defaultAttributionDeltaPath = resolve(repoRoot, outputDir, "download-attribution-delta.json");
   const attributionDeltaPath = (
     getArgValue("attribution-delta-path")
@@ -280,7 +295,8 @@ async function run(): Promise<void> {
   }
 
   const {
-    downloads,
+    downloads: rawDownloads,
+    versionBucketInputs,
     integrity,
     integrityCache,
     stats,
@@ -297,13 +313,24 @@ async function run(): Promise<void> {
       ledger: attributionLedger,
       delta: attributionDelta,
     },
+    versionBuckets: {
+      ledger: versionBucketLedger,
+    },
   });
   const securityAlerts = collectSecurityAlerts(integrity, listingType);
 
-  const outputPath = resolve(repoRoot, outputDir, "downloads.json");
+  seedVersionBucketLedgerFromDownloads(versionBucketLedger, existingDownloads);
+
+  const downloads = applyVersionBucketMonotonicCounts(
+    versionBucketLedger,
+    rawDownloads,
+    versionBucketInputs,
+  );
+
   const integrityPath = resolve(repoRoot, outputDir, "integrity.json");
   const integrityCachePath = resolve(repoRoot, outputDir, "integrity-cache.json");
   writeFileSync(outputPath, `${JSON.stringify(downloads, null, 2)}\n`, "utf-8");
+  writeDownloadVersionBucketLedger(repoRoot, listingType, versionBucketLedger);
   if (mode === "full") {
     await announceNewAssets(integrity, integrityPath, listingType, repoRoot);
     writeFileSync(integrityPath, `${JSON.stringify(integrity, null, 2)}\n`, "utf-8");

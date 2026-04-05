@@ -6,6 +6,11 @@ import {
   createDownloadAttributionDelta,
   loadDownloadAttributionLedger,
 } from "./lib/download-attribution.js";
+import {
+  applyVersionBucketMonotonicCounts,
+  loadDownloadVersionBucketLedger,
+  writeDownloadVersionBucketLedger,
+} from "./lib/download-version-buckets.js";
 import { generateDownloadHistorySnapshot } from "./lib/download-history.js";
 import { appendGitHubOutput, getNonEmptyEnv, resolveRepoRoot } from "./lib/script-runtime.js";
 
@@ -47,6 +52,8 @@ async function run(): Promise<void> {
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const token = getNonEmptyEnv("GH_DOWNLOADS_TOKEN") ?? getNonEmptyEnv("GITHUB_TOKEN");
   const ledger = loadDownloadAttributionLedger(repoRoot);
+  const mapVersionBucketLedger = loadDownloadVersionBucketLedger(repoRoot, "map");
+  const modVersionBucketLedger = loadDownloadVersionBucketLedger(repoRoot, "mod");
   const nowIso = new Date().toISOString();
 
   const mapResult = await generateDownloadsData({
@@ -70,8 +77,23 @@ async function run(): Promise<void> {
     },
   });
 
-  writeFileSync(resolve(repoRoot, "maps", "downloads.json"), `${JSON.stringify(mapResult.downloads, null, 2)}\n`, "utf-8");
-  writeFileSync(resolve(repoRoot, "mods", "downloads.json"), `${JSON.stringify(modResult.downloads, null, 2)}\n`, "utf-8");
+  const mapsDownloads = applyVersionBucketMonotonicCounts(
+    mapVersionBucketLedger,
+    mapResult.downloads,
+    mapResult.versionBucketInputs,
+    nowIso,
+  );
+  const modsDownloads = applyVersionBucketMonotonicCounts(
+    modVersionBucketLedger,
+    modResult.downloads,
+    modResult.versionBucketInputs,
+    nowIso,
+  );
+
+  writeFileSync(resolve(repoRoot, "maps", "downloads.json"), `${JSON.stringify(mapsDownloads, null, 2)}\n`, "utf-8");
+  writeFileSync(resolve(repoRoot, "mods", "downloads.json"), `${JSON.stringify(modsDownloads, null, 2)}\n`, "utf-8");
+  writeDownloadVersionBucketLedger(repoRoot, "map", mapVersionBucketLedger);
+  writeDownloadVersionBucketLedger(repoRoot, "mod", modVersionBucketLedger);
 
   let snapshotFile = "";
   if (options.refreshHistory) {
@@ -80,8 +102,8 @@ async function run(): Promise<void> {
     console.log(`[reconcile-attributed-downloads] Refreshed history snapshot: ${snapshot.snapshotFile}`);
   }
 
-  const mapsTotal = sumDownloads(mapResult.downloads);
-  const modsTotal = sumDownloads(modResult.downloads);
+  const mapsTotal = sumDownloads(mapsDownloads);
+  const modsTotal = sumDownloads(modsDownloads);
   const adjustedDeltaTotal = mapResult.stats.adjusted_delta_total + modResult.stats.adjusted_delta_total;
   const clampedVersions = mapResult.stats.clamped_versions + modResult.stats.clamped_versions;
   console.log(
