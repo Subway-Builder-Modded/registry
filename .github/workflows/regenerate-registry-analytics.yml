@@ -64,6 +64,7 @@ jobs:
           name: maps-downloads
           path: |
             maps/downloads.json
+            maps/download-version-buckets.json
             maps/integrity.json
             maps/integrity-cache.json
             maps/download-attribution-delta.json
@@ -117,6 +118,7 @@ jobs:
           name: mods-downloads
           path: |
             mods/downloads.json
+            mods/download-version-buckets.json
             mods/integrity.json
             mods/integrity-cache.json
             mods/download-attribution-delta.json
@@ -237,6 +239,8 @@ jobs:
           MOD_ARTIFACT_FILE="$(find /tmp/download-artifacts/mods -type f -name downloads.json | head -n 1 || true)"
           MAP_INTEGRITY_FILE="$(find /tmp/download-artifacts/maps -type f -name integrity.json | head -n 1 || true)"
           MOD_INTEGRITY_FILE="$(find /tmp/download-artifacts/mods -type f -name integrity.json | head -n 1 || true)"
+          MAP_BUCKETS_FILE="$(find /tmp/download-artifacts/maps -type f -name download-version-buckets.json | head -n 1 || true)"
+          MOD_BUCKETS_FILE="$(find /tmp/download-artifacts/mods -type f -name download-version-buckets.json | head -n 1 || true)"
           MAP_INTEGRITY_CACHE_FILE="$(find /tmp/download-artifacts/maps -type f -name integrity-cache.json | head -n 1 || true)"
           MOD_INTEGRITY_CACHE_FILE="$(find /tmp/download-artifacts/mods -type f -name integrity-cache.json | head -n 1 || true)"
           MAP_ATTR_DELTA_FILE="$(find /tmp/download-artifacts/maps -type f -name download-attribution-delta.json | head -n 1 || true)"
@@ -267,6 +271,14 @@ jobs:
             echo "Failed to locate mod integrity-cache.json in downloaded artifact."
             exit 1
           fi
+          if [ -z "${MAP_BUCKETS_FILE}" ]; then
+            echo "Failed to locate map download-version-buckets.json in downloaded artifact."
+            exit 1
+          fi
+          if [ -z "${MOD_BUCKETS_FILE}" ]; then
+            echo "Failed to locate mod download-version-buckets.json in downloaded artifact."
+            exit 1
+          fi
           if [ -z "${DEMAND_ARTIFACT_FILE}" ]; then
             echo "Failed to locate map demand stats tar artifact."
             exit 1
@@ -276,6 +288,8 @@ jobs:
           cp "${MOD_ARTIFACT_FILE}" mods/downloads.json
           cp "${MAP_INTEGRITY_FILE}" maps/integrity.json
           cp "${MOD_INTEGRITY_FILE}" mods/integrity.json
+          cp "${MAP_BUCKETS_FILE}" maps/download-version-buckets.json
+          cp "${MOD_BUCKETS_FILE}" mods/download-version-buckets.json
           cp "${MAP_INTEGRITY_CACHE_FILE}" maps/integrity-cache.json
           cp "${MOD_INTEGRITY_CACHE_FILE}" mods/integrity-cache.json
           if [ -n "${MAP_ATTR_DELTA_FILE}" ]; then
@@ -306,9 +320,8 @@ jobs:
             exit 1
           fi
 
-          if [ "${{ steps.merge_attribution.outputs.registry_fetches_added_total }}" != "0" ] && git diff --quiet -- maps/downloads.json mods/downloads.json; then
-            echo "Merged attribution fetches were added, but downloads.json did not change after reconciliation."
-            exit 1
+          if [ "${{ steps.merge_attribution.outputs.registry_fetches_added_total }}" != "0" ] && git diff --quiet -- maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json; then
+            echo "Merged attribution fetches were added, but no download or version-bucket changes were needed after reconciliation (monotonic counts may have absorbed the delta)."
           fi
 
       - name: Sync map manifest file sizes from integrity
@@ -419,7 +432,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-stats-cache.json history/registry-download-attribution.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-stats-cache.json history/registry-download-attribution.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"

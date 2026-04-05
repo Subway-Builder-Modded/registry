@@ -420,7 +420,9 @@ function parseAttributionAssetKey(assetKey: string): { repo: string; tag: string
   const slashIndex = assetKey.lastIndexOf("/");
   if (slashIndex <= 0) return null;
   const repoAndTag = assetKey.slice(0, slashIndex);
-  const assetName = assetKey.slice(slashIndex + 1);
+  const rawAssetName = assetKey.slice(slashIndex + 1);
+  const hashIndex = rawAssetName.indexOf("#");
+  const assetName = hashIndex >= 0 ? rawAssetName.slice(0, hashIndex) : rawAssetName;
   const atIndex = repoAndTag.lastIndexOf("@");
   if (atIndex <= 0 || atIndex === repoAndTag.length - 1 || assetName.trim() === "") return null;
   return {

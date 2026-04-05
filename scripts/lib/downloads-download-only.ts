@@ -8,6 +8,7 @@ import {
   getAttributedCountForAssetKey,
   toDownloadAttributionAssetKey,
 } from "./download-attribution.js";
+import { toDownloadAssetBucketKey } from "./download-version-buckets.js";
 import {
   type ListingContext,
   emptyIntegrity,
@@ -40,11 +41,13 @@ export async function generateDownloadsDataDownloadOnly(
   const hasIntegritySnapshot = loadedIntegrity !== null && Object.keys(loadedIntegrity.listings).length > 0;
 
   const downloadsByListing: D.DownloadsByListing = {};
+  const versionBucketInputs: D.VersionBucketInputsByListing = {};
   const listingContexts = new Map<string, ListingContext>();
   const repoSet = new Set<string>();
 
   for (const id of ids) {
     downloadsByListing[id] = {};
+    versionBucketInputs[id] = {};
     let manifest;
     try {
       manifest = getManifest(repoRoot, dir, id);
@@ -118,13 +121,28 @@ export async function generateDownloadsDataDownloadOnly(
         versionsChecked += 1;
         let adjustedTotal = 0;
         let sawClamped = false;
+        const bucketInputs: D.DownloadVersionBucketInput[] = [];
         for (const [assetName, asset] of releaseData.assets.entries()) {
           if (!assetName.toLowerCase().endsWith(".zip")) continue;
-          const key = toDownloadAttributionAssetKey(context.update.repo, tag, assetName);
+          const key = toDownloadAttributionAssetKey(
+            context.update.repo,
+            tag,
+            assetName,
+            asset.assetNodeId,
+          );
           const attributed = getAttributedCountForAssetKey(attributionLedger, attributionDelta, key);
           const adjusted = adjustDownloadCount(asset.downloadCount, attributed);
           adjustedTotal += adjusted.adjusted;
           adjustedDeltaTotal += adjusted.subtracted;
+          bucketInputs.push({
+            bucketKey: toDownloadAssetBucketKey(
+              context.update.repo,
+              tag,
+              assetName,
+              asset.assetNodeId,
+            ),
+            adjustedCount: adjusted.adjusted,
+          });
           if (adjusted.clamped) {
             sawClamped = true;
             warnListing(
@@ -139,6 +157,7 @@ export async function generateDownloadsDataDownloadOnly(
           clampedVersions += 1;
         }
         downloadsByListing[id][tag] = adjustedTotal;
+        versionBucketInputs[id][tag] = bucketInputs;
       }
       continue;
     }
@@ -187,6 +206,7 @@ export async function generateDownloadsDataDownloadOnly(
         candidate.parsed.repo,
         candidate.parsed.tag,
         candidate.parsed.assetName,
+        asset.assetNodeId,
       );
       const attributed = getAttributedCountForAssetKey(attributionLedger, attributionDelta, key);
       const adjusted = adjustDownloadCount(asset.downloadCount, attributed);
@@ -201,6 +221,15 @@ export async function generateDownloadsDataDownloadOnly(
         );
       }
       downloadsByListing[id][candidate.version] = adjusted.adjusted;
+      versionBucketInputs[id][candidate.version] = [{
+        bucketKey: toDownloadAssetBucketKey(
+          candidate.parsed.repo,
+          candidate.parsed.tag,
+          candidate.parsed.assetName,
+          asset.assetNodeId,
+        ),
+        adjustedCount: adjusted.adjusted,
+      }];
     }
   }
 
@@ -214,6 +243,7 @@ export async function generateDownloadsDataDownloadOnly(
           continue;
         }
         delete byVersion[version];
+        delete versionBucketInputs[id]?.[version];
         filteredVersions += 1;
         const reason = versionIntegrity?.errors?.join("; ") || "missing integrity result in snapshot";
         warnListing(warnings, id, `excluded by integrity snapshot (${reason})`, version);
@@ -242,6 +272,7 @@ export async function generateDownloadsDataDownloadOnly(
 
   return {
     downloads: sortedDownloads,
+    versionBucketInputs,
     integrity,
     integrityCache: loadIntegrityCache(repoRoot, dir),
     stats: {

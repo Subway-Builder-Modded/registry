@@ -157,17 +157,29 @@ async function requestRepoReleasesPage(
 
 function aggregateReleaseDataByTag(releases: Array<{
   tagName: string;
-  assets: Array<{ name: string; downloadCount: number; downloadUrl: string | null; sizeBytes: number | null }>;
+  assets: Array<{
+    id: string | null;
+    name: string;
+    downloadCount: number;
+    downloadUrl: string | null;
+    sizeBytes: number | null;
+  }>;
 }>): Map<string, D.RepoReleaseTagData> {
   const byTag = new Map<string, D.RepoReleaseTagData>();
   for (const release of releases) {
     if (!isNonEmptyString(release.tagName)) continue;
-    const assets = new Map<string, { downloadCount: number; downloadUrl: string | null; sizeBytes: number | null }>();
+    const assets = new Map<string, {
+      assetNodeId: string | null;
+      downloadCount: number;
+      downloadUrl: string | null;
+      sizeBytes: number | null;
+    }>();
     let zipTotal = 0;
 
     for (const asset of release.assets) {
       if (!isNonEmptyString(asset.name) || !Number.isFinite(asset.downloadCount)) continue;
       assets.set(asset.name, {
+        assetNodeId: typeof asset.id === "string" && asset.id.trim() !== "" ? asset.id : null,
         downloadCount: asset.downloadCount,
         downloadUrl: asset.downloadUrl,
         sizeBytes: Number.isFinite(asset.sizeBytes) ? asset.sizeBytes : null,
@@ -225,6 +237,7 @@ async function fetchGraphqlReleaseIndexForRepo(
 
     for (const release of releases.nodes) {
       const assets = release.releaseAssets.nodes.map((asset) => ({
+        id: typeof asset.id === "string" && asset.id.trim() !== "" ? asset.id : null,
         name: asset.name,
         downloadCount: asset.downloadCount,
         downloadUrl: asset.downloadUrl,

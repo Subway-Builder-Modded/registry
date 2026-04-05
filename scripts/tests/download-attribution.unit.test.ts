@@ -17,6 +17,10 @@ test("toDownloadAttributionAssetKey normalizes repo and preserves tag/asset", ()
     toDownloadAttributionAssetKey("Owner/Repo", "v1.2.3", "Map.zip"),
     "owner/repo@v1.2.3/Map.zip",
   );
+  assert.equal(
+    toDownloadAttributionAssetKey("Owner/Repo", "v1.2.3", "Map.zip", "RA_kwDOExample"),
+    "owner/repo@v1.2.3/Map.zip#RA_kwDOExample",
+  );
 });
 
 test("recordDownloadAttributionFetchByUrl tracks github release asset fetches", () => {

@@ -272,8 +272,13 @@ export function toDownloadAttributionAssetKey(
   repo: string,
   tag: string,
   assetName: string,
+  assetIdentity?: string | null,
 ): string {
-  return `${repo.toLowerCase()}@${tag}/${assetName}`;
+  const base = `${repo.toLowerCase()}@${tag}/${assetName}`;
+  if (typeof assetIdentity !== "string" || assetIdentity.trim() === "") {
+    return base;
+  }
+  return `${base}#${assetIdentity.trim()}`;
 }
 
 export function toDownloadAttributionAssetKeyFromParsed(parsed: ParsedReleaseAssetUrl): string {
