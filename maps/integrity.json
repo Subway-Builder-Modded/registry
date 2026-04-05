@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-04T20:40:29.806Z",
+  "generated_at": "2026-04-05T00:41:46.951Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -3502,6 +3502,60 @@
           },
           "fingerprint": "rules:v4:sha256:b144d52d0d34c60c90ae72c4a1943f809c0b2784fcf74a1c82463243e4dc278a",
           "checked_at": "2026-03-29T19:34:38.670Z"
+        }
+      }
+    },
+    "pyongyang-nk": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PYO.pmtiles"
+          },
+          "release_size": 21.06,
+          "file_sizes": {
+            "PYO.pmtiles": 12.64,
+            "__MACOSX/._config.json": 0,
+            "__MACOSX/._demand_data.json": 0,
+            "buildings_index.json": 32.43,
+            "config.json": 0,
+            "demand_data.json": 0.91,
+            "ocean_depth_index.json": 0.94,
+            "roads.geojson": 3.47,
+            "runways_taxiways.geojson": 0.01
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "pswbsf/pyongyang-nk",
+            "tag": "1.0.0",
+            "asset_name": "Pyongyang.zip",
+            "download_url": "https://github.com/PSWBSF/pyongyang-nk/releases/download/1.0.0/Pyongyang.zip"
+          },
+          "fingerprint": "rules:v4:github:pswbsf/pyongyang-nk:1.0.0:Pyongyang.zip",
+          "checked_at": "2026-04-05T00:41:46.951Z"
         }
       }
     },
