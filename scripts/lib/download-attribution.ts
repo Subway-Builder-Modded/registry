@@ -26,6 +26,43 @@ function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
   return sorted;
 }
 
+function normalizeAssetIdentity(value: string | null | undefined): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeAttributionBaseKey(repo: string, tag: string, assetName: string): string {
+  return `${repo.toLowerCase()}@${tag}/${assetName.toLowerCase()}`;
+}
+
+function normalizeAttributionAssetKey(rawKey: string): string {
+  const trimmed = rawKey.trim();
+  if (trimmed === "") return trimmed;
+  const hashIndex = trimmed.indexOf("#");
+  const base = hashIndex >= 0 ? trimmed.slice(0, hashIndex) : trimmed;
+  const identity = hashIndex >= 0 ? normalizeAssetIdentity(trimmed.slice(hashIndex + 1)) : "";
+  const atIndex = base.indexOf("@");
+  const slashIndex = base.indexOf("/", atIndex + 1);
+  if (atIndex <= 0 || slashIndex <= atIndex + 1 || slashIndex >= base.length - 1) {
+    return identity ? `${base}#${identity}` : base;
+  }
+  const repo = base.slice(0, atIndex);
+  const tag = base.slice(atIndex + 1, slashIndex);
+  const assetName = base.slice(slashIndex + 1);
+  const normalizedBase = normalizeAttributionBaseKey(repo, tag, assetName);
+  return identity ? `${normalizedBase}#${identity}` : normalizedBase;
+}
+
+function mergeBySourceCounts(
+  existing: Record<string, number>,
+  incoming: Record<string, number>,
+): Record<string, number> {
+  const merged = { ...existing };
+  for (const [sourceKey, sourceCount] of Object.entries(incoming)) {
+    merged[sourceKey] = (merged[sourceKey] ?? 0) + sourceCount;
+  }
+  return merged;
+}
+
 export interface DownloadAttributionEntry {
   count: number;
   updated_at: string;
@@ -139,13 +176,15 @@ export function normalizeDownloadAttributionLedger(
   const timeline: Record<string, DownloadAttributionTimelineEntry> = {};
 
   if (isObject(assetsRaw)) {
-    for (const [assetKey, rawEntry] of Object.entries(assetsRaw)) {
+    for (const [rawAssetKey, rawEntry] of Object.entries(assetsRaw)) {
       if (!isObject(rawEntry)) continue;
       const count = toFiniteNonNegativeNumber(rawEntry.count);
       const updatedAt = typeof rawEntry.updated_at === "string" && rawEntry.updated_at.trim() !== ""
         ? rawEntry.updated_at
         : nowIso;
       if (count === null) continue;
+      const assetKey = normalizeAttributionAssetKey(rawAssetKey);
+      if (!assetKey) continue;
 
       const bySource: Record<string, number> = {};
       if (isObject(rawEntry.by_source)) {
@@ -156,11 +195,29 @@ export function normalizeDownloadAttributionLedger(
         }
       }
 
-      assets[assetKey] = {
-        count,
-        updated_at: updatedAt,
-        by_source: sortObjectByKeys(bySource),
-      };
+      const existing = assets[assetKey];
+      if (!existing) {
+        assets[assetKey] = {
+          count,
+          updated_at: updatedAt,
+          by_source: sortObjectByKeys(bySource),
+        };
+      } else {
+        const existingMs = Date.parse(existing.updated_at);
+        const incomingMs = Date.parse(updatedAt);
+        const mergedUpdatedAt = (
+          Number.isFinite(existingMs)
+          && Number.isFinite(incomingMs)
+          && incomingMs > existingMs
+        )
+          ? updatedAt
+          : existing.updated_at;
+        assets[assetKey] = {
+          count: existing.count + count,
+          updated_at: mergedUpdatedAt,
+          by_source: sortObjectByKeys(mergeBySourceCounts(existing.by_source, bySource)),
+        };
+      }
     }
   }
 
@@ -178,10 +235,12 @@ export function normalizeDownloadAttributionLedger(
       if (total === null) continue;
       const dailyAssets: Record<string, number> = {};
       if (isObject(dateValue.assets)) {
-        for (const [assetKey, rawCount] of Object.entries(dateValue.assets)) {
+        for (const [rawAssetKey, rawCount] of Object.entries(dateValue.assets)) {
           const parsedCount = toFiniteNonNegativeNumber(rawCount);
           if (parsedCount === null || parsedCount === 0) continue;
-          dailyAssets[assetKey] = parsedCount;
+          const assetKey = normalizeAttributionAssetKey(rawAssetKey);
+          if (!assetKey) continue;
+          dailyAssets[assetKey] = (dailyAssets[assetKey] ?? 0) + parsedCount;
         }
       }
       daily[dateKey] = {
@@ -198,10 +257,12 @@ export function normalizeDownloadAttributionLedger(
       if (total === null) continue;
       const timelineAssets: Record<string, number> = {};
       if (isObject(timeValue.assets)) {
-        for (const [assetKey, rawCount] of Object.entries(timeValue.assets)) {
+        for (const [rawAssetKey, rawCount] of Object.entries(timeValue.assets)) {
           const parsedCount = toFiniteNonNegativeNumber(rawCount);
           if (parsedCount === null || parsedCount === 0) continue;
-          timelineAssets[assetKey] = parsedCount;
+          const assetKey = normalizeAttributionAssetKey(rawAssetKey);
+          if (!assetKey) continue;
+          timelineAssets[assetKey] = (timelineAssets[assetKey] ?? 0) + parsedCount;
         }
       }
       timeline[timeKey] = {
@@ -234,10 +295,12 @@ export function normalizeDownloadAttributionDelta(
   if (!isObject(value.assets)) return null;
 
   const assets: Record<string, number> = {};
-  for (const [assetKey, count] of Object.entries(value.assets)) {
+  for (const [rawAssetKey, count] of Object.entries(value.assets)) {
     const parsedCount = toFiniteNonNegativeNumber(count);
     if (parsedCount === null || parsedCount === 0) continue;
-    assets[assetKey] = parsedCount;
+    const assetKey = normalizeAttributionAssetKey(rawAssetKey);
+    if (!assetKey) continue;
+    assets[assetKey] = (assets[assetKey] ?? 0) + parsedCount;
   }
 
   return {
@@ -274,11 +337,12 @@ export function toDownloadAttributionAssetKey(
   assetName: string,
   assetIdentity?: string | null,
 ): string {
-  const base = `${repo.toLowerCase()}@${tag}/${assetName}`;
-  if (typeof assetIdentity !== "string" || assetIdentity.trim() === "") {
+  const base = normalizeAttributionBaseKey(repo, tag, assetName);
+  const normalizedIdentity = normalizeAssetIdentity(assetIdentity);
+  if (normalizedIdentity === "") {
     return base;
   }
-  return `${base}#${assetIdentity.trim()}`;
+  return `${base}#${normalizedIdentity}`;
 }
 
 export function toDownloadAttributionAssetKeyFromParsed(parsed: ParsedReleaseAssetUrl): string {
@@ -290,12 +354,13 @@ export function getAttributedCountForAssetKey(
   delta: DownloadAttributionDelta | undefined,
   assetKey: string,
 ): number {
-  const persisted = ledger.assets[assetKey]?.count ?? 0;
-  const pending = delta?.assets[assetKey] ?? 0;
-  const hashIndex = assetKey.indexOf("#");
+  const normalizedAssetKey = normalizeAttributionAssetKey(assetKey);
+  const persisted = ledger.assets[normalizedAssetKey]?.count ?? 0;
+  const pending = delta?.assets[normalizedAssetKey] ?? 0;
+  const hashIndex = normalizedAssetKey.indexOf("#");
 
   if (hashIndex >= 0) {
-    const baseKey = assetKey.slice(0, hashIndex);
+    const baseKey = normalizedAssetKey.slice(0, hashIndex);
     if (persisted > 0 || pending > 0) {
       return persisted + pending;
     }
@@ -304,7 +369,7 @@ export function getAttributedCountForAssetKey(
     return persistedBase + pendingBase;
   }
 
-  const prefix = `${assetKey}#`;
+  const prefix = `${normalizedAssetKey}#`;
   let persistedWithIdentity = 0;
   for (const [key, entry] of Object.entries(ledger.assets)) {
     if (!key.startsWith(prefix)) continue;
@@ -469,9 +534,10 @@ export function recordDownloadAttributionFetchByAssetKey(
   delta: DownloadAttributionDelta,
   assetKey: string,
 ): void {
-  if (!assetKey || assetKey.trim() === "") return;
-  const current = delta.assets[assetKey] ?? 0;
-  delta.assets[assetKey] = current + 1;
+  const normalizedAssetKey = normalizeAttributionAssetKey(assetKey);
+  if (!normalizedAssetKey) return;
+  const current = delta.assets[normalizedAssetKey] ?? 0;
+  delta.assets[normalizedAssetKey] = current + 1;
 }
 
 export function recordDownloadAttributionFetchByParsed(

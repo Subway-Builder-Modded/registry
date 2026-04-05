@@ -7,20 +7,21 @@ import {
   getAttributedCountForAssetKey,
   getLedgerAssetsForDateCutoff,
   mergeDownloadAttributionDeltas,
+  normalizeDownloadAttributionLedger,
   recordDownloadAttributionFetchByUrl,
   sumLedgerDateTotalUpToCutoff,
   sumLedgerTotalUpToCutoff,
   toDownloadAttributionAssetKey,
 } from "../lib/download-attribution.js";
 
-test("toDownloadAttributionAssetKey normalizes repo and preserves tag/asset", () => {
+test("toDownloadAttributionAssetKey normalizes repo and asset name casing", () => {
   assert.equal(
     toDownloadAttributionAssetKey("Owner/Repo", "v1.2.3", "Map.zip"),
-    "owner/repo@v1.2.3/Map.zip",
+    "owner/repo@v1.2.3/map.zip",
   );
   assert.equal(
     toDownloadAttributionAssetKey("Owner/Repo", "v1.2.3", "Map.zip", "RA_kwDOExample"),
-    "owner/repo@v1.2.3/Map.zip#RA_kwDOExample",
+    "owner/repo@v1.2.3/map.zip#RA_kwDOExample",
   );
 });
 
@@ -127,4 +128,39 @@ test("getAttributedCountForAssetKey prefers identity-key attribution and falls b
     getAttributedCountForAssetKey(noIdentityLedger, undefined, "owner/repo@v1.0.0/asset.zip#RA_missing"),
     7,
   );
+});
+
+test("normalizeDownloadAttributionLedger collapses asset-name case variants", () => {
+  const ledger = normalizeDownloadAttributionLedger({
+    schema_version: 2,
+    updated_at: "2026-03-30T00:00:00.000Z",
+    assets: {
+      "owner/repo@v1.0.0/Asset.zip": {
+        count: 2,
+        updated_at: "2026-03-30T00:00:00.000Z",
+        by_source: { a: 2 },
+      },
+      "owner/repo@v1.0.0/asset.zip": {
+        count: 3,
+        updated_at: "2026-03-30T01:00:00.000Z",
+        by_source: { b: 3 },
+      },
+    },
+    applied_delta_ids: {},
+    daily: {
+      "2026_03_30": {
+        total: 5,
+        assets: {
+          "owner/repo@v1.0.0/Asset.zip": 2,
+          "owner/repo@v1.0.0/asset.zip": 3,
+        },
+      },
+    },
+    timeline: {},
+  });
+
+  assert.equal(ledger.assets["owner/repo@v1.0.0/asset.zip"]?.count, 5);
+  assert.equal(ledger.assets["owner/repo@v1.0.0/asset.zip"]?.by_source.a, 2);
+  assert.equal(ledger.assets["owner/repo@v1.0.0/asset.zip"]?.by_source.b, 3);
+  assert.equal(ledger.daily["2026_03_30"]?.assets["owner/repo@v1.0.0/asset.zip"], 5);
 });
