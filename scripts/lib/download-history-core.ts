@@ -7,12 +7,9 @@ import {
   sumLedgerTotalUpToCutoff,
   type DownloadAttributionLedger,
 } from "./download-attribution.js";
-import { getManifest } from "./downloads-support.js";
 import type { IntegritySource } from "./integrity.js";
-import type { ManifestDirectory } from "./manifests.js";
 
 type ListingKind = "maps" | "mods";
-type ValidVersionsByListing = Record<string, Set<string>>;
 type IntegritySourceByListingVersion = Record<string, Record<string, IntegritySource | null>>;
 type SourceDownloadsMode = "already_adjusted" | "legacy_unadjusted";
 
@@ -37,17 +34,19 @@ interface DownloadHistorySection {
 }
 
 interface IntegrityVersionLike {
-  is_complete?: unknown;
   source?: unknown;
 }
 
 interface IntegrityListingLike {
   versions?: unknown;
-  complete_versions?: unknown;
 }
 
 interface IntegrityOutputLike {
   listings?: unknown;
+}
+
+interface AttributionHistoryLike {
+  total_attributed_fetches?: unknown;
 }
 
 export interface DownloadHistorySnapshot {
@@ -90,11 +89,14 @@ export interface NormalizeDownloadHistorySnapshotOptions {
   previousSnapshot: DownloadHistorySnapshot | null;
   warnings: string[];
   fileName: string;
+  attributionLedger?: DownloadAttributionLedger;
+  mapsIntegritySources?: IntegritySourceByListingVersion;
+  modsIntegritySources?: IntegritySourceByListingVersion;
 }
 
 const SNAPSHOT_PATTERN = /^snapshot_(\d{4}_\d{2}_\d{2})\.json$/;
 const DOWNLOAD_HISTORY_SCHEMA_VERSION = 2;
-const ATTRIBUTION_ADJUSTED_SNAPSHOT_START_DATE = "2026_03_30";
+const CANONICAL_HISTORY_CUTOFF_HOUR_UTC = 4;
 
 function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf-8")) as T;
@@ -102,6 +104,11 @@ function readJsonFile<T>(path: string): T {
 
 function toSnapshotDate(now: Date): string {
   return now.toISOString().slice(0, 10).replaceAll("-", "_");
+}
+
+function toCanonicalHistoryCutoffIso(snapshotDate: string): string {
+  const normalizedDate = snapshotDate.replaceAll("_", "-");
+  return `${normalizedDate}T${String(CANONICAL_HISTORY_CUTOFF_HOUR_UTC).padStart(2, "0")}:00:00.000Z`;
 }
 
 function asFiniteNumber(value: unknown): number | null {
@@ -114,7 +121,6 @@ function isObject(value: unknown): value is Record<string, unknown> {
 
 function normalizeDownloads(
   raw: unknown,
-  listingKind: ListingKind,
   warnings: string[],
   sourceLabel: string,
 ): DownloadsByListing {
@@ -148,58 +154,7 @@ function normalizeDownloads(
   return result;
 }
 
-function normalizeValidVersionsFromIntegrity(
-  raw: unknown,
-  listingKind: ListingKind,
-  warnings: string[],
-): ValidVersionsByListing {
-  if (!isObject(raw)) {
-    throw new Error(`${listingKind}/integrity.json must be a JSON object`);
-  }
-
-  const listings = (raw as IntegrityOutputLike).listings;
-  if (!isObject(listings)) {
-    throw new Error(`${listingKind}/integrity.json must include an object 'listings' field`);
-  }
-
-  const validVersionsByListing: ValidVersionsByListing = {};
-  for (const listingId of Object.keys(listings).sort()) {
-    const listingRaw = listings[listingId];
-    if (!isObject(listingRaw)) {
-      warnings.push(`${listingKind}/integrity.json: listing='${listingId}' has non-object payload; treating as empty`);
-      validVersionsByListing[listingId] = new Set<string>();
-      continue;
-    }
-
-    const listing = listingRaw as IntegrityListingLike;
-    const validVersions = new Set<string>();
-    if (isObject(listing.versions)) {
-      for (const version of Object.keys(listing.versions)) {
-        const versionRaw = listing.versions[version];
-        if (!isObject(versionRaw)) continue;
-        if ((versionRaw as IntegrityVersionLike).is_complete === true) {
-          validVersions.add(version);
-        }
-      }
-    }
-
-    if (Array.isArray(listing.complete_versions)) {
-      for (const version of listing.complete_versions) {
-        if (typeof version === "string" && version.trim() !== "") {
-          validVersions.add(version);
-        }
-      }
-    }
-
-    validVersionsByListing[listingId] = validVersions;
-  }
-
-  return validVersionsByListing;
-}
-
-function normalizeIntegritySource(
-  raw: unknown,
-): IntegritySource | null {
+function normalizeIntegritySource(raw: unknown): IntegritySource | null {
   if (!isObject(raw)) return null;
   const updateType = raw.update_type;
   if (updateType !== "github" && updateType !== "custom") return null;
@@ -257,7 +212,7 @@ function normalizeIntegritySourcesFromIntegrity(
       const normalizedSource = normalizeIntegritySource((versionRaw as IntegrityVersionLike).source);
       if ((versionRaw as IntegrityVersionLike).source && !normalizedSource) {
         warnings.push(
-          `${listingKind}/integrity.json: listing='${listingId}' version='${version}' has invalid source metadata; falling back to manifest inference`,
+          `${listingKind}/integrity.json: listing='${listingId}' version='${version}' has invalid source metadata; strict attribution matching skipped for this version`,
         );
       }
       listingSources[version] = normalizedSource;
@@ -283,53 +238,6 @@ function readIntegritySourcesFromIntegrity(
     listingKind,
     warnings,
   );
-}
-
-function readValidVersionsFromIntegrity(
-  repoRoot: string,
-  listingKind: ListingKind,
-  warnings: string[],
-): ValidVersionsByListing {
-  const integrityPath = resolve(repoRoot, listingKind, "integrity.json");
-  if (!existsSync(integrityPath)) {
-    throw new Error(`${listingKind}/integrity.json is required to generate download history`);
-  }
-
-  return normalizeValidVersionsFromIntegrity(
-    readJsonFile<unknown>(integrityPath),
-    listingKind,
-    warnings,
-  );
-}
-
-function filterDownloadsByIntegrity(
-  downloads: DownloadsByListing,
-  validVersionsByListing: ValidVersionsByListing,
-  sourceLabel: string,
-  warnings: string[],
-): DownloadsByListing {
-  const filtered: DownloadsByListing = {};
-  for (const listingId of Object.keys(downloads).sort()) {
-    const versions = downloads[listingId] ?? {};
-    const validVersions = validVersionsByListing[listingId];
-    if (!validVersions) {
-      warnings.push(`${sourceLabel}: listing='${listingId}' not found in integrity.json; treating as empty`);
-      filtered[listingId] = {};
-      continue;
-    }
-
-    const filteredVersions: Record<string, number> = {};
-    for (const version of Object.keys(versions).sort()) {
-      if (!validVersions.has(version)) {
-        warnings.push(`${sourceLabel}: listing='${listingId}' version='${version}' is not complete; skipping version`);
-        continue;
-      }
-      filteredVersions[version] = versions[version]!;
-    }
-    filtered[listingId] = filteredVersions;
-  }
-
-  return filtered;
 }
 
 function computeTotalDownloads(downloads: DownloadsByListing): number {
@@ -382,7 +290,7 @@ function capAttributedDownloadsToRaw(
       const cappedCount = Math.min(rawCount, attributedCount);
       if (cappedCount !== attributedCount) {
         warnings.push(
-          `${sourceLabel}: listing='${listingId}' version='${version}' attributed downloads exceeded stored raw downloads (${attributedCount} > ${rawCount}); capping attribution to raw count`,
+          `${sourceLabel}: listing='${listingId}' version='${version}' attributed downloads exceeded raw downloads (${attributedCount} > ${rawCount}); capping`,
         );
       }
       cappedVersions[version] = cappedCount;
@@ -425,80 +333,11 @@ function parseAttributionAssetKey(assetKey: string): { repo: string; tag: string
   };
 }
 
-function parseCustomUpdateRepo(updateUrl: string): string | null {
-  try {
-    const parsed = new URL(updateUrl);
-    if (parsed.hostname === "raw.githubusercontent.com") {
-      const segments = parsed.pathname.split("/").filter((segment) => segment !== "");
-      if (segments.length >= 2) {
-        return `${segments[0]}/${segments[1]}`.toLowerCase();
-      }
-    }
-    if (parsed.hostname.endsWith(".github.io")) {
-      const owner = parsed.hostname.slice(0, -".github.io".length);
-      const segments = parsed.pathname.split("/").filter((segment) => segment !== "");
-      if (owner !== "" && segments.length >= 1) {
-        return `${owner}/${segments[0]}`.toLowerCase();
-      }
-    }
-  } catch {
-    return null;
-  }
-  return null;
-}
-
-function normalizeTagForMatching(tag: string): string {
-  const lowered = tag.trim().toLowerCase();
-  return lowered.startsWith("v") ? lowered.slice(1) : lowered;
-}
-
-function inferAssetMatcherTokenFromManifest(
-  listingKind: ListingKind,
-  manifest: Record<string, unknown>,
-  updateUrl?: string,
-): string | null {
-  if (listingKind === "maps") {
-    const cityCode = typeof manifest.city_code === "string" ? manifest.city_code.trim() : "";
-    if (cityCode !== "") return cityCode.toLowerCase();
-  }
-
-  if (!updateUrl) {
-    return null;
-  }
-
-  try {
-    const parsed = new URL(updateUrl);
-    const baseName = parsed.pathname.split("/").pop() ?? "";
-    const normalized = baseName
-      .replace(/\.json$/i, "")
-      .replace(/^update[-_]?/i, "")
-      .replace(/[-_]?update$/i, "")
-      .trim()
-      .toLowerCase();
-    return normalized !== "" ? normalized : null;
-  } catch {
-    return null;
-  }
-}
-
-function assetMatchesToken(assetName: string, token: string | null): boolean {
-  if (!assetName.toLowerCase().endsWith(".zip")) return false;
-  if (!token) return true;
-  const normalizedAsset = assetName.toLowerCase().replace(/\.zip$/i, "");
-  return normalizedAsset === token
-    || normalizedAsset.startsWith(`${token}_`)
-    || normalizedAsset.startsWith(`${token}-`)
-    || normalizedAsset.startsWith(token)
-    || normalizedAsset.includes(`-${token}`)
-    || normalizedAsset.includes(`_${token}`)
-    || normalizedAsset.includes(token);
-}
-
 function sumAttributedForIntegritySource(
   ledger: DownloadAttributionLedger,
   source: IntegritySource,
   snapshotDate: string,
-  generatedAtIso?: string | null,
+  cutoffIso: string,
 ): number {
   const repo = source.repo?.trim().toLowerCase();
   const tag = source.tag?.trim();
@@ -506,7 +345,7 @@ function sumAttributedForIntegritySource(
   if (!repo || !tag || !assetName) return 0;
 
   let total = 0;
-  forEachLedgerAssetCountUpToCutoff(ledger, snapshotDate, generatedAtIso, (assetKey, count) => {
+  forEachLedgerAssetCountUpToCutoff(ledger, snapshotDate, cutoffIso, (assetKey, count) => {
     const parsed = parseAttributionAssetKey(assetKey);
     if (!parsed) return;
     if (parsed.repo !== repo) return;
@@ -517,76 +356,10 @@ function sumAttributedForIntegritySource(
   return total;
 }
 
-function sumAttributedForVersion(
-  ledger: DownloadAttributionLedger,
-  listingKind: ListingKind,
-  listingId: string,
-  version: string,
-  snapshotDate: string,
-  generatedAtIso: string | null | undefined,
-  repoRoot: string,
-  exactSource?: IntegritySource | null,
-): number {
-  if (exactSource) {
-    return sumAttributedForIntegritySource(ledger, exactSource, snapshotDate, generatedAtIso);
-  }
-
-  const dir: ManifestDirectory = listingKind;
-  let manifest: Record<string, unknown>;
-  try {
-    manifest = getManifest(repoRoot, dir, listingId) as unknown as Record<string, unknown>;
-  } catch {
-    return 0;
-  }
-
-  const update = manifest.update;
-  if (typeof update !== "object" || update === null || Array.isArray(update)) {
-    return 0;
-  }
-
-  let repo: string | null = null;
-  let assetMatcherToken: string | null = null;
-  const updateType = (update as { type?: unknown }).type;
-  if (updateType === "github") {
-    const updateRepo = (update as { repo?: unknown }).repo;
-    if (typeof updateRepo === "string" && updateRepo.trim() !== "") {
-      repo = updateRepo.trim().toLowerCase();
-      assetMatcherToken = inferAssetMatcherTokenFromManifest(listingKind, manifest);
-    }
-  } else if (updateType === "custom") {
-    const updateUrl = (update as { url?: unknown }).url;
-    if (typeof updateUrl === "string" && updateUrl.trim() !== "") {
-      repo = parseCustomUpdateRepo(updateUrl);
-      assetMatcherToken = inferAssetMatcherTokenFromManifest(listingKind, manifest, updateUrl);
-    }
-  }
-
-  if (!repo) return 0;
-
-  const normalizedVersion = normalizeTagForMatching(version);
-  let total = 0;
-  forEachLedgerAssetCountUpToCutoff(ledger, snapshotDate, generatedAtIso, (assetKey, count) => {
-    const parsed = parseAttributionAssetKey(assetKey);
-    if (!parsed) return;
-    if (parsed.repo !== repo) return;
-    if (
-      normalizeTagForMatching(parsed.tag) !== normalizedVersion
-      && !normalizeTagForMatching(parsed.tag).includes(normalizedVersion)
-    ) {
-      return;
-    }
-    if (!assetMatchesToken(parsed.assetName, assetMatcherToken)) return;
-    total += count;
-  });
-  return total;
-}
-
 function buildAttributedDownloadsForSnapshot(
-  repoRoot: string,
-  listingKind: ListingKind,
   downloads: DownloadsByListing,
   snapshotDate: string,
-  generatedAtIso: string | null | undefined,
+  cutoffIso: string,
   ledger: DownloadAttributionLedger,
   integritySources: IntegritySourceByListingVersion,
 ): DownloadsByListing {
@@ -595,16 +368,10 @@ function buildAttributedDownloadsForSnapshot(
     const versions = downloads[listingId] ?? {};
     const attributedVersions: Record<string, number> = {};
     for (const version of Object.keys(versions).sort()) {
-      attributedVersions[version] = sumAttributedForVersion(
-        ledger,
-        listingKind,
-        listingId,
-        version,
-        snapshotDate,
-        generatedAtIso,
-        repoRoot,
-        integritySources[listingId]?.[version] ?? null,
-      );
+      const source = integritySources[listingId]?.[version] ?? null;
+      attributedVersions[version] = source
+        ? sumAttributedForIntegritySource(ledger, source, snapshotDate, cutoffIso)
+        : 0;
     }
     attributed[listingId] = attributedVersions;
   }
@@ -615,22 +382,14 @@ function readListingData(
   repoRoot: string,
   listingKind: ListingKind,
   warnings: string[],
-  validVersionsByListing: ValidVersionsByListing,
 ): { downloads: DownloadsByListing; totalDownloads: number; index: IndexFile; entries: number } {
   const downloadsPath = resolve(repoRoot, listingKind, "downloads.json");
   const indexPath = resolve(repoRoot, listingKind, "index.json");
   const downloadsRaw = readJsonFile<unknown>(downloadsPath);
-  const normalizedDownloads = normalizeDownloads(
+  const downloads = normalizeDownloads(
     downloadsRaw,
-    listingKind,
     warnings,
     `${listingKind}/downloads.json`,
-  );
-  const downloads = filterDownloadsByIntegrity(
-    normalizedDownloads,
-    validVersionsByListing,
-    `${listingKind}/downloads.json`,
-    warnings,
   );
   const totalDownloads = computeTotalDownloads(downloads);
   const index = readJsonFile<IndexFile>(indexPath);
@@ -749,73 +508,42 @@ function asEntriesOrFallback(
 
 function normalizeSnapshotDownloadsOrEmpty(
   raw: unknown,
-  listingKind: ListingKind,
   warnings: string[],
   sourceLabel: string,
 ): DownloadsByListing {
   try {
-    return normalizeDownloads(raw, listingKind, warnings, sourceLabel);
+    return normalizeDownloads(raw, warnings, sourceLabel);
   } catch {
     warnings.push(`${sourceLabel} has invalid downloads payload; treating as empty`);
     return {};
   }
 }
 
-function resolveStoredDownloadsForBackfill(
-  snapshotDate: string,
+function resolveStoredRawDownloadsForBackfill(
   section: DownloadHistorySection | undefined,
-  listingKind: ListingKind,
   warnings: string[],
   sourceLabel: string,
 ): DownloadsByListing {
-  const sourceMode = resolveSourceDownloadsMode(
-    section?.source_downloads_mode,
-    snapshotDate,
-    warnings,
-    `${sourceLabel}.source_downloads_mode`,
-  );
   if (section?.raw_downloads) {
     return normalizeSnapshotDownloadsOrEmpty(
       section.raw_downloads,
-      listingKind,
       warnings,
       `${sourceLabel}.raw_downloads`,
     );
   }
-  const adjustedDownloads = normalizeSnapshotDownloadsOrEmpty(
+
+  const fallbackRaw = normalizeSnapshotDownloadsOrEmpty(
     section?.downloads,
-    listingKind,
     warnings,
     `${sourceLabel}.downloads`,
   );
-  if (sourceMode === "already_adjusted" && section?.attributed_downloads) {
-    const attributedDownloads = normalizeSnapshotDownloadsOrEmpty(
-      section.attributed_downloads,
-      listingKind,
-      warnings,
-      `${sourceLabel}.attributed_downloads`,
-    );
-    warnings.push(
-      `${sourceLabel}: missing raw_downloads; reconstructed raw_downloads as downloads + attributed_downloads`,
-    );
-    return addDownloads(adjustedDownloads, attributedDownloads);
-  }
-  if (sourceMode === "already_adjusted") {
-    warnings.push(
-      `${sourceLabel}: missing raw_downloads for already_adjusted snapshot; using downloads as fallback raw baseline`,
-    );
-  }
-  return normalizeSnapshotDownloadsOrEmpty(
-    adjustedDownloads,
-    listingKind,
-    warnings,
-    `${sourceLabel}.downloads`,
-  );
+  warnings.push(`${sourceLabel}: missing raw_downloads; using downloads as canonical raw baseline`);
+  return fallbackRaw;
 }
 
 function resolveSourceDownloadsMode(
   raw: unknown,
-  snapshotDate: string,
+  section: DownloadHistorySection | undefined,
   warnings: string[],
   sourceLabel: string,
 ): SourceDownloadsMode {
@@ -824,12 +552,25 @@ function resolveSourceDownloadsMode(
   }
   if (typeof raw === "string" && raw.trim() !== "") {
     warnings.push(
-      `${sourceLabel} has invalid source_downloads_mode='${raw}'; defaulting by snapshot date boundary`,
+      `${sourceLabel} has invalid source_downloads_mode='${raw}'; inferring mode from raw_downloads presence`,
     );
   }
-  return snapshotDate >= ATTRIBUTION_ADJUSTED_SNAPSHOT_START_DATE
-    ? "already_adjusted"
-    : "legacy_unadjusted";
+  return section?.raw_downloads ? "already_adjusted" : "legacy_unadjusted";
+}
+
+function readAttributionHistoryTotal(
+  repoRoot: string,
+  snapshotDate: string,
+): number | null {
+  const filePath = resolve(repoRoot, "history", `download_attribution_${snapshotDate}.json`);
+  if (!existsSync(filePath)) return null;
+  try {
+    const parsed = readJsonFile<AttributionHistoryLike>(filePath);
+    const total = asFiniteNumber(parsed.total_attributed_fetches);
+    return total === null ? null : total;
+  } catch {
+    return null;
+  }
 }
 
 export function generateDownloadHistorySnapshot(
@@ -841,16 +582,12 @@ export function generateDownloadHistorySnapshot(
   const snapshotFileName = `snapshot_${snapshotDate}.json`;
   const previous = readPreviousSnapshot(options.repoRoot, snapshotFileName, warnings);
   const attributionLedger = loadDownloadAttributionLedger(options.repoRoot);
-  const mapsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "maps", warnings);
-  const modsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "mods", warnings);
   const mapsIntegritySources = readIntegritySourcesFromIntegrity(options.repoRoot, "maps", warnings);
   const modsIntegritySources = readIntegritySourcesFromIntegrity(options.repoRoot, "mods", warnings);
 
-  const mapsData = readListingData(options.repoRoot, "maps", warnings, mapsValidVersions);
-  const modsData = readListingData(options.repoRoot, "mods", warnings, modsValidVersions);
+  const mapsData = readListingData(options.repoRoot, "maps", warnings);
+  const modsData = readListingData(options.repoRoot, "mods", warnings);
   const mapsAttributedDownloads = buildAttributedDownloadsForSnapshot(
-    options.repoRoot,
-    "maps",
     mapsData.downloads,
     snapshotDate,
     now.toISOString(),
@@ -858,8 +595,6 @@ export function generateDownloadHistorySnapshot(
     mapsIntegritySources,
   );
   const modsAttributedDownloads = buildAttributedDownloadsForSnapshot(
-    options.repoRoot,
-    "mods",
     modsData.downloads,
     snapshotDate,
     now.toISOString(),
@@ -935,8 +670,8 @@ export function backfillDownloadHistorySnapshots(
   const historyDir = getHistoryDir(options.repoRoot);
   const snapshotFiles = listSnapshotFileNames(historyDir);
   const attributionLedger = loadDownloadAttributionLedger(options.repoRoot);
-  const mapsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "maps", warnings);
-  const modsValidVersions = readValidVersionsFromIntegrity(options.repoRoot, "mods", warnings);
+  const mapsIntegritySources = readIntegritySourcesFromIntegrity(options.repoRoot, "maps", warnings);
+  const modsIntegritySources = readIntegritySourcesFromIntegrity(options.repoRoot, "mods", warnings);
   const updatedFiles: string[] = [];
   let previousSnapshot: DownloadHistorySnapshot | null = null;
 
@@ -955,6 +690,9 @@ export function backfillDownloadHistorySnapshots(
       previousSnapshot,
       warnings,
       fileName,
+      attributionLedger,
+      mapsIntegritySources,
+      modsIntegritySources,
     });
 
     const normalizedRaw = `${JSON.stringify(normalizedSnapshot, null, 2)}\n`;
@@ -976,57 +714,52 @@ export function backfillDownloadHistorySnapshots(
 export function normalizeDownloadHistorySnapshot(
   options: NormalizeDownloadHistorySnapshotOptions,
 ): DownloadHistorySnapshot {
-  const { repoRoot, snapshot, previousSnapshot, warnings, fileName } = options;
-  const attributionLedger = loadDownloadAttributionLedger(repoRoot);
-  const mapsValidVersions = readValidVersionsFromIntegrity(repoRoot, "maps", warnings);
-  const modsValidVersions = readValidVersionsFromIntegrity(repoRoot, "mods", warnings);
-  const mapsIntegritySources = readIntegritySourcesFromIntegrity(repoRoot, "maps", warnings);
-  const modsIntegritySources = readIntegritySourcesFromIntegrity(repoRoot, "mods", warnings);
+  const {
+    repoRoot,
+    snapshot,
+    previousSnapshot,
+    warnings,
+    fileName,
+    attributionLedger = loadDownloadAttributionLedger(repoRoot),
+    mapsIntegritySources = readIntegritySourcesFromIntegrity(repoRoot, "maps", warnings),
+    modsIntegritySources = readIntegritySourcesFromIntegrity(repoRoot, "mods", warnings),
+  } = options;
+  const cutoffIso = toCanonicalHistoryCutoffIso(snapshot.snapshot_date);
 
   const mapsSourceMode = resolveSourceDownloadsMode(
     snapshot.maps?.source_downloads_mode,
-    snapshot.snapshot_date,
+    snapshot.maps,
     warnings,
     `history/${fileName}:maps.source_downloads_mode`,
   );
   const modsSourceMode = resolveSourceDownloadsMode(
     snapshot.mods?.source_downloads_mode,
-    snapshot.snapshot_date,
+    snapshot.mods,
     warnings,
     `history/${fileName}:mods.source_downloads_mode`,
   );
-  const mapsAttributionCutoffIso = snapshot.generated_at;
-  const modsAttributionCutoffIso = snapshot.generated_at;
 
-  const mapsStoredRawDownloads = resolveStoredDownloadsForBackfill(
-    snapshot.snapshot_date,
+  const mapsStoredRawDownloads = resolveStoredRawDownloadsForBackfill(
     snapshot.maps,
-    "maps",
     warnings,
     `history/${fileName}:maps`,
   );
-  const modsStoredRawDownloads = resolveStoredDownloadsForBackfill(
-    snapshot.snapshot_date,
+  const modsStoredRawDownloads = resolveStoredRawDownloadsForBackfill(
     snapshot.mods,
-    "mods",
     warnings,
     `history/${fileName}:mods`,
   );
   const mapsAttributionUncapped = buildAttributedDownloadsForSnapshot(
-    repoRoot,
-    "maps",
     mapsStoredRawDownloads,
     snapshot.snapshot_date,
-    mapsAttributionCutoffIso,
+    cutoffIso,
     attributionLedger,
     mapsIntegritySources,
   );
   const modsAttributionUncapped = buildAttributedDownloadsForSnapshot(
-    repoRoot,
-    "mods",
     modsStoredRawDownloads,
     snapshot.snapshot_date,
-    modsAttributionCutoffIso,
+    cutoffIso,
     attributionLedger,
     modsIntegritySources,
   );
@@ -1042,64 +775,24 @@ export function normalizeDownloadHistorySnapshot(
     warnings,
     `history/${fileName}:mods.attributed_downloads`,
   );
-  const mapsRawDownloads = mapsStoredRawDownloads;
-  const modsRawDownloads = modsStoredRawDownloads;
-  const mapsEffectiveDownloads = subtractDownloadsWithClamp(
+  const mapsDownloads = subtractDownloadsWithClamp(
     mapsStoredRawDownloads,
     mapsAttribution,
   );
-  const modsEffectiveDownloads = subtractDownloadsWithClamp(
+  const modsDownloads = subtractDownloadsWithClamp(
     modsStoredRawDownloads,
     modsAttribution,
   );
 
-  const mapsDownloads = filterDownloadsByIntegrity(
-    mapsEffectiveDownloads,
-    mapsValidVersions,
-    `history/${fileName}:maps.downloads`,
-    warnings,
-  );
-  const modsDownloads = filterDownloadsByIntegrity(
-    modsEffectiveDownloads,
-    modsValidVersions,
-    `history/${fileName}:mods.downloads`,
-    warnings,
-  );
-  const mapsFilteredRawDownloads = filterDownloadsByIntegrity(
-    mapsRawDownloads,
-    mapsValidVersions,
-    `history/${fileName}:maps.raw_downloads`,
-    warnings,
-  );
-  const modsFilteredRawDownloads = filterDownloadsByIntegrity(
-    modsRawDownloads,
-    modsValidVersions,
-    `history/${fileName}:mods.raw_downloads`,
-    warnings,
-  );
-  const mapsFilteredAttribution = filterDownloadsByIntegrity(
-    mapsAttribution,
-    mapsValidVersions,
-    `history/${fileName}:maps.attributed_downloads`,
-    warnings,
-  );
-  const modsFilteredAttribution = filterDownloadsByIntegrity(
-    modsAttribution,
-    modsValidVersions,
-    `history/${fileName}:mods.attributed_downloads`,
-    warnings,
-  );
-
   const mapsTotalDownloads = computeTotalDownloads(mapsDownloads);
   const modsTotalDownloads = computeTotalDownloads(modsDownloads);
-  const mapsRawTotalDownloads = computeTotalDownloads(mapsFilteredRawDownloads);
-  const modsRawTotalDownloads = computeTotalDownloads(modsFilteredRawDownloads);
-  const mapsAttributedTotal = computeTotalDownloads(mapsFilteredAttribution);
-  const modsAttributedTotal = computeTotalDownloads(modsFilteredAttribution);
-  const totalAttributedFetches = sumLedgerTotalUpToCutoff(
-    attributionLedger,
-    snapshot.snapshot_date,
-    snapshot.generated_at,
+  const mapsRawTotalDownloads = computeTotalDownloads(mapsStoredRawDownloads);
+  const modsRawTotalDownloads = computeTotalDownloads(modsStoredRawDownloads);
+  const mapsAttributedTotal = computeTotalDownloads(mapsAttribution);
+  const modsAttributedTotal = computeTotalDownloads(modsAttribution);
+  const totalAttributedFetches = (
+    readAttributionHistoryTotal(repoRoot, snapshot.snapshot_date)
+    ?? sumLedgerTotalUpToCutoff(attributionLedger, snapshot.snapshot_date, cutoffIso)
   );
 
   const mapsIndex = asIndexFileOrFallback(
@@ -1145,8 +838,8 @@ export function normalizeDownloadHistorySnapshot(
     ),
     maps: {
       downloads: mapsDownloads,
-      raw_downloads: mapsFilteredRawDownloads,
-      attributed_downloads: mapsFilteredAttribution,
+      raw_downloads: mapsStoredRawDownloads,
+      attributed_downloads: mapsAttribution,
       total_downloads: mapsTotalDownloads,
       raw_total_downloads: mapsRawTotalDownloads,
       total_attributed_downloads: mapsAttributedTotal,
@@ -1157,8 +850,8 @@ export function normalizeDownloadHistorySnapshot(
     },
     mods: {
       downloads: modsDownloads,
-      raw_downloads: modsFilteredRawDownloads,
-      attributed_downloads: modsFilteredAttribution,
+      raw_downloads: modsStoredRawDownloads,
+      attributed_downloads: modsAttribution,
       total_downloads: modsTotalDownloads,
       raw_total_downloads: modsRawTotalDownloads,
       total_attributed_downloads: modsAttributedTotal,

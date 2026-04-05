@@ -93,9 +93,9 @@ test("runGenerateAnalyticsCli writes assets_by_day.csv grouped by listing type",
     assert.equal(
       assetsByDayCsv,
       [
-        "snapshot_date,total_downloads,maps,mods,cumulative_total,cumulative_maps,cumulative_mods,total_new_assets,new_maps,new_mods,cumulative_assets,cumulative_maps_assets,cumulative_mods_assets,total_new_assets_versions,new_maps_versions,new_mods_versions,cumulative_asset_versions,cumulative_maps_versions,cumulative_mods_versions",
-        "2026_03_30,15,10,5,15,10,5,2,1,1,2,1,1,2,1,1,2,1,1",
-        "2026_03_31,5,3,2,20,13,7,0,0,0,2,1,1,0,0,0,2,1,1",
+        "snapshot_date,total_downloads,maps,mods,total_downloads_signed,maps_signed,mods_signed,total_downloads_clamped,maps_clamped,mods_clamped,cumulative_total,cumulative_maps,cumulative_mods,total_new_assets,new_maps,new_mods,cumulative_assets,cumulative_maps_assets,cumulative_mods_assets,total_new_assets_versions,new_maps_versions,new_mods_versions,cumulative_asset_versions,cumulative_maps_versions,cumulative_mods_versions",
+        "2026_03_30,15,10,5,15,10,5,15,10,5,15,10,5,2,1,1,2,1,1,2,1,1,2,1,1",
+        "2026_03_31,5,3,2,5,3,2,5,3,2,20,13,7,0,0,0,2,1,1,0,0,0,2,1,1",
         "",
       ].join("\n"),
     );

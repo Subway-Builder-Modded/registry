@@ -165,6 +165,12 @@ interface AssetByDayRow {
   total_downloads: number;
   maps: number;
   mods: number;
+  total_downloads_signed: number;
+  maps_signed: number;
+  mods_signed: number;
+  total_downloads_clamped: number;
+  maps_clamped: number;
+  mods_clamped: number;
   cumulative_total: number;
   cumulative_maps: number;
   cumulative_mods: number;
@@ -904,6 +910,33 @@ function buildDailyDeltaSnapshotTotals(
   return bySnapshot;
 }
 
+function buildSignedDailyDeltaSnapshotTotals(
+  snapshots: SnapshotEntry[],
+  adjustedTotalsBySnapshot: Map<string, ListingTotals>,
+): Map<string, ListingTotals> {
+  const bySnapshot = new Map<string, ListingTotals>();
+  let previousTotals = new Map<ListingKey, number>();
+
+  for (const snapshot of snapshots) {
+    const currentTotals = adjustedTotalsBySnapshot.get(snapshot.file) ?? new Map<ListingKey, number>();
+    const keys = new Set<ListingKey>([
+      ...previousTotals.keys(),
+      ...currentTotals.keys(),
+    ]);
+    const deltaTotals = new Map<ListingKey, number>();
+    for (const key of keys) {
+      const delta = (currentTotals.get(key) ?? 0) - (previousTotals.get(key) ?? 0);
+      if (delta !== 0 || currentTotals.has(key) || previousTotals.has(key)) {
+        deltaTotals.set(key, delta);
+      }
+    }
+    bySnapshot.set(snapshot.file, deltaTotals);
+    previousTotals = currentTotals;
+  }
+
+  return bySnapshot;
+}
+
 function buildListingByDayRows(
   snapshotDates: string[],
   latestTotals: ListingTotals,
@@ -1041,6 +1074,7 @@ function buildAuthorByDayRows(
 function buildAssetsByDayRows(
   snapshotDates: string[],
   dailyDeltasBySnapshot: Map<string, ListingTotals>,
+  signedDailyDeltasBySnapshot: Map<string, ListingTotals>,
   listingIdsBySnapshot: Map<string, { maps: Set<string>; mods: Set<string> }>,
   listingVersionsBySnapshot: Map<string, { maps: Set<string>; mods: Set<string> }>,
 ): AssetByDayRow[] {
@@ -1054,11 +1088,15 @@ function buildAssetsByDayRows(
   return snapshotDates.map((snapshotDate) => {
     let maps = 0;
     let mods = 0;
+    let mapsSigned = 0;
+    let modsSigned = 0;
     let newMaps = 0;
     let newMods = 0;
     let newMapVersions = 0;
     let newModVersions = 0;
     const snapshotTotals = dailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)
+      ?? new Map<ListingKey, number>();
+    const snapshotSignedTotals = signedDailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)
       ?? new Map<ListingKey, number>();
     const listingIds = listingIdsBySnapshot.get(`snapshot_${snapshotDate}.json`) ?? {
       maps: new Set<string>(),
@@ -1073,6 +1111,11 @@ function buildAssetsByDayRows(
       const [listingType] = key.split(":") as ["maps" | "mods", string];
       if (listingType === "maps") maps += totalDownloads;
       if (listingType === "mods") mods += totalDownloads;
+    }
+    for (const [key, totalDownloads] of snapshotSignedTotals.entries()) {
+      const [listingType] = key.split(":") as ["maps" | "mods", string];
+      if (listingType === "maps") mapsSigned += totalDownloads;
+      if (listingType === "mods") modsSigned += totalDownloads;
     }
 
     for (const id of listingIds.maps) {
@@ -1108,6 +1151,12 @@ function buildAssetsByDayRows(
       total_downloads: maps + mods,
       maps,
       mods,
+      total_downloads_signed: mapsSigned + modsSigned,
+      maps_signed: mapsSigned,
+      mods_signed: modsSigned,
+      total_downloads_clamped: maps + mods,
+      maps_clamped: maps,
+      mods_clamped: mods,
       cumulative_total: cumulativeMaps + cumulativeMods,
       cumulative_maps: cumulativeMaps,
       cumulative_mods: cumulativeMods,
@@ -1156,18 +1205,39 @@ export function runGenerateAnalyticsCli(
   }
 
   const latest = snapshots[snapshots.length - 1];
-  const latestData = loadJsonFile<SnapshotData>(join(historyDir, latest.file));
   const adjustedTotalsBySnapshot = new Map<string, ListingTotals>();
-  adjustedTotalsBySnapshot.set(latest.file, filterOutTestListingTotals(resolvedRepoRoot, toListingTotals(latestData)));
+  const getAdjustedTotalsForSnapshot = (snapshotFile: string): ListingTotals => {
+    const cached = adjustedTotalsBySnapshot.get(snapshotFile);
+    if (cached) return cached;
+    const totals = filterOutTestListingTotals(
+      resolvedRepoRoot,
+      toListingTotals(loadJsonFile<SnapshotData>(join(historyDir, snapshotFile))),
+    );
+    adjustedTotalsBySnapshot.set(snapshotFile, totals);
+    return totals;
+  };
+  const latestAdjustedTotals = getAdjustedTotalsForSnapshot(latest.file);
+  for (const snapshot of snapshots) {
+    getAdjustedTotalsForSnapshot(snapshot.file);
+  }
   const monotonicTotalsBySnapshot = buildMonotonicSnapshotTotals(snapshots, historyDir);
   const dailyDeltasBySnapshot = buildDailyDeltaSnapshotTotals(snapshots, monotonicTotalsBySnapshot);
+  const signedDailyDeltasBySnapshot = buildSignedDailyDeltaSnapshotTotals(snapshots, adjustedTotalsBySnapshot);
   const filteredDailyDeltasBySnapshot = new Map<string, ListingTotals>();
+  const filteredSignedDailyDeltasBySnapshot = new Map<string, ListingTotals>();
   for (const snapshot of snapshots) {
     filteredDailyDeltasBySnapshot.set(
       snapshot.file,
       filterOutTestListingTotals(
         resolvedRepoRoot,
         dailyDeltasBySnapshot.get(snapshot.file) ?? new Map<ListingKey, number>(),
+      ),
+    );
+    filteredSignedDailyDeltasBySnapshot.set(
+      snapshot.file,
+      filterOutTestListingTotals(
+        resolvedRepoRoot,
+        signedDailyDeltasBySnapshot.get(snapshot.file) ?? new Map<ListingKey, number>(),
       ),
     );
   }
@@ -1182,7 +1252,6 @@ export function runGenerateAnalyticsCli(
     resolvedRepoRoot,
     monotonicTotalsBySnapshot.get(latest.file) ?? new Map<ListingKey, number>(),
   );
-  const latestAdjustedTotals = adjustedTotalsBySnapshot.get(latest.file) ?? new Map<ListingKey, number>();
 
   const listingMeta = new Map<ListingKey, ListingMeta>();
   for (const key of latestAdjustedTotals.keys()) {
@@ -1208,13 +1277,7 @@ export function runGenerateAnalyticsCli(
 
   const rowsForWindow = (days: number): ListingWindowRow[] => {
     const baseline = resolveBaselineSnapshot(snapshots, latest.date, days);
-    const baselineAdjustedTotals = adjustedTotalsBySnapshot.get(baseline.file)
-      ?? (() => {
-        const totals = toListingTotals(loadJsonFile<SnapshotData>(join(historyDir, baseline.file)));
-        const filteredTotals = filterOutTestListingTotals(resolvedRepoRoot, totals);
-        adjustedTotalsBySnapshot.set(baseline.file, filteredTotals);
-        return filteredTotals;
-      })();
+    const baselineAdjustedTotals = getAdjustedTotalsForSnapshot(baseline.file);
     const baselineTotals = filterOutTestListingTotals(
       resolvedRepoRoot,
       monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>(),
@@ -1296,13 +1359,7 @@ export function runGenerateAnalyticsCli(
 
   const projectRowsForWindow = (days: number): ProjectWindowRow[] => {
     const baseline = resolveBaselineSnapshot(snapshots, latest.date, days);
-    const baselineAdjustedTotals = adjustedTotalsBySnapshot.get(baseline.file)
-      ?? (() => {
-        const totals = toListingTotals(loadJsonFile<SnapshotData>(join(historyDir, baseline.file)));
-        const filteredTotals = filterOutTestListingTotals(resolvedRepoRoot, totals);
-        adjustedTotalsBySnapshot.set(baseline.file, filteredTotals);
-        return filteredTotals;
-      })();
+    const baselineAdjustedTotals = getAdjustedTotalsForSnapshot(baseline.file);
     const baselineTotals = filterOutTestListingTotals(
       resolvedRepoRoot,
       monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>(),
@@ -1496,6 +1553,7 @@ export function runGenerateAnalyticsCli(
   const assetsByDayRows = buildAssetsByDayRows(
     snapshotDates,
     filteredDailyDeltasBySnapshot,
+    filteredSignedDailyDeltasBySnapshot,
     listingIdsBySnapshot,
     listingVersionsBySnapshot,
   );
@@ -1805,6 +1863,12 @@ export function runGenerateAnalyticsCli(
       "total_downloads",
       "maps",
       "mods",
+      "total_downloads_signed",
+      "maps_signed",
+      "mods_signed",
+      "total_downloads_clamped",
+      "maps_clamped",
+      "mods_clamped",
       "cumulative_total",
       "cumulative_maps",
       "cumulative_mods",

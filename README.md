@@ -126,6 +126,9 @@ Each snapshot includes:
 
 - `maps` and `mods` sections
 - embedded current `downloads` and `index` payloads
+- canonical `raw_downloads` baseline (or legacy fallback to historical `downloads` when `raw_downloads` is absent)
+- canonical `attributed_downloads` from strict source-key attribution matching
+- adjusted `downloads = max(0, raw_downloads - attributed_downloads)`
 - `total_downloads`
 - `net_downloads` versus the previous snapshot (or total on first snapshot)
 - `entries` count from the corresponding `index.json`
@@ -134,6 +137,13 @@ Local command:
 
 - Generate/update today’s history snapshot:
   - `pnpm --dir scripts run generate-download-history`
+
+- Canonical consistency suite (deterministic historical rebuild):
+  1. `pnpm --dir scripts run backfill-download-attribution -- --days 90 --rebuild-ledger`
+  2. `pnpm --dir scripts run generate-download-history -- --backfill`
+  3. `pnpm --dir scripts run analytics`
+
+Backfill normalization uses a fixed historical attribution cutoff of `04:00:00 UTC` for each snapshot date.
 
 Shared-pack attribution audit:
 

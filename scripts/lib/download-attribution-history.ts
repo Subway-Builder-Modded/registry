@@ -47,6 +47,12 @@ interface DownloadSnapshotMeta {
   generatedAtIso: string;
 }
 
+const CANONICAL_HISTORY_CUTOFF_HOUR_UTC = 4;
+
+function toCanonicalHistoryCutoffIso(snapshotDate: string): string {
+  return `${snapshotDate.replaceAll("_", "-")}T${String(CANONICAL_HISTORY_CUTOFF_HOUR_UTC).padStart(2, "0")}:00:00.000Z`;
+}
+
 function toSnapshotDate(now: Date): string {
   return now.toISOString().slice(0, 10).replaceAll("-", "_");
 }
@@ -241,15 +247,7 @@ function readDownloadSnapshotMetas(repoRoot: string): DownloadSnapshotMeta[] {
   for (const name of readdirSync(historyDir).sort()) {
     const snapshotDate = parseDateFromDownloadSnapshotFile(name);
     if (!snapshotDate) continue;
-    try {
-      const raw = readJsonFile<{ generated_at?: unknown }>(resolve(historyDir, name));
-      const generatedAtIso = typeof raw.generated_at === "string" && raw.generated_at.trim() !== ""
-        ? raw.generated_at
-        : `${snapshotDate.replaceAll("_", "-")}T23:59:59.999Z`;
-      metas.push({ snapshotDate, generatedAtIso });
-    } catch {
-      metas.push({ snapshotDate, generatedAtIso: `${snapshotDate.replaceAll("_", "-")}T23:59:59.999Z` });
-    }
+    metas.push({ snapshotDate, generatedAtIso: toCanonicalHistoryCutoffIso(snapshotDate) });
   }
   return metas;
 }

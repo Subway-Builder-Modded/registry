@@ -101,6 +101,8 @@ test("backfillDownloadAttributionHistorySnapshots writes files for existing snap
 
     const day1 = JSON.parse(readFileSync(join(repoRoot, "history", "download_attribution_2026_03_29.json"), "utf-8"));
     const day2 = JSON.parse(readFileSync(join(repoRoot, "history", "download_attribution_2026_03_30.json"), "utf-8"));
+    assert.equal(day1.generated_at, "2026-03-29T04:00:00.000Z");
+    assert.equal(day2.generated_at, "2026-03-30T04:00:00.000Z");
     assert.equal(day1.daily_attributed_fetches, 1);
     assert.equal(day2.daily_attributed_fetches, 2);
     assert.equal(day1.total_attributed_fetches, 1);
@@ -162,6 +164,7 @@ test("backfillDownloadAttributionHistorySnapshots aligns totals to download snap
     assert.equal(result.updatedFiles.length, 1);
 
     const day = JSON.parse(readFileSync(join(repoRoot, "history", "download_attribution_2026_03_30.json"), "utf-8"));
+    assert.equal(day.generated_at, "2026-03-30T04:00:00.000Z");
     assert.equal(day.daily_attributed_fetches, 2);
     assert.equal(day.total_attributed_fetches, 2);
     assert.equal(day.net_attributed_fetches, 2);
