@@ -4,6 +4,7 @@ import {
   adjustDownloadCount,
   createDownloadAttributionDelta,
   createEmptyDownloadAttributionLedger,
+  getAttributedCountForAssetKey,
   getLedgerAssetsForDateCutoff,
   mergeDownloadAttributionDeltas,
   recordDownloadAttributionFetchByUrl,
@@ -87,5 +88,28 @@ test("mergeDownloadAttributionDeltas records timestamp buckets and honors cutoff
   assert.deepEqual(
     getLedgerAssetsForDateCutoff(merged.ledger, "2026_03_30", "2026-03-30T03:00:00.000Z"),
     { "owner/repo@v1.0.0/asset.zip": 2 },
+  );
+});
+
+test("getAttributedCountForAssetKey includes base-key attribution for identity-aware lookups", () => {
+  const ledger = createEmptyDownloadAttributionLedger("2026-03-30T00:00:00.000Z");
+  ledger.assets["owner/repo@v1.0.0/asset.zip"] = {
+    count: 3,
+    updated_at: "2026-03-30T00:00:00.000Z",
+    by_source: {},
+  };
+  ledger.assets["owner/repo@v1.0.0/asset.zip#RA_abc"] = {
+    count: 5,
+    updated_at: "2026-03-30T00:00:00.000Z",
+    by_source: {},
+  };
+
+  const delta = createDownloadAttributionDelta("workflow:test", "delta-identity", "2026-03-30T01:00:00.000Z");
+  delta.assets["owner/repo@v1.0.0/asset.zip"] = 2;
+  delta.assets["owner/repo@v1.0.0/asset.zip#RA_abc"] = 4;
+
+  assert.equal(
+    getAttributedCountForAssetKey(ledger, delta, "owner/repo@v1.0.0/asset.zip#RA_abc"),
+    14,
   );
 });

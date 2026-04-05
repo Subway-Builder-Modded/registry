@@ -292,7 +292,30 @@ export function getAttributedCountForAssetKey(
 ): number {
   const persisted = ledger.assets[assetKey]?.count ?? 0;
   const pending = delta?.assets[assetKey] ?? 0;
-  return persisted + pending;
+  const hashIndex = assetKey.indexOf("#");
+
+  if (hashIndex >= 0) {
+    const baseKey = assetKey.slice(0, hashIndex);
+    const persistedBase = ledger.assets[baseKey]?.count ?? 0;
+    const pendingBase = delta?.assets[baseKey] ?? 0;
+    return persisted + pending + persistedBase + pendingBase;
+  }
+
+  const prefix = `${assetKey}#`;
+  let persistedWithIdentity = 0;
+  for (const [key, entry] of Object.entries(ledger.assets)) {
+    if (!key.startsWith(prefix)) continue;
+    persistedWithIdentity += entry.count;
+  }
+  let pendingWithIdentity = 0;
+  if (delta) {
+    for (const [key, count] of Object.entries(delta.assets)) {
+      if (!key.startsWith(prefix)) continue;
+      pendingWithIdentity += count;
+    }
+  }
+
+  return persisted + pending + persistedWithIdentity + pendingWithIdentity;
 }
 
 export function getAttributedCountForParsedAsset(

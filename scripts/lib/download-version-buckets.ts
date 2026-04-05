@@ -21,6 +21,46 @@ function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
   return sorted;
 }
 
+function isSyntheticBucketKey(bucketKey: string): boolean {
+  return bucketKey.startsWith("legacy:")
+    || bucketKey.startsWith("history-max:")
+    || bucketKey.startsWith("version:");
+}
+
+function bucketLogicalKey(bucketKey: string): string {
+  const hashIndex = bucketKey.indexOf("#");
+  return hashIndex >= 0 ? bucketKey.slice(0, hashIndex) : bucketKey;
+}
+
+function hasCanonicalBucketKey(buckets: Record<string, DownloadVersionBucketEntry>): boolean {
+  return Object.keys(buckets).some((bucketKey) => !isSyntheticBucketKey(bucketKey));
+}
+
+function filterSyntheticBuckets(
+  buckets: Record<string, DownloadVersionBucketEntry>,
+): Record<string, DownloadVersionBucketEntry> {
+  const filtered: Record<string, DownloadVersionBucketEntry> = {};
+  for (const [bucketKey, bucket] of Object.entries(buckets)) {
+    if (isSyntheticBucketKey(bucketKey)) continue;
+    filtered[bucketKey] = bucket;
+  }
+  return filtered;
+}
+
+function computeMaxTotalFromBuckets(
+  buckets: Record<string, DownloadVersionBucketEntry>,
+): number {
+  const perLogicalKeyMax: Record<string, number> = {};
+  for (const [bucketKey, bucket] of Object.entries(buckets)) {
+    const logicalKey = bucketLogicalKey(bucketKey);
+    perLogicalKeyMax[logicalKey] = Math.max(
+      perLogicalKeyMax[logicalKey] ?? 0,
+      bucket.max_adjusted_downloads,
+    );
+  }
+  return Object.values(perLogicalKeyMax).reduce((sum, count) => sum + count, 0);
+}
+
 export interface DownloadVersionBucketEntry {
   max_adjusted_downloads: number;
   last_adjusted_downloads: number;
@@ -105,18 +145,22 @@ function normalizeDownloadVersionEntry(
     if (!normalized) continue;
     buckets[bucketKey] = normalized;
   }
+  const normalizedBuckets = hasCanonicalBucketKey(buckets)
+    ? filterSyntheticBuckets(buckets)
+    : buckets;
 
-  const maxTotalFromBuckets = Object.values(buckets)
-    .reduce((sum, bucket) => sum + bucket.max_adjusted_downloads, 0);
+  const maxTotalFromBuckets = computeMaxTotalFromBuckets(normalizedBuckets);
   const storedMaxTotal = toFiniteNonNegativeNumber(value.max_total_downloads);
-  const maxTotal = Math.max(maxTotalFromBuckets, storedMaxTotal ?? 0);
+  const maxTotal = Object.keys(normalizedBuckets).length > 0
+    ? maxTotalFromBuckets
+    : (storedMaxTotal ?? 0);
   const updatedAt = typeof value.updated_at === "string" && value.updated_at.trim() !== ""
     ? value.updated_at
     : nowIso;
 
   return {
     max_total_downloads: maxTotal,
-    buckets: sortObjectByKeys(buckets),
+    buckets: sortObjectByKeys(normalizedBuckets),
     updated_at: updatedAt,
   };
 }
@@ -211,11 +255,21 @@ export function applyVersionBucketMonotonicCounts(
         buckets: {},
         updated_at: nowIso,
       };
-      const nextBuckets: Record<string, DownloadVersionBucketEntry> = {
+      let nextBuckets: Record<string, DownloadVersionBucketEntry> = {
         ...previousVersionEntry.buckets,
       };
 
       if (inputs.length > 0) {
+        if (hasCanonicalBucketKey({
+          ...nextBuckets,
+          ...Object.fromEntries(inputs.map((input) => [input.bucketKey, {
+            max_adjusted_downloads: input.adjustedCount,
+            last_adjusted_downloads: input.adjustedCount,
+            updated_at: nowIso,
+          }])),
+        })) {
+          nextBuckets = filterSyntheticBuckets(nextBuckets);
+        }
         for (const input of inputs) {
           const previousBucket = nextBuckets[input.bucketKey];
           const previousMax = previousBucket?.max_adjusted_downloads ?? 0;
@@ -236,14 +290,13 @@ export function applyVersionBucketMonotonicCounts(
         };
       }
 
-      const maxTotal = Object.values(nextBuckets)
-        .reduce((sum, bucket) => sum + bucket.max_adjusted_downloads, 0);
+      const maxTotal = computeMaxTotalFromBuckets(nextBuckets);
       nextVersionEntries[version] = {
         max_total_downloads: maxTotal,
         buckets: sortObjectByKeys(nextBuckets),
         updated_at: nowIso,
       };
-      nextVersions[version] = maxTotal;
+      nextVersions[version] = computedValue;
     }
 
     nextLedger.listings[listingId] = {
@@ -260,37 +313,4 @@ export function applyVersionBucketMonotonicCounts(
   ledger.listings = nextLedger.listings;
 
   return nextDownloads;
-}
-
-export function seedVersionBucketLedgerFromDownloads(
-  ledger: DownloadVersionBucketLedger,
-  downloads: DownloadsByListing,
-  nowIso = new Date().toISOString(),
-): void {
-  for (const listingId of Object.keys(downloads)) {
-    const versions = downloads[listingId] ?? {};
-    const listingEntry = ledger.listings[listingId] ?? { versions: {} };
-    for (const version of Object.keys(versions)) {
-      const existing = listingEntry.versions[version];
-      if (existing) continue;
-      const count = toFiniteNonNegativeNumber(versions[version]) ?? 0;
-      const fallbackBucketKey = `legacy:${listingId}:${version}`;
-      listingEntry.versions[version] = {
-        max_total_downloads: count,
-        buckets: {
-          [fallbackBucketKey]: {
-            max_adjusted_downloads: count,
-            last_adjusted_downloads: count,
-            updated_at: nowIso,
-          },
-        },
-        updated_at: nowIso,
-      };
-    }
-    ledger.listings[listingId] = {
-      versions: sortObjectByKeys(listingEntry.versions),
-    };
-  }
-  ledger.updated_at = nowIso;
-  ledger.listings = sortObjectByKeys(ledger.listings);
 }
