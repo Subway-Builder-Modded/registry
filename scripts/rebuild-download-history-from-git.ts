@@ -9,6 +9,7 @@ import {
 } from "./lib/download-history.js";
 import { resolveRepoRoot } from "./lib/script-runtime.js";
 
+const ATTRIBUTION_ROLLOUT_COMMIT = "60e49f4cb10e6900e12bfaf3b48a06a27eb48f85";
 const DOWNLOAD_SOURCE_PATHS = [
   "maps/downloads.json",
   "mods/downloads.json",
@@ -22,6 +23,12 @@ interface HistoricalSnapshotSource {
   botTimestamp: string;
   sourceCommit: string;
   generatedAt: string;
+  mapsSourceDownloadsMode?: "already_adjusted" | "legacy_unadjusted";
+  modsSourceDownloadsMode?: "already_adjusted" | "legacy_unadjusted";
+}
+
+interface CliOptions {
+  fromDate?: string;
 }
 
 interface LegacySnapshot {
@@ -120,6 +127,44 @@ function listSnapshotFiles(repoRoot: string): string[] {
     : [];
 }
 
+function normalizeDateArg(raw: string): string | null {
+  const trimmed = raw.trim();
+  const normalized = trimmed.replaceAll("-", "_");
+  return /^\d{4}_\d{2}_\d{2}$/.test(normalized) ? normalized : null;
+}
+
+function parseCliOptions(argv: string[]): CliOptions {
+  let fromDate: string | undefined;
+  for (let index = 0; index < argv.length; index += 1) {
+    const arg = argv[index];
+    if (arg === "--from-date" || arg === "--date") {
+      const next = argv[index + 1];
+      if (!next || next.startsWith("-")) {
+        throw new Error(`Missing value after ${arg}`);
+      }
+      const parsed = normalizeDateArg(next);
+      if (!parsed) {
+        throw new Error(`Invalid date '${next}'. Use YYYY_MM_DD or YYYY-MM-DD`);
+      }
+      fromDate = parsed;
+      index += 1;
+      continue;
+    }
+    if (arg.startsWith("--from-date=") || arg.startsWith("--date=")) {
+      const value = arg.slice(arg.indexOf("=") + 1);
+      const parsed = normalizeDateArg(value);
+      if (!parsed) {
+        throw new Error(`Invalid date '${value}'. Use YYYY_MM_DD or YYYY-MM-DD`);
+      }
+      fromDate = parsed;
+      continue;
+    }
+    if (arg === "--") continue;
+    throw new Error(`Unknown argument '${arg}'. Supported: --from-date <YYYY_MM_DD>`);
+  }
+  return { fromDate };
+}
+
 function resolveLatestBotCommitForSnapshot(repoRoot: string, fileName: string): { commit: string; timestamp: string } {
   const raw = runGit(repoRoot, ["log", "--format=%H\t%an\t%aI", "--", `history/${fileName}`]);
   const lines = raw.split("\n").filter((line) => line.trim() !== "");
@@ -153,22 +198,56 @@ function resolveHistoricalSourceCommit(repoRoot: string, generatedAt: string): s
   return commit !== "" ? commit : resolveSourceCommitAtTime(repoRoot, generatedAt);
 }
 
+function isCommitAtOrAfterRollout(repoRoot: string, commit: string): boolean {
+  try {
+    execFileSync("git", ["merge-base", "--is-ancestor", ATTRIBUTION_ROLLOUT_COMMIT, commit], {
+      cwd: repoRoot,
+      stdio: "ignore",
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function buildHistoricalSources(repoRoot: string): HistoricalSnapshotSource[] {
   return listSnapshotFiles(repoRoot).map((fileName) => {
     const { commit: botCommit, timestamp: botTimestamp } = resolveLatestBotCommitForSnapshot(repoRoot, fileName);
-    const originalSnapshot = readJsonFromCommit<{ generated_at?: string }>(
+    const originalSnapshot = readJsonFromCommit<{
+      schema_version?: number;
+      generated_at?: string;
+      maps?: { source_downloads_mode?: string };
+      mods?: { source_downloads_mode?: string };
+    }>(
       repoRoot,
       botCommit,
       `history/${fileName}`,
     );
     const generatedAt = typeof originalSnapshot.generated_at === "string" ? originalSnapshot.generated_at : botTimestamp;
     const sourceCommit = resolveHistoricalSourceCommit(repoRoot, generatedAt);
+    const inferredDefaultMode = isCommitAtOrAfterRollout(repoRoot, sourceCommit)
+      ? "already_adjusted"
+      : "legacy_unadjusted";
+    const mapsSourceDownloadsMode = (
+      originalSnapshot.maps?.source_downloads_mode === "legacy_unadjusted"
+      || originalSnapshot.maps?.source_downloads_mode === "already_adjusted"
+    )
+      ? originalSnapshot.maps.source_downloads_mode
+      : inferredDefaultMode;
+    const modsSourceDownloadsMode = (
+      originalSnapshot.mods?.source_downloads_mode === "legacy_unadjusted"
+      || originalSnapshot.mods?.source_downloads_mode === "already_adjusted"
+    )
+      ? originalSnapshot.mods.source_downloads_mode
+      : inferredDefaultMode;
     return {
       fileName,
       botCommit,
       botTimestamp,
       sourceCommit,
       generatedAt,
+      mapsSourceDownloadsMode,
+      modsSourceDownloadsMode,
     };
   });
 }
@@ -232,6 +311,7 @@ function buildLegacySnapshot(
 }
 
 function run(): void {
+  const cli = parseCliOptions(process.argv.slice(2));
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const tempRepoRoot = mkdtempSync(resolve(tmpdir(), "railyard-history-rebuild-"));
   const warnings: string[] = [];
@@ -243,8 +323,29 @@ function run(): void {
       JSON.parse(readFileSync(resolve(repoRoot, "history", "registry-download-attribution.json"), "utf-8")),
     );
 
-    const sources = buildHistoricalSources(repoRoot);
+    const allSnapshotFiles = listSnapshotFiles(repoRoot);
+    const startFileName = cli.fromDate ? `snapshot_${cli.fromDate}.json` : null;
+    const sources = buildHistoricalSources(repoRoot)
+      .filter((source) => (startFileName ? source.fileName >= startFileName : true));
+    if (startFileName && sources.length === 0) {
+      throw new Error(`No snapshot files found at or after ${startFileName}`);
+    }
+
     let previousSnapshot: DownloadHistorySnapshot | null = null;
+    if (sources.length > 0) {
+      const firstFile = sources[0]!.fileName;
+      const previousFile = allSnapshotFiles.filter((name) => name < firstFile).sort().at(-1);
+      if (previousFile) {
+        try {
+          previousSnapshot = JSON.parse(
+            readFileSync(resolve(repoRoot, "history", previousFile), "utf-8"),
+          ) as DownloadHistorySnapshot;
+        } catch {
+          previousSnapshot = null;
+        }
+      }
+    }
+
     const updatedFiles: string[] = [];
 
     for (const source of sources) {
@@ -252,8 +353,8 @@ function run(): void {
 
       const snapshotDate = source.fileName.replace(/^snapshot_/, "").replace(/\.json$/, "");
       const provisional = buildLegacySnapshot(tempRepoRoot, snapshotDate, source.generatedAt) as unknown as DownloadHistorySnapshot;
-      provisional.maps.source_downloads_mode = "already_adjusted";
-      provisional.mods.source_downloads_mode = "already_adjusted";
+      provisional.maps.source_downloads_mode = source.mapsSourceDownloadsMode ?? "already_adjusted";
+      provisional.mods.source_downloads_mode = source.modsSourceDownloadsMode ?? "already_adjusted";
 
       const normalized = normalizeDownloadHistorySnapshot({
         repoRoot: tempRepoRoot,

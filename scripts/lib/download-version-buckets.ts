@@ -61,6 +61,35 @@ function computeMaxTotalFromBuckets(
   return Object.values(perLogicalKeyMax).reduce((sum, count) => sum + count, 0);
 }
 
+function computeRecoveredDisplayTotalFromBuckets(
+  buckets: Record<string, DownloadVersionBucketEntry>,
+  fallbackCurrentValue: number,
+): number {
+  const canonicalEntries = Object.entries(buckets)
+    .filter(([bucketKey]) => !isSyntheticBucketKey(bucketKey));
+  if (canonicalEntries.length === 0) {
+    return fallbackCurrentValue;
+  }
+
+  const perLogicalBuckets = new Map<string, DownloadVersionBucketEntry[]>();
+  for (const [bucketKey, bucket] of canonicalEntries) {
+    const logicalKey = bucketLogicalKey(bucketKey);
+    const existing = perLogicalBuckets.get(logicalKey) ?? [];
+    existing.push(bucket);
+    perLogicalBuckets.set(logicalKey, existing);
+  }
+
+  let total = 0;
+  for (const logicalBuckets of perLogicalBuckets.values()) {
+    if (logicalBuckets.length === 1) {
+      total += logicalBuckets[0]!.last_adjusted_downloads;
+      continue;
+    }
+    total += Math.max(...logicalBuckets.map((bucket) => bucket.max_adjusted_downloads));
+  }
+  return total;
+}
+
 export interface DownloadVersionBucketEntry {
   max_adjusted_downloads: number;
   last_adjusted_downloads: number;
@@ -296,7 +325,7 @@ export function applyVersionBucketMonotonicCounts(
         buckets: sortObjectByKeys(nextBuckets),
         updated_at: nowIso,
       };
-      nextVersions[version] = computedValue;
+      nextVersions[version] = computeRecoveredDisplayTotalFromBuckets(nextBuckets, computedValue);
     }
 
     nextLedger.listings[listingId] = {

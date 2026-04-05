@@ -241,28 +241,36 @@ function buildLineToAssetKeyIndex(repoRoot: string): Map<string, string> {
       continue;
     }
     if (!isObject(raw)) continue;
-    const listings = (raw as IntegritySnapshotLike).listings;
-    if (!isObject(listings)) continue;
-
-    for (const [listingId, listingValue] of Object.entries(listings)) {
-      if (!isObject(listingValue)) continue;
-      const versions = (listingValue as IntegrityListingLike).versions;
-      if (!isObject(versions)) continue;
-      for (const [version, versionValue] of Object.entries(versions)) {
-        if (!isObject(versionValue)) continue;
-        const source = (versionValue as IntegrityVersionLike).source;
-        if (!isObject(source)) continue;
-        const repo = typeof source.repo === "string" ? source.repo.toLowerCase() : "";
-        const tag = typeof source.tag === "string" ? source.tag : "";
-        const assetName = typeof source.asset_name === "string" ? source.asset_name : "";
-        if (!repo || !tag || !assetName) continue;
-        const assetKey = toDownloadAttributionAssetKey(repo, tag, assetName);
-        index.set(`${listingId}::${version}::${assetName}`, assetKey);
-        index.set(`${listingId}::${version}::${assetName.toLowerCase()}`, assetKey);
-      }
-    }
+    addIntegrityMappingsToLineIndex(raw, index);
   }
   return index;
+}
+
+function addIntegrityMappingsToLineIndex(
+  raw: unknown,
+  index: Map<string, string>,
+): void {
+  if (!isObject(raw)) return;
+  const listings = (raw as IntegritySnapshotLike).listings;
+  if (!isObject(listings)) return;
+
+  for (const [listingId, listingValue] of Object.entries(listings)) {
+    if (!isObject(listingValue)) continue;
+    const versions = (listingValue as IntegrityListingLike).versions;
+    if (!isObject(versions)) continue;
+    for (const [version, versionValue] of Object.entries(versions)) {
+      if (!isObject(versionValue)) continue;
+      const source = (versionValue as IntegrityVersionLike).source;
+      if (!isObject(source)) continue;
+      const repo = typeof source.repo === "string" ? source.repo.toLowerCase() : "";
+      const tag = typeof source.tag === "string" ? source.tag : "";
+      const assetName = typeof source.asset_name === "string" ? source.asset_name : "";
+      if (!repo || !tag || !assetName) continue;
+      const assetKey = toDownloadAttributionAssetKey(repo, tag, assetName);
+      index.set(`${listingId}::${version}::${assetName}`, assetKey);
+      index.set(`${listingId}::${version}::${assetName.toLowerCase()}`, assetKey);
+    }
+  }
 }
 
 function toUtcDateKey(isoLike: string): string | null {
@@ -524,6 +532,27 @@ function readJsonAtSource<T>(
   }
 }
 
+function buildLineToAssetKeyIndexAtSource(
+  repoRoot: string,
+  sourceCommit: string | null | undefined,
+  gitShowCache?: Map<string, string | null>,
+  cache?: Map<string, Map<string, string>>,
+): Map<string, string> {
+  const sourceKey = sourceCommit?.trim() ? sourceCommit.trim() : "working";
+  if (cache?.has(sourceKey)) {
+    return cache.get(sourceKey)!;
+  }
+
+  const index = new Map<string, string>();
+  const mapsIntegrity = readJsonAtSource<unknown>(repoRoot, "maps/integrity.json", sourceCommit, gitShowCache);
+  const modsIntegrity = readJsonAtSource<unknown>(repoRoot, "mods/integrity.json", sourceCommit, gitShowCache);
+  addIntegrityMappingsToLineIndex(mapsIntegrity, index);
+  addIntegrityMappingsToLineIndex(modsIntegrity, index);
+
+  cache?.set(sourceKey, index);
+  return index;
+}
+
 function parseGithubSourceFingerprint(
   value: string | null | undefined,
 ): { tag: string; assetName: string } | null {
@@ -780,6 +809,7 @@ export async function runDownloadAttributionBackfillCli(
   const gitShowCache = new Map<string, string | null>();
   const mapManifestCache = new Map<string, MapManifest | null>();
   const demandSourceFingerprintCache = new Map<string, string | null>();
+  const sourceLineIndexCache = new Map<string, Map<string, string>>();
 
   const deltas: DownloadAttributionDelta[] = [];
   deltas.push(...gitDeltaBackfill.deltas);
@@ -830,11 +860,26 @@ export async function runDownloadAttributionBackfillCli(
         parsedLines += 1;
         perWorkflow.parsedLines += 1;
         let assetKey: string | null = null;
+        const sourceCommit = runSourceCommitCache.has(runInfo.created_at)
+          ? (runSourceCommitCache.get(runInfo.created_at) ?? null)
+          : resolveSourceCommitAtTime(cli.repoRoot, runInfo.created_at);
+        if (!runSourceCommitCache.has(runInfo.created_at)) {
+          runSourceCommitCache.set(runInfo.created_at, sourceCommit);
+        }
 
         if (hit.kind === "downloads") {
           const mapKeyExact = `${hit.listingId}::${hit.version}::${hit.assetName}`;
           const mapKeyLower = `${hit.listingId}::${hit.version}::${hit.assetName.toLowerCase()}`;
           assetKey = lineIndex.get(mapKeyExact) ?? lineIndex.get(mapKeyLower) ?? null;
+          if (!assetKey) {
+            const sourceLineIndex = buildLineToAssetKeyIndexAtSource(
+              cli.repoRoot,
+              sourceCommit,
+              gitShowCache,
+              sourceLineIndexCache,
+            );
+            assetKey = sourceLineIndex.get(mapKeyExact) ?? sourceLineIndex.get(mapKeyLower) ?? null;
+          }
         } else {
           assetKey = hit.assetKey ?? null;
           if (!assetKey && hit.zipUrl) {
@@ -844,12 +889,6 @@ export async function runDownloadAttributionBackfillCli(
             }
           }
           if (!assetKey) {
-            const sourceCommit = runSourceCommitCache.has(runInfo.created_at)
-              ? (runSourceCommitCache.get(runInfo.created_at) ?? null)
-              : resolveSourceCommitAtTime(cli.repoRoot, runInfo.created_at);
-            if (!runSourceCommitCache.has(runInfo.created_at)) {
-              runSourceCommitCache.set(runInfo.created_at, sourceCommit);
-            }
             assetKey = await resolveMapDemandBackfillAssetKey(
               hit.listingId,
               cli.repoRoot,

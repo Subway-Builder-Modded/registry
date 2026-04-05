@@ -17,7 +17,7 @@ test("toDownloadAssetBucketKey appends immutable asset identity when available",
   );
 });
 
-test("applyVersionBucketMonotonicCounts keeps version totals non-decreasing across asset replacement", () => {
+test("applyVersionBucketMonotonicCounts recovers replaced same-tag assets from prior max", () => {
   const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
 
   const first = applyVersionBucketMonotonicCounts(
@@ -57,9 +57,53 @@ test("applyVersionBucketMonotonicCounts keeps version totals non-decreasing acro
     "2026-04-05T01:00:00.000Z",
   );
 
-  // downloads.json should reflect the current adjusted value.
-  assert.equal(second.sample?.["1.0.0"], 2);
+  // downloads.json should recover replacement-resets for the same logical asset.
+  assert.equal(second.sample?.["1.0.0"], 100);
   // Ledger still preserves monotonic historical max for audit/debug.
+  assert.equal(ledger.listings.sample?.versions["1.0.0"]?.max_total_downloads, 100);
+});
+
+test("applyVersionBucketMonotonicCounts keeps single-bucket versions on current adjusted value", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+
+  const first = applyVersionBucketMonotonicCounts(
+    ledger,
+    {
+      sample: {
+        "1.0.0": 100,
+      },
+    },
+    {
+      sample: {
+        "1.0.0": [{
+          bucketKey: "owner/repo@1.0.0/sample.zip#assetA",
+          adjustedCount: 100,
+        }],
+      },
+    },
+    "2026-04-05T00:00:00.000Z",
+  );
+  assert.equal(first.sample?.["1.0.0"], 100);
+
+  const second = applyVersionBucketMonotonicCounts(
+    ledger,
+    {
+      sample: {
+        "1.0.0": 2,
+      },
+    },
+    {
+      sample: {
+        "1.0.0": [{
+          bucketKey: "owner/repo@1.0.0/sample.zip#assetA",
+          adjustedCount: 2,
+        }],
+      },
+    },
+    "2026-04-05T01:00:00.000Z",
+  );
+
+  assert.equal(second.sample?.["1.0.0"], 2);
   assert.equal(ledger.listings.sample?.versions["1.0.0"]?.max_total_downloads, 100);
 });
 
