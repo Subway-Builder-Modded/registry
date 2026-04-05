@@ -27,6 +27,15 @@ function isSyntheticBucketKey(bucketKey: string): boolean {
     || bucketKey.startsWith("version:");
 }
 
+function isHistoryMaxBucketKey(bucketKey: string): boolean {
+  return bucketKey.startsWith("history-max:");
+}
+
+function isDiscardableSyntheticBucketKey(bucketKey: string): boolean {
+  return bucketKey.startsWith("legacy:")
+    || bucketKey.startsWith("version:");
+}
+
 function bucketLogicalKey(bucketKey: string): string {
   const hashIndex = bucketKey.indexOf("#");
   return hashIndex >= 0 ? bucketKey.slice(0, hashIndex) : bucketKey;
@@ -36,12 +45,12 @@ function hasCanonicalBucketKey(buckets: Record<string, DownloadVersionBucketEntr
   return Object.keys(buckets).some((bucketKey) => !isSyntheticBucketKey(bucketKey));
 }
 
-function filterSyntheticBuckets(
+function filterDiscardableSyntheticBuckets(
   buckets: Record<string, DownloadVersionBucketEntry>,
 ): Record<string, DownloadVersionBucketEntry> {
   const filtered: Record<string, DownloadVersionBucketEntry> = {};
   for (const [bucketKey, bucket] of Object.entries(buckets)) {
-    if (isSyntheticBucketKey(bucketKey)) continue;
+    if (isDiscardableSyntheticBucketKey(bucketKey)) continue;
     filtered[bucketKey] = bucket;
   }
   return filtered;
@@ -61,14 +70,26 @@ function computeMaxTotalFromBuckets(
   return Object.values(perLogicalKeyMax).reduce((sum, count) => sum + count, 0);
 }
 
+function computeHistoryMaxFloor(
+  buckets: Record<string, DownloadVersionBucketEntry>,
+): number {
+  let floor = 0;
+  for (const [bucketKey, bucket] of Object.entries(buckets)) {
+    if (!isHistoryMaxBucketKey(bucketKey)) continue;
+    floor = Math.max(floor, bucket.max_adjusted_downloads);
+  }
+  return floor;
+}
+
 function computeRecoveredDisplayTotalFromBuckets(
   buckets: Record<string, DownloadVersionBucketEntry>,
   fallbackCurrentValue: number,
 ): number {
+  const historyFloor = computeHistoryMaxFloor(buckets);
   const canonicalEntries = Object.entries(buckets)
     .filter(([bucketKey]) => !isSyntheticBucketKey(bucketKey));
   if (canonicalEntries.length === 0) {
-    return fallbackCurrentValue;
+    return Math.max(fallbackCurrentValue, historyFloor);
   }
 
   const perLogicalBuckets = new Map<string, DownloadVersionBucketEntry[]>();
@@ -87,7 +108,7 @@ function computeRecoveredDisplayTotalFromBuckets(
     }
     total += Math.max(...logicalBuckets.map((bucket) => bucket.max_adjusted_downloads));
   }
-  return total;
+  return Math.max(total, historyFloor);
 }
 
 export interface DownloadVersionBucketEntry {
@@ -175,10 +196,15 @@ function normalizeDownloadVersionEntry(
     buckets[bucketKey] = normalized;
   }
   const normalizedBuckets = hasCanonicalBucketKey(buckets)
-    ? filterSyntheticBuckets(buckets)
+    ? filterDiscardableSyntheticBuckets(buckets)
     : buckets;
-
-  const maxTotalFromBuckets = computeMaxTotalFromBuckets(normalizedBuckets);
+  const canonicalBuckets = Object.fromEntries(
+    Object.entries(normalizedBuckets).filter(([bucketKey]) => !isSyntheticBucketKey(bucketKey)),
+  ) as Record<string, DownloadVersionBucketEntry>;
+  const historyFloor = computeHistoryMaxFloor(normalizedBuckets);
+  const maxTotalFromBuckets = Object.keys(canonicalBuckets).length > 0
+    ? Math.max(computeMaxTotalFromBuckets(canonicalBuckets), historyFloor)
+    : computeMaxTotalFromBuckets(normalizedBuckets);
   const storedMaxTotal = toFiniteNonNegativeNumber(value.max_total_downloads);
   const maxTotal = Object.keys(normalizedBuckets).length > 0
     ? maxTotalFromBuckets
@@ -297,7 +323,7 @@ export function applyVersionBucketMonotonicCounts(
             updated_at: nowIso,
           }])),
         })) {
-          nextBuckets = filterSyntheticBuckets(nextBuckets);
+          nextBuckets = filterDiscardableSyntheticBuckets(nextBuckets);
         }
         for (const input of inputs) {
           const previousBucket = nextBuckets[input.bucketKey];
@@ -319,7 +345,13 @@ export function applyVersionBucketMonotonicCounts(
         };
       }
 
-      const maxTotal = computeMaxTotalFromBuckets(nextBuckets);
+      const canonicalBuckets = Object.fromEntries(
+        Object.entries(nextBuckets).filter(([bucketKey]) => !isSyntheticBucketKey(bucketKey)),
+      ) as Record<string, DownloadVersionBucketEntry>;
+      const historyFloor = computeHistoryMaxFloor(nextBuckets);
+      const maxTotal = Object.keys(canonicalBuckets).length > 0
+        ? Math.max(computeMaxTotalFromBuckets(canonicalBuckets), historyFloor)
+        : computeMaxTotalFromBuckets(nextBuckets);
       nextVersionEntries[version] = {
         max_total_downloads: maxTotal,
         buckets: sortObjectByKeys(nextBuckets),

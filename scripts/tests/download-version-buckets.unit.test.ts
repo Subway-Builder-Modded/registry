@@ -107,6 +107,39 @@ test("applyVersionBucketMonotonicCounts keeps single-bucket versions on current 
   assert.equal(ledger.listings.sample?.versions["1.0.0"]?.max_total_downloads, 100);
 });
 
+test("applyVersionBucketMonotonicCounts uses history-max floor when canonical bucket drops", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+  ledger.listings.sample = {
+    versions: {
+      "1.0.0": {
+        max_total_downloads: 164,
+        buckets: {
+          "history-max:sample:1.0.0": {
+            max_adjusted_downloads: 164,
+            last_adjusted_downloads: 164,
+            updated_at: "2026-04-05T00:00:00.000Z",
+          },
+          "owner/repo@1.0.0/sample.zip#assetB": {
+            max_adjusted_downloads: 0,
+            last_adjusted_downloads: 0,
+            updated_at: "2026-04-05T00:00:00.000Z",
+          },
+        },
+        updated_at: "2026-04-05T00:00:00.000Z",
+      },
+    },
+  };
+
+  const next = applyVersionBucketMonotonicCounts(
+    ledger,
+    { sample: { "1.0.0": 0 } },
+    { sample: { "1.0.0": [{ bucketKey: "owner/repo@1.0.0/sample.zip#assetB", adjustedCount: 0 }] } },
+    "2026-04-05T01:00:00.000Z",
+  );
+
+  assert.equal(next.sample?.["1.0.0"], 164);
+});
+
 test("applyVersionBucketMonotonicCounts drops synthetic legacy buckets when canonical buckets exist", () => {
   const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
   ledger.listings.sample = {
