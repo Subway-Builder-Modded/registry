@@ -22,6 +22,8 @@ const GITHUB_API_BASE = "https://api.github.com";
 const TARGET_WORKFLOW_FILES = [
   "regenerate-registry-analytics.yml",
   "regenerate-downloads-hourly.yml",
+  "publish.yml",
+  "update-metadata.yml",
 ] as const;
 const FETCH_TIMEOUT_MS = 45_000;
 const PROGRESS_HEARTBEAT_RUN_INTERVAL = 10;
@@ -754,7 +756,16 @@ async function listWorkflowRunsForFile(
   const runs: WorkflowRun[] = [];
   for (let page = 1; page <= 10; page += 1) {
     const url = `${GITHUB_API_BASE}/repos/${repoFullName}/actions/workflows/${workflowFile}/runs?per_page=100&page=${page}`;
-    const payload = await fetchJson<{ workflow_runs?: WorkflowRun[] }>(url, token);
+    let payload: { workflow_runs?: WorkflowRun[] };
+    try {
+      payload = await fetchJson<{ workflow_runs?: WorkflowRun[] }>(url, token);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (message.includes("HTTP 404")) {
+        return [];
+      }
+      throw error;
+    }
     const pageRuns = Array.isArray(payload.workflow_runs) ? payload.workflow_runs : [];
     if (pageRuns.length === 0) break;
 
