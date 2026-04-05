@@ -106,7 +106,7 @@ test("resolveMapDemandBackfillAssetKey resolves github-backed map demand fetches
       fetchMock,
     );
 
-    assert.equal(assetKey, "owner/romania@v1.1.0/BUC.zip");
+    assert.equal(assetKey, "owner/romania@v1.1.0/buc.zip");
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
