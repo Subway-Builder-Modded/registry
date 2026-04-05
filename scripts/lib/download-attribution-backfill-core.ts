@@ -1,16 +1,20 @@
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import JSZip from "jszip";
 import {
   createDownloadAttributionDelta,
   createEmptyDownloadAttributionLedger,
   loadDownloadAttributionLedger,
   mergeDownloadAttributionDeltas,
+  normalizeDownloadAttributionDelta,
   toDownloadAttributionAssetKey,
   writeDownloadAttributionLedger,
   type DownloadAttributionDelta,
 } from "./download-attribution.js";
+import type { MapManifest } from "./manifests.js";
+import { resolveZipUrlForMapSource } from "./map-demand-stats/source-resolution.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 
@@ -43,6 +47,18 @@ interface WorkflowBackfillStats {
   runsWithAttribution: number;
   parsedLines: number;
   skippedLines: number;
+}
+
+interface GitDeltaBackfillStats {
+  commitsScanned: number;
+  deltasParsed: number;
+  deltasInvalid: number;
+}
+
+interface GitDeltaBackfillResult {
+  deltas: DownloadAttributionDelta[];
+  stats: GitDeltaBackfillStats;
+  runIdsWithDelta: Set<number>;
 }
 
 export interface DownloadsFetchHit {
@@ -81,6 +97,23 @@ interface IntegrityListingLike {
 
 interface IntegritySnapshotLike {
   listings?: Record<string, IntegrityListingLike>;
+}
+
+interface DemandStatsCacheListingLike {
+  source_fingerprint?: unknown;
+}
+
+interface DemandStatsCacheLike {
+  listings?: Record<string, DemandStatsCacheListingLike>;
+}
+
+interface ResolveMapDemandBackfillAssetKeyOptions {
+  sourceCommit?: string | null;
+  allowLiveFallback?: boolean;
+  warnings?: string[];
+  gitShowCache?: Map<string, string | null>;
+  mapManifestCache?: Map<string, MapManifest | null>;
+  demandSourceFingerprintCache?: Map<string, string | null>;
 }
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -347,6 +380,342 @@ function workflowSourceLabel(workflowFile: string): string {
   return `backfill:${workflowFile.replace(/\.yml$/i, "")}`;
 }
 
+function runGitCommand(repoRoot: string, args: string[]): string | null {
+  try {
+    const output = execFileSync("git", args, {
+      cwd: repoRoot,
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    return output === "" ? null : output;
+  } catch {
+    return null;
+  }
+}
+
+function listCommitShasForPathSince(
+  repoRoot: string,
+  relativePath: string,
+  lookbackDays: number,
+): string[] {
+  const sinceIso = new Date(Date.now() - (lookbackDays * 24 * 60 * 60 * 1000)).toISOString();
+  const output = runGitCommand(
+    repoRoot,
+    ["log", "--since", sinceIso, "--format=%H", "--", relativePath],
+  );
+  if (!output) return [];
+  return output
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line !== "");
+}
+
+function readJsonFromCommit(
+  repoRoot: string,
+  commitSha: string,
+  relativePath: string,
+): unknown | null {
+  const raw = runGitCommand(repoRoot, ["show", `${commitSha}:${relativePath}`]);
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as unknown;
+  } catch {
+    return null;
+  }
+}
+
+function collectDeltasFromGitHistory(
+  repoRoot: string,
+  lookbackDays: number,
+): GitDeltaBackfillResult {
+  const deltaPaths = [
+    "maps/download-attribution-delta.json",
+    "mods/download-attribution-delta.json",
+    "maps/demand-attribution-delta.json",
+  ] as const;
+  const deltas: DownloadAttributionDelta[] = [];
+  const seenCommitPath = new Set<string>();
+  const stats: GitDeltaBackfillStats = {
+    commitsScanned: 0,
+    deltasParsed: 0,
+    deltasInvalid: 0,
+  };
+  const runIdsWithDelta = new Set<number>();
+
+  for (const relativePath of deltaPaths) {
+    const commits = listCommitShasForPathSince(repoRoot, relativePath, lookbackDays);
+    for (const commitSha of commits) {
+      const commitPathKey = `${commitSha}:${relativePath}`;
+      if (seenCommitPath.has(commitPathKey)) continue;
+      seenCommitPath.add(commitPathKey);
+      stats.commitsScanned += 1;
+      const raw = readJsonFromCommit(repoRoot, commitSha, relativePath);
+      const normalized = normalizeDownloadAttributionDelta(raw);
+      if (!normalized) {
+        stats.deltasInvalid += 1;
+        continue;
+      }
+      const runIdPrefix = normalized.delta_id.split(":", 1)[0];
+      if (runIdPrefix) {
+        const parsedRunId = Number.parseInt(runIdPrefix, 10);
+        if (Number.isFinite(parsedRunId) && parsedRunId > 0) {
+          runIdsWithDelta.add(parsedRunId);
+        }
+      }
+      deltas.push(normalized);
+      stats.deltasParsed += 1;
+    }
+  }
+
+  return { deltas, stats, runIdsWithDelta };
+}
+
+function resolveSourceCommitAtTime(repoRoot: string, timestampIso: string): string | null {
+  return runGitCommand(
+    repoRoot,
+    ["rev-list", "-1", "--first-parent", `--before=${timestampIso}`, "HEAD"],
+  );
+}
+
+function readTextAtSource(
+  repoRoot: string,
+  relativePath: string,
+  sourceCommit: string | null | undefined,
+  cache?: Map<string, string | null>,
+): string | null {
+  const sourceKey = sourceCommit?.trim() ? sourceCommit.trim() : "";
+  const cacheKey = `${sourceKey || "working"}:${relativePath}`;
+  if (cache?.has(cacheKey)) {
+    return cache.get(cacheKey) ?? null;
+  }
+
+  let content: string | null;
+  if (sourceKey) {
+    content = runGitCommand(repoRoot, ["show", `${sourceKey}:${relativePath}`]);
+  } else {
+    const filePath = resolve(repoRoot, ...relativePath.split("/"));
+    if (!existsSync(filePath)) {
+      content = null;
+    } else {
+      try {
+        content = readFileSync(filePath, "utf-8");
+      } catch {
+        content = null;
+      }
+    }
+  }
+
+  cache?.set(cacheKey, content);
+  return content;
+}
+
+function readJsonAtSource<T>(
+  repoRoot: string,
+  relativePath: string,
+  sourceCommit: string | null | undefined,
+  cache?: Map<string, string | null>,
+): T | null {
+  const text = readTextAtSource(repoRoot, relativePath, sourceCommit, cache);
+  if (!text) return null;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    return null;
+  }
+}
+
+function parseGithubSourceFingerprint(
+  value: string | null | undefined,
+): { tag: string; assetName: string } | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("github:")) return null;
+  const body = trimmed.slice("github:".length);
+  const separator = body.indexOf("|");
+  if (separator <= 0 || separator >= body.length - 1) return null;
+  const tag = body.slice(0, separator).trim();
+  const assetName = body.slice(separator + 1).trim();
+  if (!tag || !assetName) return null;
+  return { tag, assetName };
+}
+
+function getMapManifestAtSource(
+  listingId: string,
+  repoRoot: string,
+  sourceCommit: string | null | undefined,
+  gitShowCache?: Map<string, string | null>,
+  manifestCache?: Map<string, MapManifest | null>,
+): MapManifest | null {
+  const sourceKey = sourceCommit?.trim() ? sourceCommit.trim() : "working";
+  const cacheKey = `${sourceKey}:${listingId}`;
+  if (manifestCache?.has(cacheKey)) {
+    return manifestCache.get(cacheKey) ?? null;
+  }
+
+  const manifest = readJsonAtSource<MapManifest>(
+    repoRoot,
+    `maps/${listingId}/manifest.json`,
+    sourceCommit,
+    gitShowCache,
+  );
+  const normalized = (
+    manifest
+    && isObject(manifest)
+    && isObject(manifest.update)
+    && typeof manifest.update.type === "string"
+  )
+    ? manifest
+    : null;
+  manifestCache?.set(cacheKey, normalized);
+  return normalized;
+}
+
+function getDemandSourceFingerprintAtSource(
+  listingId: string,
+  repoRoot: string,
+  sourceCommit: string | null | undefined,
+  gitShowCache?: Map<string, string | null>,
+  cache?: Map<string, string | null>,
+): string | null {
+  const sourceKey = sourceCommit?.trim() ? sourceCommit.trim() : "working";
+  const cacheKey = `${sourceKey}:${listingId}`;
+  if (cache?.has(cacheKey)) {
+    return cache.get(cacheKey) ?? null;
+  }
+
+  const demandCache = readJsonAtSource<DemandStatsCacheLike>(
+    repoRoot,
+    "maps/demand-stats-cache.json",
+    sourceCommit,
+    gitShowCache,
+  );
+  let sourceFingerprint: string | null = null;
+  if (demandCache && isObject(demandCache.listings)) {
+    const listing = demandCache.listings[listingId];
+    if (listing && isObject(listing) && typeof listing.source_fingerprint === "string") {
+      const trimmed = listing.source_fingerprint.trim();
+      sourceFingerprint = trimmed !== "" ? trimmed : null;
+    }
+  }
+
+  cache?.set(cacheKey, sourceFingerprint);
+  return sourceFingerprint;
+}
+
+function resolveDeterministicMapDemandAssetKeyFromSourceState(
+  listingId: string,
+  repoRoot: string,
+  sourceCommit: string | null | undefined,
+  gitShowCache?: Map<string, string | null>,
+  manifestCache?: Map<string, MapManifest | null>,
+  demandSourceFingerprintCache?: Map<string, string | null>,
+): string | null {
+  const manifest = getMapManifestAtSource(
+    listingId,
+    repoRoot,
+    sourceCommit,
+    gitShowCache,
+    manifestCache,
+  );
+  if (!manifest) return null;
+
+  const sourceFingerprint = getDemandSourceFingerprintAtSource(
+    listingId,
+    repoRoot,
+    sourceCommit,
+    gitShowCache,
+    demandSourceFingerprintCache,
+  );
+  const parsedFingerprint = parseGithubSourceFingerprint(sourceFingerprint);
+  if (parsedFingerprint) {
+    let repo: string | null = null;
+    if (manifest.update.type === "github") {
+      repo = manifest.update.repo.toLowerCase();
+    } else if (typeof manifest.source === "string") {
+      const parsedSource = parseGitHubReleaseAssetDownloadUrl(manifest.source);
+      repo = parsedSource?.repo ?? null;
+    }
+    if (repo) {
+      return toDownloadAttributionAssetKey(repo, parsedFingerprint.tag, parsedFingerprint.assetName);
+    }
+  }
+
+  if (typeof manifest.source === "string") {
+    const parsed = parseGitHubReleaseAssetDownloadUrl(manifest.source);
+    if (parsed) {
+      return toDownloadAttributionAssetKey(parsed.repo, parsed.tag, parsed.assetName);
+    }
+  }
+
+  return null;
+}
+
+export async function resolveMapDemandBackfillAssetKey(
+  listingId: string,
+  repoRoot: string,
+  token: string | undefined,
+  fetchImpl: typeof fetch,
+  options: ResolveMapDemandBackfillAssetKeyOptions = {},
+): Promise<string | null> {
+  const {
+    sourceCommit,
+    allowLiveFallback = true,
+    warnings = [],
+    gitShowCache,
+    mapManifestCache,
+    demandSourceFingerprintCache,
+  } = options;
+
+  if (sourceCommit?.trim()) {
+    const deterministic = resolveDeterministicMapDemandAssetKeyFromSourceState(
+      listingId,
+      repoRoot,
+      sourceCommit,
+      gitShowCache,
+      mapManifestCache,
+      demandSourceFingerprintCache,
+    );
+    if (deterministic) {
+      return deterministic;
+    }
+  }
+
+  if (!allowLiveFallback) {
+    return null;
+  }
+
+  const manifest = getMapManifestAtSource(
+    listingId,
+    repoRoot,
+    null,
+    gitShowCache,
+    mapManifestCache,
+  );
+  if (!manifest) {
+    return null;
+  }
+
+  const resolved = await resolveZipUrlForMapSource(
+    listingId,
+    manifest.source,
+    manifest.update,
+    fetchImpl,
+    token,
+    warnings,
+  );
+  if (!resolved) {
+    return null;
+  }
+  if (resolved.attributionAssetKey) {
+    return resolved.attributionAssetKey;
+  }
+  const parsed = parseGitHubReleaseAssetDownloadUrl(resolved.zipUrl);
+  if (!parsed) {
+    return null;
+  }
+  return toDownloadAttributionAssetKey(parsed.repo, parsed.tag, parsed.assetName);
+}
+
 async function listWorkflowRunsForFile(
   repoFullName: string,
   token: string,
@@ -404,16 +773,27 @@ export async function runDownloadAttributionBackfillCli(
   }
   const cli = parseArgs(argv);
   const cutoffMs = Date.now() - (cli.lookbackDays * 24 * 60 * 60 * 1000);
+  const gitDeltaBackfill = collectDeltasFromGitHistory(cli.repoRoot, cli.lookbackDays);
   const lineIndex = buildLineToAssetKeyIndex(cli.repoRoot);
   const runs = await listWorkflowRuns(cli.repoFullName, cli.token, cutoffMs);
+  const runSourceCommitCache = new Map<string, string | null>();
+  const gitShowCache = new Map<string, string | null>();
+  const mapManifestCache = new Map<string, MapManifest | null>();
+  const demandSourceFingerprintCache = new Map<string, string | null>();
 
   const deltas: DownloadAttributionDelta[] = [];
+  deltas.push(...gitDeltaBackfill.deltas);
   let parsedRuns = 0;
   let skippedLines = 0;
   let parsedLines = 0;
+  let logRunsSkippedByGitDelta = 0;
   const workflowStats = new Map<string, WorkflowBackfillStats>();
 
   for (const [index, runInfo] of runs.entries()) {
+    if (gitDeltaBackfill.runIdsWithDelta.has(runInfo.id)) {
+      logRunsSkippedByGitDelta += 1;
+      continue;
+    }
     const perWorkflow = workflowStats.get(runInfo.workflowFile) ?? {
       runsScanned: 0,
       runsWithLogZip: 0,
@@ -463,9 +843,27 @@ export async function runDownloadAttributionBackfillCli(
               assetKey = toDownloadAttributionAssetKey(parsed.repo, parsed.tag, parsed.assetName);
             }
           }
-          // Do not infer map-demand attribution from current manifest/update state.
-          // Historical logs without explicit asset key/URL are ambiguous and can
-          // misattribute old runs to newer release tags.
+          if (!assetKey) {
+            const sourceCommit = runSourceCommitCache.has(runInfo.created_at)
+              ? (runSourceCommitCache.get(runInfo.created_at) ?? null)
+              : resolveSourceCommitAtTime(cli.repoRoot, runInfo.created_at);
+            if (!runSourceCommitCache.has(runInfo.created_at)) {
+              runSourceCommitCache.set(runInfo.created_at, sourceCommit);
+            }
+            assetKey = await resolveMapDemandBackfillAssetKey(
+              hit.listingId,
+              cli.repoRoot,
+              cli.token,
+              fetch,
+              {
+                sourceCommit,
+                allowLiveFallback: false,
+                gitShowCache,
+                mapManifestCache,
+                demandSourceFingerprintCache,
+              },
+            );
+          }
         }
         if (!assetKey) {
           skippedLines += 1;
@@ -507,7 +905,6 @@ export async function runDownloadAttributionBackfillCli(
     .map(([workflowFile, stats]) => (
       `${workflowFile}:runs=${stats.runsScanned},logZips=${stats.runsWithLogZip},runsWithAttribution=${stats.runsWithAttribution},parsedLines=${stats.parsedLines},skippedLines=${stats.skippedLines}`
     ));
-
   if (cli.rebuildLedger && deltas.length === 0) {
     throw new Error(
       `[download-attribution-backfill] Refusing to overwrite ledger with zero parsed deltas. ${workflowSummaries.join(" | ")}`,
@@ -521,7 +918,7 @@ export async function runDownloadAttributionBackfillCli(
   writeDownloadAttributionLedger(cli.repoRoot, merge.ledger);
 
   console.log(
-    `[download-attribution-backfill] lookbackDays=${cli.lookbackDays}, runsScanned=${runs.length}, runsWithAttribution=${parsedRuns}, parsedLines=${parsedLines}, skippedLines=${skippedLines}, addedFetches=${merge.addedFetches}, appliedDeltas=${merge.appliedDeltaIds.length}, skippedDeltas=${merge.skippedDeltaIds.length}`,
+    `[download-attribution-backfill] lookbackDays=${cli.lookbackDays}, runsScanned=${runs.length}, runsWithAttribution=${parsedRuns}, parsedLines=${parsedLines}, skippedLines=${skippedLines}, logRunsSkippedByGitDelta=${logRunsSkippedByGitDelta}, gitDeltaCommits=${gitDeltaBackfill.stats.commitsScanned}, gitDeltasParsed=${gitDeltaBackfill.stats.deltasParsed}, gitDeltasInvalid=${gitDeltaBackfill.stats.deltasInvalid}, addedFetches=${merge.addedFetches}, appliedDeltas=${merge.appliedDeltaIds.length}, skippedDeltas=${merge.skippedDeltaIds.length}`,
   );
   for (const summary of workflowSummaries) {
     console.log(`[download-attribution-backfill] workflow ${summary}`);
@@ -533,6 +930,10 @@ export async function runDownloadAttributionBackfillCli(
       `runs_with_attribution=${parsedRuns}`,
       `parsed_lines=${parsedLines}`,
       `skipped_lines=${skippedLines}`,
+      `log_runs_skipped_by_git_delta=${logRunsSkippedByGitDelta}`,
+      `git_delta_commits=${gitDeltaBackfill.stats.commitsScanned}`,
+      `git_deltas_parsed=${gitDeltaBackfill.stats.deltasParsed}`,
+      `git_deltas_invalid=${gitDeltaBackfill.stats.deltasInvalid}`,
       `added_fetches=${merge.addedFetches}`,
       `applied_deltas=${merge.appliedDeltaIds.length}`,
       `skipped_deltas=${merge.skippedDeltaIds.length}`,
