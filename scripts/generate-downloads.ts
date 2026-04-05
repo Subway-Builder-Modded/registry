@@ -11,7 +11,6 @@ import {
 import {
   applyVersionBucketMonotonicCounts,
   loadDownloadVersionBucketLedger,
-  seedVersionBucketLedgerFromDownloads,
   writeDownloadVersionBucketLedger,
 } from "./lib/download-version-buckets.js";
 import type { IntegrityOutput } from "./lib/integrity.js";
@@ -264,13 +263,6 @@ async function run(): Promise<void> {
   const versionBucketLedger = loadDownloadVersionBucketLedger(repoRoot, listingType);
   const outputDir = listingType === "map" ? "maps" : "mods";
   const outputPath = resolve(repoRoot, outputDir, "downloads.json");
-  const existingDownloads = (() => {
-    try {
-      return JSON.parse(readFileSync(outputPath, "utf8")) as Record<string, Record<string, number>>;
-    } catch {
-      return {} as Record<string, Record<string, number>>;
-    }
-  })();
   const defaultAttributionDeltaPath = resolve(repoRoot, outputDir, "download-attribution-delta.json");
   const attributionDeltaPath = (
     getArgValue("attribution-delta-path")
@@ -318,8 +310,6 @@ async function run(): Promise<void> {
     },
   });
   const securityAlerts = collectSecurityAlerts(integrity, listingType);
-
-  seedVersionBucketLedgerFromDownloads(versionBucketLedger, existingDownloads);
 
   const downloads = applyVersionBucketMonotonicCounts(
     versionBucketLedger,

@@ -9,7 +9,6 @@ import {
 } from "./lib/download-history.js";
 import { resolveRepoRoot } from "./lib/script-runtime.js";
 
-const ATTRIBUTION_ROLLOUT_COMMIT = "60e49f4cb10e6900e12bfaf3b48a06a27eb48f85";
 const DOWNLOAD_SOURCE_PATHS = [
   "maps/downloads.json",
   "mods/downloads.json",
@@ -232,18 +231,6 @@ function buildLegacySnapshot(
   };
 }
 
-function isCommitAtOrAfterRollout(repoRoot: string, commit: string): boolean {
-  try {
-    execFileSync("git", ["merge-base", "--is-ancestor", ATTRIBUTION_ROLLOUT_COMMIT, commit], {
-      cwd: repoRoot,
-      stdio: "ignore",
-    });
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 function run(): void {
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const tempRepoRoot = mkdtempSync(resolve(tmpdir(), "railyard-history-rebuild-"));
@@ -265,13 +252,8 @@ function run(): void {
 
       const snapshotDate = source.fileName.replace(/^snapshot_/, "").replace(/\.json$/, "");
       const provisional = buildLegacySnapshot(tempRepoRoot, snapshotDate, source.generatedAt) as unknown as DownloadHistorySnapshot;
-      if (isCommitAtOrAfterRollout(repoRoot, source.sourceCommit)) {
-        provisional.maps.source_downloads_mode = "already_adjusted";
-        provisional.mods.source_downloads_mode = "already_adjusted";
-      } else {
-        provisional.maps.source_downloads_mode = "legacy_unadjusted";
-        provisional.mods.source_downloads_mode = "legacy_unadjusted";
-      }
+      provisional.maps.source_downloads_mode = "already_adjusted";
+      provisional.mods.source_downloads_mode = "already_adjusted";
 
       const normalized = normalizeDownloadHistorySnapshot({
         repoRoot: tempRepoRoot,

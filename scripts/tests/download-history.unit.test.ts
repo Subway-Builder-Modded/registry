@@ -261,7 +261,7 @@ test("backfillDownloadHistorySnapshots rewrites snapshots to keep complete versi
   }
 });
 
-test("backfillDownloadHistorySnapshots caps legacy attributed downloads to stored raw counts", () => {
+test("backfillDownloadHistorySnapshots keeps adjusted snapshots and recomputes raw totals", () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-download-history-"));
   try {
     setupBaseRepo(repoRoot);
@@ -336,10 +336,7 @@ test("backfillDownloadHistorySnapshots caps legacy attributed downloads to store
 
     const result = backfillDownloadHistorySnapshots({ repoRoot });
     assert.deepEqual(result.updatedFiles, ["history/snapshot_2026_03_12.json"]);
-    assert.match(
-      result.warnings.join("\n"),
-      /attributed downloads exceeded stored raw downloads/,
-    );
+    assert.equal(result.warnings.length, 0);
 
     const snapshot = JSON.parse(
       readFileSync(join(repoRoot, "history", "snapshot_2026_03_12.json"), "utf-8"),
@@ -347,19 +344,19 @@ test("backfillDownloadHistorySnapshots caps legacy attributed downloads to store
     const maps = snapshot.maps as Record<string, unknown>;
     const mods = snapshot.mods as Record<string, unknown>;
 
-    assert.deepEqual(maps.raw_downloads, { "map-a": { "1.0.0": 4 } });
-    assert.deepEqual(maps.attributed_downloads, { "map-a": { "1.0.0": 4 } });
-    assert.deepEqual(maps.downloads, { "map-a": { "1.0.0": 0 } });
-    assert.equal(maps.total_downloads, 0);
-    assert.equal(maps.raw_total_downloads, 4);
-    assert.equal(maps.total_attributed_downloads, 4);
+    assert.deepEqual(maps.raw_downloads, { "map-a": { "1.0.0": 14 } });
+    assert.deepEqual(maps.attributed_downloads, { "map-a": { "1.0.0": 10 } });
+    assert.deepEqual(maps.downloads, { "map-a": { "1.0.0": 4 } });
+    assert.equal(maps.total_downloads, 4);
+    assert.equal(maps.raw_total_downloads, 14);
+    assert.equal(maps.total_attributed_downloads, 10);
 
-    assert.deepEqual(mods.raw_downloads, { "mod-a": { "1.0.0": 3 } });
-    assert.deepEqual(mods.attributed_downloads, { "mod-a": { "1.0.0": 3 } });
-    assert.deepEqual(mods.downloads, { "mod-a": { "1.0.0": 0 } });
-    assert.equal(mods.total_downloads, 0);
-    assert.equal(mods.raw_total_downloads, 3);
-    assert.equal(mods.total_attributed_downloads, 3);
+    assert.deepEqual(mods.raw_downloads, { "mod-a": { "1.0.0": 11 } });
+    assert.deepEqual(mods.attributed_downloads, { "mod-a": { "1.0.0": 8 } });
+    assert.deepEqual(mods.downloads, { "mod-a": { "1.0.0": 3 } });
+    assert.equal(mods.total_downloads, 3);
+    assert.equal(mods.raw_total_downloads, 11);
+    assert.equal(mods.total_attributed_downloads, 8);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
@@ -656,7 +653,7 @@ test("generateDownloadHistorySnapshot prefers integrity source tags for custom s
   }
 });
 
-test("backfillDownloadHistorySnapshots retroactively adjusts legacy snapshots with attribution metadata", () => {
+test("backfillDownloadHistorySnapshots preserves adjusted snapshots while adding attribution metadata", () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-download-history-"));
   try {
     mkdirSync(join(repoRoot, "maps", "toronto"), { recursive: true });
@@ -738,17 +735,17 @@ test("backfillDownloadHistorySnapshots retroactively adjusts legacy snapshots wi
     ) as Record<string, unknown>;
     const maps = snapshot.maps as Record<string, unknown>;
     assert.equal(snapshot.schema_version, 2);
-    assert.equal(snapshot.total_downloads, 7);
-    assert.equal(snapshot.raw_total_downloads, 10);
+    assert.equal(snapshot.total_downloads, 10);
+    assert.equal(snapshot.raw_total_downloads, 13);
     assert.equal(snapshot.total_attributed_downloads, 3);
     assert.equal(snapshot.total_attributed_fetches, 3);
-    assert.equal(snapshot.net_downloads, 7);
-    assert.equal(maps.source_downloads_mode, "legacy_unadjusted");
-    assert.deepEqual(maps.downloads, { toronto: { "1.0.1": 7 } });
-    assert.deepEqual(maps.raw_downloads, { toronto: { "1.0.1": 10 } });
+    assert.equal(snapshot.net_downloads, 10);
+    assert.equal(maps.source_downloads_mode, "already_adjusted");
+    assert.deepEqual(maps.downloads, { toronto: { "1.0.1": 10 } });
+    assert.deepEqual(maps.raw_downloads, { toronto: { "1.0.1": 13 } });
     assert.deepEqual(maps.attributed_downloads, { toronto: { "1.0.1": 3 } });
-    assert.equal(maps.total_downloads, 7);
-    assert.equal(maps.raw_total_downloads, 10);
+    assert.equal(maps.total_downloads, 10);
+    assert.equal(maps.raw_total_downloads, 13);
     assert.equal(maps.total_attributed_downloads, 3);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });

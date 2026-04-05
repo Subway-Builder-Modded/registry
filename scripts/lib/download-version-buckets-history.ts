@@ -3,7 +3,6 @@ import { resolve } from "node:path";
 import type { ManifestType } from "./manifests.js";
 import {
   loadDownloadVersionBucketLedger,
-  seedVersionBucketLedgerFromDownloads,
   writeDownloadVersionBucketLedger,
   type DownloadVersionBucketLedger,
 } from "./download-version-buckets.js";
@@ -146,7 +145,6 @@ export function rebuildDownloadVersionBucketsFromHistory(
   for (const kind of ["maps", "mods"] as const) {
     const listingType = toListingType(kind);
     const ledger = loadDownloadVersionBucketLedger(repoRoot, listingType);
-    seedVersionBucketLedgerFromDownloads(ledger, maximaByKind[kind], nowIso);
     applyHistoryMaximaToLedger(ledger, maximaByKind[kind], nowIso);
     writeDownloadVersionBucketLedger(repoRoot, listingType, ledger);
 
@@ -165,4 +163,3 @@ export function rebuildDownloadVersionBucketsFromHistory(
     snapshotFilesScanned,
   };
 }
-
