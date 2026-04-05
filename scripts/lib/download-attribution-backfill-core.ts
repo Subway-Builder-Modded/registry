@@ -12,8 +12,6 @@ import {
   type DownloadAttributionDelta,
 } from "./download-attribution.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
-import { getMapManifest } from "./map-demand-stats/repo.js";
-import { resolveZipUrlForMapSource } from "./map-demand-stats/source-resolution.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 
 const GITHUB_API_BASE = "https://api.github.com";
@@ -345,33 +343,6 @@ export function parseAttributionBackfillLogHits(
   ];
 }
 
-export async function resolveMapDemandBackfillAssetKey(
-  listingId: string,
-  repoRoot: string,
-  token: string,
-  fetchImpl: typeof fetch = fetch,
-): Promise<string | null> {
-  try {
-    const manifest = getMapManifest(repoRoot, listingId);
-    const warnings: string[] = [];
-    const resolved = await resolveZipUrlForMapSource(
-      listingId,
-      manifest.source,
-      manifest.update,
-      fetchImpl,
-      token,
-      warnings,
-    );
-    if (!resolved) return null;
-    if (resolved.attributionAssetKey) return resolved.attributionAssetKey;
-    const parsed = parseGitHubReleaseAssetDownloadUrl(resolved.zipUrl);
-    if (!parsed) return null;
-    return toDownloadAttributionAssetKey(parsed.repo, parsed.tag, parsed.assetName);
-  } catch {
-    return null;
-  }
-}
-
 function workflowSourceLabel(workflowFile: string): string {
   return `backfill:${workflowFile.replace(/\.yml$/i, "")}`;
 }
@@ -435,7 +406,6 @@ export async function runDownloadAttributionBackfillCli(
   const cutoffMs = Date.now() - (cli.lookbackDays * 24 * 60 * 60 * 1000);
   const lineIndex = buildLineToAssetKeyIndex(cli.repoRoot);
   const runs = await listWorkflowRuns(cli.repoFullName, cli.token, cutoffMs);
-  const demandBackfillAssetKeyCache = new Map<string, Promise<string | null>>();
 
   const deltas: DownloadAttributionDelta[] = [];
   let parsedRuns = 0;
@@ -493,12 +463,9 @@ export async function runDownloadAttributionBackfillCli(
               assetKey = toDownloadAttributionAssetKey(parsed.repo, parsed.tag, parsed.assetName);
             }
           }
-          if (!assetKey) {
-            const cached = demandBackfillAssetKeyCache.get(hit.listingId)
-              ?? resolveMapDemandBackfillAssetKey(hit.listingId, cli.repoRoot, cli.token);
-            demandBackfillAssetKeyCache.set(hit.listingId, cached);
-            assetKey = await cached;
-          }
+          // Do not infer map-demand attribution from current manifest/update state.
+          // Historical logs without explicit asset key/URL are ambiguous and can
+          // misattribute old runs to newer release tags.
         }
         if (!assetKey) {
           skippedLines += 1;

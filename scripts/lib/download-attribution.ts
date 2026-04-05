@@ -296,9 +296,12 @@ export function getAttributedCountForAssetKey(
 
   if (hashIndex >= 0) {
     const baseKey = assetKey.slice(0, hashIndex);
+    if (persisted > 0 || pending > 0) {
+      return persisted + pending;
+    }
     const persistedBase = ledger.assets[baseKey]?.count ?? 0;
     const pendingBase = delta?.assets[baseKey] ?? 0;
-    return persisted + pending + persistedBase + pendingBase;
+    return persistedBase + pendingBase;
   }
 
   const prefix = `${assetKey}#`;
@@ -314,8 +317,10 @@ export function getAttributedCountForAssetKey(
       pendingWithIdentity += count;
     }
   }
-
-  return persisted + pending + persistedWithIdentity + pendingWithIdentity;
+  if (persistedWithIdentity > 0 || pendingWithIdentity > 0) {
+    return persistedWithIdentity + pendingWithIdentity;
+  }
+  return persisted + pending;
 }
 
 export function getAttributedCountForParsedAsset(
