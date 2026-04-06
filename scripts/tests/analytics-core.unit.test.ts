@@ -535,13 +535,20 @@ test("runGenerateAnalyticsCli defaults to full listing and author outputs and st
     const authorRows = readFileSync(join(repoRoot, "analytics", "authors_by_total_downloads.csv"), "utf-8").trim().split(/\r?\n/);
     assert.equal(allTimeRows.length, 3);
     assert.equal(authorRows.length, 3);
+    for (const days of [1, 3, 7, 14, 30]) {
+      assert.equal(existsSync(join(repoRoot, "analytics", `most_popular_last_${days}d.csv`)), true);
+      assert.equal(existsSync(join(repoRoot, "analytics", `projects_most_popular_last_${days}d.csv`)), true);
+      assert.equal(existsSync(join(repoRoot, "analytics", `authors_last_${days}d.csv`)), true);
+    }
 
     runGenerateAnalyticsCli(["--top-k-listings", "1", "--top-k-authors", "1"], repoRoot);
 
     const limitedAllTimeRows = readFileSync(join(repoRoot, "analytics", "most_popular_all_time.csv"), "utf-8").trim().split(/\r?\n/);
     const limitedAuthorRows = readFileSync(join(repoRoot, "analytics", "authors_by_total_downloads.csv"), "utf-8").trim().split(/\r?\n/);
+    const limitedAuthorWindowRows = readFileSync(join(repoRoot, "analytics", "authors_last_30d.csv"), "utf-8").trim().split(/\r?\n/);
     assert.equal(limitedAllTimeRows.length, 2);
     assert.equal(limitedAuthorRows.length, 2);
+    assert.equal(limitedAuthorWindowRows.length, 2);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
