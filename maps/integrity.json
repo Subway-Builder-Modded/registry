@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-06T03:22:51.983Z",
+  "generated_at": "2026-04-06T04:04:09.769Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -1049,6 +1049,57 @@
           },
           "fingerprint": "rules:v4:github:pswbsf/charleston-huntington-wv:1.0.0:CHAI.zip",
           "checked_at": "2026-04-04T02:43:48.218Z"
+        }
+      }
+    },
+    "ciudad-de-mexico": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CDMX.pmtiles"
+          },
+          "release_size": 470.17,
+          "file_sizes": {
+            "CDMX.pmtiles": 354.21,
+            "buildings_index.json": 443.75,
+            "config.json": 0,
+            "demand_data.json": 15.29,
+            "roads.geojson": 57.37,
+            "runways_taxiways.geojson": 1.06
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.2",
+            "asset_name": "CDMX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.2/CDMX.zip"
+          },
+          "fingerprint": "rules:v4:sha256:8f5b521246d7cef21317e2a5cb49d48812908dab1972373555b7c9fc95fa51e3",
+          "checked_at": "2026-04-06T04:04:09.769Z"
         }
       }
     },
