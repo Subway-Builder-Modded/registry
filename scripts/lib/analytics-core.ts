@@ -127,6 +127,24 @@ interface AuthorTotalDownloadsRow {
   mod_count: number;
 }
 
+interface AuthorWindowRow {
+  rank: number;
+  author: string;
+  author_alias: string;
+  attribution_link: string;
+  asset_count: number;
+  map_count: number;
+  mod_count: number;
+  download_change: number;
+  adjusted_download_change: number;
+  current_total: number;
+  adjusted_current_total: number;
+  baseline_total: number;
+  adjusted_baseline_total: number;
+  latest_snapshot: string;
+  baseline_snapshot: string;
+}
+
 interface MapStatisticsRow {
   rank: number;
   id: string;
@@ -193,7 +211,7 @@ type ListingKey = `${"maps" | "mods"}:${string}`;
 
 const DEFAULT_TOP_LISTINGS: number | null = null;
 const DEFAULT_TOP_AUTHORS: number | null = null;
-const WINDOWS = [1, 3, 7, 14] as const;
+const WINDOWS = [1, 3, 7, 14, 30] as const;
 
 function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
@@ -1504,6 +1522,66 @@ export function runGenerateAnalyticsCli(
     authorStats.set(meta.author, previous);
   }
 
+  const authorRowsForWindow = (days: number): AuthorWindowRow[] => {
+    const baseline = resolveBaselineSnapshot(snapshots, latest.date, days);
+    const baselineAdjustedTotals = getAdjustedTotalsForSnapshot(baseline.file);
+    const baselineTotals = filterOutTestListingTotals(
+      resolvedRepoRoot,
+      monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>(),
+    );
+    const authorWindowStats = new Map<string, Omit<AuthorWindowRow, "rank">>();
+
+    for (const [key, currentTotal] of latestTotals.entries()) {
+      const [listingType] = key.split(":") as ["maps" | "mods", string];
+      const meta = listingMeta.get(key) ?? {
+        name: "",
+        author: "UNKNOWN",
+        author_alias: "UNKNOWN",
+        attribution_link: "https://github.com/UNKNOWN",
+        github_id: null,
+      };
+      const baselineTotal = baselineTotals.get(key) ?? 0;
+      const currentAdjustedTotal = latestAdjustedTotals.get(key) ?? 0;
+      const baselineAdjustedTotal = baselineAdjustedTotals.get(key) ?? 0;
+      const existing = authorWindowStats.get(meta.author) ?? {
+        author: meta.author,
+        author_alias: meta.author_alias,
+        attribution_link: meta.attribution_link,
+        asset_count: 0,
+        map_count: 0,
+        mod_count: 0,
+        download_change: 0,
+        adjusted_download_change: 0,
+        current_total: 0,
+        adjusted_current_total: 0,
+        baseline_total: 0,
+        adjusted_baseline_total: 0,
+        latest_snapshot: latest.file,
+        baseline_snapshot: baseline.file,
+      };
+      existing.asset_count += 1;
+      if (listingType === "maps") existing.map_count += 1;
+      if (listingType === "mods") existing.mod_count += 1;
+      existing.download_change += currentTotal - baselineTotal;
+      existing.adjusted_download_change += currentAdjustedTotal - baselineAdjustedTotal;
+      existing.current_total += currentTotal;
+      existing.adjusted_current_total += currentAdjustedTotal;
+      existing.baseline_total += baselineTotal;
+      existing.adjusted_baseline_total += baselineAdjustedTotal;
+      authorWindowStats.set(meta.author, existing);
+    }
+
+    const rows = [...authorWindowStats.values()]
+      .sort((a, b) =>
+        b.download_change - a.download_change
+        || b.current_total - a.current_total
+        || a.author.localeCompare(b.author));
+    return limitRows(rows, topAuthors).map((row, index) => ({
+      rank: index + 1,
+      ...row,
+    }));
+  };
+
   const authorRowsByAssetCount: AuthorAssetCountRow[] = [...authorStats.values()]
     .sort((a, b) =>
       b.asset_count - a.asset_count
@@ -1558,137 +1636,81 @@ export function runGenerateAnalyticsCli(
     listingVersionsBySnapshot,
   );
 
-  writeCsv<ListingWindowRow>(
-    join(analyticsDir, "most_popular_last_1d.csv"),
-    [
-      "rank",
-      "listing_type",
-      "id",
-      "name",
-      "author",
-      "author_alias",
-      "attribution_link",
-      "download_change",
-      "adjusted_download_change",
-      "current_total",
-      "adjusted_current_total",
-      "baseline_total",
-      "adjusted_baseline_total",
-      "latest_snapshot",
-      "baseline_snapshot",
-    ],
-    rowsForWindow(WINDOWS[0]),
-  );
+  const listingWindowColumns = [
+    "rank",
+    "listing_type",
+    "id",
+    "name",
+    "author",
+    "author_alias",
+    "attribution_link",
+    "download_change",
+    "adjusted_download_change",
+    "current_total",
+    "adjusted_current_total",
+    "baseline_total",
+    "adjusted_baseline_total",
+    "latest_snapshot",
+    "baseline_snapshot",
+  ] as const;
+  const projectWindowColumns = [
+    "rank",
+    "project_key",
+    "project_name",
+    "author",
+    "author_alias",
+    "attribution_link",
+    "listing_count",
+    "download_change",
+    "adjusted_download_change",
+    "current_total",
+    "adjusted_current_total",
+    "baseline_total",
+    "adjusted_baseline_total",
+    "latest_snapshot",
+    "baseline_snapshot",
+  ] as const;
+  const authorWindowColumns = [
+    "rank",
+    "author",
+    "author_alias",
+    "attribution_link",
+    "asset_count",
+    "map_count",
+    "mod_count",
+    "download_change",
+    "adjusted_download_change",
+    "current_total",
+    "adjusted_current_total",
+    "baseline_total",
+    "adjusted_baseline_total",
+    "latest_snapshot",
+    "baseline_snapshot",
+  ] as const;
 
-  writeCsv<ListingWindowRow>(
-    join(analyticsDir, "most_popular_last_3d.csv"),
-    [
-      "rank",
-      "listing_type",
-      "id",
-      "name",
-      "author",
-      "author_alias",
-      "attribution_link",
-      "download_change",
-      "adjusted_download_change",
-      "current_total",
-      "adjusted_current_total",
-      "baseline_total",
-      "adjusted_baseline_total",
-      "latest_snapshot",
-      "baseline_snapshot",
-    ],
-    rowsForWindow(WINDOWS[1]),
-  );
+  for (const days of WINDOWS) {
+    writeCsv<ListingWindowRow>(
+      join(analyticsDir, `most_popular_last_${days}d.csv`),
+      [...listingWindowColumns],
+      rowsForWindow(days),
+    );
+  }
 
-  writeCsv<ListingWindowRow>(
-    join(analyticsDir, "most_popular_last_7d.csv"),
-    [
-      "rank",
-      "listing_type",
-      "id",
-      "name",
-      "author",
-      "author_alias",
-      "attribution_link",
-      "download_change",
-      "adjusted_download_change",
-      "current_total",
-      "adjusted_current_total",
-      "baseline_total",
-      "adjusted_baseline_total",
-      "latest_snapshot",
-      "baseline_snapshot",
-    ],
-    rowsForWindow(WINDOWS[2]),
-  );
+  for (const days of WINDOWS) {
+    writeCsv<ProjectWindowRow>(
+      join(analyticsDir, `projects_most_popular_last_${days}d.csv`),
+      [...projectWindowColumns],
+      projectRowsForWindow(days),
+    );
+  }
 
-  writeCsv<ProjectWindowRow>(
-    join(analyticsDir, "projects_most_popular_last_1d.csv"),
-    [
-      "rank",
-      "project_key",
-      "project_name",
-      "author",
-      "author_alias",
-      "attribution_link",
-      "listing_count",
-      "download_change",
-      "adjusted_download_change",
-      "current_total",
-      "adjusted_current_total",
-      "baseline_total",
-      "adjusted_baseline_total",
-      "latest_snapshot",
-      "baseline_snapshot",
-    ],
-    projectRowsForWindow(WINDOWS[0]),
-  );
-
-  writeCsv<ProjectWindowRow>(
-    join(analyticsDir, "projects_most_popular_last_3d.csv"),
-    [
-      "rank",
-      "project_key",
-      "project_name",
-      "author",
-      "author_alias",
-      "attribution_link",
-      "listing_count",
-      "download_change",
-      "adjusted_download_change",
-      "current_total",
-      "adjusted_current_total",
-      "baseline_total",
-      "adjusted_baseline_total",
-      "latest_snapshot",
-      "baseline_snapshot",
-    ],
-    projectRowsForWindow(WINDOWS[1]),
-  );
-
-  writeCsv<ProjectWindowRow>(
-    join(analyticsDir, "projects_most_popular_last_7d.csv"),
-    [
-      "rank",
-      "project_key",
-      "project_name",
-      "author",
-      "author_alias",
-      "attribution_link",
-      "listing_count",
-      "download_change",
-      "adjusted_download_change",
-      "current_total",
-      "adjusted_current_total",
-      "baseline_total",
-      "adjusted_baseline_total",
-      "latest_snapshot",
-      "baseline_snapshot",
-    ],
-    projectRowsForWindow(WINDOWS[2]),
-  );
+  for (const days of WINDOWS) {
+    writeCsv<AuthorWindowRow>(
+      join(analyticsDir, `authors_last_${days}d.csv`),
+      [...authorWindowColumns],
+      authorRowsForWindow(days),
+    );
+  }
 
   writeCsv<ListingAllTimeRow>(
     join(analyticsDir, "most_popular_all_time.csv"),
