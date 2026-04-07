@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ListingManifest, ManifestDirectory, ManifestType } from "./manifests.js";
 import type { MapManifest } from "./manifests.js";
@@ -13,8 +13,11 @@ import type {
   ZipCompletenessResult,
 } from "./integrity.js";
 import { fetchWithTimeout, resolveTimeoutMsFromEnv } from "./http.js";
+import { readJsonFile, sortObjectByKeys } from "./json-utils.js";
 import { isSupportedReleaseTag, parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
 import { compareStableSemverDesc } from "./semver.js";
+
+export { sortObjectByKeys, bytesToMebibytesRounded } from "./json-utils.js";
 
 export interface CustomVersionCandidate {
   version: string;
@@ -38,10 +41,6 @@ export interface ListingContext {
 
 const NON_SHA_RECHECK_WINDOW_MS = 12 * 60 * 60 * 1000;
 const REMOTE_REQUEST_TIMEOUT_MS = resolveTimeoutMsFromEnv("REGISTRY_FETCH_TIMEOUT_MS", 45_000);
-
-function readJsonFile<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf-8")) as T;
-}
 
 function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim() !== "";
@@ -72,13 +71,7 @@ export function getDirectoryForType(listingType: ManifestType): ManifestDirector
   return listingType === "map" ? "maps" : "mods";
 }
 
-export function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
-  const sorted: Record<string, T> = {};
-  for (const key of Object.keys(value).sort()) {
-    sorted[key] = value[key];
-  }
-  return sorted;
-}
+
 
 export function getIndexIds(repoRoot: string, dir: ManifestDirectory): string[] {
   const indexPath = resolve(repoRoot, dir, "index.json");
@@ -274,10 +267,6 @@ export function withCheckResult(
     fingerprint,
     checked_at: checkedAt,
   };
-}
-
-export function bytesToMebibytesRounded(value: number): number {
-  return Math.round((value / (1024 * 1024)) * 100) / 100;
 }
 
 export async function fetchZipBuffer(

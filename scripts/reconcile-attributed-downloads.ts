@@ -12,7 +12,7 @@ import {
   writeDownloadVersionBucketLedger,
 } from "./lib/download-version-buckets.js";
 import { generateDownloadHistorySnapshot } from "./lib/download-history.js";
-import { appendGitHubOutput, getNonEmptyEnv, resolveRepoRoot } from "./lib/script-runtime.js";
+import { appendGitHubOutput, getNonEmptyEnv, resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 
 interface CliOptions {
   refreshHistory: boolean;
@@ -120,8 +120,5 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }

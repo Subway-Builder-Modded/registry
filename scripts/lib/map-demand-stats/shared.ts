@@ -1,15 +1,16 @@
-import { readFileSync } from "node:fs";
 import type { InitialViewState } from "../manifests.js";
+import {
+  isObject as _isObject,
+  toFiniteNumber as _toFiniteNumber,
+} from "../json-utils.js";
 import { compareStableSemverDesc } from "../semver.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "../release-resolution.js";
 import type { JsonObject } from "./types.js";
 
+export { readJsonFile, getDemandPointRef } from "../json-utils.js";
+
 export function compareSemverDescending(a: string, b: string): number {
   return compareStableSemverDesc(a, b);
-}
-
-export function readJsonFile<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf-8")) as T;
 }
 
 export function warn(warnings: string[], message: string): void {
@@ -60,11 +61,11 @@ export function inferPreferredGithubAssetName(sourceUrl: string | undefined, rep
 }
 
 export function isObject(value: unknown): value is JsonObject {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return _isObject(value);
 }
 
 export function toFiniteNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
+  return _toFiniteNumber(value);
 }
 
 export function parseInitialViewState(value: unknown): InitialViewState | null {
@@ -92,15 +93,3 @@ export function initialViewStateEquals(
   );
 }
 
-export function getDemandPointRef(pointValue: unknown, fallbackRef: string): string {
-  if (isObject(pointValue)) {
-    const idValue = pointValue.id;
-    if (typeof idValue === "string" && idValue.trim() !== "") {
-      return idValue.trim();
-    }
-    if (typeof idValue === "number" && Number.isFinite(idValue)) {
-      return String(idValue);
-    }
-  }
-  return fallbackRef;
-}

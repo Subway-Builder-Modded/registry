@@ -1,29 +1,14 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ParsedReleaseAssetUrl } from "./download-definitions.js";
+import { isObject, toFiniteNonNegativeNumber, sortObjectByKeys, writeJsonFile } from "./json-utils.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
 
 const DOWNLOAD_ATTRIBUTION_SCHEMA_VERSION = 2;
 const DOWNLOAD_ATTRIBUTION_FILE = ["history", "registry-download-attribution.json"] as const;
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function toFiniteNonNegativeNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
-}
-
 function normalizeSource(value: string): string {
   return value.trim() === "" ? "unknown" : value.trim();
-}
-
-function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
-  const sorted: Record<string, T> = {};
-  for (const key of Object.keys(value).sort()) {
-    sorted[key] = value[key];
-  }
-  return sorted;
 }
 
 function normalizeAssetIdentity(value: string | null | undefined): string {
@@ -328,7 +313,7 @@ export function loadDownloadAttributionLedger(repoRoot: string): DownloadAttribu
 export function writeDownloadAttributionLedger(repoRoot: string, ledger: DownloadAttributionLedger): void {
   const path = getDownloadAttributionPath(repoRoot);
   const normalized = normalizeDownloadAttributionLedger(ledger);
-  writeFileSync(path, `${JSON.stringify(normalized, null, 2)}\n`, "utf-8");
+  writeJsonFile(path, normalized);
 }
 
 export function toDownloadAttributionAssetKey(
@@ -664,5 +649,5 @@ export function writeDownloadAttributionDeltaFile(path: string, delta: DownloadA
   if (!normalized) {
     throw new Error(`Invalid download attribution delta payload for path '${path}'`);
   }
-  writeFileSync(path, `${JSON.stringify(normalized, null, 2)}\n`, "utf-8");
+  writeJsonFile(path, normalized);
 }

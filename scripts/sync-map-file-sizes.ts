@@ -1,7 +1,8 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeJsonFile } from "./lib/json-utils.js";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { appendGitHubOutput, resolveRepoRoot } from "./lib/script-runtime.js";
+import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 
 interface IntegrityVersionEntry {
   is_complete?: unknown;
@@ -128,7 +129,7 @@ export function syncMapFileSizesFromIntegrity(
     const nextFileSizes = resolved.fileSizes;
     if (JSON.stringify(currentFileSizes) !== JSON.stringify(nextFileSizes)) {
       manifest.file_sizes = nextFileSizes;
-      writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf-8");
+      writeJsonFile(manifestPath, manifest);
       updatedMaps += 1;
     }
   }
@@ -157,8 +158,5 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }
