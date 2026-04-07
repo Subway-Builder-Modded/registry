@@ -86,6 +86,10 @@ export const SPECIAL_DEMAND_TAG_SET = new Set<string>(SPECIAL_DEMAND_TAGS);
 export const SOURCE_QUALITY_SET = new Set<string>(SOURCE_QUALITY_VALUES);
 export const LEVEL_OF_DETAIL_SET = new Set<string>(LEVEL_OF_DETAIL_VALUES);
 
+export const GRANDFATHERED_CITY_CODE_DUPLICATES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ["DAY", new Set(["dayton-oh", "daytonatti"])],
+]);
+
 export function isOsmDataSource(value: string): boolean {
   return /osm/i.test(value);
 }

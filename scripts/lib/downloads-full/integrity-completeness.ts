@@ -7,6 +7,7 @@ import type {
 } from "../integrity.js";
 import { inspectZipCompleteness } from "../integrity.js";
 import type { LoadedSecurityRules } from "../mod-security.js";
+import { normalizeStableSemverTag } from "../semver.js";
 import {
   bytesToMebibytesRounded,
   type CustomVersionCandidate,
@@ -17,6 +18,42 @@ import {
 } from "../downloads-support.js";
 
 const INTEGRITY_RULES_VERSION = "v4";
+
+function applyVersionTagCheck(
+  check: ZipCompletenessResult,
+  releaseTag: string,
+  listingType: D.GenerateDownloadsOptions["listingType"],
+): ZipCompletenessResult {
+  if (listingType !== "mod") return check;
+  const normalizedTag = normalizeStableSemverTag(releaseTag);
+  if (!normalizedTag) return check;
+
+  const manifestVersion = check.manifestVersion ?? null;
+  const normalizedManifestVersion = manifestVersion ? normalizeStableSemverTag(manifestVersion) : null;
+  const versionMatches = normalizedManifestVersion !== null && normalizedManifestVersion === normalizedTag;
+
+  const errors = versionMatches
+    ? check.errors
+    : [
+      ...check.errors,
+      `manifest.json version '${manifestVersion ?? "(missing)"}' does not match release tag '${releaseTag}'`
+      + ` (expected '${normalizedTag}')`,
+    ];
+
+  return {
+    ...check,
+    isComplete: versionMatches ? check.isComplete : false,
+    errors,
+    requiredChecks: {
+      ...check.requiredChecks,
+      manifest_version_matches_tag: versionMatches,
+    },
+    matchedFiles: {
+      ...check.matchedFiles,
+      manifest_version_matches_tag: versionMatches ? "manifest.json" : null,
+    },
+  };
+}
 
 export function versionedFingerprint(base: string): string {
   return `rules:${INTEGRITY_RULES_VERSION}:${base}`;
@@ -145,7 +182,8 @@ export function createInspectZipWithMemo(options: {
     });
     const memoEntry = inspectionMemo.get(memoKey);
     if (memoEntry) {
-      return { ok: true, value: { ...memoEntry, fromMemo: true } };
+      const check = applyVersionTagCheck(memoEntry.check, params.version, options.listingType);
+      return { ok: true, value: { ...memoEntry, check, fromMemo: true } };
     }
 
     const zipBuffer = await fetchZipBuffer(
@@ -193,7 +231,8 @@ export function createInspectZipWithMemo(options: {
       fromMemo: false,
     };
     inspectionMemo.set(memoKey, value);
-    return { ok: true, value };
+    const tagChecked = applyVersionTagCheck(check, params.version, options.listingType);
+    return { ok: true, value: { ...value, check: tagChecked } };
   };
 }
 
