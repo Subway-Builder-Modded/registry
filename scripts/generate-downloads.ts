@@ -14,6 +14,10 @@ import {
   loadDownloadVersionBucketLedger,
   writeDownloadVersionBucketLedger,
 } from "./lib/download-version-buckets.js";
+import {
+  loadGrandfatheredDownloads,
+  mergeGrandfatheredDownloads,
+} from "./lib/grandfathered-downloads.js";
 import type { IntegrityOutput } from "./lib/integrity.js";
 import type { ManifestType } from "./lib/manifests.js";
 import type { SecurityFinding } from "./lib/mod-security.js";
@@ -313,11 +317,14 @@ async function run(): Promise<void> {
   });
   const securityAlerts = collectSecurityAlerts(integrity, listingType);
 
-  const downloads = applyVersionBucketMonotonicCounts(
+  const bucketDownloads = applyVersionBucketMonotonicCounts(
     versionBucketLedger,
     rawDownloads,
     versionBucketInputs,
   );
+
+  const grandfathered = loadGrandfatheredDownloads(repoRoot, listingType);
+  const downloads = mergeGrandfatheredDownloads(bucketDownloads, grandfathered);
 
   const integrityPath = resolve(repoRoot, outputDir, "integrity.json");
   const integrityCachePath = resolve(repoRoot, outputDir, "integrity-cache.json");
