@@ -184,3 +184,45 @@ test("publish validation rejects map demand data when point/pop resident totals 
   const output = readValidationError();
   assert.match(output, /\*\*demand_data\*\*: listing=.*resident totals mismatch/);
 });
+
+test("publish validation rejects city codes that clash with existing maps", () => {
+  const issue = basePublishMapIssue({ "city-code": "ALB" });
+  const result = runScript("validate-publish", {
+    LISTING_TYPE: "map",
+    ISSUE_JSON: JSON.stringify(issue),
+  });
+
+  assert.notEqual(result.status, 0, "Validation should fail for duplicate city code");
+  const output = readValidationError();
+  assert.match(output, /\*\*city-code\*\*: `ALB` is already used by map `albany`\. City codes must be unique\./);
+});
+
+test("publish validation rejects map ID that matches an existing mod", () => {
+  const issue = basePublishMapIssue({ "map-id": "transit-overlay" });
+  const result = runScript("validate-publish", {
+    LISTING_TYPE: "map",
+    ISSUE_JSON: JSON.stringify(issue),
+  });
+
+  assert.notEqual(result.status, 0, "Validation should fail for cross-type duplicate ID");
+  const output = readValidationError();
+  assert.match(output, /\*\*map-id\*\*: A mod with ID `transit-overlay` already exists\. Listing IDs must be unique across maps and mods\./);
+});
+
+test("publish validation rejects mod ID that matches an existing map", () => {
+  const result = runScript("validate-publish", {
+    LISTING_TYPE: "mod",
+    ISSUE_JSON: JSON.stringify({
+      "mod-id": "albany",
+      name: "Test Mod",
+      description: "Test description.",
+      source: "https://example.com/test-mod",
+      "update-type": "GitHub Releases",
+      "github-repo": "invalid-repo-format",
+    }),
+  });
+
+  assert.notEqual(result.status, 0, "Validation should fail for cross-type duplicate ID");
+  const output = readValidationError();
+  assert.match(output, /\*\*mod-id\*\*: A map with ID `albany` already exists\. Listing IDs must be unique across maps and mods\./);
+});

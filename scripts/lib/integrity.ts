@@ -5,6 +5,7 @@ import type { CompiledSecurityRule, SecurityIssue } from "./mod-security.js";
 import { scanZipForSecurityIssues } from "./mod-security.js";
 import { isObject, toFiniteNumber, bytesToMebibytesRounded, getDemandPointRef } from "./json-utils.js";
 
+
 export interface IntegritySource {
   update_type: "github" | "custom";
   repo?: string;
@@ -60,6 +61,7 @@ export interface ZipCompletenessResult {
   matchedFiles: Record<string, string | null>;
   fileSizes?: Record<string, number>;
   securityIssue?: SecurityIssue;
+  manifestVersion?: string;
 }
 
 interface InspectZipOptions {
@@ -453,6 +455,7 @@ async function inspectModZip(
   const matchedFiles: Record<string, string | null> = {};
   const errors: string[] = [];
   const warnings: string[] = [];
+  let manifestVersion: string | undefined;
 
   requiredChecks.release_manifest_asset = releaseHasManifestAsset;
   matchedFiles.release_manifest_asset = releaseHasManifestAsset ? expectedReleaseManifestAssetName : null;
@@ -465,6 +468,21 @@ async function inspectModZip(
   matchedFiles.zip_manifest_json = manifestInZip;
   if (!manifestInZip) {
     errors.push("missing top-level manifest.json in ZIP");
+  }
+
+  if (manifestInZip) {
+    try {
+      const manifestEntry = zip.files[manifestInZip];
+      if (manifestEntry) {
+        const raw = await manifestEntry.async("string");
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        if (typeof parsed.version === "string") {
+          manifestVersion = parsed.version.trim();
+        }
+      }
+    } catch {
+      // Cannot read/parse manifest — manifestVersion stays undefined
+    }
   }
 
   let securityIssue: SecurityIssue | undefined;
@@ -514,6 +532,7 @@ async function inspectModZip(
     matchedFiles,
     fileSizes: undefined,
     securityIssue,
+    manifestVersion,
   };
 }
 
