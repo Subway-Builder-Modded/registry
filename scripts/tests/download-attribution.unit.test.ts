@@ -92,7 +92,7 @@ test("mergeDownloadAttributionDeltas records timestamp buckets and honors cutoff
   );
 });
 
-test("getAttributedCountForAssetKey prefers identity-key attribution and falls back to base-key attribution", () => {
+test("getAttributedCountForAssetKey aggregates base-key and identity-key attribution", () => {
   const ledger = createEmptyDownloadAttributionLedger("2026-03-30T00:00:00.000Z");
   ledger.assets["owner/repo@v1.0.0/asset.zip"] = {
     count: 3,
@@ -111,11 +111,11 @@ test("getAttributedCountForAssetKey prefers identity-key attribution and falls b
 
   assert.equal(
     getAttributedCountForAssetKey(ledger, delta, "owner/repo@v1.0.0/asset.zip#RA_abc"),
-    9,
+    14,
   );
   assert.equal(
     getAttributedCountForAssetKey(ledger, delta, "owner/repo@v1.0.0/asset.zip"),
-    9,
+    14,
   );
 
   const noIdentityLedger = createEmptyDownloadAttributionLedger("2026-03-30T00:00:00.000Z");
