@@ -4,7 +4,7 @@ import {
   collectLocalGridStatistics,
   writeLocalGridStatisticsReport,
 } from "./lib/local-grid-statistics.js";
-import { resolveRepoRoot } from "./lib/script-runtime.js";
+import { resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 
 interface CliOptions {
   inputDir: string;
@@ -89,8 +89,5 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }

@@ -233,11 +233,11 @@ test("generateGrid returns zeroed metric bundles when commute and density sample
     expectedPointSpacingKm: 0,
     normalizedRadius: 0,
     activityPerPoint: 0,
-    playableAreaKm2: 1,
-    playableAreaPerPointKm2: 1,
-    playableCatchmentRadiusKm: Math.sqrt(1 / Math.PI),
+    playableAreaKm2: 4,
+    playableAreaPerPointKm2: 4,
+    playableCatchmentRadiusKm: Math.sqrt(4 / Math.PI),
     localityScore: 0,
-    deaggregationScore: 1,
+    deaggregationScore: 0,
     score: 0,
   });
 });

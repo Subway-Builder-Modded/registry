@@ -6,24 +6,9 @@ import {
   parseStableSemverTag,
 } from "./semver.js";
 export { normalizeStableSemverTag } from "./semver.js";
+import { isObject, toFiniteNonNegativeNumber, sortObjectByKeys } from "./json-utils.js";
 
 const RAILYARD_APP_DOWNLOAD_HISTORY_FILE = ["history", "railyard_app_downloads.json"] as const;
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function toFiniteNonNegativeNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
-}
-
-function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
-  const sorted: Record<string, T> = {};
-  for (const key of Object.keys(value).sort()) {
-    sorted[key] = value[key]!;
-  }
-  return sorted;
-}
 
 export interface GitHubReleaseAssetLike {
   name: string;

@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ManifestType } from "./manifests.js";
 import {
@@ -6,6 +6,7 @@ import {
   writeDownloadVersionBucketLedger,
   type DownloadVersionBucketLedger,
 } from "./download-version-buckets.js";
+import { isObject, toFiniteNonNegativeNumber, readJsonFile } from "./json-utils.js";
 
 const SNAPSHOT_PATTERN = /^snapshot_(\d{4}_\d{2}_\d{2})\.json$/;
 
@@ -16,18 +17,6 @@ interface SnapshotSectionLike {
 interface SnapshotLike {
   maps?: SnapshotSectionLike;
   mods?: SnapshotSectionLike;
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function toFiniteNonNegativeNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
-}
-
-function readJsonFile<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf-8")) as T;
 }
 
 function normalizeDownloads(raw: unknown): Record<string, Record<string, number>> {

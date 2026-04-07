@@ -1,7 +1,8 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { basename, dirname, resolve } from "node:path";
 import JSZip from "jszip";
 import { extractDemandStatsFromZipBuffer, type DemandStats } from "./map-demand-stats.js";
+import { isObject, writeJsonFile } from "./json-utils.js";
 
 export interface LocalGridStatisticsEntry {
   cityCode: string;
@@ -145,9 +146,6 @@ export async function collectLocalGridStatistics(
 export function writeLocalGridStatisticsReport(outputPath: string, report: LocalGridStatisticsReport): void {
   const resolvedOutputPath = resolve(outputPath);
   mkdirSync(dirname(resolvedOutputPath), { recursive: true });
-  writeFileSync(resolvedOutputPath, `${JSON.stringify(report, null, 2)}\n`, "utf-8");
+  writeJsonFile(resolvedOutputPath, report);
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}

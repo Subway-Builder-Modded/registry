@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeJsonFile } from "./lib/json-utils.js";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { makeAnnouncement } from "./make-announcement.js";
@@ -21,6 +22,7 @@ import {
   getNonEmptyEnv,
   isTruthyEnv,
   resolveRepoRoot,
+  runAndExitOnError,
 } from "./lib/script-runtime.js";
 import { compareStableSemverAsc, isStableSemverTag } from "./lib/semver.js";
 import { filterListingMessages, isTestListing } from "./lib/test-listings.js";
@@ -319,12 +321,12 @@ async function run(): Promise<void> {
 
   const integrityPath = resolve(repoRoot, outputDir, "integrity.json");
   const integrityCachePath = resolve(repoRoot, outputDir, "integrity-cache.json");
-  writeFileSync(outputPath, `${JSON.stringify(downloads, null, 2)}\n`, "utf-8");
+  writeJsonFile(outputPath, downloads);
   writeDownloadVersionBucketLedger(repoRoot, listingType, versionBucketLedger);
   if (mode === "full") {
     await announceNewAssets(integrity, integrityPath, listingType, repoRoot);
-    writeFileSync(integrityPath, `${JSON.stringify(integrity, null, 2)}\n`, "utf-8");
-    writeFileSync(integrityCachePath, `${JSON.stringify(integrityCache, null, 2)}\n`, "utf-8");
+    writeJsonFile(integrityPath, integrity);
+    writeJsonFile(integrityCachePath, integrityCache);
     writeDownloadAttributionDeltaFile(attributionDeltaPath, attributionDelta);
   }
 
@@ -414,8 +416,5 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }

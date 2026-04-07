@@ -3,6 +3,7 @@ import { gunzipSync } from "node:zlib";
 import type { ManifestType } from "./manifests.js";
 import type { CompiledSecurityRule, SecurityIssue } from "./mod-security.js";
 import { scanZipForSecurityIssues } from "./mod-security.js";
+import { isObject, toFiniteNumber, bytesToMebibytesRounded, getDemandPointRef } from "./json-utils.js";
 
 export interface IntegritySource {
   update_type: "github" | "custom";
@@ -96,10 +97,6 @@ function findTopLevelEntry(zip: JSZip, names: string[]): JSZip.JSZipObject | nul
   return null;
 }
 
-function bytesToMebibytesRounded(value: number): number {
-  return Math.round((value / (1024 * 1024)) * 100) / 100;
-}
-
 function getEntryUncompressedSize(entry: JSZip.JSZipObject): number {
   const rawData = entry as unknown as {
     _data?: { uncompressedSize?: unknown };
@@ -138,27 +135,6 @@ function firstMatch(files: Set<string>, names: string[]): string | null {
     }
   }
   return null;
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function toFiniteNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
-
-function getDemandPointRef(pointValue: unknown, fallbackRef: string): string {
-  if (isObject(pointValue)) {
-    const idValue = pointValue.id;
-    if (typeof idValue === "string" && idValue.trim() !== "") {
-      return idValue.trim();
-    }
-    if (typeof idValue === "number" && Number.isFinite(idValue)) {
-      return String(idValue);
-    }
-  }
-  return fallbackRef;
 }
 
 function findConfigCode(value: unknown): string | null {

@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
+import { isObject } from "./json-utils.js";
 
 export type AttributionMethod = "github" | "discord" | "custom";
 export type ContributorTier = "developer" | "executive" | "engineer";
@@ -32,10 +33,6 @@ export interface EnsureAuthorAliasPrefillResult {
   path: string;
 }
 
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function parseAttributionMethod(value: unknown): AttributionMethod {
   if (value === "discord" || value === "custom") return value;
   return "github";
@@ -46,6 +43,12 @@ function parseContributorTier(value: unknown): ContributorTier | undefined {
     return value;
   }
   return undefined;
+}
+
+function trimmedStringOrUndefined(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  return trimmed !== "" ? trimmed : undefined;
 }
 
 export function getAuthorAliasIndexPath(repoRoot: string): string {
@@ -68,21 +71,13 @@ export function loadAuthorAliasIndex(repoRoot: string): AuthorAliasIndex {
       .filter((entry): entry is Record<string, unknown> => isObject(entry))
       .map((entry) => ({
         github_id: typeof entry.github_id === "number" && Number.isFinite(entry.github_id) ? entry.github_id : 0,
-        author_id: typeof entry.author_id === "string" && entry.author_id.trim() !== "" ? entry.author_id.trim() : undefined,
-        author_alias: typeof entry.author_alias === "string" && entry.author_alias.trim() !== ""
-          ? entry.author_alias.trim()
-          : undefined,
+        author_id: trimmedStringOrUndefined(entry.author_id),
+        author_alias: trimmedStringOrUndefined(entry.author_alias),
         attribution_method: parseAttributionMethod(entry.attribution_method),
-        discord_username: typeof entry.discord_username === "string" && entry.discord_username.trim() !== ""
-          ? entry.discord_username.trim()
-          : undefined,
-        discord_id: typeof entry.discord_id === "string" && entry.discord_id.trim() !== "" ? entry.discord_id.trim() : undefined,
-        attribution_link: typeof entry.attribution_link === "string" && entry.attribution_link.trim() !== ""
-          ? entry.attribution_link.trim()
-          : undefined,
-        ko_fi_username: typeof entry.ko_fi_username === "string" && entry.ko_fi_username.trim() !== ""
-          ? entry.ko_fi_username.trim()
-          : undefined,
+        discord_username: trimmedStringOrUndefined(entry.discord_username),
+        discord_id: trimmedStringOrUndefined(entry.discord_id),
+        attribution_link: trimmedStringOrUndefined(entry.attribution_link),
+        ko_fi_username: trimmedStringOrUndefined(entry.ko_fi_username),
         contributor_tier: parseContributorTier(entry.contributor_tier),
       }))
       .filter((entry) => entry.github_id > 0)

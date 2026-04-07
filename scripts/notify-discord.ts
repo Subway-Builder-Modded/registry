@@ -1,5 +1,6 @@
 import { pathToFileURL } from "node:url";
 import { sendDiscordMarkdown } from "./lib/discord-webhook.js";
+import { runAndExitOnError } from "./lib/script-runtime.js";
 
 interface ParsedNotificationPayload {
   title: string;
@@ -81,9 +82,6 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }
 

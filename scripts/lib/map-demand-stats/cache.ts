@@ -1,6 +1,7 @@
 import { existsSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { FeatureCollection, GeoJsonProperties, Polygon } from "geojson";
+import { writeJsonFile } from "../json-utils.js";
 import { CACHE_FILE_NAME, DEMAND_STATS_CACHE_SCHEMA_VERSION, GRID_SCHEMA_VERSION, UNCHANGED_SKIP_WINDOW_MS } from "./constants.js";
 import { isObject, parseInitialViewState, readJsonFile } from "./shared.js";
 import type { DemandStatsCache, DemandStatsCacheEntry, DemandStatsCacheFile, DemandStats } from "./types.js";
@@ -78,7 +79,7 @@ export function writeDemandStatsCache(repoRoot: string, cache: DemandStatsCache)
     schema_version: DEMAND_STATS_CACHE_SCHEMA_VERSION,
     listings: sorted,
   };
-  writeFileSync(getCachePath(repoRoot), `${JSON.stringify(cacheFile, null, 2)}\n`, "utf-8");
+  writeJsonFile(getCachePath(repoRoot), cacheFile);
 }
 
 export function shouldSkipUnchanged(

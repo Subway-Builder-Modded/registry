@@ -6,7 +6,7 @@ import {
   sumDownloadAttributionDeltaFetches,
   writeDownloadAttributionDeltaFile,
 } from "./lib/download-attribution.js";
-import { appendGitHubOutput, getNonEmptyEnv, isTruthyEnv, resolveRepoRoot } from "./lib/script-runtime.js";
+import { appendGitHubOutput, getNonEmptyEnv, isTruthyEnv, resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 import { filterListingMessages, isTestListing } from "./lib/test-listings.js";
 
 function parseCliArgs(argv: string[]): { force: boolean; mapId?: string; strictFingerprintCache: boolean } {
@@ -146,8 +146,5 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }

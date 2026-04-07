@@ -8,6 +8,8 @@ import {
   type DownloadAttributionLedger,
 } from "./download-attribution.js";
 import type { IntegritySource } from "./integrity.js";
+import { isObject, toFiniteNumber, readJsonFile, writeJsonFile } from "./json-utils.js";
+import { toSnapshotDate, toCanonicalHistoryCutoffIso, getHistoryDir, CANONICAL_HISTORY_CUTOFF_HOUR_UTC } from "./history-utils.js";
 
 type ListingKind = "maps" | "mods";
 type IntegritySourceByListingVersion = Record<string, Record<string, IntegritySource | null>>;
@@ -96,28 +98,6 @@ export interface NormalizeDownloadHistorySnapshotOptions {
 
 const SNAPSHOT_PATTERN = /^snapshot_(\d{4}_\d{2}_\d{2})\.json$/;
 const DOWNLOAD_HISTORY_SCHEMA_VERSION = 2;
-const CANONICAL_HISTORY_CUTOFF_HOUR_UTC = 4;
-
-function readJsonFile<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf-8")) as T;
-}
-
-function toSnapshotDate(now: Date): string {
-  return now.toISOString().slice(0, 10).replaceAll("-", "_");
-}
-
-function toCanonicalHistoryCutoffIso(snapshotDate: string): string {
-  const normalizedDate = snapshotDate.replaceAll("_", "-");
-  return `${normalizedDate}T${String(CANONICAL_HISTORY_CUTOFF_HOUR_UTC).padStart(2, "0")}:00:00.000Z`;
-}
-
-function asFiniteNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 function normalizeDownloads(
   raw: unknown,
@@ -139,7 +119,7 @@ function normalizeDownloads(
 
     const versionsResult: Record<string, number> = {};
     for (const version of Object.keys(versionsRaw).sort()) {
-      const parsed = asFiniteNumber(versionsRaw[version]);
+      const parsed = toFiniteNumber(versionsRaw[version]);
       if (parsed === null) {
         warnings.push(
           `${sourceLabel}: listing='${listingId}' version='${version}' has non-numeric download count; skipping version`,
@@ -408,10 +388,6 @@ function readListingData(
   };
 }
 
-function getHistoryDir(repoRoot: string): string {
-  return resolve(repoRoot, "history");
-}
-
 function listSnapshotFileNames(historyDir: string): string[] {
   if (!existsSync(historyDir)) {
     return [];
@@ -566,7 +542,7 @@ function readAttributionHistoryTotal(
   if (!existsSync(filePath)) return null;
   try {
     const parsed = readJsonFile<AttributionHistoryLike>(filePath);
-    const total = asFiniteNumber(parsed.total_attributed_fetches);
+    const total = toFiniteNumber(parsed.total_attributed_fetches);
     return total === null ? null : total;
   } catch {
     return null;
@@ -653,7 +629,7 @@ export function generateDownloadHistorySnapshot(
   const historyDir = getHistoryDir(options.repoRoot);
   mkdirSync(historyDir, { recursive: true });
   const snapshotPath = resolve(historyDir, snapshotFileName);
-  writeFileSync(snapshotPath, `${JSON.stringify(snapshot, null, 2)}\n`, "utf-8");
+  writeJsonFile(snapshotPath, snapshot);
 
   return {
     snapshotFile: `history/${snapshotFileName}`,

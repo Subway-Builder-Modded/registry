@@ -5,7 +5,7 @@ import {
   backfillDownloadAttributionHistorySnapshots,
   generateDownloadAttributionHistorySnapshot,
 } from "./lib/download-attribution-history.js";
-import { appendGitHubOutput, resolveRepoRoot } from "./lib/script-runtime.js";
+import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 import { isTestListing } from "./lib/test-listings.js";
 
 function toWarningsOutputJson(warnings: string[]): string {
@@ -154,8 +154,5 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }

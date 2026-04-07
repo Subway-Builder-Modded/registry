@@ -7,6 +7,8 @@ import {
   sumLedgerTotalUpToCutoff,
   type DownloadAttributionLedger,
 } from "./download-attribution.js";
+import { readJsonFile, sortObjectByKeys, writeJsonFile } from "./json-utils.js";
+import { toSnapshotDate, toCanonicalHistoryCutoffIso, getHistoryDir } from "./history-utils.js";
 
 const ATTRIBUTION_SNAPSHOT_PATTERN = /^download_attribution_(\d{4}_\d{2}_\d{2})\.json$/;
 
@@ -47,34 +49,8 @@ interface DownloadSnapshotMeta {
   generatedAtIso: string;
 }
 
-const CANONICAL_HISTORY_CUTOFF_HOUR_UTC = 4;
-
-function toCanonicalHistoryCutoffIso(snapshotDate: string): string {
-  return `${snapshotDate.replaceAll("_", "-")}T${String(CANONICAL_HISTORY_CUTOFF_HOUR_UTC).padStart(2, "0")}:00:00.000Z`;
-}
-
-function toSnapshotDate(now: Date): string {
-  return now.toISOString().slice(0, 10).replaceAll("-", "_");
-}
-
-function getHistoryDir(repoRoot: string): string {
-  return resolve(repoRoot, "history");
-}
-
-function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
-  const sorted: Record<string, T> = {};
-  for (const key of Object.keys(value).sort()) {
-    sorted[key] = value[key];
-  }
-  return sorted;
-}
-
 function hasDailyBuckets(ledger: DownloadAttributionLedger): boolean {
   return Object.keys(ledger.daily).length > 0;
-}
-
-function readJsonFile<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf-8")) as T;
 }
 
 function listAttributionSnapshotFiles(historyDir: string): string[] {
@@ -225,7 +201,7 @@ export function generateDownloadAttributionHistorySnapshot(
   const historyDir = getHistoryDir(options.repoRoot);
   mkdirSync(historyDir, { recursive: true });
   const path = resolve(historyDir, fileName);
-  writeFileSync(path, `${JSON.stringify(snapshot, null, 2)}\n`, "utf-8");
+  writeJsonFile(path, snapshot);
 
   return {
     snapshotFile: `history/${fileName}`,

@@ -8,7 +8,7 @@ import {
   writeRailyardAppDownloadHistory,
   type GitHubReleaseLike,
 } from "./lib/railyard-app-downloads.js";
-import { getNonEmptyEnv, resolveRepoRoot } from "./lib/script-runtime.js";
+import { getNonEmptyEnv, resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 
 const DEFAULT_REPO = "Subway-Builder-Modded/railyard";
 const GITHUB_API_BASE = "https://api.github.com";
@@ -132,8 +132,5 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }

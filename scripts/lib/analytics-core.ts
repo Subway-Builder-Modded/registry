@@ -1,7 +1,8 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { writeCsv } from "./csv.js";
+import { isFiniteNumber, isObject, readJsonFile } from "./json-utils.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 import { isTestListing } from "./test-listings.js";
 import { loadAuthorAliasIndex, resolveAuthorPresentation, type AuthorAliasIndex } from "./author-aliases.js";
@@ -213,14 +214,6 @@ const DEFAULT_TOP_LISTINGS: number | null = null;
 const DEFAULT_TOP_AUTHORS: number | null = null;
 const WINDOWS = [1, 3, 7, 14, 30] as const;
 
-function isFiniteNumber(value: unknown): value is number {
-  return typeof value === "number" && Number.isFinite(value);
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
 function getArgValue(argv: string[], name: string): string | undefined {
   const exact = `--${name}=`;
   for (const arg of argv) {
@@ -275,10 +268,6 @@ function parseSnapshotDate(fileName: string): Date | null {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
-function loadJsonFile<T>(path: string): T {
-  return JSON.parse(readFileSync(path, "utf-8")) as T;
-}
-
 function listSnapshots(historyDir: string): SnapshotEntry[] {
   return readdirSync(historyDir)
     .filter((file) => /^snapshot_\d{4}_\d{2}_\d{2}\.json$/.test(file))
@@ -329,7 +318,7 @@ function buildListingIdsBySnapshot(
 ): Map<string, { maps: Set<string>; mods: Set<string> }> {
   const bySnapshot = new Map<string, { maps: Set<string>; mods: Set<string> }>();
   for (const snapshot of snapshots) {
-    const snapshotData = loadJsonFile<SnapshotData>(join(historyDir, snapshot.file));
+    const snapshotData = readJsonFile<SnapshotData>(join(historyDir, snapshot.file));
     bySnapshot.set(snapshot.file, {
       maps: toListingIdSet(snapshotData, repoRoot, "maps"),
       mods: toListingIdSet(snapshotData, repoRoot, "mods"),
@@ -365,7 +354,7 @@ function buildListingVersionsBySnapshot(
 ): Map<string, { maps: Set<string>; mods: Set<string> }> {
   const bySnapshot = new Map<string, { maps: Set<string>; mods: Set<string> }>();
   for (const snapshot of snapshots) {
-    const snapshotData = loadJsonFile<SnapshotData>(join(historyDir, snapshot.file));
+    const snapshotData = readJsonFile<SnapshotData>(join(historyDir, snapshot.file));
     bySnapshot.set(snapshot.file, {
       maps: toListingVersionSet(snapshotData, repoRoot, "maps"),
       mods: toListingVersionSet(snapshotData, repoRoot, "mods"),
@@ -382,7 +371,7 @@ function buildMonotonicSnapshotTotals(
   const runningMax = new Map<ListingKey, number>();
 
   for (const snapshot of snapshots) {
-    const snapshotData = loadJsonFile<SnapshotData>(join(historyDir, snapshot.file));
+    const snapshotData = readJsonFile<SnapshotData>(join(historyDir, snapshot.file));
     const adjustedTotals = toListingTotals(snapshotData);
     const snapshotMonotonic = new Map<ListingKey, number>();
     const keys = new Set<ListingKey>([
@@ -454,7 +443,7 @@ function loadManifestMeta(
 ): ListingMeta {
   const manifestPath = join(repoRoot, listingType, id, "manifest.json");
   try {
-    const manifest = loadJsonFile<Record<string, unknown>>(manifestPath);
+    const manifest = readJsonFile<Record<string, unknown>>(manifestPath);
     const name = typeof manifest.name === "string" && manifest.name.trim() !== ""
       ? manifest.name
       : id;
@@ -530,7 +519,7 @@ function loadListingProjectRow(
   const listingLabel = toListingLabel(listingType);
 
   try {
-    const manifest = loadJsonFile<Record<string, unknown>>(manifestPath);
+    const manifest = readJsonFile<Record<string, unknown>>(manifestPath);
     const name = typeof manifest.name === "string" && manifest.name.trim() !== ""
       ? manifest.name
       : id;
@@ -760,7 +749,7 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
   if (!existsSync(gridPath)) return emptyGridSummary();
 
   try {
-    const grid = loadJsonFile<Record<string, unknown>>(gridPath);
+    const grid = readJsonFile<Record<string, unknown>>(gridPath);
     const features = Array.isArray(grid.features) ? grid.features : [];
     const gridProperties = isObject(grid.properties) ? grid.properties : {};
     const commuteSummary = readGridMetricBundle(gridProperties, "commuteDistanceKm");
@@ -837,7 +826,7 @@ function loadGridSummary(repoRoot: string, id: string): GridSummary {
 
 function loadMapStatisticsRows(repoRoot: string, authorAliases: AuthorAliasIndex): MapStatisticsRow[] {
   const indexPath = join(repoRoot, "maps", "index.json");
-  const index = loadJsonFile<{ maps?: unknown }>(indexPath);
+  const index = readJsonFile<{ maps?: unknown }>(indexPath);
   const mapIds = Array.isArray(index.maps)
     ? index.maps.filter((value): value is string => typeof value === "string")
     : [];
@@ -846,7 +835,7 @@ function loadMapStatisticsRows(repoRoot: string, authorAliases: AuthorAliasIndex
   for (const id of mapIds) {
     const manifestPath = join(repoRoot, "maps", id, "manifest.json");
     try {
-      const manifest = loadJsonFile<Record<string, unknown>>(manifestPath);
+      const manifest = readJsonFile<Record<string, unknown>>(manifestPath);
       const author = toNonEmptyString(manifest.author, "UNKNOWN");
       const githubId = typeof manifest.github_id === "number" && Number.isFinite(manifest.github_id)
         ? manifest.github_id
@@ -1229,7 +1218,7 @@ export function runGenerateAnalyticsCli(
     if (cached) return cached;
     const totals = filterOutTestListingTotals(
       resolvedRepoRoot,
-      toListingTotals(loadJsonFile<SnapshotData>(join(historyDir, snapshotFile))),
+      toListingTotals(readJsonFile<SnapshotData>(join(historyDir, snapshotFile))),
     );
     adjustedTotalsBySnapshot.set(snapshotFile, totals);
     return totals;

@@ -6,7 +6,7 @@ import JSZip from "jszip";
 import { parseAttributionBackfillLogHits } from "./lib/download-attribution-backfill-core.js";
 import type { DownloadAttributionLedger } from "./lib/download-attribution.js";
 import type { IntegrityOutput } from "./lib/integrity.js";
-import { resolveRepoRoot } from "./lib/script-runtime.js";
+import { resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 
 const TARGET_WORKFLOW_FILES = [
   "regenerate-registry-analytics.yml",
@@ -357,9 +357,6 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }
 
