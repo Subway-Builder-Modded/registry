@@ -1,5 +1,6 @@
 import { gunzipSync } from "node:zlib";
-import { mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { writeJsonFile } from "./lib/json-utils.js";
 import { basename, dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
@@ -7,7 +8,7 @@ import {
   type PlayableAreaDebugResult,
 } from "./lib/map-playable-area.js";
 import { parseDemandGridData } from "./lib/map-demand-stats.js";
-import { resolveRepoRoot } from "./lib/script-runtime.js";
+import { resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 
 interface CliOptions {
   inputDir: string;
@@ -126,7 +127,7 @@ function readDemandPayload(demandDataPath: string): unknown {
 
 function writeGeoJson(path: string, content: unknown): void {
   mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(content, null, 2)}\n`, "utf-8");
+  writeJsonFile(path, content);
 }
 
 function writeReport(path: string, report: PlayableAreaDebugReport): void {
@@ -232,8 +233,5 @@ async function run(): Promise<void> {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  run().catch((error) => {
-    console.error(error instanceof Error ? error.message : String(error));
-    process.exit(1);
-  });
+  runAndExitOnError(run);
 }

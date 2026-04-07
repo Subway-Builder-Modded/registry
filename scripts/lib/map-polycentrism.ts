@@ -122,7 +122,7 @@ const LOCAL_CONSOLIDATION_RADIUS_KM = 15;
 // Ignore tiny local fragments during consolidation so the low-share branch does
 // not sweep in noise just because it is spatially nearby.
 const LOCAL_CONSOLIDATION_MIN_NEIGHBOR_SHARE = 0.02;
-const CONTINUOUS_SCORE_DISTANCE_SCALE_KM = 15;
+const CONTINUOUS_SCORE_DISTANCE_SCALE_KM = 10;
 const MAX_LOCAL_CONTRIBUTOR_DISTANCES = 6;
 const ACTIVITY_CENTER_GATE: CenterGateConfig = {
   protectedCenterShareFloor: 0.15,
@@ -665,9 +665,7 @@ function computeContinuousPolycentrismScore(
   const normalizedShares = qualifyingAssignments.map((assignment) => assignment.assignedMass / qualifyingMass);
   const hhi = normalizedShares.reduce((sum, share) => sum + (share * share), 0);
   const effectiveCenterCount = hhi > 0 ? 1 / hhi : 0;
-  const effectiveCountTerm = effectiveCenterCount > 0
-    ? clamp((effectiveCenterCount - 1) / (effectiveCenterCount + 1), 0, 1)
-    : 0;
+  const effectiveCountTerm = clamp(effectiveCenterCount - 1, 0, 1);
 
   let weightedSeparationSum = 0;
   let pairWeightSum = 0;

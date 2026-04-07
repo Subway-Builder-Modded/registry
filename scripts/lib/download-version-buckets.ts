@@ -1,25 +1,10 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ManifestType } from "./manifests.js";
 import type { DownloadVersionBucketInput, DownloadsByListing, VersionBucketInputsByListing } from "./download-definitions.js";
+import { isObject, toFiniteNonNegativeNumber, sortObjectByKeys, writeJsonFile } from "./json-utils.js";
 
 const DOWNLOAD_VERSION_BUCKETS_SCHEMA_VERSION = 1;
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function toFiniteNonNegativeNumber(value: unknown): number | null {
-  return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : null;
-}
-
-function sortObjectByKeys<T>(value: Record<string, T>): Record<string, T> {
-  const sorted: Record<string, T> = {};
-  for (const key of Object.keys(value).sort()) {
-    sorted[key] = value[key];
-  }
-  return sorted;
-}
 
 function isSyntheticBucketKey(bucketKey: string): boolean {
   return bucketKey.startsWith("legacy:")
@@ -277,7 +262,7 @@ export function writeDownloadVersionBucketLedger(
 ): void {
   const path = getDownloadVersionBucketPath(repoRoot, listingType);
   const normalized = normalizeDownloadVersionBucketLedger(ledger);
-  writeFileSync(path, `${JSON.stringify(normalized, null, 2)}\n`, "utf-8");
+  writeJsonFile(path, normalized);
 }
 
 export function applyVersionBucketMonotonicCounts(

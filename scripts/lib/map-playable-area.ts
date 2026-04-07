@@ -239,11 +239,23 @@ function computePlayableAreaState(locations: PlayableAreaLocation[]): PlayableAr
   for (let index = 1; index < PLAYABLE_AREA_CELL_SIZES_KM.length; index += 1) {
     const parentSizeKm = PLAYABLE_AREA_CELL_SIZES_KM[index - 1]!;
     const childSizeKm = PLAYABLE_AREA_CELL_SIZES_KM[index]!;
+    const ratio = Math.round(parentSizeKm / childSizeKm);
     const allowedCells = buildChildCellUniverse(occupiedCells, parentSizeKm, childSizeKm);
     const rawChildCells = intersectSets(
       buildOccupiedCells(projectedPoints, projection.originXKm, projection.originYKm, childSizeKm),
       allowedCells,
     );
+    for (const key of [...rawChildCells]) {
+      const [cx, cy] = parseCellKey(key);
+      const parentX = Math.floor(cx / ratio);
+      const parentY = Math.floor(cy / ratio);
+      for (let dx = 0; dx < ratio; dx += 1) {
+        for (let dy = 0; dy < ratio; dy += 1) {
+          const siblingKey = cellKey(parentX * ratio + dx, parentY * ratio + dy);
+          if (allowedCells.has(siblingKey)) rawChildCells.add(siblingKey);
+        }
+      }
+    }
     stagedCells.push({
       stage: "raw",
       cellSizeKm: childSizeKm,

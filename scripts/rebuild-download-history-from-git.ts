@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
+import { writeJsonFile } from "./lib/json-utils.js";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -85,7 +86,7 @@ function tryReadJsonFromCommit<T>(repoRoot: string, commit: string, path: string
 
 function writeJson(path: string, value: unknown): void {
   mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, "utf-8");
+  writeJsonFile(path, value);
 }
 
 function sumDownloads(downloads: Record<string, Record<string, number>>): number {

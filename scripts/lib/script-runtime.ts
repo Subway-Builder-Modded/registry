@@ -25,3 +25,12 @@ export function appendGitHubOutput(lines: string[]): void {
   if (!outputPath) return;
   appendFileSync(outputPath, `${lines.join("\n")}\n`);
 }
+
+export async function runAndExitOnError(fn: () => Promise<void>): Promise<void> {
+  try {
+    await fn();
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exit(1);
+  }
+}

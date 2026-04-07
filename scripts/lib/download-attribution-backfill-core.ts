@@ -17,6 +17,7 @@ import type { MapManifest } from "./manifests.js";
 import { resolveZipUrlForMapSource } from "./map-demand-stats/source-resolution.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
 import { resolveRepoRoot } from "./script-runtime.js";
+import { isObject } from "./json-utils.js";
 
 const GITHUB_API_BASE = "https://api.github.com";
 const TARGET_WORKFLOW_FILES = [
@@ -116,10 +117,6 @@ interface ResolveMapDemandBackfillAssetKeyOptions {
   gitShowCache?: Map<string, string | null>;
   mapManifestCache?: Map<string, MapManifest | null>;
   demandSourceFingerprintCache?: Map<string, string | null>;
-}
-
-function isObject(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function parseLookbackDays(value: string | undefined): number {
@@ -493,7 +490,7 @@ function readTextAtSource(
   sourceCommit: string | null | undefined,
   cache?: Map<string, string | null>,
 ): string | null {
-  const sourceKey = sourceCommit?.trim() ? sourceCommit.trim() : "";
+  const sourceKey = sourceCommit?.trim() || "";
   const cacheKey = `${sourceKey || "working"}:${relativePath}`;
   if (cache?.has(cacheKey)) {
     return cache.get(cacheKey) ?? null;
@@ -540,7 +537,7 @@ function buildLineToAssetKeyIndexAtSource(
   gitShowCache?: Map<string, string | null>,
   cache?: Map<string, Map<string, string>>,
 ): Map<string, string> {
-  const sourceKey = sourceCommit?.trim() ? sourceCommit.trim() : "working";
+  const sourceKey = sourceCommit?.trim() || "working";
   if (cache?.has(sourceKey)) {
     return cache.get(sourceKey)!;
   }
@@ -577,7 +574,7 @@ function getMapManifestAtSource(
   gitShowCache?: Map<string, string | null>,
   manifestCache?: Map<string, MapManifest | null>,
 ): MapManifest | null {
-  const sourceKey = sourceCommit?.trim() ? sourceCommit.trim() : "working";
+  const sourceKey = sourceCommit?.trim() || "working";
   const cacheKey = `${sourceKey}:${listingId}`;
   if (manifestCache?.has(cacheKey)) {
     return manifestCache.get(cacheKey) ?? null;
@@ -608,7 +605,7 @@ function getDemandSourceFingerprintAtSource(
   gitShowCache?: Map<string, string | null>,
   cache?: Map<string, string | null>,
 ): string | null {
-  const sourceKey = sourceCommit?.trim() ? sourceCommit.trim() : "working";
+  const sourceKey = sourceCommit?.trim() || "working";
   const cacheKey = `${sourceKey}:${listingId}`;
   if (cache?.has(cacheKey)) {
     return cache.get(cacheKey) ?? null;
