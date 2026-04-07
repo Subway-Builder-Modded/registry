@@ -11,6 +11,10 @@ import {
   loadDownloadVersionBucketLedger,
   writeDownloadVersionBucketLedger,
 } from "./lib/download-version-buckets.js";
+import {
+  loadGrandfatheredDownloads,
+  mergeGrandfatheredDownloads,
+} from "./lib/grandfathered-downloads.js";
 import { generateDownloadHistorySnapshot } from "./lib/download-history.js";
 import { appendGitHubOutput, getNonEmptyEnv, resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 
@@ -77,18 +81,23 @@ async function run(): Promise<void> {
     },
   });
 
-  const mapsDownloads = applyVersionBucketMonotonicCounts(
+  const mapsBucketDownloads = applyVersionBucketMonotonicCounts(
     mapVersionBucketLedger,
     mapResult.downloads,
     mapResult.versionBucketInputs,
     nowIso,
   );
-  const modsDownloads = applyVersionBucketMonotonicCounts(
+  const modsBucketDownloads = applyVersionBucketMonotonicCounts(
     modVersionBucketLedger,
     modResult.downloads,
     modResult.versionBucketInputs,
     nowIso,
   );
+
+  const mapsGrandfathered = loadGrandfatheredDownloads(repoRoot, "map");
+  const modsGrandfathered = loadGrandfatheredDownloads(repoRoot, "mod");
+  const mapsDownloads = mergeGrandfatheredDownloads(mapsBucketDownloads, mapsGrandfathered);
+  const modsDownloads = mergeGrandfatheredDownloads(modsBucketDownloads, modsGrandfathered);
 
   writeFileSync(resolve(repoRoot, "maps", "downloads.json"), `${JSON.stringify(mapsDownloads, null, 2)}\n`, "utf-8");
   writeFileSync(resolve(repoRoot, "mods", "downloads.json"), `${JSON.stringify(modsDownloads, null, 2)}\n`, "utf-8");
