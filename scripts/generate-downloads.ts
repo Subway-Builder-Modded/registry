@@ -180,6 +180,7 @@ function parseListingWarning(warning: string): ParsedListingWarning | null {
 function filterWarningsForGitHub(
   warnings: string[],
   integrity: IntegrityOutput,
+  downloads: Record<string, Record<string, number>>,
 ): string[] {
   if (Object.keys(integrity.listings).length === 0) return warnings;
 
@@ -187,6 +188,14 @@ function filterWarningsForGitHub(
     const parsed = parseListingWarning(warning);
     if (!parsed || !parsed.version) return true;
     if (!isStableSemverTag(parsed.version)) return true;
+
+    // Suppress attribution-clamped warnings when bucket recovery restored a non-zero count
+    if (warning.includes("download attribution clamped")) {
+      const recoveredCount = downloads[parsed.listingId]?.[parsed.version];
+      if (typeof recoveredCount === "number" && recoveredCount > 0) {
+        return false;
+      }
+    }
 
     const listingIntegrity = integrity.listings[parsed.listingId];
     if (!listingIntegrity) return true;
@@ -386,7 +395,7 @@ async function run(): Promise<void> {
     ...buildZeroValidSemverWarnings(integrity),
   ];
   const warningsForGitHub = filterListingMessages(
-    filterWarningsForGitHub(warningsForOutput, integrity),
+    filterWarningsForGitHub(warningsForOutput, integrity, downloads),
     (listingId) => isTestListing(repoRoot, listingType === "map" ? "maps" : "mods", listingId),
   );
   const securityErrorsForOutput = filterListingMessages(

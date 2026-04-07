@@ -385,13 +385,17 @@ export function adjustDownloadCount(
 ): DownloadCountAdjustment {
   const normalizedRaw = Number.isFinite(raw) && raw >= 0 ? raw : 0;
   const normalizedAttributed = Number.isFinite(attributed) && attributed >= 0 ? attributed : 0;
-  const adjusted = Math.max(0, normalizedRaw - normalizedAttributed);
+  // Cap attribution at raw: over-attribution can occur when an asset is
+  // re-uploaded (resetting GitHub's download counter) while the attribution
+  // ledger retains cumulative fetches across all uploads.
+  const effectiveAttributed = Math.min(normalizedAttributed, normalizedRaw);
+  const adjusted = normalizedRaw - effectiveAttributed;
   return {
     raw: normalizedRaw,
     attributed: normalizedAttributed,
     adjusted,
     subtracted: normalizedRaw - adjusted,
-    clamped: normalizedRaw > 0 && adjusted === 0 && normalizedAttributed > normalizedRaw,
+    clamped: false,
   };
 }
 

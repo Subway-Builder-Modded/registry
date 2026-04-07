@@ -253,6 +253,60 @@ function buildHistoricalSources(repoRoot: string): HistoricalSnapshotSource[] {
   });
 }
 
+interface SourceLedgerAsset {
+  count: number;
+  [key: string]: unknown;
+}
+
+interface SourceLedger {
+  assets: Record<string, SourceLedgerAsset>;
+  [key: string]: unknown;
+}
+
+/**
+ * For `already_adjusted` snapshots, the stored downloads.json has attribution
+ * already subtracted. We need to reconstruct the true GitHub raw download
+ * counts by reading the attribution ledger from the same source commit and
+ * adding back the full cumulative attribution for each asset.
+ *
+ * Without this, raw_downloads in the snapshot is systematically too low because
+ * the pipeline subtracted full cumulative attribution (no time cutoff) but the
+ * snapshot reconstruction only added back time-bounded attribution.
+ */
+function reconstructRawFromAdjusted(
+  adjustedDownloads: Record<string, Record<string, number>>,
+  sourceLedger: SourceLedger,
+  integrityRaw: Record<string, unknown>,
+): Record<string, Record<string, number>> {
+  const raw: Record<string, Record<string, number>> = {};
+  const listings = (integrityRaw as { listings?: Record<string, { versions?: Record<string, { source?: Record<string, string> }> }> }).listings ?? {};
+
+  for (const [listingId, versions] of Object.entries(adjustedDownloads)) {
+    raw[listingId] = {};
+    for (const [version, adjusted] of Object.entries(versions)) {
+      const source = listings[listingId]?.versions?.[version]?.source;
+      if (!source?.repo || !source?.tag || !source?.asset_name) {
+        raw[listingId]![version] = adjusted;
+        continue;
+      }
+      const repo = source.repo.trim().toLowerCase();
+      const tag = source.tag.trim();
+      const assetName = source.asset_name.trim().toLowerCase();
+
+      let attrFull = 0;
+      for (const [key, entry] of Object.entries(sourceLedger.assets)) {
+        const match = key.match(/^([^@]+)@([^/]+)\/(.+?)(?:#.*)?$/);
+        if (!match) continue;
+        if (match[1] !== repo || match[2] !== tag || match[3]!.toLowerCase() !== assetName) continue;
+        attrFull += entry.count;
+      }
+
+      raw[listingId]![version] = adjusted + attrFull;
+    }
+  }
+  return raw;
+}
+
 function writeHistoricalRepoState(tempRepoRoot: string, liveRepoRoot: string, sourceCommit: string): void {
   for (const section of ["maps", "mods"] as const) {
     const indexPath = `${section}/index.json`;
@@ -356,6 +410,30 @@ function run(): void {
       const provisional = buildLegacySnapshot(tempRepoRoot, snapshotDate, source.generatedAt) as unknown as DownloadHistorySnapshot;
       provisional.maps.source_downloads_mode = source.mapsSourceDownloadsMode ?? "already_adjusted";
       provisional.mods.source_downloads_mode = source.modsSourceDownloadsMode ?? "already_adjusted";
+
+      // For already_adjusted snapshots, reconstruct true GitHub raw counts by
+      // reversing the pipeline's attribution subtraction using the source commit's ledger.
+      const needsRawReconstruction =
+        source.mapsSourceDownloadsMode === "already_adjusted" ||
+        source.modsSourceDownloadsMode === "already_adjusted";
+      if (needsRawReconstruction) {
+        const sourceLedger = tryReadJsonFromCommit<SourceLedger>(repoRoot, source.sourceCommit, "history/registry-download-attribution.json");
+        if (sourceLedger?.assets) {
+          for (const section of ["maps", "mods"] as const) {
+            const mode = section === "maps" ? source.mapsSourceDownloadsMode : source.modsSourceDownloadsMode;
+            if (mode !== "already_adjusted") continue;
+            const integrityRaw = JSON.parse(readFileSync(resolve(tempRepoRoot, section, "integrity.json"), "utf-8")) as Record<string, unknown>;
+            provisional[section].downloads = reconstructRawFromAdjusted(
+              provisional[section].downloads as Record<string, Record<string, number>>,
+              sourceLedger,
+              integrityRaw,
+            );
+            provisional[section].total_downloads = sumDownloads(
+              provisional[section].downloads as Record<string, Record<string, number>>,
+            );
+          }
+        }
+      }
 
       const normalized = normalizeDownloadHistorySnapshot({
         repoRoot: tempRepoRoot,

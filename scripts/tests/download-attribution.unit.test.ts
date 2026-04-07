@@ -42,11 +42,12 @@ test("recordDownloadAttributionFetchByUrl tracks github release asset fetches", 
   assert.equal(delta.assets["owner/repo@v1.0.0/asset.zip"], 1);
 });
 
-test("adjustDownloadCount clamps to zero when attributed exceeds raw", () => {
+test("adjustDownloadCount caps attribution at raw when attributed exceeds raw", () => {
   const adjusted = adjustDownloadCount(5, 8);
   assert.equal(adjusted.adjusted, 0);
   assert.equal(adjusted.subtracted, 5);
-  assert.equal(adjusted.clamped, true);
+  assert.equal(adjusted.clamped, false);
+  assert.equal(adjusted.attributed, 8);
 });
 
 test("mergeDownloadAttributionDeltas applies once per delta_id", () => {
