@@ -60,10 +60,10 @@ function makeBaseMapManifest(id: string): Record<string, unknown> {
   };
 }
 
-async function makeModZip(includeTopLevelManifest: boolean): Promise<Buffer> {
+async function makeModZip(includeTopLevelManifest: boolean, version = "1.0.0"): Promise<Buffer> {
   const zip = new JSZip();
   if (includeTopLevelManifest) {
-    zip.file("manifest.json", "{\"schema_version\":1}");
+    zip.file("manifest.json", JSON.stringify({ schema_version: 1, version }));
   }
   zip.file("mod.dll", "binary");
   return zip.generateAsync({ type: "nodebuffer" });
@@ -72,10 +72,11 @@ async function makeModZip(includeTopLevelManifest: boolean): Promise<Buffer> {
 async function makeModZipWithSources(
   includeTopLevelManifest: boolean,
   sources: Record<string, string>,
+  version = "1.0.0",
 ): Promise<Buffer> {
   const zip = new JSZip();
   if (includeTopLevelManifest) {
-    zip.file("manifest.json", "{\"schema_version\":1}");
+    zip.file("manifest.json", JSON.stringify({ schema_version: 1, version }));
   }
   zip.file("mod.dll", "binary");
   for (const [path, source] of Object.entries(sources)) {
@@ -202,7 +203,7 @@ test("github releases are integrity-validated and filtered before download aggre
       update: { type: "github", repo: "owner/good" },
     });
 
-    const validZip = await makeModZip(true);
+    const validZip = await makeModZip(true, "2.0.0");
     const invalidZip = await makeModZip(false);
     const fetchMock = makeFetchRouter([
       {
@@ -467,14 +468,17 @@ test("custom versions sharing the same release asset reuse a single ZIP inspecti
     assert.deepEqual(result.downloads, {
       "shared-asset-mod": {
         "1.0.0": 20,
-        "1.0.1": 20,
       },
     });
     assert.equal(zipFetchCount, 1);
     assert.equal(result.stats.registry_fetches_added, 1);
     assert.equal(result.stats.adjusted_delta_total, 2);
     assert.equal(result.integrity.listings["shared-asset-mod"]?.versions["1.0.0"]?.is_complete, true);
-    assert.equal(result.integrity.listings["shared-asset-mod"]?.versions["1.0.1"]?.is_complete, true);
+    assert.equal(result.integrity.listings["shared-asset-mod"]?.versions["1.0.1"]?.is_complete, false);
+    assert.ok(
+      (result.integrity.listings["shared-asset-mod"]?.versions["1.0.1"]?.errors ?? [])
+        .some((e) => e.includes("does not match release tag")),
+    );
   });
 });
 
@@ -571,7 +575,7 @@ test("custom mod integrity honors versions[].manifest asset name when checking r
       update: { type: "custom", url: "https://example.com/custom-update-manifest.json" },
     });
 
-    const validZip = await makeModZip(true);
+    const validZip = await makeModZip(true, "0.1.0");
     const fetchMock = makeFetchRouter([
       {
         match: (url) => url === "https://example.com/custom-update-manifest.json",
@@ -834,7 +838,7 @@ test("full mode records ZIP fetch attribution deltas on successful fetches", asy
       update: { type: "github", repo: "owner/good" },
     });
 
-    const validZip = await makeModZip(true);
+    const validZip = await makeModZip(true, "2.0.0");
     const fetchMock = makeFetchRouter([
       {
         match: (url) => url === "https://github.com/owner/good/releases/download/v2.0.0/good-v2.zip",

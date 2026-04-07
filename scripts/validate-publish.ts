@@ -18,6 +18,7 @@ import {
   isPresentIssueValue,
 } from "./lib/map-field-utils.js";
 import { resolveAndExtractDemandStatsForMapSource } from "./lib/map-demand-stats.js";
+import { checkCityCodeUniqueness, checkCrossTypeIdUniqueness } from "./lib/registry-uniqueness.js";
 
 
 const REPO_ROOT = process.env.RAILYARD_REPO_ROOT
@@ -79,6 +80,7 @@ async function validateMod(data: Record<string, string>): Promise<ValidationResu
   if (existsSync(modDir)) {
     errors.push(`**mod-id**: A mod with ID \`${id}\` already exists.`);
   }
+  errors.push(...checkCrossTypeIdUniqueness({ repoRoot: REPO_ROOT, id, currentType: "mod" }));
   if (!getOptionalIssueValue(parsed.data.description)) {
     errors.push("**description**: Description is required.");
   }
@@ -125,6 +127,7 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
   if (existsSync(mapDir)) {
     errors.push(`**map-id**: A map with ID \`${id}\` already exists.`);
   }
+  errors.push(...checkCrossTypeIdUniqueness({ repoRoot: REPO_ROOT, id, currentType: "map" }));
   if (!getOptionalIssueValue(parsed.data.description)) {
     errors.push("**description**: Description is required.");
   }
@@ -132,6 +135,7 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
   if (VANILLA_CITY_CODE_SET.has(parsed.data["city-code"])) {
     errors.push(`**city-code**: \`${parsed.data["city-code"]}\` clashes with a vanilla city code.`);
   }
+  errors.push(...checkCityCodeUniqueness({ repoRoot: REPO_ROOT, cityCode: parsed.data["city-code"], currentMapId: null }));
 
   if (parseGalleryImages(data.gallery).length === 0) {
     errors.push("**gallery**: At least one gallery image is required.");

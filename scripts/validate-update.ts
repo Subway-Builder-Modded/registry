@@ -9,8 +9,10 @@ import {
   resolveListingIdAndDir,
   resolveManifestType as resolveManifestType,
 } from "./lib/manifests.js";
+import { VANILLA_CITY_CODE_SET } from "./lib/map-constants.js";
 import { isPresentIssueValue } from "./lib/map-field-utils.js";
 import { validateMapUpdateFields } from "./lib/map-update-logic.js";
+import { checkCityCodeUniqueness } from "./lib/registry-uniqueness.js";
 
 const REPO_ROOT = process.env.RAILYARD_REPO_ROOT
   ? resolve(process.env.RAILYARD_REPO_ROOT)
@@ -123,6 +125,13 @@ async function main() {
 
       if (manifestType === "map") {
         validateMapUpdateFields(manifest as MapManifest, data, errors);
+        if (isPresentIssueValue(data["city-code"])) {
+          const cityCode = data["city-code"] as string;
+          if (VANILLA_CITY_CODE_SET.has(cityCode)) {
+            errors.push(`**city-code**: \`${cityCode}\` clashes with a vanilla city code.`);
+          }
+          errors.push(...checkCityCodeUniqueness({ repoRoot: REPO_ROOT, cityCode, currentMapId: id }));
+        }
       }
     }
   }
