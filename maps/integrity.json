@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-08T17:13:05.943Z",
+  "generated_at": "2026-04-08T20:53:54.207Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -1093,6 +1093,59 @@
           },
           "fingerprint": "rules:v5:github:pswbsf/charleston-huntington-wv:1.0.0:CHA.zip",
           "checked_at": "2026-04-07T07:45:27.917Z"
+        }
+      }
+    },
+    "charleston-sc": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CHS.pmtiles"
+          },
+          "release_size": 32.45,
+          "file_sizes": {
+            "CHS.pmtiles": 21.33,
+            "__MACOSX/._config.json": 0,
+            "buildings_index.json": 27.83,
+            "config.json": 0,
+            "demand_data.json": 3.13,
+            "ocean_depth_index.json": 6.02,
+            "roads.geojson": 10.38,
+            "runways_taxiways.geojson": 0.22
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "pswbsf/charleston-sc",
+            "tag": "1.0.0",
+            "asset_name": "Charleston.zip",
+            "download_url": "https://github.com/PSWBSF/charleston-sc/releases/download/1.0.0/Charleston.zip"
+          },
+          "fingerprint": "rules:v5:github:pswbsf/charleston-sc:1.0.0:Charleston.zip",
+          "checked_at": "2026-04-08T20:53:54.207Z"
         }
       }
     },
