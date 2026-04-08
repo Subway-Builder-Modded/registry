@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-08T05:50:41.871Z",
+  "generated_at": "2026-04-08T06:24:17.271Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -2552,10 +2552,12 @@
       }
     },
     "mfn-hamptonroads": {
-      "has_complete_version": false,
-      "latest_semver_version": "1.0.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "1.4.1",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.4.1"
+      ],
       "incomplete_versions": [
         "1.0.0"
       ],
@@ -2593,6 +2595,47 @@
           },
           "fingerprint": "rules:v5:github:crumpetime/sb-maps-orf:1.0.0:ORF.zip",
           "checked_at": "2026-04-07T07:45:27.917Z"
+        },
+        "1.4.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ORF.pmtiles"
+          },
+          "release_size": 119.79,
+          "file_sizes": {
+            "ORF.pmtiles": 64.89,
+            "buildings_index.json": 196.99,
+            "config.json": 0,
+            "demand_data.json": 9.92,
+            "ocean_depth_index.json": 0.8,
+            "roads.geojson": 23.22,
+            "runways_taxiways.geojson": 2.19
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "crumpetime/sb-maps-orf",
+            "tag": "1.4.1",
+            "asset_name": "ORF.zip",
+            "download_url": "https://github.com/crumpetime/sb-maps-orf/releases/download/1.4.1/ORF.zip"
+          },
+          "fingerprint": "rules:v5:github:crumpetime/sb-maps-orf:1.4.1:ORF.zip",
+          "checked_at": "2026-04-08T06:24:17.271Z"
         }
       }
     },
