@@ -87,6 +87,7 @@ export const InitialViewStateSchema = z.object({
   latitude: z.number(),
   longitude: z.number(),
   zoom: z.number(),
+  pitch: z.number().optional(),
   bearing: z.number(),
 });
 
@@ -137,3 +138,4 @@ export type InitialViewState = z.infer<typeof InitialViewStateSchema>;
 export type ModManifest = z.infer<typeof ModManifestSchema>;
 export type MapManifest = z.infer<typeof MapManifestSchema>;
 export type ListingManifest = z.infer<typeof ListingManifestSchema>;
+

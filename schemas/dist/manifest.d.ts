@@ -589,17 +589,20 @@ export declare const InitialViewStateSchema: z.ZodObject<{
     latitude: z.ZodNumber;
     longitude: z.ZodNumber;
     zoom: z.ZodNumber;
+    pitch: z.ZodOptional<z.ZodNumber>;
     bearing: z.ZodNumber;
 }, "strip", z.ZodTypeAny, {
     longitude: number;
     latitude: number;
     zoom: number;
     bearing: number;
+    pitch?: number | undefined;
 }, {
     longitude: number;
     latitude: number;
     zoom: number;
     bearing: number;
+    pitch?: number | undefined;
 }>;
 export declare const ModManifestSchema: z.ZodObject<{
     schema_version: z.ZodLiteral<1>;
@@ -709,17 +712,20 @@ export declare const MapManifestSchema: z.ZodObject<{
         latitude: z.ZodNumber;
         longitude: z.ZodNumber;
         zoom: z.ZodNumber;
+        pitch: z.ZodOptional<z.ZodNumber>;
         bearing: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
         longitude: number;
         latitude: number;
         zoom: number;
         bearing: number;
+        pitch?: number | undefined;
     }, {
         longitude: number;
         latitude: number;
         zoom: number;
         bearing: number;
+        pitch?: number | undefined;
     }>;
     grid_statistics: z.ZodOptional<z.ZodObject<{
         residentWeightedNearestNeighborKm: z.ZodObject<{
@@ -1168,6 +1174,7 @@ export declare const MapManifestSchema: z.ZodObject<{
         latitude: number;
         zoom: number;
         bearing: number;
+        pitch?: number | undefined;
     };
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
@@ -1280,6 +1287,7 @@ export declare const MapManifestSchema: z.ZodObject<{
         latitude: number;
         zoom: number;
         bearing: number;
+        pitch?: number | undefined;
     };
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
@@ -1405,17 +1413,20 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         latitude: z.ZodNumber;
         longitude: z.ZodNumber;
         zoom: z.ZodNumber;
+        pitch: z.ZodOptional<z.ZodNumber>;
         bearing: z.ZodNumber;
     }, "strip", z.ZodTypeAny, {
         longitude: number;
         latitude: number;
         zoom: number;
         bearing: number;
+        pitch?: number | undefined;
     }, {
         longitude: number;
         latitude: number;
         zoom: number;
         bearing: number;
+        pitch?: number | undefined;
     }>;
     grid_statistics: z.ZodOptional<z.ZodObject<{
         residentWeightedNearestNeighborKm: z.ZodObject<{
@@ -1864,6 +1875,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         latitude: number;
         zoom: number;
         bearing: number;
+        pitch?: number | undefined;
     };
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
@@ -1976,6 +1988,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         latitude: number;
         zoom: number;
         bearing: number;
+        pitch?: number | undefined;
     };
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";

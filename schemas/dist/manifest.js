@@ -67,6 +67,7 @@ export const InitialViewStateSchema = z.object({
     latitude: z.number(),
     longitude: z.number(),
     zoom: z.number(),
+    pitch: z.number().optional(),
     bearing: z.number(),
 });
 const BaseManifestSchema = z.object({
