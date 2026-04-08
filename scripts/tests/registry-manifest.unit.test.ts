@@ -33,16 +33,6 @@ function makeMapManifest(fileSizes: unknown): Record<string, unknown> {
     location: "north-america",
     special_demand: [],
     file_sizes: fileSizes,
-    grid_statistics: {
-      commuteDistanceKm: {
-        p10: 1,
-        p25: 2,
-        p50: 3,
-        p75: 4,
-        p90: 4,
-        mean: 2.5,
-      },
-    },
   };
 }
 

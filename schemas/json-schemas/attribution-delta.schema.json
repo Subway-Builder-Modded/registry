@@ -1,0 +1,38 @@
+{
+  "$ref": "#/definitions/attribution-delta",
+  "definitions": {
+    "attribution-delta": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "number",
+          "const": 2
+        },
+        "delta_id": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string"
+        },
+        "assets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "delta_id",
+        "source",
+        "generated_at",
+        "assets"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

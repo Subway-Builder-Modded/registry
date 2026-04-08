@@ -19,6 +19,7 @@ import {
 } from "./lib/manifests.js";
 import { resolveAndExtractDemandStatsForMapSource } from "./lib/map-demand-stats.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
+import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@registry/schemas";
 import { ensureAuthorAliasPrefill } from "./lib/author-aliases.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");
@@ -87,10 +88,10 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
       population_count: demandStats.population_count,
       initial_view_state: demandStats.initial_view_state,
       data_source: dataSource,
-      source_quality: sourceQuality,
-      level_of_detail: levelOfDetail,
-      location,
-      special_demand: specialDemand,
+      source_quality: sourceQuality as SourceQuality,
+      level_of_detail: levelOfDetail as LevelOfDetail,
+      location: location as LocationTag,
+      special_demand: specialDemand as SpecialDemandTag[],
       file_sizes: {},
     },
   };

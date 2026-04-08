@@ -3,6 +3,19 @@ import { resolve } from "node:path";
 import type { ManifestType } from "./manifests.js";
 import type { DownloadVersionBucketInput, DownloadsByListing, VersionBucketInputsByListing } from "./download-definitions.js";
 import { isObject, toFiniteNonNegativeNumber, sortObjectByKeys, writeJsonFile } from "./json-utils.js";
+import type {
+  DownloadVersionBucketEntry,
+  DownloadVersionEntry,
+  DownloadVersionListingEntry,
+  DownloadVersionBucketLedger,
+} from "@registry/schemas";
+
+export type {
+  DownloadVersionBucketEntry,
+  DownloadVersionEntry,
+  DownloadVersionListingEntry,
+  DownloadVersionBucketLedger,
+} from "@registry/schemas";
 
 const DOWNLOAD_VERSION_BUCKETS_SCHEMA_VERSION = 1;
 
@@ -94,28 +107,6 @@ function computeRecoveredDisplayTotalFromBuckets(
     total += Math.max(...logicalBuckets.map((bucket) => bucket.max_adjusted_downloads));
   }
   return Math.max(total, historyFloor);
-}
-
-export interface DownloadVersionBucketEntry {
-  max_adjusted_downloads: number;
-  last_adjusted_downloads: number;
-  updated_at: string;
-}
-
-export interface DownloadVersionEntry {
-  max_total_downloads: number;
-  buckets: Record<string, DownloadVersionBucketEntry>;
-  updated_at: string;
-}
-
-export interface DownloadVersionListingEntry {
-  versions: Record<string, DownloadVersionEntry>;
-}
-
-export interface DownloadVersionBucketLedger {
-  schema_version: 1;
-  updated_at: string;
-  listings: Record<string, DownloadVersionListingEntry>;
 }
 
 export function toDownloadAssetBucketKey(

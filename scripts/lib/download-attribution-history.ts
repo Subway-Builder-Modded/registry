@@ -9,19 +9,11 @@ import {
 } from "./download-attribution.js";
 import { readJsonFile, sortObjectByKeys, writeJsonFile } from "./json-utils.js";
 import { toSnapshotDate, toCanonicalHistoryCutoffIso, getHistoryDir } from "./history-utils.js";
+import type { DownloadAttributionHistorySnapshot } from "@registry/schemas";
+
+export type { DownloadAttributionHistorySnapshot } from "@registry/schemas";
 
 const ATTRIBUTION_SNAPSHOT_PATTERN = /^download_attribution_(\d{4}_\d{2}_\d{2})\.json$/;
-
-export interface DownloadAttributionHistorySnapshot {
-  schema_version: 1;
-  snapshot_date: string;
-  generated_at: string;
-  source_ledger_updated_at: string;
-  total_attributed_fetches: number;
-  net_attributed_fetches: number;
-  daily_attributed_fetches: number;
-  assets_daily: Record<string, number>;
-}
 
 export interface GenerateDownloadAttributionHistoryOptions {
   repoRoot: string;

@@ -8,7 +8,7 @@ import {
 
 function makeBaseManifest(): MapManifest {
   return {
-    schema_version: 2,
+    schema_version: 1,
     id: "sample-map",
     name: "Sample Map",
     author: "Example Author",

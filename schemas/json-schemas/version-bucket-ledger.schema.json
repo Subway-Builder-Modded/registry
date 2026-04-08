@@ -1,0 +1,79 @@
+{
+  "$ref": "#/definitions/version-bucket-ledger",
+  "definitions": {
+    "version-bucket-ledger": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "number",
+          "const": 1
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "listings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "versions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "max_total_downloads": {
+                      "type": "number"
+                    },
+                    "buckets": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "max_adjusted_downloads": {
+                            "type": "number"
+                          },
+                          "last_adjusted_downloads": {
+                            "type": "number"
+                          },
+                          "updated_at": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "max_adjusted_downloads",
+                          "last_adjusted_downloads",
+                          "updated_at"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "updated_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "max_total_downloads",
+                    "buckets",
+                    "updated_at"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "versions"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "updated_at",
+        "listings"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

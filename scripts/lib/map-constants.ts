@@ -35,45 +35,17 @@ export const VANILLA_CITY_CODES = [
   "NCL",
 ] as const;
 
-export const LOCATION_TAGS = [
-  "caribbean",
-  "central-america",
-  "central-asia",
-  "east-africa",
-  "east-asia",
-  "europe",
-  "middle-east",
-  "north-africa",
-  "north-america",
-  "oceania",
-  "south-america",
-  "south-asia",
-  "southeast-asia",
-  "southern-africa",
-  "west-africa",
-] as const;
+import {
+  LocationTagSchema,
+  SourceQualitySchema,
+  LevelOfDetailSchema,
+  SpecialDemandTagSchema,
+} from "@registry/schemas";
 
-export const SPECIAL_DEMAND_TAGS = [
-  "airports",
-  "entertainment",
-  "ferries",
-  "hospitals",
-  "parks",
-  "schools",
-  "universities",
-] as const;
-
-export const SOURCE_QUALITY_VALUES = [
-  "low-quality",
-  "medium-quality",
-  "high-quality",
-] as const;
-
-export const LEVEL_OF_DETAIL_VALUES = [
-  "low-detail",
-  "medium-detail",
-  "high-detail",
-] as const;
+export const LOCATION_TAGS = LocationTagSchema.options;
+export const SPECIAL_DEMAND_TAGS = SpecialDemandTagSchema.options;
+export const SOURCE_QUALITY_VALUES = SourceQualitySchema.options;
+export const LEVEL_OF_DETAIL_VALUES = LevelOfDetailSchema.options;
 
 export const DEFAULT_MAP_DATA_SOURCE = "OSM" as const;
 export const DEFAULT_SOURCE_QUALITY = "low-quality" as const;

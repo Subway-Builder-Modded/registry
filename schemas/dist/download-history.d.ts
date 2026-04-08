@@ -1,0 +1,212 @@
+import { z } from "zod";
+declare const DownloadHistorySectionSchema: z.ZodObject<{
+    downloads: z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>;
+    raw_downloads: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>>;
+    attributed_downloads: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>>;
+    total_downloads: z.ZodNumber;
+    raw_total_downloads: z.ZodOptional<z.ZodNumber>;
+    total_attributed_downloads: z.ZodOptional<z.ZodNumber>;
+    net_downloads: z.ZodNumber;
+    source_downloads_mode: z.ZodOptional<z.ZodEnum<["already_adjusted", "legacy_unadjusted"]>>;
+    index: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+    entries: z.ZodNumber;
+}, "strip", z.ZodTypeAny, {
+    entries: number;
+    downloads: Record<string, Record<string, number>>;
+    total_downloads: number;
+    net_downloads: number;
+    index: Record<string, unknown>;
+    raw_downloads?: Record<string, Record<string, number>> | undefined;
+    attributed_downloads?: Record<string, Record<string, number>> | undefined;
+    raw_total_downloads?: number | undefined;
+    total_attributed_downloads?: number | undefined;
+    source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+}, {
+    entries: number;
+    downloads: Record<string, Record<string, number>>;
+    total_downloads: number;
+    net_downloads: number;
+    index: Record<string, unknown>;
+    raw_downloads?: Record<string, Record<string, number>> | undefined;
+    attributed_downloads?: Record<string, Record<string, number>> | undefined;
+    raw_total_downloads?: number | undefined;
+    total_attributed_downloads?: number | undefined;
+    source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+}>;
+export declare const DownloadHistorySnapshotSchema: z.ZodObject<{
+    schema_version: z.ZodLiteral<2>;
+    snapshot_date: z.ZodString;
+    generated_at: z.ZodString;
+    total_downloads: z.ZodNumber;
+    raw_total_downloads: z.ZodNumber;
+    total_attributed_downloads: z.ZodNumber;
+    total_attributed_fetches: z.ZodNumber;
+    net_downloads: z.ZodNumber;
+    maps: z.ZodObject<{
+        downloads: z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>;
+        raw_downloads: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>>;
+        attributed_downloads: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>>;
+        total_downloads: z.ZodNumber;
+        raw_total_downloads: z.ZodOptional<z.ZodNumber>;
+        total_attributed_downloads: z.ZodOptional<z.ZodNumber>;
+        net_downloads: z.ZodNumber;
+        source_downloads_mode: z.ZodOptional<z.ZodEnum<["already_adjusted", "legacy_unadjusted"]>>;
+        index: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+        entries: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        entries: number;
+        downloads: Record<string, Record<string, number>>;
+        total_downloads: number;
+        net_downloads: number;
+        index: Record<string, unknown>;
+        raw_downloads?: Record<string, Record<string, number>> | undefined;
+        attributed_downloads?: Record<string, Record<string, number>> | undefined;
+        raw_total_downloads?: number | undefined;
+        total_attributed_downloads?: number | undefined;
+        source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+    }, {
+        entries: number;
+        downloads: Record<string, Record<string, number>>;
+        total_downloads: number;
+        net_downloads: number;
+        index: Record<string, unknown>;
+        raw_downloads?: Record<string, Record<string, number>> | undefined;
+        attributed_downloads?: Record<string, Record<string, number>> | undefined;
+        raw_total_downloads?: number | undefined;
+        total_attributed_downloads?: number | undefined;
+        source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+    }>;
+    mods: z.ZodObject<{
+        downloads: z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>;
+        raw_downloads: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>>;
+        attributed_downloads: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodRecord<z.ZodString, z.ZodNumber>>>;
+        total_downloads: z.ZodNumber;
+        raw_total_downloads: z.ZodOptional<z.ZodNumber>;
+        total_attributed_downloads: z.ZodOptional<z.ZodNumber>;
+        net_downloads: z.ZodNumber;
+        source_downloads_mode: z.ZodOptional<z.ZodEnum<["already_adjusted", "legacy_unadjusted"]>>;
+        index: z.ZodRecord<z.ZodString, z.ZodUnknown>;
+        entries: z.ZodNumber;
+    }, "strip", z.ZodTypeAny, {
+        entries: number;
+        downloads: Record<string, Record<string, number>>;
+        total_downloads: number;
+        net_downloads: number;
+        index: Record<string, unknown>;
+        raw_downloads?: Record<string, Record<string, number>> | undefined;
+        attributed_downloads?: Record<string, Record<string, number>> | undefined;
+        raw_total_downloads?: number | undefined;
+        total_attributed_downloads?: number | undefined;
+        source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+    }, {
+        entries: number;
+        downloads: Record<string, Record<string, number>>;
+        total_downloads: number;
+        net_downloads: number;
+        index: Record<string, unknown>;
+        raw_downloads?: Record<string, Record<string, number>> | undefined;
+        attributed_downloads?: Record<string, Record<string, number>> | undefined;
+        raw_total_downloads?: number | undefined;
+        total_attributed_downloads?: number | undefined;
+        source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+    }>;
+}, "strip", z.ZodTypeAny, {
+    schema_version: 2;
+    generated_at: string;
+    total_downloads: number;
+    raw_total_downloads: number;
+    total_attributed_downloads: number;
+    net_downloads: number;
+    snapshot_date: string;
+    total_attributed_fetches: number;
+    maps: {
+        entries: number;
+        downloads: Record<string, Record<string, number>>;
+        total_downloads: number;
+        net_downloads: number;
+        index: Record<string, unknown>;
+        raw_downloads?: Record<string, Record<string, number>> | undefined;
+        attributed_downloads?: Record<string, Record<string, number>> | undefined;
+        raw_total_downloads?: number | undefined;
+        total_attributed_downloads?: number | undefined;
+        source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+    };
+    mods: {
+        entries: number;
+        downloads: Record<string, Record<string, number>>;
+        total_downloads: number;
+        net_downloads: number;
+        index: Record<string, unknown>;
+        raw_downloads?: Record<string, Record<string, number>> | undefined;
+        attributed_downloads?: Record<string, Record<string, number>> | undefined;
+        raw_total_downloads?: number | undefined;
+        total_attributed_downloads?: number | undefined;
+        source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+    };
+}, {
+    schema_version: 2;
+    generated_at: string;
+    total_downloads: number;
+    raw_total_downloads: number;
+    total_attributed_downloads: number;
+    net_downloads: number;
+    snapshot_date: string;
+    total_attributed_fetches: number;
+    maps: {
+        entries: number;
+        downloads: Record<string, Record<string, number>>;
+        total_downloads: number;
+        net_downloads: number;
+        index: Record<string, unknown>;
+        raw_downloads?: Record<string, Record<string, number>> | undefined;
+        attributed_downloads?: Record<string, Record<string, number>> | undefined;
+        raw_total_downloads?: number | undefined;
+        total_attributed_downloads?: number | undefined;
+        source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+    };
+    mods: {
+        entries: number;
+        downloads: Record<string, Record<string, number>>;
+        total_downloads: number;
+        net_downloads: number;
+        index: Record<string, unknown>;
+        raw_downloads?: Record<string, Record<string, number>> | undefined;
+        attributed_downloads?: Record<string, Record<string, number>> | undefined;
+        raw_total_downloads?: number | undefined;
+        total_attributed_downloads?: number | undefined;
+        source_downloads_mode?: "already_adjusted" | "legacy_unadjusted" | undefined;
+    };
+}>;
+export declare const DownloadAttributionHistorySnapshotSchema: z.ZodObject<{
+    schema_version: z.ZodLiteral<1>;
+    snapshot_date: z.ZodString;
+    generated_at: z.ZodString;
+    source_ledger_updated_at: z.ZodString;
+    total_attributed_fetches: z.ZodNumber;
+    net_attributed_fetches: z.ZodNumber;
+    daily_attributed_fetches: z.ZodNumber;
+    assets_daily: z.ZodRecord<z.ZodString, z.ZodNumber>;
+}, "strip", z.ZodTypeAny, {
+    schema_version: 1;
+    generated_at: string;
+    snapshot_date: string;
+    total_attributed_fetches: number;
+    source_ledger_updated_at: string;
+    net_attributed_fetches: number;
+    daily_attributed_fetches: number;
+    assets_daily: Record<string, number>;
+}, {
+    schema_version: 1;
+    generated_at: string;
+    snapshot_date: string;
+    total_attributed_fetches: number;
+    source_ledger_updated_at: string;
+    net_attributed_fetches: number;
+    daily_attributed_fetches: number;
+    assets_daily: Record<string, number>;
+}>;
+export type DownloadHistorySection = z.infer<typeof DownloadHistorySectionSchema>;
+export type DownloadHistorySnapshot = z.infer<typeof DownloadHistorySnapshotSchema>;
+export type DownloadAttributionHistorySnapshot = z.infer<typeof DownloadAttributionHistorySnapshotSchema>;
+export {};
+//# sourceMappingURL=download-history.d.ts.map
