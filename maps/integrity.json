@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-09T06:44:22.590Z",
+  "generated_at": "2026-04-09T06:57:40.632Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -2268,26 +2268,54 @@
       }
     },
     "jelegend-tokyo": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "v0.1.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v0.1.0"
+      ],
       "incomplete_versions": [],
       "versions": {
-        "Production": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'Production'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+        "v0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TYO.pmtiles"
+          },
+          "release_size": 230.07,
+          "file_sizes": {
+            "TYO.pmtiles": 199.15,
+            "buildings_index.json": 71.11,
+            "config.json": 0,
+            "demand_data.json": 101.38,
+            "roads.geojson": 59.76,
+            "runways_taxiways.geojson": 0.05,
+            "thumbnail.svg": 0
+          },
           "source": {
             "update_type": "github",
             "repo": "jelegend/subwaybuilder",
-            "tag": "Production"
+            "tag": "v0.1.0",
+            "asset_name": "TYO.zip",
+            "download_url": "https://github.com/jelegend/subwaybuilder/releases/download/v0.1.0/TYO.zip"
           },
-          "fingerprint": "rules:v5:github:jelegend/subwaybuilder:Production:TYO.zip",
-          "checked_at": "2026-04-09T06:44:22.590Z"
+          "fingerprint": "rules:v5:github:jelegend/subwaybuilder:v0.1.0:TYO.zip",
+          "checked_at": "2026-04-09T06:57:40.632Z"
         }
       }
     },
