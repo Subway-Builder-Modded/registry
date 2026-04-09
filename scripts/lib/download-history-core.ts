@@ -10,9 +10,9 @@ import {
 import type { IntegritySource } from "./integrity.js";
 import { isObject, toFiniteNumber, readJsonFile, writeJsonFile } from "./json-utils.js";
 import { toSnapshotDate, toCanonicalHistoryCutoffIso, getHistoryDir, CANONICAL_HISTORY_CUTOFF_HOUR_UTC } from "./history-utils.js";
-import type { DownloadHistorySnapshot } from "@registry/schemas";
+import type { DownloadHistorySnapshot } from "@subway-builder-modded/registry-schemas";
 
-export type { DownloadHistorySnapshot } from "@registry/schemas";
+export type { DownloadHistorySnapshot } from "@subway-builder-modded/registry-schemas";
 
 type ListingKind = "maps" | "mods";
 type IntegritySourceByListingVersion = Record<string, Record<string, IntegritySource | null>>;

@@ -9,9 +9,9 @@ import {
 } from "./download-attribution.js";
 import { readJsonFile, sortObjectByKeys, writeJsonFile } from "./json-utils.js";
 import { toSnapshotDate, toCanonicalHistoryCutoffIso, getHistoryDir } from "./history-utils.js";
-import type { DownloadAttributionHistorySnapshot } from "@registry/schemas";
+import type { DownloadAttributionHistorySnapshot } from "@subway-builder-modded/registry-schemas";
 
-export type { DownloadAttributionHistorySnapshot } from "@registry/schemas";
+export type { DownloadAttributionHistorySnapshot } from "@subway-builder-modded/registry-schemas";
 
 const ATTRIBUTION_SNAPSHOT_PATTERN = /^download_attribution_(\d{4}_\d{2}_\d{2})\.json$/;
 

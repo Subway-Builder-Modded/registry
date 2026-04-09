@@ -9,7 +9,7 @@ import type {
   DownloadAttributionTimelineEntry,
   DownloadAttributionLedger,
   DownloadAttributionDelta,
-} from "@registry/schemas";
+} from "@subway-builder-modded/registry-schemas";
 
 export type {
   DownloadAttributionEntry,
@@ -17,7 +17,7 @@ export type {
   DownloadAttributionTimelineEntry,
   DownloadAttributionLedger,
   DownloadAttributionDelta,
-} from "@registry/schemas";
+} from "@subway-builder-modded/registry-schemas";
 
 const DOWNLOAD_ATTRIBUTION_SCHEMA_VERSION = 2;
 const DOWNLOAD_ATTRIBUTION_FILE = ["history", "registry-download-attribution.json"] as const;
