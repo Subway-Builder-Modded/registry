@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-08T20:53:54.207Z",
+  "generated_at": "2026-04-09T02:51:47.864Z",
   "listings": {
     "albany": {
       "has_complete_version": true,
@@ -810,9 +810,10 @@
     },
     "cairo": {
       "has_complete_version": true,
-      "latest_semver_version": "2.0.1",
+      "latest_semver_version": "2.1.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "2.1.0",
         "2.0.1",
         "2.0.0"
       ],
@@ -897,6 +898,46 @@
           },
           "fingerprint": "rules:v5:sha256:eb5f6f280e7d6ace4047627fe19d801e159c596f4b9758a2ec38123a842ad077",
           "checked_at": "2026-04-07T07:45:27.917Z"
+        },
+        "2.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CAI.pmtiles"
+          },
+          "release_size": 147.96,
+          "file_sizes": {
+            "CAI.pmtiles": 49.03,
+            "buildings_index.json": 335.48,
+            "config.json": 0,
+            "demand_data.json": 1.52,
+            "roads.geojson": 67.5,
+            "runways_taxiways.geojson": 1.47
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v2.1.0-cai",
+            "asset_name": "CAI.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.1.0-cai/CAI.zip"
+          },
+          "fingerprint": "rules:v5:sha256:d8f2f28dbf25b2c99d9106724f0e05b751e05133e412dadaf8f46bf69d6a55aa",
+          "checked_at": "2026-04-09T02:51:47.864Z"
         }
       }
     },
