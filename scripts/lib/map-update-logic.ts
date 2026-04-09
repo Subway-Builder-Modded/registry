@@ -1,5 +1,5 @@
 import type { MapManifest } from "./manifests.js";
-import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@registry/schemas";
+import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import {
   DEFAULT_LEVEL_OF_DETAIL,
   DEFAULT_MAP_DATA_SOURCE,

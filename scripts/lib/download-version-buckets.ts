@@ -8,14 +8,14 @@ import type {
   DownloadVersionEntry,
   DownloadVersionListingEntry,
   DownloadVersionBucketLedger,
-} from "@registry/schemas";
+} from "@subway-builder-modded/registry-schemas";
 
 export type {
   DownloadVersionBucketEntry,
   DownloadVersionEntry,
   DownloadVersionListingEntry,
   DownloadVersionBucketLedger,
-} from "@registry/schemas";
+} from "@subway-builder-modded/registry-schemas";
 
 const DOWNLOAD_VERSION_BUCKETS_SCHEMA_VERSION = 1;
 

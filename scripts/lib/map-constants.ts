@@ -40,7 +40,7 @@ import {
   SourceQualitySchema,
   LevelOfDetailSchema,
   SpecialDemandTagSchema,
-} from "@registry/schemas";
+} from "@subway-builder-modded/registry-schemas";
 
 export const LOCATION_TAGS = LocationTagSchema.options;
 export const SPECIAL_DEMAND_TAGS = SpecialDemandTagSchema.options;
