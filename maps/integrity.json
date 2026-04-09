@@ -1,7 +1,60 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-09T09:17:55.378Z",
+  "generated_at": "2026-04-09T13:08:24.480Z",
   "listings": {
+    "akron-oh": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "AKR.pmtiles"
+          },
+          "release_size": 48.16,
+          "file_sizes": {
+            "AKR.pmtiles": 37.7,
+            "__MACOSX/._config.json": 0,
+            "__MACOSX/._demand_data.json": 0,
+            "buildings_index.json": 21.52,
+            "config.json": 0,
+            "demand_data.json": 7.37,
+            "roads.geojson": 18.5,
+            "runways_taxiways.geojson": 0.68
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "bean1322/akron-oh-map",
+            "tag": "v1.0.0",
+            "asset_name": "Akron.zip",
+            "download_url": "https://github.com/bean1322/akron-oh-map/releases/download/v1.0.0/Akron.zip"
+          },
+          "fingerprint": "rules:v5:github:bean1322/akron-oh-map:v1.0.0:Akron.zip",
+          "checked_at": "2026-04-09T13:08:24.480Z"
+        }
+      }
+    },
     "albany": {
       "has_complete_version": true,
       "latest_semver_version": "1.0.0",
