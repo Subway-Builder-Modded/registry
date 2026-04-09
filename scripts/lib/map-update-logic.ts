@@ -1,4 +1,5 @@
 import type { MapManifest } from "./manifests.js";
+import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@registry/schemas";
 import {
   DEFAULT_LEVEL_OF_DETAIL,
   DEFAULT_MAP_DATA_SOURCE,
@@ -77,7 +78,7 @@ export function applyMapManifestUpdates(
   data: Record<string, unknown>,
 ): void {
   const existingSpecialDemand = Array.isArray(manifest.special_demand)
-    ? manifest.special_demand.filter((tag): tag is string => typeof tag === "string")
+    ? [...manifest.special_demand]
     : [];
   manifest.special_demand = existingSpecialDemand;
 
@@ -85,13 +86,13 @@ export function applyMapManifestUpdates(
   if (isPresentIssueValue(data.country)) manifest.country = data.country;
 
   if (isPresentIssueValue(data.level_of_detail)) {
-    manifest.level_of_detail = data.level_of_detail;
+    manifest.level_of_detail = data.level_of_detail as LevelOfDetail;
   } else if (!isPresentIssueValue(manifest.level_of_detail)) {
     manifest.level_of_detail = DEFAULT_LEVEL_OF_DETAIL;
   }
 
   if (isPresentIssueValue(data.source_quality)) {
-    manifest.source_quality = data.source_quality;
+    manifest.source_quality = data.source_quality as SourceQuality;
   } else if (!isPresentIssueValue(manifest.source_quality)) {
     manifest.source_quality = DEFAULT_SOURCE_QUALITY;
   }
@@ -103,7 +104,7 @@ export function applyMapManifestUpdates(
   }
 
   if (isPresentIssueValue(data.location)) {
-    manifest.location = data.location;
+    manifest.location = data.location as LocationTag;
   }
   if (
     data.special_demand !== undefined
@@ -112,7 +113,7 @@ export function applyMapManifestUpdates(
   ) {
     const selectedSpecialDemand = parseCheckedBoxes(data.special_demand);
     if (selectedSpecialDemand.length > 0) {
-      manifest.special_demand = selectedSpecialDemand;
+      manifest.special_demand = selectedSpecialDemand as SpecialDemandTag[];
     }
   }
 
@@ -125,9 +126,9 @@ export function applyMapManifestUpdates(
   }
 
   if (isPresentIssueValue(manifest.location)) {
-    const specialDemand = (Array.isArray(manifest.special_demand)
+    const specialDemand = Array.isArray(manifest.special_demand)
       ? manifest.special_demand
-      : []).filter((tag: unknown): tag is string => typeof tag === "string");
+      : [] as SpecialDemandTag[];
     manifest.special_demand = specialDemand;
     manifest.tags = combineMapTags(manifest.location, specialDemand);
   }

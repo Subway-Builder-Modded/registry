@@ -1,0 +1,181 @@
+{
+  "$ref": "#/definitions/download-history-snapshot",
+  "definitions": {
+    "download-history-snapshot": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "number",
+          "const": 2
+        },
+        "snapshot_date": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string"
+        },
+        "total_downloads": {
+          "type": "number"
+        },
+        "raw_total_downloads": {
+          "type": "number"
+        },
+        "total_attributed_downloads": {
+          "type": "number"
+        },
+        "total_attributed_fetches": {
+          "type": "number"
+        },
+        "net_downloads": {
+          "type": "number"
+        },
+        "maps": {
+          "type": "object",
+          "properties": {
+            "downloads": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "raw_downloads": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "attributed_downloads": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "total_downloads": {
+              "type": "number"
+            },
+            "raw_total_downloads": {
+              "type": "number"
+            },
+            "total_attributed_downloads": {
+              "type": "number"
+            },
+            "net_downloads": {
+              "type": "number"
+            },
+            "source_downloads_mode": {
+              "type": "string",
+              "enum": [
+                "already_adjusted",
+                "legacy_unadjusted"
+              ]
+            },
+            "index": {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            "entries": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "downloads",
+            "total_downloads",
+            "net_downloads",
+            "index",
+            "entries"
+          ],
+          "additionalProperties": false
+        },
+        "mods": {
+          "type": "object",
+          "properties": {
+            "downloads": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "raw_downloads": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "attributed_downloads": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "total_downloads": {
+              "type": "number"
+            },
+            "raw_total_downloads": {
+              "type": "number"
+            },
+            "total_attributed_downloads": {
+              "type": "number"
+            },
+            "net_downloads": {
+              "type": "number"
+            },
+            "source_downloads_mode": {
+              "type": "string",
+              "enum": [
+                "already_adjusted",
+                "legacy_unadjusted"
+              ]
+            },
+            "index": {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            "entries": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "downloads",
+            "total_downloads",
+            "net_downloads",
+            "index",
+            "entries"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "schema_version",
+        "snapshot_date",
+        "generated_at",
+        "total_downloads",
+        "raw_total_downloads",
+        "total_attributed_downloads",
+        "total_attributed_fetches",
+        "net_downloads",
+        "maps",
+        "mods"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

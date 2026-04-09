@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { JsonObject, MapManifest } from "../manifests.js";
+import type { GridStatistics } from "@registry/schemas";
 import {
   createGraphqlUsageState,
   fetchRepoReleaseIndexes,
@@ -245,7 +246,7 @@ export async function generateMapDemandStats(
           manifest.points_count = cachedStats.points_count;
           manifest.population_count = cachedStats.population_count;
           manifest.initial_view_state = cachedStats.initial_view_state;
-          manifest.grid_statistics = nextGridStatistics;
+          manifest.grid_statistics = nextGridStatistics as unknown as GridStatistics;
           writeManifest(repoRoot, id, manifest);
           updatedMaps += 1;
           residentsDeltaTotal += cachedStats.residents_total - oldResidents;
@@ -322,7 +323,7 @@ export async function generateMapDemandStats(
     manifest.points_count = stats.points_count;
     manifest.population_count = stats.population_count;
     manifest.initial_view_state = stats.initial_view_state;
-    manifest.grid_statistics = nextGridStatistics;
+    manifest.grid_statistics = nextGridStatistics as unknown as GridStatistics;
     cache[id] = {
       source_fingerprint: resolvedSource.sourceFingerprint,
       last_checked_at: now.toISOString(),

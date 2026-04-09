@@ -3,6 +3,21 @@ import { resolve } from "node:path";
 import type { ParsedReleaseAssetUrl } from "./download-definitions.js";
 import { isObject, toFiniteNonNegativeNumber, sortObjectByKeys, writeJsonFile } from "./json-utils.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
+import type {
+  DownloadAttributionEntry,
+  DownloadAttributionDailyEntry,
+  DownloadAttributionTimelineEntry,
+  DownloadAttributionLedger,
+  DownloadAttributionDelta,
+} from "@registry/schemas";
+
+export type {
+  DownloadAttributionEntry,
+  DownloadAttributionDailyEntry,
+  DownloadAttributionTimelineEntry,
+  DownloadAttributionLedger,
+  DownloadAttributionDelta,
+} from "@registry/schemas";
 
 const DOWNLOAD_ATTRIBUTION_SCHEMA_VERSION = 2;
 const DOWNLOAD_ATTRIBUTION_FILE = ["history", "registry-download-attribution.json"] as const;
@@ -46,39 +61,6 @@ function mergeBySourceCounts(
     merged[sourceKey] = (merged[sourceKey] ?? 0) + sourceCount;
   }
   return merged;
-}
-
-export interface DownloadAttributionEntry {
-  count: number;
-  updated_at: string;
-  by_source: Record<string, number>;
-}
-
-export interface DownloadAttributionDailyEntry {
-  total: number;
-  assets: Record<string, number>;
-}
-
-export interface DownloadAttributionTimelineEntry {
-  total: number;
-  assets: Record<string, number>;
-}
-
-export interface DownloadAttributionLedger {
-  schema_version: 2;
-  updated_at: string;
-  assets: Record<string, DownloadAttributionEntry>;
-  applied_delta_ids: Record<string, string>;
-  daily: Record<string, DownloadAttributionDailyEntry>;
-  timeline: Record<string, DownloadAttributionTimelineEntry>;
-}
-
-export interface DownloadAttributionDelta {
-  schema_version: 2;
-  delta_id: string;
-  source: string;
-  generated_at: string;
-  assets: Record<string, number>;
 }
 
 export interface DownloadCountAdjustment {
