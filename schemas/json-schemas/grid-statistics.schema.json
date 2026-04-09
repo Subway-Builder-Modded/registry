@@ -1,0 +1,324 @@
+{
+  "$ref": "#/definitions/grid-statistics",
+  "definitions": {
+    "grid-statistics": {
+      "type": "object",
+      "properties": {
+        "residentWeightedNearestNeighborKm": {
+          "type": "object",
+          "properties": {
+            "p10": {
+              "type": "number"
+            },
+            "p25": {
+              "type": "number"
+            },
+            "p50": {
+              "type": "number"
+            },
+            "p75": {
+              "type": "number"
+            },
+            "p90": {
+              "type": "number"
+            },
+            "mean": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "p10",
+            "p25",
+            "p50",
+            "p75",
+            "p90",
+            "mean"
+          ],
+          "additionalProperties": false
+        },
+        "workerWeightedNearestNeighborKm": {
+          "type": "object",
+          "properties": {
+            "p10": {
+              "type": "number"
+            },
+            "p25": {
+              "type": "number"
+            },
+            "p50": {
+              "type": "number"
+            },
+            "p75": {
+              "type": "number"
+            },
+            "p90": {
+              "type": "number"
+            },
+            "mean": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "p10",
+            "p25",
+            "p50",
+            "p75",
+            "p90",
+            "mean"
+          ],
+          "additionalProperties": false
+        },
+        "commuteDistanceKm": {
+          "type": "object",
+          "properties": {
+            "p10": {
+              "type": "number"
+            },
+            "p25": {
+              "type": "number"
+            },
+            "p50": {
+              "type": "number"
+            },
+            "p75": {
+              "type": "number"
+            },
+            "p90": {
+              "type": "number"
+            },
+            "mean": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "p10",
+            "p25",
+            "p50",
+            "p75",
+            "p90",
+            "mean"
+          ],
+          "additionalProperties": false
+        },
+        "residentCellDensity": {
+          "type": "object",
+          "properties": {
+            "p10": {
+              "type": "number"
+            },
+            "p25": {
+              "type": "number"
+            },
+            "p50": {
+              "type": "number"
+            },
+            "p75": {
+              "type": "number"
+            },
+            "p90": {
+              "type": "number"
+            },
+            "mean": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "p10",
+            "p25",
+            "p50",
+            "p75",
+            "p90",
+            "mean"
+          ],
+          "additionalProperties": false
+        },
+        "workerCellDensity": {
+          "type": "object",
+          "properties": {
+            "p10": {
+              "type": "number"
+            },
+            "p25": {
+              "type": "number"
+            },
+            "p50": {
+              "type": "number"
+            },
+            "p75": {
+              "type": "number"
+            },
+            "p90": {
+              "type": "number"
+            },
+            "mean": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "p10",
+            "p25",
+            "p50",
+            "p75",
+            "p90",
+            "mean"
+          ],
+          "additionalProperties": false
+        },
+        "detail": {
+          "type": "object",
+          "properties": {
+            "radiusKm": {
+              "type": "number"
+            },
+            "expectedPointSpacingKm": {
+              "type": "number"
+            },
+            "normalizedRadius": {
+              "type": "number"
+            },
+            "activityPerPoint": {
+              "type": "number"
+            },
+            "playableAreaKm2": {
+              "type": "number"
+            },
+            "playableAreaPerPointKm2": {
+              "type": "number"
+            },
+            "playableCatchmentRadiusKm": {
+              "type": "number"
+            },
+            "localityScore": {
+              "type": "number"
+            },
+            "deaggregationScore": {
+              "type": "number"
+            },
+            "score": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "radiusKm",
+            "expectedPointSpacingKm",
+            "normalizedRadius",
+            "activityPerPoint",
+            "playableAreaKm2",
+            "playableAreaPerPointKm2",
+            "playableCatchmentRadiusKm",
+            "localityScore",
+            "deaggregationScore",
+            "score"
+          ],
+          "additionalProperties": false
+        },
+        "polycentrism": {
+          "type": "object",
+          "properties": {
+            "activity": {
+              "type": "object",
+              "properties": {
+                "score": {
+                  "type": "number"
+                },
+                "continuousScore": {
+                  "type": "number"
+                },
+                "detectedCenterCount": {
+                  "type": "number"
+                },
+                "effectiveCenterCount": {
+                  "type": "number"
+                },
+                "largestCenterShare": {
+                  "type": "number"
+                },
+                "bandwidthKm": {
+                  "type": "number"
+                },
+                "reliabilityScore": {
+                  "type": "number"
+                },
+                "supportLevel": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high"
+                  ]
+                },
+                "usedFallback": {
+                  "type": "boolean"
+                },
+                "topCenters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "longitude": {
+                        "type": "number"
+                      },
+                      "latitude": {
+                        "type": "number"
+                      },
+                      "massShare": {
+                        "type": "number"
+                      },
+                      "assignedMass": {
+                        "type": "number"
+                      },
+                      "assignedPointCount": {
+                        "type": "number"
+                      },
+                      "prominenceRatio": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "longitude",
+                      "latitude",
+                      "massShare",
+                      "assignedMass",
+                      "assignedPointCount",
+                      "prominenceRatio"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "debug": {}
+              },
+              "required": [
+                "score",
+                "continuousScore",
+                "detectedCenterCount",
+                "effectiveCenterCount",
+                "largestCenterShare",
+                "bandwidthKm",
+                "reliabilityScore",
+                "supportLevel",
+                "usedFallback",
+                "topCenters"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "activity"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "residentWeightedNearestNeighborKm",
+        "workerWeightedNearestNeighborKm",
+        "commuteDistanceKm",
+        "residentCellDensity",
+        "workerCellDensity",
+        "detail",
+        "polycentrism"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

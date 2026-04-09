@@ -1,0 +1,30 @@
+{
+  "name": "@registry/schemas",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.js",
+    "./json-schemas": "./json-schemas/index.json"
+  },
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "json-schemas"
+  ],
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "build": "tsc",
+    "emit-json-schemas": "node dist/emit-json-schemas.js",
+    "prepublishOnly": "pnpm build && pnpm emit-json-schemas"
+  },
+  "dependencies": {
+    "zod": "^3.24.0",
+    "zod-to-json-schema": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

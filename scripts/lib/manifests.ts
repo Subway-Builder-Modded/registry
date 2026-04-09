@@ -1,17 +1,6 @@
 export type ManifestType = "map" | "mod";
 export type ManifestDirectory = "maps" | "mods";
 
-export type UpdateType =
-  | { type: "github"; repo: string }
-  | { type: "custom"; url: string };
-
-export interface InitialViewState {
-  latitude: number;
-  longitude: number;
-  zoom: number;
-  bearing: number;
-}
-
 export type JsonValue =
   | string
   | number
@@ -24,38 +13,14 @@ export interface JsonObject {
   [key: string]: JsonValue;
 }
 
-export interface ModManifest {
-  schema_version: number;
-  id: string;
-  name: string;
-  author: string;
-  github_id: number;
-  description: string;
-  tags: string[];
-  gallery: string[];
-  is_test: boolean;
-  source: string;
-  update: UpdateType;
-}
-
-export interface MapManifest extends ModManifest {
-  city_code: string;
-  country: string;
-  population: number;
-  residents_total: number;
-  points_count: number;
-  population_count: number;
-  initial_view_state: InitialViewState;
-  grid_statistics?: JsonObject;
-  data_source: string;
-  source_quality: string;
-  level_of_detail: string;
-  location: string;
-  special_demand: string[];
-  file_sizes: Record<string, number>;
-}
-
-export type ListingManifest = ModManifest | MapManifest;
+export type {
+  UpdateConfig as UpdateType,
+  InitialViewState,
+  ModManifest,
+  MapManifest,
+  ListingManifest,
+  GridStatistics,
+} from "@registry/schemas";
 
 export function resolveManifestType(value: string | undefined): ManifestType {
   return value === "map" ? "map" : "mod";

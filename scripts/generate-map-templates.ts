@@ -1,8 +1,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import YAML from "yaml";
-import Ajv, { type ErrorObject } from "ajv";
-import addFormats from "ajv-formats";
+import { z } from "zod";
 import {
   DEFAULT_MAP_DATA_SOURCE,
   LEVEL_OF_DETAIL_VALUES,
@@ -25,104 +24,43 @@ const YAML_OPTIONS = {
   blockQuote: true,
 } as const;
 
-const ajv = new Ajv({ allErrors: true, strict: false });
-addFormats(ajv);
+const OptionItemSchema = z.union([
+  z.string(),
+  z.object({ label: z.string().min(1), required: z.boolean().optional() }).passthrough(),
+]);
 
-const ISSUE_FORM_SCHEMA = {
-  type: "object",
-  required: ["name", "description", "title", "labels", "body"],
-  properties: {
-    name: { type: "string", minLength: 1 },
-    description: { type: "string", minLength: 1 },
-    title: { type: "string", minLength: 1 },
-    labels: {
-      type: "array",
-      items: { type: "string", minLength: 1 },
-      minItems: 1,
-    },
-    body: {
-      type: "array",
-      minItems: 1,
-      items: { $ref: "#/$defs/bodyItem" },
-    },
-  },
-  $defs: {
-    optionItem: {
-      anyOf: [
-        { type: "string", minLength: 0 },
-        {
-          type: "object",
-          required: ["label"],
-          properties: {
-            label: { type: "string", minLength: 1 },
-            required: { type: "boolean" },
-          },
-          additionalProperties: true,
-        },
-      ],
-    },
-    bodyItem: {
-      type: "object",
-      required: ["type", "attributes"],
-      properties: {
-        type: {
-          type: "string",
-          enum: ["markdown", "input", "textarea", "checkboxes", "dropdown"],
-        },
-        id: { type: "string", minLength: 1 },
-        attributes: { type: "object" },
-        validations: {
-          type: "object",
-          properties: {
-            required: { type: "boolean" },
-          },
-          additionalProperties: true,
-        },
-      },
-      additionalProperties: true,
-      allOf: [
-        {
-          if: { properties: { type: { const: "markdown" } } },
-          then: {
-            properties: {
-              attributes: {
-                type: "object",
-                required: ["value"],
-                properties: {
-                  value: { type: "string", minLength: 1 },
-                },
-                additionalProperties: true,
-              },
-            },
-          },
-          else: {
-            required: ["id"],
-            properties: {
-              attributes: {
-                type: "object",
-                required: ["label"],
-                properties: {
-                  label: { type: "string", minLength: 1 },
-                  description: { type: "string", minLength: 1 },
-                  placeholder: { type: "string" },
-                  render: { type: "string" },
-                  value: { type: "string" },
-                  options: {
-                    type: "array",
-                    items: { $ref: "#/$defs/optionItem" },
-                  },
-                },
-                additionalProperties: true,
-              },
-            },
-          },
-        },
-      ],
-    },
-  },
-};
+const MarkdownBodyItemSchema = z
+  .object({
+    type: z.literal("markdown"),
+    attributes: z.object({ value: z.string().min(1) }).passthrough(),
+  })
+  .passthrough();
 
-const validateIssueForm = ajv.compile(ISSUE_FORM_SCHEMA);
+const NonMarkdownBodyItemSchema = z
+  .object({
+    type: z.enum(["input", "textarea", "checkboxes", "dropdown"]),
+    id: z.string().min(1),
+    attributes: z
+      .object({
+        label: z.string().min(1),
+        description: z.string().min(1).optional(),
+        placeholder: z.string().optional(),
+        render: z.string().optional(),
+        value: z.string().optional(),
+        options: z.array(OptionItemSchema).optional(),
+      })
+      .passthrough(),
+    validations: z.object({ required: z.boolean().optional() }).passthrough().optional(),
+  })
+  .passthrough();
+
+const IssueFormSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().min(1),
+  title: z.string().min(1),
+  labels: z.array(z.string().min(1)).min(1),
+  body: z.array(z.union([MarkdownBodyItemSchema, NonMarkdownBodyItemSchema])).min(1),
+});
 
 type TemplateValue = Record<string, unknown>;
 type TemplateField = {
@@ -483,15 +421,9 @@ function buildTemplateFile(doc: TemplateValue): string {
   return `${GENERATED_HEADER}\n${YAML.stringify(doc, YAML_OPTIONS)}`;
 }
 
-function failValidation(
-  label: string,
-  errors: readonly ErrorObject[] | null | undefined,
-): never {
-  const details = (errors || [])
-    .map(
-      (err) =>
-        `${err.instancePath || "/"} ${err.message || ""}`.trim(),
-    )
+function failValidation(label: string, error: z.ZodError): never {
+  const details = error.issues
+    .map((issue) => `${issue.path.join(".") || "/"} ${issue.message}`)
     .join("\n");
   throw new Error(
     `Schema validation failed for ${label}${details ? `:\n${details}` : "."}`,
@@ -499,9 +431,9 @@ function failValidation(
 }
 
 function validateTemplateDoc(label: string, doc: TemplateValue): void {
-  const valid = validateIssueForm(doc);
-  if (!valid) {
-    failValidation(label, validateIssueForm.errors);
+  const result = IssueFormSchema.safeParse(doc);
+  if (!result.success) {
+    failValidation(label, result.error);
   }
 }
 
