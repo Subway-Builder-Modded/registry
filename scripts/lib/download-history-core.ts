@@ -10,6 +10,9 @@ import {
 import type { IntegritySource } from "./integrity.js";
 import { isObject, toFiniteNumber, readJsonFile, writeJsonFile } from "./json-utils.js";
 import { toSnapshotDate, toCanonicalHistoryCutoffIso, getHistoryDir, CANONICAL_HISTORY_CUTOFF_HOUR_UTC } from "./history-utils.js";
+import type { DownloadHistorySnapshot } from "@registry/schemas";
+
+export type { DownloadHistorySnapshot } from "@registry/schemas";
 
 type ListingKind = "maps" | "mods";
 type IntegritySourceByListingVersion = Record<string, Record<string, IntegritySource | null>>;
@@ -49,19 +52,6 @@ interface IntegrityOutputLike {
 
 interface AttributionHistoryLike {
   total_attributed_fetches?: unknown;
-}
-
-export interface DownloadHistorySnapshot {
-  schema_version: 2;
-  snapshot_date: string;
-  generated_at: string;
-  total_downloads: number;
-  raw_total_downloads: number;
-  total_attributed_downloads: number;
-  total_attributed_fetches: number;
-  net_downloads: number;
-  maps: DownloadHistorySection;
-  mods: DownloadHistorySection;
 }
 
 export interface GenerateDownloadHistoryOptions {

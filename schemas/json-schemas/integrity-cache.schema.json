@@ -1,0 +1,177 @@
+{
+  "$ref": "#/definitions/integrity-cache",
+  "definitions": {
+    "integrity-cache": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "number",
+          "const": 1
+        },
+        "entries": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "fingerprint": {
+                  "type": "string"
+                },
+                "last_checked_at": {
+                  "type": "string"
+                },
+                "result": {
+                  "type": "object",
+                  "properties": {
+                    "is_complete": {
+                      "type": "boolean"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "required_checks": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "boolean"
+                      }
+                    },
+                    "matched_files": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    },
+                    "release_size": {
+                      "type": "number"
+                    },
+                    "file_sizes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      }
+                    },
+                    "security_issue": {
+                      "type": "object",
+                      "properties": {
+                        "findings": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "rule_id": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string",
+                                "enum": [
+                                  "WARNING",
+                                  "ERROR"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "literal",
+                                  "regex",
+                                  "ast"
+                                ]
+                              },
+                              "pattern": {
+                                "type": "string"
+                              },
+                              "file": {
+                                "type": "string"
+                              },
+                              "snippet": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "rule_id",
+                              "severity",
+                              "type",
+                              "pattern",
+                              "file"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "findings"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "source": {
+                      "type": "object",
+                      "properties": {
+                        "update_type": {
+                          "type": "string",
+                          "enum": [
+                            "github",
+                            "custom"
+                          ]
+                        },
+                        "repo": {
+                          "type": "string"
+                        },
+                        "tag": {
+                          "type": "string"
+                        },
+                        "asset_name": {
+                          "type": "string"
+                        },
+                        "download_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "update_type"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "fingerprint": {
+                      "type": "string"
+                    },
+                    "checked_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "is_complete",
+                    "errors",
+                    "required_checks",
+                    "matched_files",
+                    "source",
+                    "fingerprint",
+                    "checked_at"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "fingerprint",
+                "last_checked_at",
+                "result"
+              ],
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "entries"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

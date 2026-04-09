@@ -1,0 +1,205 @@
+{
+  "$ref": "#/definitions/integrity-output",
+  "definitions": {
+    "integrity-output": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "number",
+          "const": 1
+        },
+        "generated_at": {
+          "type": "string"
+        },
+        "listings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "has_complete_version": {
+                "type": "boolean"
+              },
+              "latest_semver_version": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "latest_semver_complete": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "complete_versions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "incomplete_versions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "versions": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "is_complete": {
+                      "type": "boolean"
+                    },
+                    "errors": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "required_checks": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "boolean"
+                      }
+                    },
+                    "matched_files": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": [
+                          "string",
+                          "null"
+                        ]
+                      }
+                    },
+                    "release_size": {
+                      "type": "number"
+                    },
+                    "file_sizes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "number"
+                      }
+                    },
+                    "security_issue": {
+                      "type": "object",
+                      "properties": {
+                        "findings": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "rule_id": {
+                                "type": "string"
+                              },
+                              "severity": {
+                                "type": "string",
+                                "enum": [
+                                  "WARNING",
+                                  "ERROR"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "literal",
+                                  "regex",
+                                  "ast"
+                                ]
+                              },
+                              "pattern": {
+                                "type": "string"
+                              },
+                              "file": {
+                                "type": "string"
+                              },
+                              "snippet": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "rule_id",
+                              "severity",
+                              "type",
+                              "pattern",
+                              "file"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "findings"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "source": {
+                      "type": "object",
+                      "properties": {
+                        "update_type": {
+                          "type": "string",
+                          "enum": [
+                            "github",
+                            "custom"
+                          ]
+                        },
+                        "repo": {
+                          "type": "string"
+                        },
+                        "tag": {
+                          "type": "string"
+                        },
+                        "asset_name": {
+                          "type": "string"
+                        },
+                        "download_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "update_type"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "fingerprint": {
+                      "type": "string"
+                    },
+                    "checked_at": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "is_complete",
+                    "errors",
+                    "required_checks",
+                    "matched_files",
+                    "source",
+                    "fingerprint",
+                    "checked_at"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "has_complete_version",
+              "latest_semver_version",
+              "latest_semver_complete",
+              "complete_versions",
+              "incomplete_versions",
+              "versions"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "generated_at",
+        "listings"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

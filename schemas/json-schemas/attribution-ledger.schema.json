@@ -1,0 +1,103 @@
+{
+  "$ref": "#/definitions/attribution-ledger",
+  "definitions": {
+    "attribution-ledger": {
+      "type": "object",
+      "properties": {
+        "schema_version": {
+          "type": "number",
+          "const": 2
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "assets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "number"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "by_source": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": [
+              "count",
+              "updated_at",
+              "by_source"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "applied_delta_ids": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "daily": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "assets": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": [
+              "total",
+              "assets"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "timeline": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "number"
+              },
+              "assets": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "number"
+                }
+              }
+            },
+            "required": [
+              "total",
+              "assets"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "schema_version",
+        "updated_at",
+        "assets",
+        "applied_delta_ids",
+        "daily",
+        "timeline"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

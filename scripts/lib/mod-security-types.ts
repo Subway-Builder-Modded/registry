@@ -1,47 +1,19 @@
-export type SecuritySeverity = "WARNING" | "ERROR";
-export type SecurityRuleType = "literal" | "regex" | "ast";
+// Data types serialized to JSON — defined in @registry/schemas
+export type {
+  SecuritySeverity,
+  SecurityRuleType,
+  AstRuleCallArgCallPattern,
+  AstRuleCallInWhilePattern,
+  AstRulePattern,
+  SecurityRule,
+  SecurityRulesFile,
+  SecurityFinding,
+  SecurityIssue,
+} from "@registry/schemas";
 
-export interface AstRuleCallArgCallPattern {
-  kind: "call-arg-call";
-  callee: string;
-  first_arg_callee: string;
-}
+import type { SecurityRule } from "@registry/schemas";
 
-export interface AstRuleCallInWhilePattern {
-  kind: "call-in-while";
-  callees: string[];
-  allow_aliases?: boolean;
-}
-
-export type AstRulePattern =
-  | AstRuleCallArgCallPattern
-  | AstRuleCallInWhilePattern;
-
-interface SecurityRuleBase {
-  id: string;
-  severity: SecuritySeverity;
-  description?: string;
-  enabled?: boolean;
-}
-
-export type SecurityRule =
-  | (SecurityRuleBase & {
-    type: "literal";
-    pattern: string;
-  })
-  | (SecurityRuleBase & {
-    type: "regex";
-    pattern: string;
-  })
-  | (SecurityRuleBase & {
-    type: "ast";
-    pattern: AstRulePattern;
-  });
-
-export interface SecurityRulesFile {
-  schema_version: 1;
-  rules: SecurityRule[];
-}
+// Runtime-only types (not serialized to JSON)
 
 export type CompiledSecurityRule =
   | (Extract<SecurityRule, { type: "literal" }> & {
@@ -61,17 +33,3 @@ export interface LoadedSecurityRules {
   fingerprint: string;
   rules: CompiledSecurityRule[];
 }
-
-export interface SecurityFinding {
-  rule_id: string;
-  severity: SecuritySeverity;
-  type: SecurityRuleType;
-  pattern: string;
-  file: string;
-  snippet?: string;
-}
-
-export interface SecurityIssue {
-  findings: SecurityFinding[];
-}
-

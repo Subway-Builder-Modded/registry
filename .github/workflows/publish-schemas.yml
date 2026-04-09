@@ -1,0 +1,38 @@
+name: Publish @registry/schemas
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10.19.0"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@registry"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build and emit JSON schemas
+        run: pnpm --filter @registry/schemas prepublishOnly
+
+      - name: Publish
+        run: pnpm --filter @registry/schemas publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
