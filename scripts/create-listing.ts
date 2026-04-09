@@ -19,7 +19,7 @@ import {
 } from "./lib/manifests.js";
 import { resolveAndExtractDemandStatsForMapSource } from "./lib/map-demand-stats.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
-import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@registry/schemas";
+import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import { ensureAuthorAliasPrefill } from "./lib/author-aliases.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");

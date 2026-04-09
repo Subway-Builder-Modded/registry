@@ -1,7 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { JsonObject, MapManifest } from "../manifests.js";
-import type { GridStatistics } from "@registry/schemas";
+import type { GridStatistics } from "@subway-builder-modded/registry-schemas";
 import {
   createGraphqlUsageState,
   fetchRepoReleaseIndexes,

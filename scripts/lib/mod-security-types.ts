@@ -1,4 +1,4 @@
-// Data types serialized to JSON — defined in @registry/schemas
+// Data types serialized to JSON — defined in @subway-builder-modded/registry-schemas
 export type {
   SecuritySeverity,
   SecurityRuleType,
@@ -9,9 +9,9 @@ export type {
   SecurityRulesFile,
   SecurityFinding,
   SecurityIssue,
-} from "@registry/schemas";
+} from "@subway-builder-modded/registry-schemas";
 
-import type { SecurityRule } from "@registry/schemas";
+import type { SecurityRule } from "@subway-builder-modded/registry-schemas";
 
 // Runtime-only types (not serialized to JSON)
 

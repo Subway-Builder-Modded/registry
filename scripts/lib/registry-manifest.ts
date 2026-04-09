@@ -1,4 +1,4 @@
-import { ListingManifestSchema } from "@registry/schemas";
+import { ListingManifestSchema } from "@subway-builder-modded/registry-schemas";
 
 export function assertValidRegistryManifest(
   manifest: unknown,

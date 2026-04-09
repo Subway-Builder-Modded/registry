@@ -1,4 +1,4 @@
-# Releasing @registry/schemas
+# Releasing @subway-builder-modded/registry-schemas
 
 Publishing is triggered automatically when a `v*` tag is pushed. The GitHub Actions workflow builds the package, emits JSON Schema files, and publishes to GitHub Packages.
 
@@ -47,4 +47,4 @@ The [publish-schemas workflow](.github/workflows/publish-schemas.yml) runs on th
 
 ## Consuming the new version
 
-The `scripts/` package references `"@registry/schemas": "workspace:*"` and always uses the local workspace version. External consumers (e.g., the Go app via quicktype) should update their dependency to the new tag.
+The `scripts/` package references `"@subway-builder-modded/registry-schemas": "workspace:*"` and always uses the local workspace version. External consumers (e.g., the Go app via quicktype) should update their dependency to the new tag.

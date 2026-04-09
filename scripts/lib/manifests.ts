@@ -20,7 +20,7 @@ export type {
   MapManifest,
   ListingManifest,
   GridStatistics,
-} from "@registry/schemas";
+} from "@subway-builder-modded/registry-schemas";
 
 export function resolveManifestType(value: string | undefined): ManifestType {
   return value === "map" ? "map" : "mod";

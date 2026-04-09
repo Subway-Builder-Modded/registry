@@ -1,4 +1,4 @@
-name: Publish @registry/schemas
+name: Publish @subway-builder-modded/registry-schemas
 
 on:
   push:
@@ -24,15 +24,15 @@ jobs:
         with:
           node-version: "22"
           registry-url: "https://npm.pkg.github.com"
-          scope: "@registry"
+          scope: "@subway-builder-modded"
 
       - name: Install dependencies
         run: pnpm install
 
       - name: Build and emit JSON schemas
-        run: pnpm --filter @registry/schemas prepublishOnly
+        run: pnpm --filter @subway-builder-modded/registry-schemas prepublishOnly
 
       - name: Publish
-        run: pnpm --filter @registry/schemas publish --no-git-checks
+        run: pnpm --filter @subway-builder-modded/registry-schemas publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
