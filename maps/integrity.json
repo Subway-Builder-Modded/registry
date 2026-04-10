@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-10T18:34:50.564Z",
+  "generated_at": "2026-04-10T20:48:03.165Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -6546,19 +6546,17 @@
       }
     },
     "wilmington-nc": {
-      "has_complete_version": false,
-      "latest_semver_version": "v1.0.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
-        "v1.0.0"
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
       ],
+      "incomplete_versions": [],
       "versions": {
-        "v1.0.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'Wilmington.zip': config.json version '1.1.0' does not match release tag 'v1.0.0' (expected '1.0.0')"
-          ],
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -6567,7 +6565,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -6577,18 +6575,28 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "WIL.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 12.29,
+          "file_sizes": {
+            "WIL.pmtiles": 6.88,
+            "__MACOSX/._config.json": 0,
+            "buildings_index.json": 18.55,
+            "config.json": 0,
+            "demand_data.json": 0.6,
+            "ocean_depth_index.json": 1.33,
+            "roads.geojson": 3.4,
+            "runways_taxiways.geojson": 0.08
+          },
           "source": {
             "update_type": "github",
             "repo": "pswbsf/wilmington-nc",
-            "tag": "v1.0.0",
+            "tag": "1.0.0",
             "asset_name": "Wilmington.zip",
-            "download_url": "https://github.com/PSWBSF/wilmington-nc/releases/download/v1.0.0/Wilmington.zip"
+            "download_url": "https://github.com/PSWBSF/wilmington-nc/releases/download/1.0.0/Wilmington.zip"
           },
-          "fingerprint": "rules:v6:github:pswbsf/wilmington-nc:v1.0.0:Wilmington.zip",
-          "checked_at": "2026-04-10T17:31:22.373Z"
+          "fingerprint": "rules:v6:github:pswbsf/wilmington-nc:1.0.0:Wilmington.zip",
+          "checked_at": "2026-04-10T20:48:03.165Z"
         }
       }
     },
