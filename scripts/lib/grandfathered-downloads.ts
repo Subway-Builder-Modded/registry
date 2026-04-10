@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ManifestType } from "./manifests.js";
 import type { DownloadsByListing } from "./download-definitions.js";
-import { isObject, toFiniteNonNegativeNumber } from "./json-utils.js";
+import { isObject, toFiniteNonNegativeNumber, sortObjectByKeys } from "./json-utils.js";
 
 /**
  * Loads frozen download counts for versions that were clamped before being
@@ -60,5 +60,11 @@ export function mergeGrandfatheredDownloads(
       }
     }
   }
-  return merged;
+
+  // Sort listing IDs and version keys within each listing for stable, readable output
+  const sorted: DownloadsByListing = {};
+  for (const listingId of Object.keys(merged).sort()) {
+    sorted[listingId] = sortObjectByKeys(merged[listingId]!);
+  }
+  return sorted;
 }
