@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-10T03:23:39.578Z",
+  "generated_at": "2026-04-10T06:02:39.084Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -4203,6 +4203,57 @@
           },
           "fingerprint": "rules:v5:github:soccerjonj/providence:1.0.0:Providence-Railyard.zip",
           "checked_at": "2026-04-07T07:45:27.917Z"
+        }
+      }
+    },
+    "puebla": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PBC.pmtiles"
+          },
+          "release_size": 116.44,
+          "file_sizes": {
+            "PBC.pmtiles": 66.85,
+            "buildings_index.json": 202.9,
+            "config.json": 0,
+            "demand_data.json": 7.24,
+            "roads.geojson": 37.52,
+            "runways_taxiways.geojson": 0.1
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.5",
+            "asset_name": "PBC.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.5/PBC.zip"
+          },
+          "fingerprint": "rules:v5:sha256:cf86a3411440e9513db3b877c648fbe9278430316032aaacf5b30b66afd0f857",
+          "checked_at": "2026-04-10T06:02:39.084Z"
         }
       }
     },
