@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-10T13:25:23.992Z",
+  "generated_at": "2026-04-10T16:52:34.236Z",
   "listings": {
     "advanced-analytics": {
       "has_complete_version": true,
@@ -42,7 +42,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v5:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-10T13:25:23.992Z"
+          "checked_at": "2026-04-10T16:52:34.236Z"
         },
         "v0.9.1": {
           "is_complete": false,
@@ -624,13 +624,14 @@
     },
     "cinematic-camera": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.2.0",
+      "latest_semver_version": "v1.2.1",
       "latest_semver_complete": false,
       "complete_versions": [
         "v1.1.0",
         "v1.0.0"
       ],
       "incomplete_versions": [
+        "v1.2.1",
         "v1.2.0"
       ],
       "versions": {
@@ -714,6 +715,35 @@
           },
           "fingerprint": "rules:v5:github:transitcore/cinematic-camera:v1.2.0:cinematic-camera.v1.2.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
           "checked_at": "2026-04-10T03:23:45.887Z"
+        },
+        "v1.2.1": {
+          "is_complete": false,
+          "errors": [
+            "asset 'cinematic-camera.v1.2.1.zip': missing top-level manifest.json in ZIP",
+            "asset 'cinematic-camera.v1.2.1.zip': manifest.json version '(missing)' does not match release tag 'v1.2.1' (expected '1.2.1')"
+          ],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": false,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": false
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": null,
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": null
+          },
+          "release_size": 0.01,
+          "source": {
+            "update_type": "github",
+            "repo": "transitcore/cinematic-camera",
+            "tag": "v1.2.1",
+            "asset_name": "cinematic-camera.v1.2.1.zip",
+            "download_url": "https://github.com/TransitCore/cinematic-camera/releases/download/v1.2.1/cinematic-camera.v1.2.1.zip"
+          },
+          "fingerprint": "rules:v5:github:transitcore/cinematic-camera:v1.2.1:cinematic-camera.v1.2.1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-04-10T16:52:34.236Z"
         }
       }
     },
@@ -1944,7 +1974,7 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v5:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-10T13:25:23.992Z"
+          "checked_at": "2026-04-10T16:52:34.236Z"
         },
         "v1.1": {
           "is_complete": false,
@@ -1959,7 +1989,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v5:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-10T13:25:23.992Z"
+          "checked_at": "2026-04-10T16:52:34.236Z"
         }
       }
     }
