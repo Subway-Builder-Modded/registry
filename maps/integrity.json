@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-10T06:02:39.084Z",
+  "generated_at": "2026-04-10T09:18:03.535Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -863,9 +863,10 @@
     },
     "cairo": {
       "has_complete_version": true,
-      "latest_semver_version": "2.1.0",
+      "latest_semver_version": "2.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "2.2.0",
         "2.1.0",
         "2.0.1",
         "2.0.0"
@@ -991,6 +992,46 @@
           },
           "fingerprint": "rules:v5:sha256:d8f2f28dbf25b2c99d9106724f0e05b751e05133e412dadaf8f46bf69d6a55aa",
           "checked_at": "2026-04-09T02:51:47.864Z"
+        },
+        "2.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CAI.pmtiles"
+          },
+          "release_size": 205.34,
+          "file_sizes": {
+            "CAI.pmtiles": 106.39,
+            "buildings_index.json": 335.48,
+            "config.json": 0,
+            "demand_data.json": 1.52,
+            "roads.geojson": 67.5,
+            "runways_taxiways.geojson": 1.47
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v2.2.0-cai",
+            "asset_name": "CAI.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.2.0-cai/CAI.zip"
+          },
+          "fingerprint": "rules:v5:sha256:653d9e21e488639e8b2dcb91a50dfe7a3a8c9c9c0e0ead15cc44be38e750ad6b",
+          "checked_at": "2026-04-10T09:18:03.535Z"
         }
       }
     },
@@ -5027,9 +5068,10 @@
     },
     "spokane": {
       "has_complete_version": true,
-      "latest_semver_version": "2.1.0",
+      "latest_semver_version": "2.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "2.2.0",
         "2.1.0",
         "2.0.0",
         "1.0.0"
@@ -5155,6 +5197,46 @@
           },
           "fingerprint": "rules:v5:sha256:d89c66ec7376fb8b9da9a61ff227961c087ce218f7df78e50ddf525d9b1b6685",
           "checked_at": "2026-04-07T07:45:27.917Z"
+        },
+        "2.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "GEG.pmtiles"
+          },
+          "release_size": 24.91,
+          "file_sizes": {
+            "GEG.pmtiles": 15.7,
+            "buildings_index.json": 35.17,
+            "config.json": 0,
+            "demand_data.json": 2.66,
+            "roads.geojson": 5.04,
+            "runways_taxiways.geojson": 0.6
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v2.2.0-geg",
+            "asset_name": "GEG.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.2.0-geg/GEG.zip"
+          },
+          "fingerprint": "rules:v5:sha256:62a84fb8e7fc8321c2e4ec85ccdea6fca032d1421093558bf224c16ee8f7bca5",
+          "checked_at": "2026-04-10T09:18:03.535Z"
         }
       }
     },
