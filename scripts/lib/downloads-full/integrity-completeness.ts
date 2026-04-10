@@ -17,42 +17,73 @@ import {
   withCheckResult,
 } from "../downloads-support.js";
 
-const INTEGRITY_RULES_VERSION = "v5";
+const INTEGRITY_RULES_VERSION = "v6";
 
 function applyVersionTagCheck(
   check: ZipCompletenessResult,
   releaseTag: string,
   listingType: D.GenerateDownloadsOptions["listingType"],
 ): ZipCompletenessResult {
-  if (listingType !== "mod") return check;
   const normalizedTag = normalizeStableSemverTag(releaseTag);
   if (!normalizedTag) return check;
 
-  const manifestVersion = check.manifestVersion ?? null;
-  const normalizedManifestVersion = manifestVersion ? normalizeStableSemverTag(manifestVersion) : null;
-  const versionMatches = normalizedManifestVersion !== null && normalizedManifestVersion === normalizedTag;
+  if (listingType === "mod") {
+    const manifestVersion = check.manifestVersion ?? null;
+    const normalizedManifestVersion = manifestVersion ? normalizeStableSemverTag(manifestVersion) : null;
+    const versionMatches = normalizedManifestVersion !== null && normalizedManifestVersion === normalizedTag;
 
-  const errors = versionMatches
-    ? check.errors
-    : [
-      ...check.errors,
-      `manifest.json version '${manifestVersion ?? "(missing)"}' does not match release tag '${releaseTag}'`
-      + ` (expected '${normalizedTag}')`,
-    ];
+    const errors = versionMatches
+      ? check.errors
+      : [
+        ...check.errors,
+        `manifest.json version '${manifestVersion ?? "(missing)"}' does not match release tag '${releaseTag}'`
+        + ` (expected '${normalizedTag}')`,
+      ];
 
-  return {
-    ...check,
-    isComplete: versionMatches ? check.isComplete : false,
-    errors,
-    requiredChecks: {
-      ...check.requiredChecks,
-      manifest_version_matches_tag: versionMatches,
-    },
-    matchedFiles: {
-      ...check.matchedFiles,
-      manifest_version_matches_tag: versionMatches ? "manifest.json" : null,
-    },
-  };
+    return {
+      ...check,
+      isComplete: versionMatches ? check.isComplete : false,
+      errors,
+      requiredChecks: {
+        ...check.requiredChecks,
+        manifest_version_matches_tag: versionMatches,
+      },
+      matchedFiles: {
+        ...check.matchedFiles,
+        manifest_version_matches_tag: versionMatches ? "manifest.json" : null,
+      },
+    };
+  }
+
+  if (listingType === "map") {
+    const configVersion = check.configVersion ?? null;
+    const normalizedConfigVersion = configVersion ? normalizeStableSemverTag(configVersion) : null;
+    const versionMatches = normalizedConfigVersion !== null && normalizedConfigVersion === normalizedTag;
+
+    const errors = versionMatches
+      ? check.errors
+      : [
+        ...check.errors,
+        `config.json version '${configVersion ?? "(missing)"}' does not match release tag '${releaseTag}'`
+        + ` (expected '${normalizedTag}')`,
+      ];
+
+    return {
+      ...check,
+      isComplete: versionMatches ? check.isComplete : false,
+      errors,
+      requiredChecks: {
+        ...check.requiredChecks,
+        config_version_matches_tag: versionMatches,
+      },
+      matchedFiles: {
+        ...check.matchedFiles,
+        config_version_matches_tag: versionMatches ? "config.json" : null,
+      },
+    };
+  }
+
+  return check;
 }
 
 export function versionedFingerprint(base: string): string {

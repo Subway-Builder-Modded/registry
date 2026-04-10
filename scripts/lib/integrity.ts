@@ -62,6 +62,7 @@ export interface ZipCompletenessResult {
   fileSizes?: Record<string, number>;
   securityIssue?: SecurityIssue;
   manifestVersion?: string;
+  configVersion?: string;
 }
 
 interface InspectZipOptions {
@@ -165,29 +166,35 @@ function findConfigCode(value: unknown): string | null {
 
 async function parseConfigCode(zip: JSZip): Promise<{
   code: string | null;
+  version: string | null;
   parseError: string | null;
 }> {
   const configEntry = zip.files["config.json"];
   if (!configEntry || configEntry.dir) {
-    return { code: null, parseError: null };
+    return { code: null, version: null, parseError: null };
   }
 
   let rawConfig: string;
   try {
     rawConfig = await configEntry.async("string");
   } catch {
-    return { code: null, parseError: "failed to read top-level config.json" };
+    return { code: null, version: null, parseError: "failed to read top-level config.json" };
   }
 
   let parsedConfig: unknown;
   try {
     parsedConfig = JSON.parse(rawConfig);
   } catch {
-    return { code: null, parseError: "top-level config.json is not valid JSON" };
+    return { code: null, version: null, parseError: "top-level config.json is not valid JSON" };
   }
+
+  const version = isObject(parsedConfig) && typeof parsedConfig.version === "string" && parsedConfig.version.trim() !== ""
+    ? parsedConfig.version.trim()
+    : null;
 
   return {
     code: findConfigCode(parsedConfig),
+    version,
     parseError: null,
   };
 }
@@ -340,6 +347,7 @@ async function inspectMapZip(
   fileSizes: Record<string, number>,
   registryCityCode: string | null,
   configCode: string | null,
+  configVersion: string | null,
   parseError: string | null,
   configCodeMismatchWarning: string | null,
 ): Promise<ZipCompletenessResult> {
@@ -441,6 +449,7 @@ async function inspectMapZip(
     requiredChecks,
     matchedFiles,
     fileSizes,
+    ...(configVersion !== null ? { configVersion } : {}),
   };
 }
 
@@ -577,6 +586,7 @@ export async function inspectZipCompleteness(
       zipFileSizes,
       registryCityCode,
       configCode,
+      configCodeResult.version,
       configCodeResult.parseError,
       mismatchWarning,
     );
