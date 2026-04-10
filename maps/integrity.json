@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-10T17:31:22.373Z",
+  "generated_at": "2026-04-10T18:20:42.449Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -404,9 +404,10 @@
     },
     "barcelona": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "1.0.2",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "1.0.2",
         "1.0.0"
       ],
       "incomplete_versions": [
@@ -490,6 +491,48 @@
           },
           "fingerprint": "rules:v6:sha256:2b9becb26b5b7115f44a8ca745b58e6fccce9952b18faa3832442c34ad7ea140",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        },
+        "1.0.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ESBC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 154.59,
+          "file_sizes": {
+            "ESBC.pmtiles": 122.63,
+            "buildings_index.json": 94.78,
+            "config.json": 0,
+            "demand_data.json": 2.21,
+            "roads.geojson": 43.94,
+            "runways_taxiways.geojson": 1.31
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "maximilian284/subwaybuilder-es-maps",
+            "tag": "1.0.2",
+            "asset_name": "ESBC.zip",
+            "download_url": "https://github.com/Maximilian284/subwaybuilder-es-maps/releases/download/1.0.2/ESBC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:3c723f0e68eb91984da11aed4d221993afe6debe33e0b55035cb45283b644ce6",
+          "checked_at": "2026-04-10T18:20:42.449Z"
         }
       }
     },
@@ -601,9 +644,10 @@
     },
     "bilbao": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "1.0.2",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "1.0.2",
         "1.0.0"
       ],
       "incomplete_versions": [
@@ -688,6 +732,49 @@
           },
           "fingerprint": "rules:v6:sha256:5d4ca7e26418f1d87d0f28627d7d1f992dbaf46331036ba941bfb83bb9e45144",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        },
+        "1.0.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ESBI.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 99.85,
+          "file_sizes": {
+            "ESBI.pmtiles": 41.75,
+            "buildings_index.json": 20.5,
+            "buildings_index.zip": 49.92,
+            "config.json": 0,
+            "demand_data.json": 0.98,
+            "roads.geojson": 13.07,
+            "runways_taxiways.geojson": 0.12
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "maximilian284/subwaybuilder-es-maps",
+            "tag": "1.0.2",
+            "asset_name": "ESBI.zip",
+            "download_url": "https://github.com/Maximilian284/subwaybuilder-es-maps/releases/download/1.0.2/ESBI.zip"
+          },
+          "fingerprint": "rules:v6:sha256:678dca35f176fea4d0b12d99522139c168e92923bf1de073a211b5586a2ccfe7",
+          "checked_at": "2026-04-10T18:20:42.449Z"
         }
       }
     },
@@ -766,7 +853,8 @@
             "tag": "BUC-1.0"
           },
           "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:BUC-1.0:BUC.zip",
-          "checked_at": "2026-04-10T17:31:22.373Z"
+          "checked_at": "2026-04-10T17:31:22.373Z",
+          "release_size": 40.39
         },
         "BUC-1.1": {
           "is_complete": false,
@@ -781,7 +869,8 @@
             "tag": "BUC-1.1"
           },
           "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:BUC-1.1:BUC.zip",
-          "checked_at": "2026-04-10T17:31:22.373Z"
+          "checked_at": "2026-04-10T17:31:22.373Z",
+          "release_size": 39.15
         },
         "IAS-0.1": {
           "is_complete": false,
@@ -796,7 +885,8 @@
             "tag": "IAS-0.1"
           },
           "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:IAS-0.1:IAS.zip",
-          "checked_at": "2026-04-10T17:31:22.373Z"
+          "checked_at": "2026-04-10T17:31:22.373Z",
+          "release_size": 6.59
         },
         "v1.0": {
           "is_complete": false,
@@ -2871,9 +2961,10 @@
     },
     "madrid": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "1.0.2",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "1.0.2",
         "1.0.0"
       ],
       "incomplete_versions": [
@@ -2957,6 +3048,48 @@
           },
           "fingerprint": "rules:v6:sha256:4ed2737d1405c5deae8e5d2be7d967af12ef295f57bc5dbd29e63cc2b1f401d0",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        },
+        "1.0.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ESMD.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 113.62,
+          "file_sizes": {
+            "ESMD.pmtiles": 78.49,
+            "buildings_index.json": 113.24,
+            "config.json": 0,
+            "demand_data.json": 4.49,
+            "roads.geojson": 39.98,
+            "runways_taxiways.geojson": 2.09
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "maximilian284/subwaybuilder-es-maps",
+            "tag": "1.0.2",
+            "asset_name": "ESMD.zip",
+            "download_url": "https://github.com/Maximilian284/subwaybuilder-es-maps/releases/download/1.0.2/ESMD.zip"
+          },
+          "fingerprint": "rules:v6:sha256:4a070cbfdec6d9a2f82b341e8427ed28337f2cb578a6eda7740b8c79935205ac",
+          "checked_at": "2026-04-10T18:20:42.449Z"
         }
       }
     },
@@ -3217,7 +3350,8 @@
             "tag": "railyard"
           },
           "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:railyard:HKG.zip",
-          "checked_at": "2026-04-10T17:31:22.373Z"
+          "checked_at": "2026-04-10T17:31:22.373Z",
+          "release_size": 14.81
         }
       }
     },
@@ -5992,9 +6126,10 @@
     },
     "valencia": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "1.0.2",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "1.0.2",
         "1.0.0"
       ],
       "incomplete_versions": [
@@ -6078,6 +6213,48 @@
           },
           "fingerprint": "rules:v6:sha256:b4452e34b5c4f95df131fdc199b173fb05a6caee92e4bd055c2c071bfeac0a0b",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        },
+        "1.0.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ESVA.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 89.79,
+          "file_sizes": {
+            "ESVA.pmtiles": 66.42,
+            "buildings_index.json": 74.72,
+            "config.json": 0,
+            "demand_data.json": 1.69,
+            "roads.geojson": 32.95,
+            "runways_taxiways.geojson": 0.32
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "maximilian284/subwaybuilder-es-maps",
+            "tag": "1.0.2",
+            "asset_name": "ESVA.zip",
+            "download_url": "https://github.com/Maximilian284/subwaybuilder-es-maps/releases/download/1.0.2/ESVA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:d21fab3c8051ac6de5ccfefde16c6209c872af8a9be4e64bb27f5174f01b5e9b",
+          "checked_at": "2026-04-10T18:20:42.449Z"
         }
       }
     },
