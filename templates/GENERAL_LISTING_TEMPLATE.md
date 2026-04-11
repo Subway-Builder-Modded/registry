@@ -279,9 +279,9 @@
 
 <!-- Replace the bullets below with features your map actually includes. -->
 
-- **Building Collision** — A buildings index is included, providing in-game collision geometry for all non-filtered buildings with a uniform depth value.
+- **Building Collision** — A buildings index is included, providing in-game collision geometry for all non-filtered buildings.
 - **Ocean Foundations** — An ocean bathymetry layer is included, providing depth-colored ocean floor tiles for open-water areas.
-- **Neighborhood Labels** — The map includes sub-municipal neighborhood label overlays derived from administrative boundary data.
+- **Neighborhood Labels** — The map includes municipal and neighborhood labels derived from administrative boundary data.
 
 ## Methodology
 
