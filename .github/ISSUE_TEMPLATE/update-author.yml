@@ -1,0 +1,75 @@
+name: Update Author Profile
+description: Update your author profile (display alias, Discord, Ko-fi, attribution link).
+title: "[Update Author]: "
+labels: ["update-author"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Update Author Profile
+
+        Only fill in the fields you want to change — leave everything else blank.
+        You must submit this form as the GitHub account whose profile you are updating.
+
+        If validation fails, you can edit this issue and comment **revalidate** to retry.
+
+  - type: input
+    id: author-alias
+    attributes:
+      label: Display Name
+      description: Your display name shown in analytics and asset listings (leave blank to keep current).
+      placeholder: Your Name
+
+  - type: dropdown
+    id: attribution-method
+    attributes:
+      label: Attribution Method
+      description: How to link your display name. Select "No change" to keep the current value.
+      options:
+        - No change
+        - GitHub
+        - Custom
+
+  - type: input
+    id: attribution-link
+    attributes:
+      label: Attribution Link
+      description: >
+        Custom HTTPS URL to link your name to. Required if Attribution Method is "Custom".
+        Leave blank to keep the current value.
+      placeholder: https://example.com/yourprofile
+
+  - type: input
+    id: discord-username
+    attributes:
+      label: Discord Username
+      description: >
+        Your Discord username (e.g. yourname). Stored for future author notifications —
+        not used for attribution. Leave blank to keep the current value.
+      placeholder: yourname
+
+  - type: input
+    id: discord-id
+    attributes:
+      label: Discord ID
+      description: >
+        Your 17–19 digit Discord user ID (snowflake). Used for future author notifications.
+        Leave blank to keep the current value.
+      placeholder: "123456789012345678"
+
+  - type: input
+    id: ko-fi-username
+    attributes:
+      label: Ko-fi Username
+      description: >
+        Your Ko-fi page username (e.g. yourname from ko-fi.com/yourname).
+        Leave blank to keep the current value.
+      placeholder: yourname
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I am the GitHub account submitting this form, and I am updating my own author profile.
+          required: true
