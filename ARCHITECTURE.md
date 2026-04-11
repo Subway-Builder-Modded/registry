@@ -6,7 +6,7 @@ This repository stores manifests, gallery assets, and update pointers. It does n
 ## Repository Layout
 
 ```text
-The-Railyard/
+registry/
 |-- .github/
 |   |-- ISSUE_TEMPLATE/
 |   |   |-- config.yml
