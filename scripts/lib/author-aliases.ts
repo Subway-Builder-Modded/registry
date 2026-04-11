@@ -138,6 +138,56 @@ export function resolveAuthorPresentation(
   };
 }
 
+export interface AuthorAliasUpdates {
+  author_alias?: string;
+  attribution_method?: AttributionMethod;
+  attribution_link?: string;
+  discord_username?: string;
+  discord_id?: string;
+  ko_fi_username?: string;
+}
+
+export function updateAuthorEntry(
+  index: AuthorAliasIndex,
+  githubId: number,
+  login: string,
+  updates: AuthorAliasUpdates,
+): AuthorAliasIndex {
+  const existing = index.authors.find((e) => e.github_id === githubId);
+  let entry: AuthorAliasEntry = existing
+    ? { ...existing }
+    : {
+      github_id: githubId,
+      author_id: login,
+      author_alias: login,
+      attribution_method: "github" as AttributionMethod,
+      attribution_link: `https://github.com/${login}`,
+    };
+
+  if (updates.author_alias !== undefined) entry.author_alias = updates.author_alias;
+  if (updates.discord_username !== undefined) entry.discord_username = updates.discord_username;
+  if (updates.discord_id !== undefined) entry.discord_id = updates.discord_id;
+  if (updates.ko_fi_username !== undefined) entry.ko_fi_username = updates.ko_fi_username;
+
+  if (updates.attribution_method !== undefined) {
+    entry.attribution_method = updates.attribution_method;
+    if (updates.attribution_method === "github") {
+      entry.attribution_link = undefined;
+    }
+  }
+
+  if (updates.attribution_link !== undefined) {
+    entry.attribution_link = updates.attribution_link;
+  }
+
+  const authors = [
+    ...index.authors.filter((e) => e.github_id !== githubId),
+    entry,
+  ].sort((a, b) => a.github_id - b.github_id);
+
+  return { schema_version: 1, authors };
+}
+
 export function ensureAuthorAliasPrefill(
   repoRoot: string,
   githubId: number,

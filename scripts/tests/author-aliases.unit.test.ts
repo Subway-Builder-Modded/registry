@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
-import { ensureAuthorAliasPrefill, loadAuthorAliasIndex } from "../lib/author-aliases.js";
+import { ensureAuthorAliasPrefill, loadAuthorAliasIndex, updateAuthorEntry } from "../lib/author-aliases.js";
+import type { AuthorAliasIndex } from "../lib/author-aliases.js";
 
 function writeJson(path: string, value: unknown): void {
   mkdirSync(dirname(path), { recursive: true });
@@ -109,4 +110,108 @@ test("ensureAuthorAliasPrefill is a no-op for existing github_id", () => {
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
+});
+
+// updateAuthorEntry tests (pure function — no temp dir needed)
+
+const BASE_INDEX: AuthorAliasIndex = {
+  schema_version: 1,
+  authors: [
+    {
+      github_id: 10,
+      author_id: "alice",
+      author_alias: "Alice",
+      attribution_method: "github",
+      attribution_link: "https://github.com/alice",
+      contributor_tier: "developer",
+    },
+    {
+      github_id: 50,
+      author_id: "slurry",
+      author_alias: "Slurry",
+      attribution_method: "github",
+      contributor_tier: "collaborator",
+    },
+  ],
+};
+
+test("updateAuthorEntry applies partial update without touching other fields", () => {
+  const result = updateAuthorEntry(BASE_INDEX, 10, "alice", { author_alias: "Alice Smith" });
+  const alice = result.authors.find((e) => e.github_id === 10);
+  assert.ok(alice);
+  assert.equal(alice.author_alias, "Alice Smith");
+  assert.equal(alice.attribution_method, "github");
+  assert.equal(alice.contributor_tier, "developer");
+  // Other author unchanged
+  const slurry = result.authors.find((e) => e.github_id === 50);
+  assert.ok(slurry);
+  assert.equal(slurry.contributor_tier, "collaborator");
+});
+
+test("updateAuthorEntry does not mutate contributor_tier", () => {
+  const result = updateAuthorEntry(BASE_INDEX, 50, "slurry", { ko_fi_username: "slurrykofi" });
+  const slurry = result.authors.find((e) => e.github_id === 50);
+  assert.ok(slurry);
+  assert.equal(slurry.ko_fi_username, "slurrykofi");
+  assert.equal(slurry.contributor_tier, "collaborator");
+});
+
+test("updateAuthorEntry creates baseline entry when github_id not in index", () => {
+  const result = updateAuthorEntry(BASE_INDEX, 99, "newuser", { author_alias: "New User" });
+  assert.equal(result.authors.length, 3);
+  const newUser = result.authors.find((e) => e.github_id === 99);
+  assert.ok(newUser);
+  assert.equal(newUser.author_id, "newuser");
+  assert.equal(newUser.author_alias, "New User");
+  assert.equal(newUser.attribution_method, "github");
+});
+
+test("updateAuthorEntry sorts authors by github_id after update", () => {
+  const result = updateAuthorEntry(BASE_INDEX, 99, "newuser", { author_alias: "New User" });
+  const ids = result.authors.map((e) => e.github_id);
+  assert.deepEqual(ids, [10, 50, 99]);
+});
+
+test("updateAuthorEntry switching to github clears stored attribution_link", () => {
+  const indexWithCustom: AuthorAliasIndex = {
+    schema_version: 1,
+    authors: [
+      {
+        github_id: 10,
+        author_id: "alice",
+        author_alias: "Alice",
+        attribution_method: "custom",
+        attribution_link: "https://alice.example.com",
+      },
+    ],
+  };
+  const result = updateAuthorEntry(indexWithCustom, 10, "alice", { attribution_method: "github" });
+  const alice = result.authors.find((e) => e.github_id === 10);
+  assert.ok(alice);
+  assert.equal(alice.attribution_method, "github");
+  assert.equal(alice.attribution_link, undefined);
+});
+
+test("updateAuthorEntry custom attribution_link overrides github method clear", () => {
+  // If user provides both method=github AND a link, the link wins (link applied after method)
+  const result = updateAuthorEntry(BASE_INDEX, 10, "alice", {
+    attribution_method: "github",
+    attribution_link: "https://custom.example.com",
+  });
+  const alice = result.authors.find((e) => e.github_id === 10);
+  assert.ok(alice);
+  assert.equal(alice.attribution_method, "github");
+  assert.equal(alice.attribution_link, "https://custom.example.com");
+});
+
+test("updateAuthorEntry stores discord fields without affecting attribution", () => {
+  const result = updateAuthorEntry(BASE_INDEX, 10, "alice", {
+    discord_username: "alice#1234",
+    discord_id: "123456789012345678",
+  });
+  const alice = result.authors.find((e) => e.github_id === 10);
+  assert.ok(alice);
+  assert.equal(alice.discord_username, "alice#1234");
+  assert.equal(alice.discord_id, "123456789012345678");
+  assert.equal(alice.attribution_method, "github");
 });
