@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import { isObject } from "./json-utils.js";
 
 export type AttributionMethod = "github" | "discord" | "custom";
-export type ContributorTier = "developer" | "executive" | "engineer";
+export type ContributorTier = "developer" | "executive" | "engineer" | "collaborator";
 
 export interface AuthorAliasEntry {
   github_id: number;
@@ -39,7 +39,7 @@ function parseAttributionMethod(value: unknown): AttributionMethod {
 }
 
 function parseContributorTier(value: unknown): ContributorTier | undefined {
-  if (value === "developer" || value === "executive" || value === "engineer") {
+  if (value === "developer" || value === "executive" || value === "engineer" || value === "collaborator") {
     return value;
   }
   return undefined;
