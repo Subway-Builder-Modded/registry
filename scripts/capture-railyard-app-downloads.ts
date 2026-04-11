@@ -52,7 +52,7 @@ async function fetchJson<T>(url: string, token: string): Promise<T> {
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: `Bearer ${token}`,
-        "User-Agent": "the-railyard-app-downloads",
+        "User-Agent": "registry-app-downloads",
       },
       signal: controller.signal,
     });

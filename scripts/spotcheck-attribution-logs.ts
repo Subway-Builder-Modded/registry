@@ -73,7 +73,7 @@ function parseArgs(argv: string[]): CliArgs {
   const repoFullName = (
     getArgValue(argv, "repo")
     ?? process.env.GITHUB_REPOSITORY
-    ?? "Subway-Builder-Modded/The-Railyard"
+    ?? "Subway-Builder-Modded/registry"
   ).trim();
   const token = (
     getArgValue(argv, "token")

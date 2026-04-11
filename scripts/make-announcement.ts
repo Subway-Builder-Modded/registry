@@ -56,7 +56,7 @@ export async function makeAnnouncement(filename: string) {
     formdata.append('payload_json', JSON.stringify({ content: announcement }));
 
     const imageBlobs = await Promise.all(images.map(async (imageUrl: string, index: number) => {
-        const imageResponse = await fetch(`https://raw.githubusercontent.com/Subway-Builder-Modded/The-Railyard/refs/heads/main/${modType.toLowerCase()}s/${modId}/${imageUrl}`);
+        const imageResponse = await fetch(`https://raw.githubusercontent.com/Subway-Builder-Modded/registry/refs/heads/main/${modType.toLowerCase()}s/${modId}/${imageUrl}`);
         if (!imageResponse.ok) {
             throw new Error(`Failed to fetch image ${index + 1} (${imageUrl}): HTTP ${imageResponse.status}`);
         }

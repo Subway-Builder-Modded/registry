@@ -10,11 +10,11 @@ The central registry for **Subway Builder** community mods and custom maps.
 
 All submissions are handled through GitHub Issues. Pick a template to get started:
 
-- [Publish a New Mod](https://github.com/Subway-Builder-Modded/The-Railyard/issues/new?template=publish-mod.yml)
-- [Publish a New Map](https://github.com/Subway-Builder-Modded/The-Railyard/issues/new?template=publish-map.yml)
-- [Update an Existing Mod](https://github.com/Subway-Builder-Modded/The-Railyard/issues/new?template=update-mod.yml)
-- [Update an Existing Map](https://github.com/Subway-Builder-Modded/The-Railyard/issues/new?template=update-map.yml)
-- [Report an Issue](https://github.com/Subway-Builder-Modded/The-Railyard/issues/new?template=report.yml)
+- [Publish a New Mod](https://github.com/Subway-Builder-Modded/registry/issues/new?template=publish-mod.yml)
+- [Publish a New Map](https://github.com/Subway-Builder-Modded/registry/issues/new?template=publish-map.yml)
+- [Update an Existing Mod](https://github.com/Subway-Builder-Modded/registry/issues/new?template=update-mod.yml)
+- [Update an Existing Map](https://github.com/Subway-Builder-Modded/registry/issues/new?template=update-map.yml)
+- [Report an Issue](https://github.com/Subway-Builder-Modded/registry/issues/new?template=report.yml)
 
 ## How It Works
 

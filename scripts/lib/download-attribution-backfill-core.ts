@@ -133,7 +133,7 @@ function parseArgs(argv: string[]): CliArgs {
   const repoFullName = (
     process.env.GITHUB_REPOSITORY
     ?? process.env.DOWNLOAD_ATTRIBUTION_REPOSITORY
-    ?? "Subway-Builder-Modded/The-Railyard"
+    ?? "Subway-Builder-Modded/registry"
   ).trim();
   const token = (
     process.env.GH_DOWNLOADS_TOKEN
@@ -190,7 +190,7 @@ async function fetchJson<T>(url: string, token: string): Promise<T> {
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: `Bearer ${token}`,
-        "User-Agent": "the-railyard-download-attribution-backfill",
+        "User-Agent": "registry-download-attribution-backfill",
       },
       signal: controller.signal,
     });
@@ -211,7 +211,7 @@ async function fetchArrayBuffer(url: string, token: string): Promise<ArrayBuffer
       headers: {
         Accept: "application/vnd.github+json",
         Authorization: `Bearer ${token}`,
-        "User-Agent": "the-railyard-download-attribution-backfill",
+        "User-Agent": "registry-download-attribution-backfill",
       },
       signal: controller.signal,
     });
