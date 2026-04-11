@@ -24,10 +24,12 @@ body:
     id: attribution-method
     attributes:
       label: Attribution Method
-      description: How to link your display name. Leave blank to keep the current value.
+      description: How to link your display name.
       options:
         - GitHub
         - Custom
+    validations:
+      required: true
 
   - type: input
     id: attribution-link
