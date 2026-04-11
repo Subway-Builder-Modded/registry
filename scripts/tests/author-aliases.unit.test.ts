@@ -51,6 +51,39 @@ test("ensureAuthorAliasPrefill appends new github author with github defaults", 
   }
 });
 
+test("ensureAuthorAliasPrefill preserves contributor_tier: collaborator on existing authors", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-author-prefill-collaborator-test-"));
+  try {
+    writeJson(join(repoRoot, "authors", "index.json"), {
+      schema_version: 1,
+      authors: [
+        {
+          github_id: 50,
+          author_id: "collaboratoruser",
+          author_alias: "CollaboratorUser",
+          attribution_method: "github",
+          attribution_link: "https://github.com/collaboratoruser",
+          contributor_tier: "collaborator",
+        },
+      ],
+    });
+
+    // Adding a new unrelated author should not strip the collaborator tier
+    const result = ensureAuthorAliasPrefill(repoRoot, 99, "newauthor");
+    assert.equal(result.created, true);
+
+    const aliases = loadAuthorAliasIndex(repoRoot);
+    const collaborator = aliases.authors.find((entry) => entry.github_id === 50);
+    assert.ok(collaborator, "collaborator author should still exist");
+    assert.equal(collaborator.contributor_tier, "collaborator", "contributor_tier must survive round-trip");
+
+    const written = readFileSync(join(repoRoot, "authors", "index.json"), "utf-8");
+    assert.ok(written.includes('"contributor_tier": "collaborator"'), "collaborator tier must be present in written JSON");
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
 test("ensureAuthorAliasPrefill is a no-op for existing github_id", () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-author-prefill-noop-test-"));
   try {
