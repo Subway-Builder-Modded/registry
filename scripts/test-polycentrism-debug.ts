@@ -20,7 +20,7 @@ function buildCluster(center: [number, number], pointCount: number, residentsEac
 }
 
 function buildDemandData(points: any[]) {
-  return { points };
+  return { points, pops: [] };
 }
 
 // Test: detects two balanced centres
