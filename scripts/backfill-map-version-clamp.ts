@@ -6,11 +6,16 @@
  * a bug where the app repeatedly re-downloaded maps with mismatched config
  * version strings (config.json reports an older version than the release tag).
  *
- * Strategy (mirrors backfill-version-tag-clamp.ts for mods):
+ * Strategy:
  *   - Apr 6 is the clean baseline (last snapshot before the spike started)
- *   - Apr 7+ snapshots are scaled proportionally:
- *       scale = clamped / preClamp
- *       snapshot_clamped = max(apr6Baseline, floor(snapshot_downloads × scale))
+ *   - Apr 7–10 snapshots are scaled using a per-version delta scale:
+ *       deltaScale = (clamped − apr6Baseline) / (preClamp − apr6Baseline)
+ *       snapshot_clamped = apr6Baseline + floor((snapshot_downloads − apr6Baseline) × deltaScale)
+ *     This scales the growth above baseline rather than the total, so days with modest
+ *     early-spike counts are not collapsed to zero by the max(baseline, …) floor.
+ *     The formula exactly reaches clamped when snapshot_downloads = preClamp (Apr 10).
+ *   - Apr 11+ snapshots already carry the grandfathered cap values from the live pipeline;
+ *     their per-version counts are left untouched, but net_downloads is recalculated.
  *   - Apr 6 and earlier snapshots are left unchanged
  *
  * The mods haircut ratio used to compute clamped values:
@@ -64,8 +69,9 @@ const clampEntries: {
   { mapId: "wilmington-nc", version: "v1.0.0", apr6Baseline: 27, preClamp: 60, clamped: 36 },
 ];
 
-// Only scale snapshots on or after this date (spike started Apr 7)
+// Only scale snapshots within this window (spike ran Apr 7–10; Apr 11+ already grandfathered)
 const FIRST_SPIKE_DATE = "2026-04-07";
+const LAST_SPIKE_DATE = "2026-04-10";
 
 // Timestamp to apply to modified version bucket entries
 const CLAMP_TIMESTAMP = "2026-04-11T00:00:00.000Z";
@@ -76,14 +82,20 @@ console.log(
   `${activeEntries.length} versions need scaling (${clampEntries.length - activeEntries.length} unchanged)\n`,
 );
 
-const scaleFactors = new Map<string, number>();
+// deltaScale = (clamped − baseline) / (preClamp − baseline)
+// When preClamp === baseline the version had no real delta; deltaScale = 0 keeps it flat.
+// When current >= preClamp the result is clamped directly (avoids floor rounding off-by-one).
+const deltaScales = new Map<string, number>();
 const apr6Baselines = new Map<string, number>();
 const clampedValues = new Map<string, number>();
+const preClampValues = new Map<string, number>();
 for (const e of activeEntries) {
   const key = `${e.mapId}:${e.version}`;
-  scaleFactors.set(key, e.clamped / e.preClamp);
+  const denom = e.preClamp - e.apr6Baseline;
+  deltaScales.set(key, denom > 0 ? (e.clamped - e.apr6Baseline) / denom : 0);
   apr6Baselines.set(key, e.apr6Baseline);
   clampedValues.set(key, e.clamped);
+  preClampValues.set(key, e.preClamp);
 }
 
 // ── Process history snapshots ──
@@ -138,19 +150,22 @@ for (const file of snapshotFiles) {
     continue;
   }
 
-  // Apply proportional scaling only for Apr 7+ snapshots
-  const shouldScale = snapshotDate >= FIRST_SPIKE_DATE;
+  // Apply delta scaling only for Apr 7–10; Apr 11+ already carry grandfathered values
+  const shouldScale = snapshotDate >= FIRST_SPIKE_DATE && snapshotDate <= LAST_SPIKE_DATE;
   let modified = false;
 
   if (shouldScale) {
     for (const { mapId, version } of activeEntries) {
       const key = `${mapId}:${version}`;
-      const scale = scaleFactors.get(key)!;
+      const deltaScale = deltaScales.get(key)!;
       const apr6 = apr6Baselines.get(key)!;
+      const preClamp = preClampValues.get(key)!;
+      const clamped = clampedValues.get(key)!;
       const current = downloads[mapId]?.[version];
       if (current === undefined || current === null) continue;
 
-      const scaled = Math.max(apr6, Math.floor(current * scale));
+      // If current >= preClamp use the exact cap to avoid floor rounding off-by-one
+      const scaled = current >= preClamp ? clamped : apr6 + Math.floor((current - apr6) * deltaScale);
       if (scaled !== current) {
         downloads[mapId]![version] = scaled;
         totalVersionsAdjusted++;
