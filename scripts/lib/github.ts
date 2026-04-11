@@ -83,7 +83,7 @@ export async function validateGitHubRepo(repo: string, sourceUrl?: string, listi
           `**GitHub Releases** update type only supports repositories with a single mod or map.\n\n` +
           `To fix this, switch your update type to **Custom URL** and create an \`update.json\` file. ` +
           `You can host it in the same repo — for example:\n\`${updateJsonExample}\`\n\n` +
-          `See [the update.json format](https://github.com/Subway-Builder-Modded/The-Railyard/blob/main/ARCHITECTURE.md#custom-updatejson-format) in the docs.`
+          `See [the update.json format](https://github.com/Subway-Builder-Modded/registry/blob/main/ARCHITECTURE.md#custom-updatejson-format) in the docs.`
         );
       } else if (!/^v?\d/.test(sourceTag)) {
         // Source tag matches latest but doesn't look like a version — proactive detection.
@@ -96,7 +96,7 @@ export async function validateGitHubRepo(repo: string, sourceUrl?: string, listi
           `to this repo, the mod manager will start serving the wrong file.\n\n` +
           `To fix this, switch your update type to **Custom URL** and create an \`update.json\` file. ` +
           `You can host it in the same repo — for example:\n\`${updateJsonExample}\`\n\n` +
-          `See [the update.json format](https://github.com/Subway-Builder-Modded/The-Railyard/blob/main/ARCHITECTURE.md#custom-updatejson-format) in the docs.`
+          `See [the update.json format](https://github.com/Subway-Builder-Modded/registry/blob/main/ARCHITECTURE.md#custom-updatejson-format) in the docs.`
         );
       }
     }
