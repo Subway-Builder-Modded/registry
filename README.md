@@ -1,10 +1,10 @@
-# registry
+# Subway Builder Modded Registry
 ![image0](https://github.com/user-attachments/assets/b0659a85-ac6a-40cf-9cd3-bb9dcb99f6a4)
 
-The central registry for **Subway Builder** community mods and custom maps.
+The central registry for all **Subway Builder Modded** community created content.
 
 > [!WARNING]
-> **Work in Progress** - The Railyard is still under active development. Expect changes to the submission process, schema, and tooling.
+> **Work in Progress** - Railyard and the registry are still under active development. Expect changes to the submission process, schema, and tooling.
 
 ## Submit Your Work
 
@@ -14,11 +14,12 @@ All submissions are handled through GitHub Issues. Pick a template to get starte
 - [Publish a New Map](https://github.com/Subway-Builder-Modded/registry/issues/new?template=publish-map.yml)
 - [Update an Existing Mod](https://github.com/Subway-Builder-Modded/registry/issues/new?template=update-mod.yml)
 - [Update an Existing Map](https://github.com/Subway-Builder-Modded/registry/issues/new?template=update-map.yml)
+- [Update Your Author Profile](https://github.com/Subway-Builder-Modded/registry/issues/new?template=update-author.yml)
 - [Report an Issue](https://github.com/Subway-Builder-Modded/registry/issues/new?template=report.yml)
 
 ## How It Works
 
-The Railyard stores metadata only - manifests, gallery images, and pointers to where your mod or map is actually hosted (GitHub Releases, CDNs, etc.). When you submit through an issue template, CI validates your submission and opens a PR automatically. Once merged, your listing goes live.
+The registry stores metadata only - manifests, gallery images, and pointers to where your mod or map is actually hosted (GitHub Releases, CDNs, etc.). When you submit through an issue template, CI validates your submission and opens a PR automatically. Once merged, your listing goes live.
 
 ## Map Issue Templates
 
