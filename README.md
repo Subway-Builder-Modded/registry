@@ -4,7 +4,7 @@
 The central registry for all **Subway Builder Modded** community created content.
 
 > [!WARNING]
-> **Work in Progress** - Railyard and the registry are still under active development. Expect changes to the submission process, schema, and tooling.
+> **Work in Progress** - `monorepo` and `registry` are still under active development. Expect changes to the submission process, schema, and tooling.
 
 ## Submit Your Work
 
@@ -19,7 +19,7 @@ All submissions are handled through GitHub Issues. Pick a template to get starte
 
 ## How It Works
 
-The registry stores metadata only - manifests, gallery images, and pointers to where your mod or map is actually hosted (GitHub Releases, CDNs, etc.). When you submit through an issue template, CI validates your submission and opens a PR automatically. Once merged, your listing goes live.
+`registry` stores metadata only - manifests, gallery images, and pointers to where your mod or map is actually hosted (GitHub Releases, CDNs, etc.). When you submit through an issue template, CI validates your submission and opens a PR automatically. Once merged, your listing goes live.
 
 ## Map Issue Templates
 
