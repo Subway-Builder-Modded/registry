@@ -19,13 +19,13 @@
   },
   "city_code": "PUS3",
   "country": "KR",
-  "population": 226752,
-  "residents_total": 226752,
-  "points_count": 21,
-  "population_count": 1336,
+  "population": 1122363,
+  "residents_total": 1122363,
+  "points_count": 176,
+  "population_count": 6968,
   "initial_view_state": {
-    "latitude": 33.489,
-    "longitude": 126.4983,
+    "latitude": 35.1796,
+    "longitude": 129.0756,
     "zoom": 13,
     "bearing": 0
   },
@@ -34,5 +34,90 @@
   "level_of_detail": "low-detail",
   "location": "east-asia",
   "special_demand": [],
-  "file_sizes": {}
+  "file_sizes": {
+    "CJU3.pmtiles": 8.58,
+    "buildings_index.json": 30.04,
+    "config.json": 0,
+    "demand_data.json": 0.22,
+    "ocean_depth_index.json": 0.01,
+    "roads.geojson": 5.37,
+    "runways_taxiways.geojson": 0.58
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.409225761450547,
+      "p25": 0.5003778610509171,
+      "p50": 0.6463868518031427,
+      "p75": 0.9591181817758787,
+      "p90": 1.3265184079977452,
+      "mean": 0.8942886167123216
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.4091579046697153,
+      "p25": 0.4094969613612234,
+      "p50": 0.6463868518031427,
+      "p75": 0.9591181817758787,
+      "p90": 1.3253879271134532,
+      "mean": 0.8813600265055355
+    },
+    "commuteDistanceKm": {
+      "p10": 1398,
+      "p25": 2211,
+      "p50": 3565,
+      "p75": 6447,
+      "p90": 10395,
+      "mean": 4937.620264064294
+    },
+    "residentCellDensity": {
+      "p10": 1448,
+      "p25": 3035,
+      "p50": 6029,
+      "p75": 9601,
+      "p90": 17244,
+      "mean": 7544.013605442177
+    },
+    "workerCellDensity": {
+      "p10": 982,
+      "p25": 1753,
+      "p50": 3897,
+      "p75": 7104,
+      "p90": 13334,
+      "mean": 5338.244897959184
+    },
+    "detail": {
+      "radiusKm": 0.6463868518031427,
+      "expectedPointSpacingKm": 0.9139076937674137,
+      "normalizedRadius": 0.7072780503012659,
+      "activityPerPoint": 5365.605249109887,
+      "playableAreaKm2": 388,
+      "playableAreaPerPointKm2": 2.2045454545454546,
+      "playableCatchmentRadiusKm": 0.8376924332494335,
+      "localityScore": 0.2551410142985233,
+      "deaggregationScore": 0.346702010221145,
+      "score": 0.29741873267694474
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.4595315678796382,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 129.05252819119966,
+            "latitude": 35.15167841984677,
+            "massShare": 1,
+            "assignedMass": 1916928,
+            "assignedPointCount": 176,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  }
 }
