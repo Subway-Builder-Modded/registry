@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-12T08:58:09.573Z",
+  "generated_at": "2026-04-12T13:15:11.807Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -247,19 +247,17 @@
       }
     },
     "anchorage-ak": {
-      "has_complete_version": false,
-      "latest_semver_version": "1.1.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
-        "1.1.0"
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
       ],
+      "incomplete_versions": [],
       "versions": {
-        "1.1.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'Anchorage.zip': config.json version '1.0.0' does not match release tag '1.1.0' (expected '1.1.0')"
-          ],
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -268,7 +266,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -278,18 +276,29 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "ANC.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 33.36,
+          "file_sizes": {
+            "ANC.pmtiles": 25.36,
+            "__MACOSX/._config.json": 0,
+            "__MACOSX/._demand_data.json": 0,
+            "buildings_index.json": 24.67,
+            "config.json": 0,
+            "demand_data.json": 3.15,
+            "ocean_depth_index.json": 3.66,
+            "roads.geojson": 6.28,
+            "runways_taxiways.geojson": 3.84
+          },
           "source": {
             "update_type": "github",
             "repo": "pswbsf/anchorage-ak",
-            "tag": "1.1.0",
+            "tag": "1.0.0",
             "asset_name": "Anchorage.zip",
-            "download_url": "https://github.com/PSWBSF/anchorage-ak/releases/download/1.1.0/Anchorage.zip"
+            "download_url": "https://github.com/PSWBSF/anchorage-ak/releases/download/1.0.0/Anchorage.zip"
           },
-          "fingerprint": "rules:v6:github:pswbsf/anchorage-ak:1.1.0:Anchorage.zip",
-          "checked_at": "2026-04-12T02:55:05.050Z"
+          "fingerprint": "rules:v6:github:pswbsf/anchorage-ak:1.0.0:Anchorage.zip",
+          "checked_at": "2026-04-12T13:15:11.807Z"
         }
       }
     },
@@ -1399,19 +1408,17 @@
       }
     },
     "charleston-huntington-wv": {
-      "has_complete_version": false,
-      "latest_semver_version": "1.1.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
-        "1.1.0"
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
       ],
+      "incomplete_versions": [],
       "versions": {
-        "1.1.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'CHA.zip': config.json version '1.0.0' does not match release tag '1.1.0' (expected '1.1.0')"
-          ],
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -1420,7 +1427,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -1430,35 +1437,43 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "CHA.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 38.2,
+          "file_sizes": {
+            "CHA.pmtiles": 27.46,
+            "__MACOSX/._config.json": 0,
+            "buildings_index.json": 30.02,
+            "config.json": 0,
+            "demand_data.json": 5.1,
+            "ocean_depth_index.json": 1.09,
+            "roads.geojson": 12.88,
+            "runways_taxiways.geojson": 0.16
+          },
           "source": {
             "update_type": "github",
             "repo": "pswbsf/charleston-huntington-wv",
-            "tag": "1.1.0",
+            "tag": "1.0.0",
             "asset_name": "CHA.zip",
-            "download_url": "https://github.com/PSWBSF/charleston-huntington-wv/releases/download/1.1.0/CHA.zip"
+            "download_url": "https://github.com/PSWBSF/charleston-huntington-wv/releases/download/1.0.0/CHA.zip"
           },
-          "fingerprint": "rules:v6:github:pswbsf/charleston-huntington-wv:1.1.0:CHA.zip",
-          "checked_at": "2026-04-12T02:55:05.050Z"
+          "fingerprint": "rules:v6:github:pswbsf/charleston-huntington-wv:1.0.0:CHA.zip",
+          "checked_at": "2026-04-12T13:15:11.807Z"
         }
       }
     },
     "charleston-sc": {
-      "has_complete_version": false,
-      "latest_semver_version": "1.1.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
-        "1.1.0"
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
       ],
+      "incomplete_versions": [],
       "versions": {
-        "1.1.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'Charleston.zip': config.json version '1.0.0' does not match release tag '1.1.0' (expected '1.1.0')"
-          ],
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -1467,7 +1482,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -1477,18 +1492,28 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "CHS.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 32.45,
+          "file_sizes": {
+            "CHS.pmtiles": 21.33,
+            "__MACOSX/._config.json": 0,
+            "buildings_index.json": 27.83,
+            "config.json": 0,
+            "demand_data.json": 3.13,
+            "ocean_depth_index.json": 6.02,
+            "roads.geojson": 10.38,
+            "runways_taxiways.geojson": 0.22
+          },
           "source": {
             "update_type": "github",
             "repo": "pswbsf/charleston-sc",
-            "tag": "1.1.0",
+            "tag": "1.0.0",
             "asset_name": "Charleston.zip",
-            "download_url": "https://github.com/PSWBSF/charleston-sc/releases/download/1.1.0/Charleston.zip"
+            "download_url": "https://github.com/PSWBSF/charleston-sc/releases/download/1.0.0/Charleston.zip"
           },
-          "fingerprint": "rules:v6:github:pswbsf/charleston-sc:1.1.0:Charleston.zip",
-          "checked_at": "2026-04-12T02:55:05.050Z"
+          "fingerprint": "rules:v6:github:pswbsf/charleston-sc:1.0.0:Charleston.zip",
+          "checked_at": "2026-04-12T13:15:11.807Z"
         }
       }
     },
@@ -5551,19 +5576,17 @@
       }
     },
     "pyongyang-nk": {
-      "has_complete_version": false,
-      "latest_semver_version": "1.1.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
-        "1.1.0"
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
       ],
+      "incomplete_versions": [],
       "versions": {
-        "1.1.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'Pyongyang.zip': config.json version '1.0.0' does not match release tag '1.1.0' (expected '1.1.0')"
-          ],
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -5572,7 +5595,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -5582,18 +5605,29 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "PYO.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 21.06,
+          "file_sizes": {
+            "PYO.pmtiles": 12.64,
+            "__MACOSX/._config.json": 0,
+            "__MACOSX/._demand_data.json": 0,
+            "buildings_index.json": 32.43,
+            "config.json": 0,
+            "demand_data.json": 0.91,
+            "ocean_depth_index.json": 0.94,
+            "roads.geojson": 3.47,
+            "runways_taxiways.geojson": 0.01
+          },
           "source": {
             "update_type": "github",
             "repo": "pswbsf/pyongyang-nk",
-            "tag": "1.1.0",
+            "tag": "1.0.0",
             "asset_name": "Pyongyang.zip",
-            "download_url": "https://github.com/PSWBSF/pyongyang-nk/releases/download/1.1.0/Pyongyang.zip"
+            "download_url": "https://github.com/PSWBSF/pyongyang-nk/releases/download/1.0.0/Pyongyang.zip"
           },
-          "fingerprint": "rules:v6:github:pswbsf/pyongyang-nk:1.1.0:Pyongyang.zip",
-          "checked_at": "2026-04-12T02:55:05.050Z"
+          "fingerprint": "rules:v6:github:pswbsf/pyongyang-nk:1.0.0:Pyongyang.zip",
+          "checked_at": "2026-04-12T13:15:11.807Z"
         }
       }
     },
