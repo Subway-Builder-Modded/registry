@@ -34,5 +34,90 @@
   "level_of_detail": "low-detail",
   "location": "east-asia",
   "special_demand": [],
-  "file_sizes": {}
+  "file_sizes": {
+    "PUS4.pmtiles": 43.26,
+    "buildings_index.json": 128.2,
+    "config.json": 0,
+    "demand_data.json": 1.29,
+    "ocean_depth_index.json": 0.01,
+    "roads.geojson": 21.66,
+    "runways_taxiways.geojson": 0.73
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.409225761450547,
+      "p25": 0.5003778610509171,
+      "p50": 0.6464011700360138,
+      "p75": 1.0811413705682817,
+      "p90": 1.5011335831527512,
+      "mean": 0.8926753617382195
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.4091579046697153,
+      "p25": 0.5003778610509171,
+      "p50": 0.6464011700360138,
+      "p75": 1.0811413705682817,
+      "p90": 1.5011335831527512,
+      "mean": 0.8832444773214881
+    },
+    "commuteDistanceKm": {
+      "p10": 1398,
+      "p25": 2211,
+      "p50": 3565,
+      "p75": 6634,
+      "p90": 11888,
+      "mean": 5379.031787175989
+    },
+    "residentCellDensity": {
+      "p10": 1448,
+      "p25": 2897,
+      "p50": 5886,
+      "p75": 9451,
+      "p90": 15565,
+      "mean": 7357.632911392405
+    },
+    "workerCellDensity": {
+      "p10": 963,
+      "p25": 1708,
+      "p50": 3596,
+      "p75": 7104,
+      "p90": 13677,
+      "mean": 5343.044303797468
+    },
+    "detail": {
+      "radiusKm": 0.6464011700360138,
+      "expectedPointSpacingKm": 0.9216628264128904,
+      "normalizedRadius": 0.7013423472353829,
+      "activityPerPoint": 5546.161970411153,
+      "playableAreaKm2": 408,
+      "playableAreaPerPointKm2": 2.193548387096774,
+      "playableCatchmentRadiusKm": 0.8356004651957847,
+      "localityScore": 0.2640643339664901,
+      "deaggregationScore": 0.35159687420358693,
+      "score": 0.30470345323161335
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.4584649665784237,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 129.0397062824184,
+            "latitude": 35.15266257957639,
+            "massShare": 1,
+            "assignedMass": 2086203,
+            "assignedPointCount": 186,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  }
 }
