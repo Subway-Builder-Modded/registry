@@ -6,7 +6,7 @@ Part of the [Japan Map Pack](https://ahkimn.github.io/subwaybuilder-jp-maps).
 
 Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 Japanese government statistics. This map centers on the shores of 中海, a brackish lake between 鳥取県 (Tottori Prefecture) and 島根県 (Shimane Prefecture) in western Japan. The map includes the cities of 米子 (Yonago), 松江 (Matsue), and 出雲 (Izumo), as well as 9 surrounding municipalities.
 
-![Map Coverage](../maps/yukina-nakakumi/gallery/preview.png)
+![Map Coverage](../maps/yukina-nakaumi/gallery/preview.png)
 
 ## Coverage
 
