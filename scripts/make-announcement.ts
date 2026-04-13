@@ -1,13 +1,77 @@
 import fs from 'fs';
 import { pathToFileURL } from 'url';
 
+const CONTENT_ANNOUNCEMENTS_ROLE_ID = '1476290491363627049';
+const MAX_ANNOUNCEMENT_DESCRIPTION_LENGTH = 350;
+
 const BASE_ANNOUNCEMENT = `# New $TYPE! 🎉🎉
 
 ## $NAME ($AUTHOR)
 
-*$DESCRIPTION*
+$DESCRIPTION
 
 See more [here](https://subwaybuildermodded.com/railyard/$TYPE_LOWER/$NAME_LOWER).`
+
+const ALLOWED_MENTIONS = {
+    parse: [],
+    roles: [CONTENT_ANNOUNCEMENTS_ROLE_ID],
+};
+
+function decodeHtmlEntities(value: string): string {
+    return value
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/&amp;/gi, '&')
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;/gi, "'");
+}
+
+function truncateWithDots(value: string, maxLength: number): string {
+    if (value.length <= maxLength) {
+        return value;
+    }
+    if (maxLength <= 2) {
+        return '..'.slice(0, maxLength);
+    }
+    return `${value.slice(0, maxLength - 2).trimEnd()}..`;
+}
+
+function formatDescriptionForDiscord(value: unknown): string {
+    if (typeof value !== 'string') {
+        return '';
+    }
+
+    const text = decodeHtmlEntities(
+        value
+            .replace(/\r\n/g, '\n')
+            .replace(/```[\s\S]*?```/g, ' ')
+            .replace(/`([^`]*)`/g, '$1')
+            .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '$1')
+            .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
+            .replace(/^\s{0,3}#{1,6}\s+.*$/gm, '\n')
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/<\/?(?:p|div|li|tr|td|th|details|summary|table|ul|ol|h[1-6])[^>]*>/gi, '\n')
+            .replace(/<[^>]+>/g, ' ')
+    );
+
+    const paragraphs = text
+        .split(/\n\s*\n+/)
+        .map((paragraph) => paragraph.replace(/\s+/g, ' ').trim())
+        .filter((paragraph) => paragraph !== '')
+        .filter((paragraph) => !/^(coverage|population summary|map statistics|special demand|additional features|methodology|data sources|license|credits)\b/i.test(paragraph));
+
+    const summaryParts: string[] = [];
+    for (const paragraph of paragraphs) {
+        summaryParts.push(paragraph);
+        if (summaryParts.length >= 2 || summaryParts.join(' ').length >= MAX_ANNOUNCEMENT_DESCRIPTION_LENGTH) {
+            break;
+        }
+    }
+
+    const summary = summaryParts.join(' ').trim();
+    return truncateWithDots(summary, MAX_ANNOUNCEMENT_DESCRIPTION_LENGTH);
+}
 
 export async function makeAnnouncement(filename: string) {
     const manifestContent = fs.readFileSync(filename, 'utf-8');
@@ -19,7 +83,7 @@ export async function makeAnnouncement(filename: string) {
     const modName = manifest.name?.trim();
     const modId = manifest.id?.trim();
     const modAuthor = manifest.author?.trim();
-    const modDescription = manifest.description?.trim();
+    const modDescription = formatDescriptionForDiscord(manifest.description);
     const modType = filename.includes("maps") ? "Map" : "Mod";
     const images = manifest.gallery;
     const webhookUrl = process.env.DISCORD_ANNOUNCEMENT_WEBHOOK_URL?.trim();
@@ -35,6 +99,7 @@ export async function makeAnnouncement(filename: string) {
         .replace('$DESCRIPTION', modDescription)
         .replace('$TYPE_LOWER', modType.toLowerCase() + 's')
         .replace('$NAME_LOWER', modId.toLowerCase());
+    const announcementWithMention = `<@&${CONTENT_ANNOUNCEMENTS_ROLE_ID}>\n${announcement}`;
 
     if (images.length === 0) {
         const response = await fetch(webhookUrl, {
@@ -42,7 +107,10 @@ export async function makeAnnouncement(filename: string) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ content: announcement }),
+            body: JSON.stringify({
+                content: announcementWithMention,
+                allowed_mentions: ALLOWED_MENTIONS,
+            }),
         });
 
         if (!response.ok) {
@@ -53,7 +121,10 @@ export async function makeAnnouncement(filename: string) {
     }
 
     const formdata = new FormData();
-    formdata.append('payload_json', JSON.stringify({ content: announcement }));
+    formdata.append('payload_json', JSON.stringify({
+        content: announcementWithMention,
+        allowed_mentions: ALLOWED_MENTIONS,
+    }));
 
     const imageBlobs = await Promise.all(images.map(async (imageUrl: string, index: number) => {
         const imageResponse = await fetch(`https://raw.githubusercontent.com/Subway-Builder-Modded/registry/refs/heads/main/${modType.toLowerCase()}s/${modId}/${imageUrl}`);
