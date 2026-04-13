@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-13T03:12:09.959Z",
+  "generated_at": "2026-04-13T03:18:25.974Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -7814,6 +7814,59 @@
           },
           "fingerprint": "rules:v6:github:kronifer/sb-waterloo-map:1.1.0:YKF.zip",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        }
+      }
+    },
+    "willamette-valley": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "WMV.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 298.08,
+          "file_sizes": {
+            "WMV.pmtiles": 192.63,
+            "buildings_index.json": 401.57,
+            "config.json": 0,
+            "demand_data.json": 34.27,
+            "roads.geojson": 63.63,
+            "runways_taxiways.geojson": 2.95
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "phineapoo/willamette-valley-or",
+            "tag": "1.0.0",
+            "asset_name": "WMV.zip",
+            "download_url": "https://github.com/Phineapoo/Willamette-Valley-OR/releases/download/1.0.0/WMV.zip"
+          },
+          "fingerprint": "rules:v6:github:phineapoo/willamette-valley-or:1.0.0:WMV.zip",
+          "checked_at": "2026-04-13T03:18:25.974Z"
         }
       }
     },
