@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "id": "buffalo-ny",
+  "name": "Buffalo",
+  "author": "PSWBSF",
+  "github_id": 193011631,
+  "description": "<p>Map of Buffalo, New York. Made using the Map Patcher by Kronifer and US Demand Generator by slurry. Extends to cover Hamburg in the south and Niagara Falls in the north. Does not include demand data for the Canadian side.</p>\n<p>Uses 2023 LODES data and includes additional demand data as follows:</p>\n<h3>Airports</h3>\n<ul>\n<li><p>Buffalo Niagara International Airport (BUF)</p>\n</li>\n<li><p>Niagara Falls International Airport (IAG)</p>\n</li>\n</ul>\n<h3>Universities</h3>\n<ul>\n<li><p>University at Buffalo</p>\n</li>\n<li><p>Buffalo State University</p>\n</li>\n<li><p>Erie Community College</p>\n</li>\n<li><p>D&#39;Youville University</p>\n</li>\n<li><p>Niagara University</p>\n</li>\n<li><p>SUNY Niagara</p>\n</li>\n</ul>\n<h3>Entertainment/Tourism</h3>\n<ul>\n<li><p>Niagara Falls</p>\n</li>\n<li><p>Buffalo Zoo</p>\n</li>\n<li><p>Buffalo Naval Park</p>\n</li>\n</ul>\n<h3>Stadiums</h3>\n<ul>\n<li><p>Highmark Stadium</p>\n</li>\n<li><p>Sahlen Field</p>\n</li>\n<li><p>KeyBank Center</p>\n</li>\n</ul>\n<h3>Military Bases</h3>\n<ul>\n<li>Niagara Falls Air Reserve Station</li>\n</ul>",
+  "tags": [
+    "north-america",
+    "airports",
+    "entertainment",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.png",
+    "gallery/screenshot2.png",
+    "gallery/screenshot3.png",
+    "gallery/screenshot4.png"
+  ],
+  "is_test": false,
+  "source": "https://github.com/PSWBSF/buffalo-ny",
+  "update": {
+    "type": "github",
+    "repo": "PSWBSF/buffalo-ny"
+  },
+  "city_code": "BUF",
+  "country": "US",
+  "population": 445021,
+  "residents_total": 445021,
+  "points_count": 1559,
+  "population_count": 31196,
+  "initial_view_state": {
+    "latitude": 42.8861,
+    "longitude": -78.8739,
+    "zoom": 15,
+    "bearing": 0
+  },
+  "data_source": "LODES",
+  "source_quality": "high-quality",
+  "level_of_detail": "high-detail",
+  "location": "north-america",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "universities"
+  ],
+  "file_sizes": {
+    "BUF.pmtiles": 30.59,
+    "__MACOSX/._config.json": 0,
+    "buildings_index.json": 57.46,
+    "config.json": 0,
+    "demand_data.json": 9.32,
+    "ocean_depth_index.json": 2.27,
+    "roads.geojson": 10.7,
+    "runways_taxiways.geojson": 0.39
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.3501122878004778,
+      "p25": 0.4360211555130614,
+      "p50": 0.5689085488476592,
+      "p75": 0.7530332450628437,
+      "p90": 1.07376141140256,
+      "mean": 0.6445940430176396
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.23889945630166254,
+      "p25": 0.3175045108724538,
+      "p50": 0.4819739540598328,
+      "p75": 0.5923220753694323,
+      "p90": 0.8102182829518061,
+      "mean": 0.5041640511095856
+    },
+    "commuteDistanceKm": {
+      "p10": 4589,
+      "p25": 10079,
+      "p50": 18508,
+      "p75": 28067,
+      "p90": 37509,
+      "mean": 20010.550326964996
+    },
+    "residentCellDensity": {
+      "p10": 28,
+      "p25": 84,
+      "p50": 248,
+      "p75": 539,
+      "p90": 1008,
+      "mean": 407.82859761686524
+    },
+    "workerCellDensity": {
+      "p10": 9,
+      "p25": 45,
+      "p50": 150,
+      "p75": 381,
+      "p90": 826,
+      "mean": 399.41275797373356
+    },
+    "detail": {
+      "radiusKm": 0.5236402417562537,
+      "expectedPointSpacingKm": 0.8426568447772984,
+      "normalizedRadius": 0.621415757792419,
+      "activityPerPoint": 285.4528543938422,
+      "playableAreaKm2": 2196,
+      "playableAreaPerPointKm2": 1.4085952533675432,
+      "playableCatchmentRadiusKm": 0.669604207557308,
+      "localityScore": 0.39217518709781607,
+      "deaggregationScore": 0.7851377407070076,
+      "score": 0.5548977746930757
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.44018234201695394,
+        "continuousScore": 0.7547912674571584,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.2822011532977133,
+        "largestCenterShare": 0.8741048175254651,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -78.78723267464879,
+            "latitude": 42.915071106460225,
+            "massShare": 0.8741048175254651,
+            "assignedMass": 777990,
+            "assignedPointCount": 1353,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": -78.97530209385262,
+            "latitude": 43.086626383042976,
+            "massShare": 0.1258951824745349,
+            "assignedMass": 112052,
+            "assignedPointCount": 193,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  }
+}
