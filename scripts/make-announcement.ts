@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { pathToFileURL } from 'url';
 
-const CONTENT_ANNOUNCEMENTS_ROLE_ID = '1476290491363627049';
+const CONTENT_ANNOUNCEMENTS_ROLE_ID = '1492005223680446567';
 const MAX_ANNOUNCEMENT_DESCRIPTION_LENGTH = 350;
 
 const BASE_ANNOUNCEMENT = `# New $TYPE! 🎉🎉
@@ -150,30 +150,30 @@ export async function makeAnnouncement(filename: string) {
 }
 
 function parseCliArgs(argv: string[]): { filename: string } {
-  let filename: string | undefined;
+    let filename: string | undefined;
 
-  for (let index = 0; index < argv.length; index += 1) {
-    const arg = argv[index];
-    if (arg === "--") {
-      continue;
-    }
-    if (arg === "--filename") {
-        filename = argv[index + 1];
-        if (!filename || filename.startsWith("-")) {
-            throw new Error(`Missing filename value after '${arg}'`);
+    for (let index = 0; index < argv.length; index += 1) {
+        const arg = argv[index];
+        if (arg === "--") {
+            continue;
         }
-        filename = filename.trim();
-        index += 1;
-        continue;
+        if (arg === "--filename") {
+            filename = argv[index + 1];
+            if (!filename || filename.startsWith("-")) {
+                throw new Error(`Missing filename value after '${arg}'`);
+            }
+            filename = filename.trim();
+            index += 1;
+            continue;
+        }
+        throw new Error(`Unknown argument '${arg}'. Supported flags: --filename <filename>.`);
     }
-    throw new Error(`Unknown argument '${arg}'. Supported flags: --filename <filename>.`);
-  }
 
-  if (!filename) {
-    throw new Error('Missing filename. Please provide a filename using --filename.');
-  }
+    if (!filename) {
+        throw new Error('Missing filename. Please provide a filename using --filename.');
+    }
 
-  return { filename };
+    return { filename };
 }
 
 async function run() {
