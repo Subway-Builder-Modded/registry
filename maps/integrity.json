@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-14T09:26:14.429Z",
+  "generated_at": "2026-04-14T14:00:22.551Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -3987,12 +3987,14 @@
     },
     "jelegend-tokyo": {
       "has_complete_version": true,
-      "latest_semver_version": "v0.1.0",
-      "latest_semver_complete": true,
+      "latest_semver_version": "v0.2.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "v0.1.0"
       ],
-      "incomplete_versions": [],
+      "incomplete_versions": [
+        "v0.2.0"
+      ],
       "versions": {
         "v0.1.0": {
           "is_complete": true,
@@ -4036,6 +4038,42 @@
           },
           "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.1.0:TYO.zip",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        },
+        "v0.2.0": {
+          "is_complete": false,
+          "errors": [
+            "asset 'TYO.zip': config.json version '0.1.0' does not match release tag 'v0.2.0' (expected '0.2.0')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TYO.pmtiles",
+            "config_version_matches_tag": null
+          },
+          "release_size": 272.41,
+          "source": {
+            "update_type": "github",
+            "repo": "jelegend/subwaybuilder",
+            "tag": "v0.2.0",
+            "asset_name": "TYO.zip",
+            "download_url": "https://github.com/jelegend/subwaybuilder/releases/download/v0.2.0/TYO.zip"
+          },
+          "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.2.0:TYO.zip",
+          "checked_at": "2026-04-14T14:00:22.551Z"
         }
       }
     },
