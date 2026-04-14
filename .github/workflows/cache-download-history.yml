@@ -34,7 +34,8 @@ jobs:
             done < <(
               git ls-tree -r --name-only origin/bot/cache-download-history -- \
                 'history/snapshot_*.json' \
-                'history/download_attribution_*.json'
+                'history/download_attribution_*.json' \
+                'history/discord_server_metrics.json'
             )
           else
             echo "No bot/cache-download-history branch found; using history from checked out ref."
@@ -57,6 +58,100 @@ jobs:
       - name: Generate download history snapshot
         id: generate_history
         run: pnpm --dir scripts run generate-download-history
+
+      - name: Capture Discord server metrics
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        run: pnpm --dir scripts run capture-discord-server-metrics
+
+      - name: Summarize Discord server metrics
+        id: discord_metrics
+        run: |
+          node <<'NODE'
+          const fs = require("node:fs");
+
+          const historyPath = "history/discord_server_metrics.json";
+          const outputPath = process.env.GITHUB_OUTPUT;
+
+          function appendOutput(name, value) {
+            fs.appendFileSync(outputPath, `${name}=${value}\n`, "utf8");
+          }
+
+          if (!fs.existsSync(historyPath)) {
+            appendOutput("summary_line", "- **Discord server:** metrics unavailable");
+            appendOutput("total_users", "");
+            appendOutput("daily_delta", "");
+            process.exit(0);
+          }
+
+          const history = JSON.parse(fs.readFileSync(historyPath, "utf8"));
+          const snapshots = Object.entries(history.snapshots ?? {})
+            .filter(([, snapshot]) => snapshot && typeof snapshot === "object" && Number.isFinite(snapshot.total_users))
+            .sort(([a], [b]) => Date.parse(a) - Date.parse(b));
+          const userDays = history.user_days && typeof history.user_days === "object"
+            ? history.user_days
+            : {};
+
+          if (snapshots.length === 0) {
+            appendOutput("summary_line", "- **Discord server:** metrics unavailable");
+            appendOutput("total_users", "");
+            appendOutput("daily_delta", "");
+            process.exit(0);
+          }
+
+          const latestByDay = new Map();
+          for (const [snapshotKey, snapshot] of snapshots) {
+            const parsed = Date.parse(snapshotKey);
+            if (!Number.isFinite(parsed)) continue;
+            latestByDay.set(new Date(parsed).toISOString().slice(0, 10), snapshot);
+          }
+
+          const dayKeys = [...latestByDay.keys()].sort();
+          const latestDay = dayKeys[dayKeys.length - 1];
+          const previousDay = dayKeys.length > 1 ? dayKeys[dayKeys.length - 2] : null;
+          const latestSnapshot = latestByDay.get(latestDay);
+          const latestTotal = latestSnapshot?.total_users;
+
+          if (!Number.isFinite(latestTotal)) {
+            appendOutput("summary_line", "- **Discord server:** metrics unavailable");
+            appendOutput("total_users", "");
+            appendOutput("daily_delta", "");
+            process.exit(0);
+          }
+
+          let summaryLine = `- **Discord server:** now at ${latestTotal} members`;
+          let dailyDelta = "";
+          const latestActivity = userDays[latestDay] && typeof userDays[latestDay] === "object"
+            ? userDays[latestDay]
+            : { users_joined: 0, users_left: 0 };
+          const latestJoined = Number.isFinite(latestActivity.users_joined) ? latestActivity.users_joined : 0;
+          const latestLeft = Number.isFinite(latestActivity.users_left) ? latestActivity.users_left : 0;
+
+          if (latestJoined > 0 || latestLeft > 0) {
+            summaryLine += `, ${latestJoined} joined / ${latestLeft} left`;
+          }
+
+          if (previousDay) {
+            const previousTotal = latestByDay.get(previousDay)?.total_users;
+            if (Number.isFinite(previousTotal)) {
+              const delta = latestTotal - previousTotal;
+              dailyDelta = String(delta);
+              if (delta > 0) {
+                summaryLine += `, up +${delta} vs yesterday`;
+              } else if (delta < 0) {
+                summaryLine += `, down ${delta} vs yesterday`;
+              } else {
+                summaryLine += ", flat vs yesterday";
+              }
+            }
+          } else {
+            summaryLine += " (first recorded snapshot)";
+          }
+
+          appendOutput("summary_line", summaryLine);
+          appendOutput("total_users", String(latestTotal));
+          appendOutput("daily_delta", dailyDelta);
+          NODE
 
       - name: Validate generated snapshot totals against current downloads
         env:
@@ -106,7 +201,7 @@ jobs:
           EXPECTED_ATTRIBUTION_SNAPSHOT="${{ steps.generate_history.outputs.attribution_snapshot_file }}"
           mapfile -t CHANGED_HISTORY < <(git diff --name-only -- history)
           for path in "${CHANGED_HISTORY[@]}"; do
-            if [ "$path" != "$EXPECTED_DOWNLOAD_SNAPSHOT" ] && [ "$path" != "$EXPECTED_ATTRIBUTION_SNAPSHOT" ]; then
+            if [ "$path" != "$EXPECTED_DOWNLOAD_SNAPSHOT" ] && [ "$path" != "$EXPECTED_ATTRIBUTION_SNAPSHOT" ] && [ "$path" != "history/discord_server_metrics.json" ]; then
               echo "Unexpected history change detected: $path"
               exit 1
             fi
@@ -115,10 +210,14 @@ jobs:
       - name: Generate analytics CSVs
         run: pnpm --dir scripts run analytics -- --top-k-listings 0 --top-k-authors 0
 
+      - name: Generate Discord server analytics
+        run: pnpm --dir scripts run generate-discord-server-analytics
+
       - name: Stage snapshot changes
         id: commit_changes
         run: |
-          git add history/snapshot_*.json history/download_attribution_*.json analytics/*.csv 2>/dev/null || true
+          git add history/snapshot_*.json history/download_attribution_*.json history/discord_server_metrics.json analytics/*.csv 2>/dev/null || true
+          git add -A analytics/discord_users_by_day.csv analytics/discord_server_by_day.csv 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No history snapshot/analytics changes detected; skipping PR update."
             echo "committed=false" >> "$GITHUB_OUTPUT"
@@ -141,7 +240,10 @@ jobs:
           add-paths: |
             history/snapshot_*.json
             history/download_attribution_*.json
+            history/discord_server_metrics.json
             analytics/*.csv
+            analytics/discord_users_by_day.csv
+            analytics/discord_server_by_day.csv
           title: "chore: cache download history snapshot"
           body: "Automated update from cache-download-history workflow."
 
@@ -194,6 +296,7 @@ jobs:
           MODS_NET_DOWNLOADS: ${{ steps.generate_history.outputs.mods_net_downloads }}
           MODS_ENTRIES: ${{ steps.generate_history.outputs.mods_entries }}
           WARNINGS_JSON: ${{ steps.generate_history.outputs.warnings_json }}
+          DISCORD_SERVER_SUMMARY_LINE: ${{ steps.discord_metrics.outputs.summary_line }}
           COMMITTED: ${{ steps.finalize_changes.outputs.committed }}
           COMMIT_SHA: ${{ steps.finalize_changes.outputs.commit_sha }}
           PULL_REQUEST_URL: ${{ steps.finalize_changes.outputs.pull_request_url }}
@@ -229,6 +332,7 @@ jobs:
             --arg mods_total "${MODS_TOTAL_DOWNLOADS}" \
             --arg mods_net "${MODS_NET_DOWNLOADS}" \
             --arg mods_entries "${MODS_ENTRIES}" \
+            --arg discord_server_summary_line "${DISCORD_SERVER_SUMMARY_LINE}" \
             --arg commit_display "${COMMIT_DISPLAY}" \
             '[
               "- **Snapshot:** \($snapshot_file)",
@@ -238,6 +342,7 @@ jobs:
               "- **Attribution fetches:** total=\($attribution_total_fetches), net=\($attribution_net_fetches), daily=\($attribution_daily_fetches)",
               "- **Maps:** total=\($maps_total), net=\($maps_net), entries=\($maps_entries)",
               "- **Mods:** total=\($mods_total), net=\($mods_net), entries=\($mods_entries)",
+              $discord_server_summary_line,
               "- **Commit:** \($commit_display)"
             ]')"
 
