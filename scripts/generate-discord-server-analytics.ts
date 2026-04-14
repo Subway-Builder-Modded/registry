@@ -2,7 +2,8 @@ import { mkdirSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
-  buildDiscordUsersByDayCsvRows,
+  buildDiscordServerByDayCsvRows,
+  buildDiscordUserMessageByDayCsvRows,
   loadDiscordServerMetricsHistory,
 } from "./lib/discord-server-metrics.js";
 import { writeCsv } from "./lib/csv.js";
@@ -26,9 +27,9 @@ function parseArgs(argv: string[]): CliArgs {
       }
       lookbackDays = parsedValue;
       index += 1;
-    } else {
-      throw new Error(`Unknown argument: ${arg}`);
+      continue;
     }
+    throw new Error(`Unknown argument: ${arg}`);
   }
 
   return {
@@ -57,24 +58,51 @@ function applyLookback<T extends { date: string }>(rows: T[], lookbackDays: numb
 
 function run(): void {
   const cli = parseArgs(process.argv.slice(2));
-  const repoRoot = cli.repoRoot;
-  const analyticsDir = join(repoRoot, "analytics");
+  const analyticsDir = join(cli.repoRoot, "analytics");
   mkdirSync(analyticsDir, { recursive: true });
 
-  const history = loadDiscordServerMetricsHistory(repoRoot);
-  const usersRows = applyLookback(
-    buildDiscordUsersByDayCsvRows(history),
+  const history = loadDiscordServerMetricsHistory(cli.repoRoot);
+  const rows = applyLookback(
+    buildDiscordServerByDayCsvRows(history),
     cli.lookbackDays,
   );
+  const allowedDates = new Set(rows.map((row) => row.date));
+  const userRows = buildDiscordUserMessageByDayCsvRows(history, 100, allowedDates);
 
   writeCsv(
-    join(analyticsDir, "discord_users_by_day.csv"),
-    ["date", "total_users", "users_joined", "users_left"],
-    usersRows,
+    join(analyticsDir, "discord_server_by_day.csv"),
+    [
+      "date",
+      "total_users",
+      "users_joined",
+      "users_left",
+      "total_messages",
+      "messages_created",
+      "messages_deleted",
+      "public_total_messages",
+      "public_messages_created",
+      "public_messages_deleted",
+      "private_total_messages",
+      "private_messages_created",
+      "private_messages_deleted",
+    ],
+    rows,
+  );
+  writeCsv(
+    join(analyticsDir, "discord_user_message_by_day.csv"),
+    [
+      "date",
+      "user_id",
+      "user_name",
+      "total_messages",
+      "public_messages",
+      "private_messages",
+    ],
+    userRows,
   );
 
   console.log(
-    `Generated discord user analytics in ${analyticsDir} (userDays=${usersRows.length}${cli.lookbackDays === null ? "" : `, lookbackDays=${cli.lookbackDays}`})`,
+    `Generated discord server analytics in ${analyticsDir} (days=${rows.length}, userRows=${userRows.length}${cli.lookbackDays === null ? "" : `, lookbackDays=${cli.lookbackDays}`})`,
   );
 }
 

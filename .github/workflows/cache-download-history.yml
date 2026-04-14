@@ -79,6 +79,7 @@ jobs:
 
           if (!fs.existsSync(historyPath)) {
             appendOutput("summary_line", "- **Discord server:** metrics unavailable");
+            appendOutput("message_summary_line", "- **Discord messages:** metrics unavailable");
             appendOutput("total_users", "");
             appendOutput("daily_delta", "");
             process.exit(0);
@@ -91,9 +92,13 @@ jobs:
           const userDays = history.user_days && typeof history.user_days === "object"
             ? history.user_days
             : {};
+          const messageDays = history.message_days && typeof history.message_days === "object"
+            ? history.message_days
+            : {};
 
           if (snapshots.length === 0) {
             appendOutput("summary_line", "- **Discord server:** metrics unavailable");
+            appendOutput("message_summary_line", "- **Discord messages:** metrics unavailable");
             appendOutput("total_users", "");
             appendOutput("daily_delta", "");
             process.exit(0);
@@ -114,21 +119,33 @@ jobs:
 
           if (!Number.isFinite(latestTotal)) {
             appendOutput("summary_line", "- **Discord server:** metrics unavailable");
+            appendOutput("message_summary_line", "- **Discord messages:** metrics unavailable");
             appendOutput("total_users", "");
             appendOutput("daily_delta", "");
             process.exit(0);
           }
 
           let summaryLine = `- **Discord server:** now at ${latestTotal} members`;
+          let messageSummaryLine = "- **Discord messages:** metrics unavailable";
           let dailyDelta = "";
           const latestActivity = userDays[latestDay] && typeof userDays[latestDay] === "object"
             ? userDays[latestDay]
             : { users_joined: 0, users_left: 0 };
           const latestJoined = Number.isFinite(latestActivity.users_joined) ? latestActivity.users_joined : 0;
           const latestLeft = Number.isFinite(latestActivity.users_left) ? latestActivity.users_left : 0;
+          const latestMessageActivity = messageDays[latestDay] && typeof messageDays[latestDay] === "object"
+            ? messageDays[latestDay]
+            : {
+              messages_created: 0,
+              messages_deleted: 0,
+            };
 
           if (latestJoined > 0 || latestLeft > 0) {
             summaryLine += `, ${latestJoined} joined / ${latestLeft} left`;
+          }
+
+          if (Number.isFinite(latestSnapshot?.total_messages)) {
+            messageSummaryLine = `- **Discord messages:** ${latestSnapshot.total_messages} visible, +${Number.isFinite(latestMessageActivity.messages_created) ? latestMessageActivity.messages_created : 0} created, ${Number.isFinite(latestMessageActivity.messages_deleted) ? latestMessageActivity.messages_deleted : 0} deleted`;
           }
 
           if (previousDay) {
@@ -149,6 +166,7 @@ jobs:
           }
 
           appendOutput("summary_line", summaryLine);
+          appendOutput("message_summary_line", messageSummaryLine);
           appendOutput("total_users", String(latestTotal));
           appendOutput("daily_delta", dailyDelta);
           NODE
@@ -217,7 +235,7 @@ jobs:
         id: commit_changes
         run: |
           git add history/snapshot_*.json history/download_attribution_*.json history/discord_server_metrics.json analytics/*.csv 2>/dev/null || true
-          git add -A analytics/discord_users_by_day.csv analytics/discord_server_by_day.csv 2>/dev/null || true
+          git add -A analytics/discord_server_by_day.csv 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No history snapshot/analytics changes detected; skipping PR update."
             echo "committed=false" >> "$GITHUB_OUTPUT"
@@ -242,7 +260,6 @@ jobs:
             history/download_attribution_*.json
             history/discord_server_metrics.json
             analytics/*.csv
-            analytics/discord_users_by_day.csv
             analytics/discord_server_by_day.csv
           title: "chore: cache download history snapshot"
           body: "Automated update from cache-download-history workflow."
@@ -297,6 +314,7 @@ jobs:
           MODS_ENTRIES: ${{ steps.generate_history.outputs.mods_entries }}
           WARNINGS_JSON: ${{ steps.generate_history.outputs.warnings_json }}
           DISCORD_SERVER_SUMMARY_LINE: ${{ steps.discord_metrics.outputs.summary_line }}
+          DISCORD_MESSAGE_SUMMARY_LINE: ${{ steps.discord_metrics.outputs.message_summary_line }}
           COMMITTED: ${{ steps.finalize_changes.outputs.committed }}
           COMMIT_SHA: ${{ steps.finalize_changes.outputs.commit_sha }}
           PULL_REQUEST_URL: ${{ steps.finalize_changes.outputs.pull_request_url }}
@@ -333,6 +351,7 @@ jobs:
             --arg mods_net "${MODS_NET_DOWNLOADS}" \
             --arg mods_entries "${MODS_ENTRIES}" \
             --arg discord_server_summary_line "${DISCORD_SERVER_SUMMARY_LINE}" \
+            --arg discord_message_summary_line "${DISCORD_MESSAGE_SUMMARY_LINE}" \
             --arg commit_display "${COMMIT_DISPLAY}" \
             '[
               "- **Snapshot:** \($snapshot_file)",
@@ -343,6 +362,7 @@ jobs:
               "- **Maps:** total=\($maps_total), net=\($maps_net), entries=\($maps_entries)",
               "- **Mods:** total=\($mods_total), net=\($mods_net), entries=\($mods_entries)",
               $discord_server_summary_line,
+              $discord_message_summary_line,
               "- **Commit:** \($commit_display)"
             ]')"
 
