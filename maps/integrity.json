@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-15T03:21:36.799Z",
+  "generated_at": "2026-04-15T03:51:46.456Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -6751,6 +6751,59 @@
           },
           "fingerprint": "rules:v6:github:soccerjonj/sacramento:1.0.0:Sacramento-Railyard.zip",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        }
+      }
+    },
+    "saltillo": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SLW.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 21.17,
+          "file_sizes": {
+            "SLW.pmtiles": 11.77,
+            "buildings_index.json": 37.94,
+            "config.json": 0,
+            "demand_data.json": 1.33,
+            "roads.geojson": 17.6,
+            "runways_taxiways.geojson": 0.1
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.5",
+            "asset_name": "SLW.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.5/SLW.zip"
+          },
+          "fingerprint": "rules:v6:sha256:ea3df135279831d623c41a89d85937c0a13c337684600beae20e03fde10caa79",
+          "checked_at": "2026-04-15T03:51:46.456Z"
         }
       }
     },
