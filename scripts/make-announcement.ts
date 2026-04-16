@@ -1,8 +1,12 @@
 import fs from 'fs';
 import { pathToFileURL } from 'url';
+import { loadAuthorAliasIndex, resolveAuthorPresentation } from './lib/author-aliases.js';
+import { resolveRepoRoot } from './lib/script-runtime.js';
 
 const CONTENT_ANNOUNCEMENTS_ROLE_ID = '1492005223680446567';
 const MAX_ANNOUNCEMENT_DESCRIPTION_LENGTH = 350;
+const ANNOUNCEMENT_REQUEST_DELAY_MS = 750;
+const MAX_ANNOUNCEMENT_429_RETRIES = 5;
 
 const BASE_ANNOUNCEMENT = `# New $TYPE! 🎉🎉
 
@@ -16,6 +20,60 @@ const ALLOWED_MENTIONS = {
     parse: [],
     roles: [CONTENT_ANNOUNCEMENTS_ROLE_ID],
 };
+
+function sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function parseRetryAfterMs(payload: unknown): number | null {
+    if (!payload || typeof payload !== 'object') {
+        return null;
+    }
+    const retryAfter = (payload as { retry_after?: unknown }).retry_after;
+    if (typeof retryAfter !== 'number' || !Number.isFinite(retryAfter) || retryAfter < 0) {
+        return null;
+    }
+    if (retryAfter > 1000) {
+        return Math.ceil(retryAfter);
+    }
+    return Math.ceil(retryAfter * 1000);
+}
+
+async function sendAnnouncementRequest(webhookUrl: string, init: RequestInit): Promise<void> {
+    for (let attempt = 0; attempt <= MAX_ANNOUNCEMENT_429_RETRIES; attempt += 1) {
+        const response = await fetch(webhookUrl, init);
+        if (response.status !== 429) {
+            if (!response.ok) {
+                const responseText = await response.text();
+                throw new Error(`Failed to send announcement (${response.status} ${response.statusText}): ${responseText}`);
+            }
+            await sleep(ANNOUNCEMENT_REQUEST_DELAY_MS);
+            return;
+        }
+
+        let retryAfterMs = 5000;
+        try {
+            retryAfterMs = parseRetryAfterMs(await response.json()) ?? retryAfterMs;
+        } catch {
+            const retryAfterHeader = response.headers.get('retry-after');
+            const parsedRetryAfter = retryAfterHeader ? Number(retryAfterHeader) : Number.NaN;
+            if (Number.isFinite(parsedRetryAfter) && parsedRetryAfter > 0) {
+                retryAfterMs = parsedRetryAfter > 1000
+                    ? Math.ceil(parsedRetryAfter)
+                    : Math.ceil(parsedRetryAfter * 1000);
+            }
+        }
+
+        if (attempt === MAX_ANNOUNCEMENT_429_RETRIES) {
+            throw new Error(`Failed to send announcement: Discord webhook kept returning HTTP 429 after ${MAX_ANNOUNCEMENT_429_RETRIES + 1} attempts.`);
+        }
+
+        console.warn(
+            `[announcement] Discord webhook rate limited; retrying in ${retryAfterMs}ms (attempt ${attempt + 1}/${MAX_ANNOUNCEMENT_429_RETRIES})`,
+        );
+        await sleep(retryAfterMs + ANNOUNCEMENT_REQUEST_DELAY_MS);
+    }
+}
 
 function decodeHtmlEntities(value: string): string {
     return value
@@ -83,26 +141,37 @@ export async function makeAnnouncement(filename: string) {
     const modName = manifest.name?.trim();
     const modId = manifest.id?.trim();
     const modAuthor = manifest.author?.trim();
+    const modGithubId = typeof manifest.github_id === 'number' && Number.isFinite(manifest.github_id)
+        ? manifest.github_id
+        : null;
     const modDescription = formatDescriptionForDiscord(manifest.description);
     const modType = filename.includes("maps") ? "Map" : "Mod";
     const images = manifest.gallery;
     const webhookUrl = process.env.DISCORD_ANNOUNCEMENT_WEBHOOK_URL?.trim();
+    const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
+    const authorAliases = loadAuthorAliasIndex(repoRoot);
+    const authorPresentation = modAuthor
+        ? resolveAuthorPresentation(modAuthor, modGithubId, authorAliases)
+        : null;
+    const announcementAuthor = authorPresentation?.attribution_link
+        ? `[${authorPresentation.author_alias}](${authorPresentation.attribution_link})`
+        : authorPresentation?.author_alias ?? modAuthor;
 
-    if (!modId || !modAuthor || !modDescription || !modType || !webhookUrl) {
+    if (!modId || !announcementAuthor || !modDescription || !modType || !webhookUrl) {
         throw new Error('Missing required environment variables. Please set MOD_ID, MOD_AUTHOR, MOD_DESCRIPTION, MOD_TYPE, and DISCORD_WEBHOOK_URL.');
     }
 
     const announcement = BASE_ANNOUNCEMENT
         .replace('$TYPE', modType)
         .replace('$NAME', modName || modId)
-        .replace('$AUTHOR', modAuthor)
+        .replace('$AUTHOR', announcementAuthor)
         .replace('$DESCRIPTION', modDescription)
         .replace('$TYPE_LOWER', modType.toLowerCase() + 's')
         .replace('$NAME_LOWER', modId.toLowerCase());
     const announcementWithMention = `<@&${CONTENT_ANNOUNCEMENTS_ROLE_ID}>\n${announcement}`;
 
     if (images.length === 0) {
-        const response = await fetch(webhookUrl, {
+        await sendAnnouncementRequest(webhookUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -112,11 +181,6 @@ export async function makeAnnouncement(filename: string) {
                 allowed_mentions: ALLOWED_MENTIONS,
             }),
         });
-
-        if (!response.ok) {
-            const responseText = await response.text();
-            throw new Error(`Failed to send announcement (${response.status} ${response.statusText}): ${responseText}`);
-        }
         return;
     }
 
@@ -138,15 +202,10 @@ export async function makeAnnouncement(filename: string) {
         formdata.append(`file[${index}]`, blob, `image${index}.png`);
     });
 
-    const response = await fetch(webhookUrl, {
+    await sendAnnouncementRequest(webhookUrl, {
         method: 'POST',
         body: formdata,
     });
-
-    if (!response.ok) {
-        const responseText = await response.text();
-        throw new Error(`Failed to send announcement (${response.status} ${response.statusText}): ${responseText}`);
-    }
 }
 
 function parseCliArgs(argv: string[]): { filename: string } {
