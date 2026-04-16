@@ -2851,6 +2851,53 @@
           "fingerprint": "rules:v6:sha256:c50d68b569eb0edade342fd17d96f6e636be93e0697dee8de39601836a67719a",
           "checked_at": "2026-04-10T17:31:22.373Z"
         }
+      },
+      "1.1.0": {
+        "fingerprint": "rules:v6:sha256:75c867f2d8c86ce1f913381f7028b26e001c0dd4997fedf0e41e6f57c8a3025a",
+        "last_checked_at": "2026-04-16T05:15:25.407Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "LAX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 368.81,
+          "file_sizes": {
+            "LAX.pmtiles": 274.15,
+            "buildings_index.json": 363.51,
+            "config.json": 0,
+            "demand_data.json": 37.79,
+            "ocean_depth_index.json": 3.03,
+            "roads.geojson": 91.71,
+            "runways_taxiways.geojson": 2
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.5",
+            "asset_name": "LAX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.5/LAX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:75c867f2d8c86ce1f913381f7028b26e001c0dd4997fedf0e41e6f57c8a3025a",
+          "checked_at": "2026-04-16T05:15:25.407Z"
+        }
       }
     },
     "greatertwincities": {
@@ -3899,6 +3946,94 @@
           },
           "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.1.0:TYO.zip",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        }
+      },
+      "v0.2.0": {
+        "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.2.0:TYO.zip",
+        "last_checked_at": "2026-04-16T05:15:25.407Z",
+        "result": {
+          "is_complete": false,
+          "errors": [
+            "asset 'TYO.zip': config.json version '0.1.0' does not match release tag 'v0.2.0' (expected '0.2.0')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TYO.pmtiles",
+            "config_version_matches_tag": null
+          },
+          "release_size": 272.41,
+          "source": {
+            "update_type": "github",
+            "repo": "jelegend/subwaybuilder",
+            "tag": "v0.2.0",
+            "asset_name": "TYO.zip",
+            "download_url": "https://github.com/jelegend/subwaybuilder/releases/download/v0.2.0/TYO.zip"
+          },
+          "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.2.0:TYO.zip",
+          "checked_at": "2026-04-16T05:15:25.407Z"
+        }
+      },
+      "v0.3.0": {
+        "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.3.0:TYO.zip",
+        "last_checked_at": "2026-04-16T05:15:25.407Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TYO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 271.23,
+          "file_sizes": {
+            "TYO.pmtiles": 211.84,
+            "buildings_index.json": 266.32,
+            "config.json": 0,
+            "demand_data.json": 88.39,
+            "roads.geojson": 28.92,
+            "runways_taxiways.geojson": 0.18,
+            "thumbnail.svg": 0,
+            "water.geojson": 9.09
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "jelegend/subwaybuilder",
+            "tag": "v0.3.0",
+            "asset_name": "TYO.zip",
+            "download_url": "https://github.com/jelegend/subwaybuilder/releases/download/v0.3.0/TYO.zip"
+          },
+          "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.3.0:TYO.zip",
+          "checked_at": "2026-04-16T05:15:25.407Z"
         }
       }
     },
