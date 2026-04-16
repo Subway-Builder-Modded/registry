@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-16T01:35:14.962Z",
+  "generated_at": "2026-04-16T01:42:23.470Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -12289,6 +12289,63 @@
           },
           "fingerprint": "rules:v6:sha256:c9b39cfa4489ad96348844fe3a45175fbe544ebf534a2e3aab4bce4faf3f6518",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        }
+      }
+    },
+    "yukina-tottori": {
+      "has_complete_version": true,
+      "latest_semver_version": "0.1.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TTJ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 65.01,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.05,
+            ".railyard_map/special_demand_types.json": 0.02,
+            "TTJ.pmtiles": 32.15,
+            "buildings_index.json": 45.31,
+            "config.json": 0.01,
+            "demand_data.json": 23.83,
+            "ocean_depth_index.json": 25.39,
+            "roads.geojson": 11.99,
+            "runways_taxiways.geojson": 0.07,
+            "water.geojson": 25.95
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-jp-maps",
+            "tag": "0.3.6",
+            "asset_name": "TTJ.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.3.6/TTJ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:9c2dbc307ff5e9cfe024a39a2f1add1bfc5808126292bdcdb9321c0752687478",
+          "checked_at": "2026-04-16T01:42:23.470Z"
         }
       }
     },
