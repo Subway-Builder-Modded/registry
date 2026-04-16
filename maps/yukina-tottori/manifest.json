@@ -36,5 +36,101 @@
   "level_of_detail": "high-detail",
   "location": "east-asia",
   "special_demand": [],
-  "file_sizes": {}
+  "file_sizes": {
+    ".railyard_map/special_demand_points.json": 0.05,
+    ".railyard_map/special_demand_types.json": 0.02,
+    "TTJ.pmtiles": 32.15,
+    "buildings_index.json": 45.31,
+    "config.json": 0.01,
+    "demand_data.json": 23.83,
+    "ocean_depth_index.json": 25.39,
+    "roads.geojson": 11.99,
+    "runways_taxiways.geojson": 0.07,
+    "water.geojson": 25.95
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.11102880089828544,
+      "p25": 0.13181155271180864,
+      "p50": 0.16859486651371644,
+      "p75": 0.2171663238527032,
+      "p90": 0.30014185537415483,
+      "mean": 0.21097990386138765
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.10726253818620035,
+      "p25": 0.11686052011144239,
+      "p50": 0.1487617727230491,
+      "p75": 0.21712411618486321,
+      "p90": 0.2752923580673586,
+      "mean": 0.18063997817296237
+    },
+    "commuteDistanceKm": {
+      "p10": 1489,
+      "p25": 2987,
+      "p50": 6147,
+      "p75": 13206,
+      "p90": 25560,
+      "mean": 10782.508769544527
+    },
+    "residentCellDensity": {
+      "p10": 30,
+      "p25": 47,
+      "p50": 88,
+      "p75": 215,
+      "p90": 616,
+      "mean": 255.08588957055215
+    },
+    "workerCellDensity": {
+      "p10": 27,
+      "p25": 43,
+      "p50": 97,
+      "p75": 334,
+      "p90": 927,
+      "mean": 390.1744840525328
+    },
+    "detail": {
+      "radiusKm": 0.15836815088453324,
+      "expectedPointSpacingKm": 0.5201176675135171,
+      "normalizedRadius": 0.3044852362766883,
+      "activityPerPoint": 64.69745024875621,
+      "playableAreaKm2": 1600,
+      "playableAreaPerPointKm2": 0.4975124378109453,
+      "playableCatchmentRadiusKm": 0.3979486492684982,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8594943772985779,
+        "continuousScore": 0.928339824291131,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.753608189377238,
+        "largestCenterShare": 0.6874203982371063,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 134.22028258461302,
+            "latitude": 35.482810809484945,
+            "massShare": 0.6874203982371063,
+            "assignedMass": 286059,
+            "assignedPointCount": 1926,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 133.81548905173804,
+            "latitude": 35.456650956156324,
+            "massShare": 0.3125796017628937,
+            "assignedMass": 130075,
+            "assignedPointCount": 1290,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  }
 }
