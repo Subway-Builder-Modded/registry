@@ -38,6 +38,7 @@ interface CliArgs {
   guildId: string;
   token: string;
   resetHistory: boolean;
+  skipMessages: boolean;
 }
 
 interface DiscordGuildCountsResponse {
@@ -124,10 +125,15 @@ interface ChannelMessageCounts {
 
 function parseArgs(argv: string[]): CliArgs {
   let resetHistory = false;
+  let skipMessages = false;
 
   for (const arg of argv) {
     if (arg === "--reset-history") {
       resetHistory = true;
+      continue;
+    }
+    if (arg === "--skip-messages") {
+      skipMessages = true;
       continue;
     }
     throw new Error(`Unknown argument: ${arg}`);
@@ -138,6 +144,7 @@ function parseArgs(argv: string[]): CliArgs {
     guildId: (getNonEmptyEnv("DISCORD_SERVER_GUILD_ID") ?? DEFAULT_DISCORD_SERVER_GUILD_ID).trim(),
     token: (getNonEmptyEnv("DISCORD_BOT_TOKEN") ?? "").trim(),
     resetHistory,
+    skipMessages,
   };
 }
 
@@ -816,8 +823,20 @@ async function run(): Promise<void> {
   const context = await fetchBotGuildContext(cli.guildId, cli.token);
   const memberJoinCounts = await fetchGuildMemberJoinCounts(cli.guildId, cli.token);
   const exactTotalUsers = Object.values(memberJoinCounts).reduce((sum, count) => sum + count, 0);
-  const messageCapture = await fetchGuildMessageCreationCounts(context, cli.token);
-  const messageTotals = sumMessageCreationCounts(messageCapture.perDayCounts);
+  const messageCapture = cli.skipMessages
+    ? {
+      perDayCounts: {},
+      perUserPerDayCounts: {},
+      userLabels: {},
+    }
+    : await fetchGuildMessageCreationCounts(context, cli.token);
+  const messageTotals = cli.skipMessages
+    ? {
+      total_messages: 0,
+      public_total_messages: 0,
+      private_total_messages: 0,
+    }
+    : sumMessageCreationCounts(messageCapture.perDayCounts);
 
   const existingHistory = cli.resetHistory
     ? createEmptyDiscordServerMetricsHistory(cli.guildId, nowIso)
@@ -832,9 +851,9 @@ async function run(): Promise<void> {
       captured_at: snapshotKey,
       total_users: exactTotalUsers,
       online_users: counts.onlineUsers,
-      total_messages: messageTotals.total_messages,
-      public_total_messages: messageTotals.public_total_messages,
-      private_total_messages: messageTotals.private_total_messages,
+      total_messages: cli.skipMessages ? null : messageTotals.total_messages,
+      public_total_messages: cli.skipMessages ? null : messageTotals.public_total_messages,
+      private_total_messages: cli.skipMessages ? null : messageTotals.private_total_messages,
     },
     updatedAt: nowIso,
   });
@@ -844,18 +863,22 @@ async function run(): Promise<void> {
     captureDate,
     updatedAt: nowIso,
   });
-  const historyWithMessages = updateDiscordServerMessageDays({
-    history: historyWithUsers,
-    messageCreationCounts: messageCapture.perDayCounts,
-    captureDate,
-    updatedAt: nowIso,
-  });
-  const history = replaceDiscordServerMessageUserCounts({
-    history: historyWithMessages,
-    messageUserCounts: messageCapture.perUserPerDayCounts,
-    messageUserLabels: messageCapture.userLabels,
-    updatedAt: nowIso,
-  });
+  const historyWithMessages = cli.skipMessages
+    ? historyWithUsers
+    : updateDiscordServerMessageDays({
+      history: historyWithUsers,
+      messageCreationCounts: messageCapture.perDayCounts,
+      captureDate,
+      updatedAt: nowIso,
+    });
+  const history = cli.skipMessages
+    ? historyWithMessages
+    : replaceDiscordServerMessageUserCounts({
+      history: historyWithMessages,
+      messageUserCounts: messageCapture.perUserPerDayCounts,
+      messageUserLabels: messageCapture.userLabels,
+      updatedAt: nowIso,
+    });
 
   writeDiscordServerMetricsHistory(cli.repoRoot, history);
 
@@ -865,7 +888,7 @@ async function run(): Promise<void> {
   ).size;
 
   console.log(
-    `[discord-server-metrics] guild=${cli.guildId} snapshot=${snapshotKey} total_users=${exactTotalUsers} approximate_total_users=${counts.totalUsers} total_messages=${messageTotals.total_messages} public_total_messages=${messageTotals.public_total_messages} private_total_messages=${messageTotals.private_total_messages} online_users=${counts.onlineUsers ?? "n/a"} join_days=${Object.keys(memberJoinCounts).length} message_days=${Object.keys(messageCapture.perDayCounts).length} user_message_days=${userDaysWithMessages} distinct_message_users=${distinctUsers} request_delay_ms=${REQUEST_DELAY_MS} reset_history=${cli.resetHistory}`,
+    `[discord-server-metrics] guild=${cli.guildId} snapshot=${snapshotKey} total_users=${exactTotalUsers} approximate_total_users=${counts.totalUsers} total_messages=${cli.skipMessages ? "skipped" : messageTotals.total_messages} public_total_messages=${cli.skipMessages ? "skipped" : messageTotals.public_total_messages} private_total_messages=${cli.skipMessages ? "skipped" : messageTotals.private_total_messages} online_users=${counts.onlineUsers ?? "n/a"} join_days=${Object.keys(memberJoinCounts).length} message_days=${cli.skipMessages ? "skipped" : Object.keys(messageCapture.perDayCounts).length} user_message_days=${cli.skipMessages ? "skipped" : userDaysWithMessages} distinct_message_users=${cli.skipMessages ? "skipped" : distinctUsers} request_delay_ms=${REQUEST_DELAY_MS} reset_history=${cli.resetHistory} skip_messages=${cli.skipMessages}`,
   );
 }
 
