@@ -128,6 +128,9 @@ function parseArgs(argv: string[]): CliArgs {
   let skipMessages = false;
 
   for (const arg of argv) {
+    if (arg === "--") {
+      continue;
+    }
     if (arg === "--reset-history") {
       resetHistory = true;
       continue;
