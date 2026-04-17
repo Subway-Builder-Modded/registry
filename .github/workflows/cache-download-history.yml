@@ -62,7 +62,7 @@ jobs:
       - name: Capture Discord server metrics
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-        run: pnpm --dir scripts run capture-discord-server-metrics
+        run: pnpm --dir scripts run capture-discord-server-metrics -- --skip-messages
 
       - name: Summarize Discord server metrics
         id: discord_metrics
