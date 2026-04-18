@@ -192,6 +192,14 @@ test("updateAuthorEntry switching to github clears stored attribution_link", () 
   assert.equal(alice.attribution_link, undefined);
 });
 
+test("updateAuthorEntry keeps existing github attribution_link when github method is unchanged", () => {
+  const result = updateAuthorEntry(BASE_INDEX, 10, "alice", { attribution_method: "github" });
+  const alice = result.authors.find((e) => e.github_id === 10);
+  assert.ok(alice);
+  assert.equal(alice.attribution_method, "github");
+  assert.equal(alice.attribution_link, "https://github.com/alice");
+});
+
 test("updateAuthorEntry custom attribution_link overrides github method clear", () => {
   // If user provides both method=github AND a link, the link wins (link applied after method)
   const result = updateAuthorEntry(BASE_INDEX, 10, "alice", {

@@ -171,7 +171,7 @@ export function updateAuthorEntry(
 
   if (updates.attribution_method !== undefined) {
     entry.attribution_method = updates.attribution_method;
-    if (updates.attribution_method === "github") {
+    if (updates.attribution_method === "github" && existing?.attribution_method !== "github") {
       entry.attribution_link = undefined;
     }
   }
