@@ -14,6 +14,7 @@ jobs:
       !contains(github.event.issue.labels.*.name, 'publish-map') &&
       !contains(github.event.issue.labels.*.name, 'update-mod') &&
       !contains(github.event.issue.labels.*.name, 'update-map') &&
+      !contains(github.event.issue.labels.*.name, 'update-author') &&
       !contains(github.event.issue.labels.*.name, 'report') &&
       github.event.issue.author_association != 'MEMBER' &&
       github.event.issue.author_association != 'OWNER' &&
@@ -36,6 +37,7 @@ jobs:
                 '- **[Publish New Map](../../issues/new?template=publish-map.yml)** - Submit a new custom map to the registry',
                 '- **[Update Existing Mod Metadata](../../issues/new?template=update-mod.yml)** - Update metadata for a mod you own',
                 '- **[Update Existing Map Metadata](../../issues/new?template=update-map.yml)** - Update metadata for a map you own',
+                '- **[Update Author Profile](../../issues/new?template=update-author.yml)** - Update your author alias, attribution, or profile metadata',
                 '- **[Report a Mod or Map](../../issues/new?template=report.yml)** - Report an issue with a listing',
               ].join('\n')
             });
