@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-18T20:44:35.452Z",
+  "generated_at": "2026-04-19T03:05:46.825Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -2908,9 +2908,10 @@
     },
     "greater-los-angeles": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.1",
+      "latest_semver_version": "1.1.2",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.1.2",
         "1.1.1",
         "1.1.0",
         "1.0.1"
@@ -3045,6 +3046,49 @@
           },
           "fingerprint": "rules:v6:sha256:c63210af7fb1a3e212df30d15e880ae8d907f5feb25f874ce6402d0542f2feec",
           "checked_at": "2026-04-17T02:21:35.652Z"
+        },
+        "1.1.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "LAX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 356.29,
+          "file_sizes": {
+            "LAX.pmtiles": 262.44,
+            "buildings_index.json": 363.51,
+            "config.json": 0,
+            "demand_data.json": 32.17,
+            "ocean_depth_index.json": 3.03,
+            "roads.geojson": 91.71,
+            "runways_taxiways.geojson": 2
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.7",
+            "asset_name": "LAX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.7/LAX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:96502d511e9e889394572eb0b4c95d41c0e0cf490b3c8b6180fd90cefe3488b9",
+          "checked_at": "2026-04-19T03:05:46.825Z"
         }
       }
     },
@@ -4570,9 +4614,10 @@
     },
     "los-angeles-county": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.0",
+      "latest_semver_version": "1.1.1",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.1.1",
         "1.1.0",
         "1.0.0"
       ],
@@ -4663,6 +4708,49 @@
           },
           "fingerprint": "rules:v6:sha256:53d0e023bd93b4ade014a2eef22a0cbeecb84de9310e248c2b784ab63822598d",
           "checked_at": "2026-04-17T03:25:13.943Z"
+        },
+        "1.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "LAXM.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 238.79,
+          "file_sizes": {
+            "LAXM.pmtiles": 187.42,
+            "buildings_index.json": 199.28,
+            "config.json": 0,
+            "demand_data.json": 14.81,
+            "ocean_depth_index.json": 1.41,
+            "roads.geojson": 52.73,
+            "runways_taxiways.geojson": 1.48
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.7",
+            "asset_name": "LAXM.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.7/LAXM.zip"
+          },
+          "fingerprint": "rules:v6:sha256:d5dc3f77479147106fcaa0e76e338016a5aa18a98d6306515683f30368cd7f0b",
+          "checked_at": "2026-04-19T03:05:46.825Z"
         }
       }
     },
