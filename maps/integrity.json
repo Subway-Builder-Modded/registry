@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-19T20:46:39.639Z",
+  "generated_at": "2026-04-20T03:22:53.302Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -3520,6 +3520,59 @@
           },
           "fingerprint": "rules:v6:sha256:0abf34db38c14cbf91f29d33a5a41b81e0eaf27a0feb9547d9d6bad2e613a774",
           "checked_at": "2026-04-13T21:02:37.490Z"
+        }
+      }
+    },
+    "helsinki": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "HEL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 106.45,
+          "file_sizes": {
+            "HEL.pmtiles": 91.49,
+            "buildings_index.json": 47.16,
+            "config.json": 0,
+            "demand_data.json": 2.04,
+            "roads.geojson": 18.96,
+            "runways_taxiways.geojson": 0.46
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.7",
+            "asset_name": "HEL.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.7/HEL.zip"
+          },
+          "fingerprint": "rules:v6:sha256:060cc9779aa681696df9a731642115a6867d7aae7a388d1801a3469e82996204",
+          "checked_at": "2026-04-20T03:22:53.302Z"
         }
       }
     },
