@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-21T17:11:20.797Z",
+  "generated_at": "2026-04-21T20:59:48.167Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -8265,9 +8265,10 @@
     },
     "south-florida": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.0.0",
+      "latest_semver_version": "v1.1.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "v1.1.0",
         "v1.0.0"
       ],
       "incomplete_versions": [],
@@ -8313,6 +8314,48 @@
           },
           "fingerprint": "rules:v6:github:kaicardenas0618/subway-builder-sfl:v1.0.0:SFL.zip",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        },
+        "v1.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SFL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 231.79,
+          "file_sizes": {
+            "SFL.pmtiles": 169.05,
+            "buildings_index.json": 194.68,
+            "config.json": 0,
+            "demand_data.json": 232.52,
+            "roads.geojson": 66.88,
+            "runways_taxiways.geojson": 3.17
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "kaicardenas0618/subway-builder-sfl",
+            "tag": "v1.1.0",
+            "asset_name": "SFL.zip",
+            "download_url": "https://github.com/kaicardenas0618/subway-builder-sfl/releases/download/v1.1.0/SFL.zip"
+          },
+          "fingerprint": "rules:v6:github:kaicardenas0618/subway-builder-sfl:v1.1.0:SFL.zip",
+          "checked_at": "2026-04-21T20:59:48.167Z"
         }
       }
     },
