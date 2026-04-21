@@ -4,7 +4,7 @@
     "advanced-analytics": {
       "target-1.1.0": {
         "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-04-21T03:26:12.074Z",
+        "last_checked_at": "2026-04-21T03:58:33.749Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -18,7 +18,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-21T03:26:12.074Z"
+          "checked_at": "2026-04-21T03:58:33.749Z"
         }
       },
       "v0.9.1": {
@@ -1377,14 +1377,27 @@
       },
       "0.1.4": {
         "fingerprint": "rules:v6:sha256:sha256:162ec9d981ecb11f3fb393a333fbd04a15a7da9e9a264922741ac6eda36484b9:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-04-21T03:26:12.074Z",
+        "last_checked_at": "2026-04-21T03:58:33.749Z",
         "result": {
           "is_complete": false,
           "errors": [
-            "release asset 'mod-base.zip' not found"
+            "release asset manifest-base.json is missing",
+            "missing top-level manifest.json in ZIP",
+            "manifest.json version '(missing)' does not match release tag '0.1.4' (expected '0.1.4')"
           ],
-          "required_checks": {},
-          "matched_files": {},
+          "required_checks": {
+            "release_manifest_asset": false,
+            "zip_manifest_json": false,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": false
+          },
+          "matched_files": {
+            "release_manifest_asset": null,
+            "zip_manifest_json": null,
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": null
+          },
+          "release_size": 0,
           "source": {
             "update_type": "custom",
             "repo": "subway-builder-modded/dependency-test-mod",
@@ -1393,7 +1406,7 @@
             "download_url": "https://github.com/Subway-Builder-Modded/Dependency-Test-Mod/releases/download/v0.1.4/mod-base.zip"
           },
           "fingerprint": "rules:v6:sha256:sha256:162ec9d981ecb11f3fb393a333fbd04a15a7da9e9a264922741ac6eda36484b9:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-21T03:26:12.074Z"
+          "checked_at": "2026-04-21T03:58:33.749Z"
         }
       }
     },
@@ -2327,7 +2340,7 @@
       },
       "v1.0": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-04-21T03:26:12.074Z",
+        "last_checked_at": "2026-04-21T03:58:33.749Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2341,12 +2354,12 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-21T03:26:12.074Z"
+          "checked_at": "2026-04-21T03:58:33.749Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-04-21T03:26:12.074Z",
+        "last_checked_at": "2026-04-21T03:58:33.749Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2360,7 +2373,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-04-21T03:26:12.074Z"
+          "checked_at": "2026-04-21T03:58:33.749Z"
         }
       }
     }
