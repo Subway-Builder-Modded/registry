@@ -43,5 +43,109 @@
     "airports",
     "universities"
   ],
-  "file_sizes": {}
+  "file_sizes": {
+    "DXB.pmtiles": 30.19,
+    "SOURCES.md": 0.02,
+    "buildings_index.json": 81.2,
+    "config.json": 0,
+    "demand_data.json": 27.23,
+    "demand_generation_inputs/README_v5.md": 0,
+    "demand_generation_inputs/build_community_polygons.py": 0,
+    "demand_generation_inputs/dsc_communities_2024.csv": 0.01,
+    "demand_generation_inputs/dubai_community_polygons.json": 0.36,
+    "demand_generation_inputs/dubai_emirate.geojson": 0.01,
+    "demand_generation_inputs/employment_zones.json": 0.01,
+    "demand_generation_inputs/fetch_communities.sh": 0,
+    "demand_generation_inputs/generate_dxb_demand.py": 0.02,
+    "demand_generation_inputs/generate_job_points.py": 0.01,
+    "demand_generation_inputs/generate_resident_points.py": 0.01,
+    "demand_generation_inputs/run_gravity_model.py": 0.01,
+    "roads.geojson": 31.31,
+    "runways_taxiways.geojson": 2.19
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.11304903018958248,
+      "p25": 0.1648904428900758,
+      "p50": 0.1993470795304455,
+      "p75": 0.20945461638502708,
+      "p90": 0.21352428455448128,
+      "mean": 0.1948442892298175
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.045124140438477324,
+      "p25": 0.06951154925539271,
+      "p50": 0.10344263290125617,
+      "p75": 0.15322598036323481,
+      "p90": 0.36676837090394265,
+      "mean": 0.17548327595759391
+    },
+    "commuteDistanceKm": {
+      "p10": 2831,
+      "p25": 4760,
+      "p50": 7205,
+      "p75": 11298,
+      "p90": 20644,
+      "mean": 9659.624235212405
+    },
+    "residentCellDensity": {
+      "p10": 110,
+      "p25": 390,
+      "p50": 1320,
+      "p75": 2638,
+      "p90": 6646,
+      "mean": 2779.8959641255606
+    },
+    "workerCellDensity": {
+      "p10": 696,
+      "p25": 1441,
+      "p50": 2990,
+      "p75": 9200,
+      "p90": 17166,
+      "mean": 6856.474613686534
+    },
+    "detail": {
+      "radiusKm": 0.14360009320263478,
+      "expectedPointSpacingKm": 0.3135848646691225,
+      "normalizedRadius": 0.4579305616492483,
+      "activityPerPoint": 265.1287238583013,
+      "playableAreaKm2": 1688,
+      "playableAreaPerPointKm2": 0.14408877507469056,
+      "playableCatchmentRadiusKm": 0.2141608778334329,
+      "localityScore": 0.7154099187294828,
+      "deaggregationScore": 1,
+      "score": 0.845819081559102
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9880241392978948,
+        "continuousScore": 0.8497797422076527,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9763317265417846,
+        "largestCenterShare": 0.5547171378594152,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 55.34434302648994,
+            "latitude": 25.23483542339556,
+            "massShare": 0.5547171378594152,
+            "assignedMass": 3445884,
+            "assignedPointCount": 5899,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 55.16648393161083,
+            "latitude": 25.028569067917378,
+            "massShare": 0.4452828621405848,
+            "assignedMass": 2766082,
+            "assignedPointCount": 5816,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  }
 }
