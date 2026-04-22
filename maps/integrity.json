@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-22T03:24:10.261Z",
+  "generated_at": "2026-04-22T05:39:07.103Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -2392,6 +2392,71 @@
         }
       }
     },
+    "dubai": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.2.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.2.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DXB.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 59.93,
+          "file_sizes": {
+            "DXB.pmtiles": 30.19,
+            "SOURCES.md": 0.02,
+            "buildings_index.json": 81.2,
+            "config.json": 0,
+            "demand_data.json": 27.23,
+            "demand_generation_inputs/README_v5.md": 0,
+            "demand_generation_inputs/build_community_polygons.py": 0,
+            "demand_generation_inputs/dsc_communities_2024.csv": 0.01,
+            "demand_generation_inputs/dubai_community_polygons.json": 0.36,
+            "demand_generation_inputs/dubai_emirate.geojson": 0.01,
+            "demand_generation_inputs/employment_zones.json": 0.01,
+            "demand_generation_inputs/fetch_communities.sh": 0,
+            "demand_generation_inputs/generate_dxb_demand.py": 0.02,
+            "demand_generation_inputs/generate_job_points.py": 0.01,
+            "demand_generation_inputs/generate_resident_points.py": 0.01,
+            "demand_generation_inputs/run_gravity_model.py": 0.01,
+            "roads.geojson": 31.31,
+            "runways_taxiways.geojson": 2.19
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.2.0-dxb",
+            "asset_name": "DXB.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.2.0-dxb/DXB.zip"
+          },
+          "fingerprint": "rules:v6:sha256:2304942c21aa0bcbe93bb5add45f51367ed6bcb3db60db051a15976cdb216926",
+          "checked_at": "2026-04-22T05:39:07.103Z"
+        }
+      }
+    },
     "dublin": {
       "has_complete_version": true,
       "latest_semver_version": "v1.1.0",
@@ -3568,9 +3633,10 @@
     },
     "helsinki": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.0",
+      "latest_semver_version": "1.1.1",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.1.1",
         "1.1.0",
         "1.0.0"
       ],
@@ -3659,6 +3725,48 @@
           },
           "fingerprint": "rules:v6:sha256:6c26c400585b5ccd0eb02cd4206f16a289bcce1097a4f7f830b025df55bbf6a8",
           "checked_at": "2026-04-20T20:56:32.867Z"
+        },
+        "1.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "HEL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 106.46,
+          "file_sizes": {
+            "HEL.pmtiles": 91.49,
+            "buildings_index.json": 47.16,
+            "config.json": 0,
+            "demand_data.json": 2.09,
+            "roads.geojson": 18.96,
+            "runways_taxiways.geojson": 0.46
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.9",
+            "asset_name": "HEL.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.9/HEL.zip"
+          },
+          "fingerprint": "rules:v6:sha256:1b7859aef1b8b15542c36ea6b26305bdd6eb236575efe62a2c222239a78781ec",
+          "checked_at": "2026-04-22T05:39:07.103Z"
         }
       }
     },
