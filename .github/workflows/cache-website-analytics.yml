@@ -1,0 +1,124 @@
+name: Cache Website Analytics
+
+on:
+  schedule:
+    - cron: "15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: cache-website-analytics
+  cancel-in-progress: false
+
+jobs:
+  cache-analytics:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Capture website analytics history
+        env:
+          CLOUDFLARE_ZONE_TAG: ${{ secrets.CLOUDFLARE_ZONE_TAG }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: pnpm --dir scripts run capture-website-analytics
+
+      - name: Generate website analytics exports
+        run: pnpm --dir scripts run generate-website-analytics
+
+      - name: Validate website analytics file scope
+        run: |
+          set -euo pipefail
+
+          mapfile -t CHANGED_FILES < <(git diff --name-only)
+          is_allowed() {
+            local p="$1"
+            case "$p" in
+              history/website_analytics.json) return 0 ;;
+              history/website_analytics_by_day/website_analytics_*.json) return 0 ;;
+              analytics/website_analytics.json) return 0 ;;
+              analytics/website_analytics_by_day.csv) return 0 ;;
+              analytics/website_analytics_by_hour.csv) return 0 ;;
+              analytics/website_pages.csv) return 0 ;;
+              analytics/website_countries.csv) return 0 ;;
+              analytics/website_browsers.csv) return 0 ;;
+              analytics/website_operating_systems.csv) return 0 ;;
+              analytics/website_devices.csv) return 0 ;;
+              analytics/website_screen_sizes.csv) return 0 ;;
+              *) return 1 ;;
+            esac
+          }
+
+          for path in "${CHANGED_FILES[@]}"; do
+            if ! is_allowed "$path"; then
+              echo "Unexpected file change detected in website analytics workflow: $path"
+              exit 1
+            fi
+          done
+
+      - name: Stage analytics changes
+        id: stage_changes
+        run: |
+          git add \
+            history/website_analytics.json \
+            history/website_analytics_by_day/*.json \
+            analytics/website_analytics.json \
+            analytics/website_analytics_by_day.csv \
+            analytics/website_analytics_by_hour.csv \
+            analytics/website_pages.csv \
+            analytics/website_countries.csv \
+            analytics/website_browsers.csv \
+            analytics/website_operating_systems.csv \
+            analytics/website_devices.csv \
+            analytics/website_screen_sizes.csv 2>/dev/null || true
+
+          if git diff --cached --quiet; then
+            echo "No website analytics changes detected; skipping PR update."
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update bot PR
+        id: create_pr
+        if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
+        continue-on-error: true
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: cache website analytics"
+          branch: bot/cache-website-analytics
+          delete-branch: true
+          title: "chore: cache website analytics"
+          body: "Automated update from cache-website-analytics workflow."
+
+      - name: Finalize bot PR automation
+        id: bot_pr
+        if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
+        uses: ./.github/actions/bot-pr-automation
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repo: ${{ github.repository }}
+          bot_branch: bot/cache-website-analytics
+          pr_number: ${{ steps.create_pr.outputs.pull-request-number }}
+          pr_url: ${{ steps.create_pr.outputs.pull-request-url }}
+          pr_head_sha: ${{ steps.create_pr.outputs.pull-request-head-sha }}
+          source_workflow: ${{ github.workflow }}
+          source_run_id: ${{ github.run_id }}

@@ -182,6 +182,61 @@ The hourly workflow writes:
 - `analytics/railyard_app_downloads.json`
 - `analytics/railyard_app_downloads.csv`
 
+## Website Analytics
+
+- Capture one hourly website analytics snapshot:
+  - `pnpm --dir scripts run capture-website-analytics`
+- Generate derived website analytics artifacts from cached history:
+  - `pnpm --dir scripts run generate-website-analytics`
+- Backfill website analytics by day (default: 1 day):
+  - `pnpm --dir scripts run backfill-website-analytics`
+  - `pnpm --dir scripts run backfill-website-analytics -- --days <N>`
+
+Cloudflare environment variables:
+
+- Zone identifier:
+  - `CLOUDFLARE_ZONE_TAG`
+- API token:
+  - `CLOUDFLARE_API_TOKEN`
+
+Local development:
+
+- `capture-website-analytics` and `backfill-website-analytics` automatically load a repository-root `.env` file when present.
+- Existing shell environment variables take precedence over `.env` values.
+- Example `.env`:
+  - `CLOUDFLARE_ZONE_TAG=...`
+  - `CLOUDFLARE_API_TOKEN=...`
+
+Raw history and derived outputs:
+
+- Raw source:
+  - `history/website_analytics.json`
+  - `history/website_analytics_by_day/website_analytics_YYYY_MM_DD.json`
+- Derived analytics exports:
+  - `analytics/website_analytics.json`
+  - `analytics/website_analytics_by_day.csv`
+  - `analytics/website_analytics_by_hour.csv`
+  - `analytics/website_pages.csv`
+  - `analytics/website_countries.csv`
+  - `analytics/website_browsers.csv`
+  - `analytics/website_operating_systems.csv`
+  - `analytics/website_devices.csv`
+  - `analytics/website_screen_sizes.csv`
+
+Metric and schema notes:
+
+- Canonical metric is `visits` from Cloudflare `httpRequestsAdaptiveGroups`.
+- Cached raw history keeps both hourly and derived daily snapshots.
+- Day-sliced history is checkpointed per day. If backfill is interrupted by rate limits, rerunning resumes from already-written day files.
+- `screen_sizes` is intentionally present in raw and derived schemas for compatibility, and currently remains empty unless a stable upstream dimension is introduced.
+- Path normalization removes query/hash fragments, enforces a leading slash, collapses trailing slashes (except `/`), and filters likely not-found routes (for example `/404`, `/_not-found`, `/not-found`).
+- Alias canonicalization supports redirect-style path alias maps with loop protection.
+
+Automation:
+
+- `cache-website-analytics.yml` runs hourly (and on manual dispatch), captures the latest window, regenerates derived outputs, validates that only expected website analytics files changed, and updates a bot PR.
+- `backfill-website-analytics-daily.yml` runs daily (and on manual dispatch), backfills one day-slice file under `history/website_analytics_by_day/`, regenerates derived outputs, validates expected file scope (including day-slice history files), and updates a bot PR.
+
 ## Map Demand Stats
 
 Map manifests now support auto-derived demand metrics from map ZIPs:
