@@ -223,15 +223,6 @@ Raw history and derived outputs:
   - `analytics/website_devices.csv`
   - `analytics/website_screen_sizes.csv`
 
-Metric and schema notes:
-
-- Canonical metric is `visits` from Cloudflare `httpRequestsAdaptiveGroups`.
-- Cached raw history keeps both hourly and derived daily snapshots.
-- Day-sliced history is checkpointed per day. If backfill is interrupted by rate limits, rerunning resumes from already-written day files.
-- `screen_sizes` is intentionally present in raw and derived schemas for compatibility, and currently remains empty unless a stable upstream dimension is introduced.
-- Path normalization removes query/hash fragments, enforces a leading slash, collapses trailing slashes (except `/`), and filters likely not-found routes (for example `/404`, `/_not-found`, `/not-found`).
-- Alias canonicalization supports redirect-style path alias maps with loop protection.
-
 Automation:
 
 - `cache-website-analytics.yml` runs hourly (and on manual dispatch), captures the latest window, regenerates derived outputs, validates that only expected website analytics files changed, and updates a bot PR.
