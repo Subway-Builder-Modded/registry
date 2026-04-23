@@ -3,7 +3,6 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   loadWebsiteAnalyticsHistory,
-  loadWebsiteAnalyticsHistoryFromDayFiles,
   listHourlySnapshotKeys,
   listDailySnapshotKeys,
   toDateKey,
@@ -28,7 +27,6 @@ interface AggregatedSnapshot {
   browsers: WebsiteAnalyticsMetricMap;
   operating_systems: WebsiteAnalyticsMetricMap;
   devices: WebsiteAnalyticsMetricMap;
-  screen_sizes: WebsiteAnalyticsMetricMap;
 }
 
 function aggregateMetricMaps(...maps: WebsiteAnalyticsMetricMap[]): WebsiteAnalyticsMetricMap {
@@ -53,7 +51,6 @@ function aggregateHourlyToDaily(hourlySnapshots: WebsiteAnalyticsSnapshot[]): Ag
       browsers: {},
       operating_systems: {},
       devices: {},
-      screen_sizes: {},
     };
   }
 
@@ -72,7 +69,6 @@ function aggregateHourlyToDaily(hourlySnapshots: WebsiteAnalyticsSnapshot[]): Ag
     browsers: aggregateMetricMaps(...hourlySnapshots.map((s) => s.browsers)),
     operating_systems: aggregateMetricMaps(...hourlySnapshots.map((s) => s.operating_systems)),
     devices: aggregateMetricMaps(...hourlySnapshots.map((s) => s.devices)),
-    screen_sizes: aggregateMetricMaps(...hourlySnapshots.map((s) => s.screen_sizes)),
   };
 }
 
@@ -113,26 +109,7 @@ function run(): void {
   const analyticsDir = join(repoRoot, "analytics");
   mkdirSync(analyticsDir, { recursive: true });
 
-  const baseHistory = loadWebsiteAnalyticsHistory(repoRoot);
-  const dayHistory = loadWebsiteAnalyticsHistoryFromDayFiles(
-    repoRoot,
-    baseHistory.zone_tag,
-    baseHistory.updated_at,
-  );
-  const history = {
-    ...baseHistory,
-    zone_tag: dayHistory.zone_tag || baseHistory.zone_tag,
-    updated_at: dayHistory.updated_at || baseHistory.updated_at,
-    valid_paths: Array.from(new Set([...baseHistory.valid_paths, ...dayHistory.valid_paths])).sort(),
-    path_aliases: sortObjectByKeys({
-      ...baseHistory.path_aliases,
-      ...dayHistory.path_aliases,
-    }),
-    daily_snapshots: sortObjectByKeys({
-      ...baseHistory.daily_snapshots,
-      ...dayHistory.daily_snapshots,
-    }),
-  };
+  const history = loadWebsiteAnalyticsHistory(repoRoot);
 
   // Aggregate hourly to daily
   const hourlyKeys = listHourlySnapshotKeys(history);
@@ -326,25 +303,6 @@ function run(): void {
     join(analyticsDir, "website_devices.csv"),
     ["date_or_hour", "metric", "visits"],
     devicesRows,
-  );
-
-  // Screen Sizes CSV (currently empty from Cloudflare)
-  const screenSizesRows: ByCsvRow[] = [];
-  for (const dateKey of dailyKeys) {
-    const snapshot = updatedHistory.daily_snapshots[dateKey];
-    if (!snapshot) continue;
-    for (const [screenSize, visits] of Object.entries(snapshot.screen_sizes)) {
-      screenSizesRows.push({
-        date_or_hour: dateKey,
-        metric: screenSize,
-        visits,
-      });
-    }
-  }
-  writeCsv(
-    join(analyticsDir, "website_screen_sizes.csv"),
-    ["date_or_hour", "metric", "visits"],
-    screenSizesRows,
   );
 
   console.log(

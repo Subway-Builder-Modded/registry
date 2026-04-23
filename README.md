@@ -188,7 +188,7 @@ The hourly workflow writes:
   - `pnpm --dir scripts run capture-website-analytics`
 - Generate derived website analytics artifacts from cached history:
   - `pnpm --dir scripts run generate-website-analytics`
-- Backfill website analytics by day (default: 1 day):
+- Backfill historical hourly snapshots (default: 7 days):
   - `pnpm --dir scripts run backfill-website-analytics`
   - `pnpm --dir scripts run backfill-website-analytics -- --days <N>`
 
@@ -211,7 +211,6 @@ Raw history and derived outputs:
 
 - Raw source:
   - `history/website_analytics.json`
-  - `history/website_analytics_by_day/website_analytics_YYYY_MM_DD.json`
 - Derived analytics exports:
   - `analytics/website_analytics.json`
   - `analytics/website_analytics_by_day.csv`
@@ -221,12 +220,10 @@ Raw history and derived outputs:
   - `analytics/website_browsers.csv`
   - `analytics/website_operating_systems.csv`
   - `analytics/website_devices.csv`
-  - `analytics/website_screen_sizes.csv`
 
 Automation:
 
 - `cache-website-analytics.yml` runs hourly (and on manual dispatch), captures the latest window, regenerates derived outputs, validates that only expected website analytics files changed, and updates a bot PR.
-- `backfill-website-analytics-daily.yml` runs daily (and on manual dispatch), backfills one day-slice file under `history/website_analytics_by_day/`, regenerates derived outputs, validates expected file scope (including day-slice history files), and updates a bot PR.
 
 ## Map Demand Stats
 

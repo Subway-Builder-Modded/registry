@@ -1,17 +1,15 @@
 import { pathToFileURL } from "node:url";
 import {
   createEmptyWebsiteAnalyticsHistory,
-  getWebsiteAnalyticsDayFilePath,
   loadWebsiteAnalyticsHistory,
   writeWebsiteAnalyticsHistory,
-  writeWebsiteAnalyticsDayFile,
-  upsertDailySnapshot,
+  upsertHourlySnapshot,
   updateValidPaths,
+  toHourBucketIso,
   toDateKey,
   normalizeAndCanonicalizePath,
   mergeSortedUniqueStrings,
   sortMetricMap,
-  type WebsiteAnalyticsDayFile,
   type WebsiteAnalyticsSnapshot,
   type WebsiteAnalyticsMetricMap,
 } from "./lib/website-analytics.js";
@@ -22,7 +20,6 @@ import {
   type CloudflareWebsiteAnalyticsQueryParams,
 } from "./lib/cloudflare-website-analytics.js";
 import { loadLocalDotEnv, resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
-import { existsSync } from "node:fs";
 
 interface CliArgs {
   repoRoot: string;
@@ -32,7 +29,7 @@ interface CliArgs {
   resetHistory: boolean;
 }
 
-const DEFAULT_BACKFILL_DAYS = 1;
+const DEFAULT_BACKFILL_DAYS = 7;
 
 function parseArgs(argv: string[]): CliArgs {
   const repoRoot = resolveRepoRoot(import.meta.dirname);
@@ -152,7 +149,6 @@ async function captureWindowAnalytics(
     browsers: normalizedBrowsers,
     operating_systems: normalizedOs,
     devices: normalizedDevices,
-    screen_sizes: {},
   };
 }
 
@@ -165,89 +161,80 @@ async function run(): Promise<void> {
     ? createEmptyWebsiteAnalyticsHistory(args.zoneTag, capturedAtIso)
     : loadWebsiteAnalyticsHistory(args.repoRoot, args.zoneTag, capturedAtIso);
 
-  const endDayStart = new Date(now.toISOString().slice(0, 10));
-  const startDayStart = new Date(endDayStart.getTime() - (args.days * 24 * 60 * 60 * 1000));
+  const endHour = toHourBucketIso(now);
+  const startHourDate = new Date(Date.parse(endHour) - (args.days * 24 * 60 * 60 * 1000));
 
   console.log(
-    `Backfilling website analytics daily snapshots for ${args.days} day(s) from ${startDayStart.toISOString()} to ${endDayStart.toISOString()} (exclusive end)`,
+    `Backfilling website analytics hourly snapshots for ${args.days} day(s) from ${startHourDate.toISOString()} to ${endHour}`,
   );
 
-  let capturedDays = 0;
-  let skippedDays = 0;
+  let capturedHours = 0;
+  let skippedHours = 0;
 
-  for (let cursorMs = startDayStart.getTime(); cursorMs < endDayStart.getTime(); cursorMs += 24 * 60 * 60 * 1000) {
-    const dayStartIso = new Date(cursorMs).toISOString();
-    const dayEndIso = new Date(cursorMs + 24 * 60 * 60 * 1000).toISOString();
-    const dayKey = toDateKey(dayStartIso);
-    if (!dayKey) continue;
-    const dayFilePath = getWebsiteAnalyticsDayFilePath(args.repoRoot, dayKey);
+  for (let cursorMs = startHourDate.getTime(); cursorMs < Date.parse(endHour); cursorMs += 60 * 60 * 1000) {
+    const windowStartIso = new Date(cursorMs).toISOString();
+    const windowEndIso = new Date(cursorMs + 60 * 60 * 1000).toISOString();
+    const hourKey = toHourBucketIso(new Date(cursorMs));
 
-    if (!args.resetHistory && existsSync(dayFilePath)) {
-      skippedDays += 1;
+    if (!args.resetHistory && history.hourly_snapshots[hourKey]) {
+      skippedHours += 1;
       continue;
     }
 
-    console.log(`Fetching day ${dayKey}...`);
-    let dailySnapshot: WebsiteAnalyticsSnapshot;
+    console.log(`Fetching hour ${hourKey}...`);
+    let hourlySnapshot: WebsiteAnalyticsSnapshot;
     try {
-      dailySnapshot = await captureWindowAnalytics(
+      hourlySnapshot = await captureWindowAnalytics(
         args.zoneTag,
         args.apiToken,
         history.path_aliases,
-        dayStartIso,
-        dayEndIso,
+        windowStartIso,
+        windowEndIso,
         capturedAtIso,
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (message.includes("cannot request data older than")) {
         throw new Error(
-          `Cloudflare retention window exceeded while fetching day ${dayKey}. Re-run with a smaller window (for example: pnpm --dir scripts run backfill-website-analytics -- --days 1). Original error: ${message}`,
+          `Cloudflare retention window exceeded while fetching hour ${hourKey}. Re-run with a smaller window (for example: pnpm --dir scripts run backfill-website-analytics -- --days 7). Original error: ${message}`,
         );
       }
       if (message.includes("Rate limiter budget depleted")) {
         throw new Error(
-          `Cloudflare rate limit hit while fetching day ${dayKey}. Already-captured day files are checkpointed under history/website_analytics_by_day/. Wait 5 minutes and re-run the same command to resume. Original error: ${message}`,
+          `Cloudflare rate limit hit while fetching hour ${hourKey}. Progress is checkpointed in history/website_analytics.json. Wait 5 minutes and re-run the same command to resume. Original error: ${message}`,
         );
       }
       throw error;
     }
 
-    history = upsertDailySnapshot({
+    history = upsertHourlySnapshot({
       history,
-      snapshot: dailySnapshot,
-      snapshotKey: dayKey,
+      snapshot: hourlySnapshot,
+      snapshotKey: hourKey,
       updatedAt: capturedAtIso,
     });
 
-    const discoveredPaths = Object.keys(dailySnapshot.pages).sort();
+    const discoveredPaths = Object.keys(hourlySnapshot.pages).sort();
     history = updateValidPaths(
       history,
       mergeSortedUniqueStrings(history.valid_paths, discoveredPaths),
       capturedAtIso,
     );
 
-    const dayFile: WebsiteAnalyticsDayFile = {
-      schema_version: 1,
-      zone_tag: history.zone_tag,
-      date: dayKey,
-      updated_at: capturedAtIso,
-      valid_paths: history.valid_paths,
-      path_aliases: history.path_aliases,
-      daily_snapshot: dailySnapshot,
-    };
-    writeWebsiteAnalyticsDayFile(args.repoRoot, dayKey, dayFile);
+    capturedHours += 1;
+    if (capturedHours % 24 === 0) {
+      writeWebsiteAnalyticsHistory(args.repoRoot, history);
+      const dateKey = toDateKey(hourKey) ?? "unknown-date";
+      console.log(`Checkpoint saved through ${dateKey} (${capturedHours} hour(s) captured)`);
+    }
 
-    // Checkpoint after each day.
-    writeWebsiteAnalyticsHistory(args.repoRoot, history);
-    capturedDays += 1;
-    console.log(`Checkpoint saved for day ${dayKey} (${capturedDays} day(s) captured)`);
+    await new Promise((resolve) => setTimeout(resolve, 250));
   }
 
   writeWebsiteAnalyticsHistory(args.repoRoot, history);
 
   console.log(
-    `Backfill complete: captured_days=${capturedDays}, skipped_days=${skippedDays}, totalDailySnapshots=${Object.keys(history.daily_snapshots).length}`,
+    `Backfill complete: captured_hours=${capturedHours}, skipped_hours=${skippedHours}, totalHourlySnapshots=${Object.keys(history.hourly_snapshots).length}`,
   );
 }
 

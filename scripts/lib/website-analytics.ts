@@ -31,7 +31,6 @@ export interface WebsiteAnalyticsSnapshot {
   browsers: WebsiteAnalyticsMetricMap;
   operating_systems: WebsiteAnalyticsMetricMap;
   devices: WebsiteAnalyticsMetricMap;
-  screen_sizes: WebsiteAnalyticsMetricMap;
 }
 
 export interface WebsiteAnalyticsHistory {
@@ -142,7 +141,6 @@ function normalizeSnapshot(value: unknown): WebsiteAnalyticsSnapshot | null {
     browsers: normalizeMetricMap(value.browsers),
     operating_systems: normalizeMetricMap(value.operating_systems),
     devices: normalizeMetricMap(value.devices),
-    screen_sizes: normalizeMetricMap(value.screen_sizes),
   };
 }
 

@@ -127,7 +127,6 @@ async function captureWindowAnalytics(
     browsers: normalizedBrowsers,
     operating_systems: normalizedOs,
     devices: normalizedDevices,
-    screen_sizes: {}, // not populated from Cloudflare currently
   };
 }
 

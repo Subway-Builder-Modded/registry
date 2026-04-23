@@ -51,7 +51,6 @@ jobs:
             local p="$1"
             case "$p" in
               history/website_analytics.json) return 0 ;;
-              history/website_analytics_by_day/website_analytics_*.json) return 0 ;;
               analytics/website_analytics.json) return 0 ;;
               analytics/website_analytics_by_day.csv) return 0 ;;
               analytics/website_analytics_by_hour.csv) return 0 ;;
@@ -60,7 +59,6 @@ jobs:
               analytics/website_browsers.csv) return 0 ;;
               analytics/website_operating_systems.csv) return 0 ;;
               analytics/website_devices.csv) return 0 ;;
-              analytics/website_screen_sizes.csv) return 0 ;;
               *) return 1 ;;
             esac
           }
@@ -77,7 +75,6 @@ jobs:
         run: |
           git add \
             history/website_analytics.json \
-            history/website_analytics_by_day/*.json \
             analytics/website_analytics.json \
             analytics/website_analytics_by_day.csv \
             analytics/website_analytics_by_hour.csv \
@@ -85,8 +82,7 @@ jobs:
             analytics/website_countries.csv \
             analytics/website_browsers.csv \
             analytics/website_operating_systems.csv \
-            analytics/website_devices.csv \
-            analytics/website_screen_sizes.csv 2>/dev/null || true
+            analytics/website_devices.csv 2>/dev/null || true
 
           if git diff --cached --quiet; then
             echo "No website analytics changes detected; skipping PR update."
