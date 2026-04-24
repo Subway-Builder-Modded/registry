@@ -83,6 +83,13 @@ interface ByCsvSummaryRow {
   visits: number;
 }
 
+interface ByDayDetailedCsvRow {
+  date_or_hour: string;
+  dimension: string;
+  metric: string;
+  visits: number;
+}
+
 interface WebsiteAnalyticsExport {
   schema_version: 1;
   zone_tag: string;
@@ -179,18 +186,66 @@ function run(): void {
 
   // Generate CSV exports for each dimension
   // By day CSV
-  const byDayRows: ByCsvSummaryRow[] = [];
+  const byDayRows: ByDayDetailedCsvRow[] = [];
   for (const dateKey of dailyKeys) {
     const snapshot = updatedHistory.daily_snapshots[dateKey];
     if (!snapshot) continue;
+
     byDayRows.push({
       date_or_hour: dateKey,
+      dimension: "totals",
+      metric: "visits",
       visits: snapshot.totals.visits,
     });
+
+    for (const [page, visits] of Object.entries(snapshot.pages)) {
+      byDayRows.push({
+        date_or_hour: dateKey,
+        dimension: "pages",
+        metric: page,
+        visits,
+      });
+    }
+
+    for (const [country, visits] of Object.entries(snapshot.countries)) {
+      byDayRows.push({
+        date_or_hour: dateKey,
+        dimension: "countries",
+        metric: country,
+        visits,
+      });
+    }
+
+    for (const [browser, visits] of Object.entries(snapshot.browsers)) {
+      byDayRows.push({
+        date_or_hour: dateKey,
+        dimension: "browsers",
+        metric: browser,
+        visits,
+      });
+    }
+
+    for (const [os, visits] of Object.entries(snapshot.operating_systems)) {
+      byDayRows.push({
+        date_or_hour: dateKey,
+        dimension: "operating_systems",
+        metric: os,
+        visits,
+      });
+    }
+
+    for (const [device, visits] of Object.entries(snapshot.devices)) {
+      byDayRows.push({
+        date_or_hour: dateKey,
+        dimension: "devices",
+        metric: device,
+        visits,
+      });
+    }
   }
   writeCsv(
     join(analyticsDir, "website_analytics_by_day.csv"),
-    ["date_or_hour", "visits"],
+    ["date_or_hour", "dimension", "metric", "visits"],
     byDayRows,
   );
 
