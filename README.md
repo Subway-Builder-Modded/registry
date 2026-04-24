@@ -182,6 +182,49 @@ The hourly workflow writes:
 - `analytics/railyard_app_downloads.json`
 - `analytics/railyard_app_downloads.csv`
 
+## Website Analytics
+
+- Capture one hourly website analytics snapshot:
+  - `pnpm --dir scripts run capture-website-analytics`
+- Generate derived website analytics artifacts from cached history:
+  - `pnpm --dir scripts run generate-website-analytics`
+- Backfill historical hourly snapshots (default: 7 days):
+  - `pnpm --dir scripts run backfill-website-analytics`
+  - `pnpm --dir scripts run backfill-website-analytics -- --days <N>`
+
+Cloudflare environment variables:
+
+- Zone identifier:
+  - `CLOUDFLARE_ZONE_TAG`
+- API token:
+  - `CLOUDFLARE_API_TOKEN`
+
+Local development:
+
+- `capture-website-analytics` and `backfill-website-analytics` automatically load a repository-root `.env` file when present.
+- Existing shell environment variables take precedence over `.env` values.
+- Example `.env`:
+  - `CLOUDFLARE_ZONE_TAG=...`
+  - `CLOUDFLARE_API_TOKEN=...`
+
+Raw history and derived outputs:
+
+- Raw source:
+  - `history/website_analytics.json`
+- Derived analytics exports:
+  - `analytics/website_analytics.json`
+  - `analytics/website_analytics_by_day.csv`
+  - `analytics/website_analytics_by_hour.csv`
+  - `analytics/website_pages.csv`
+  - `analytics/website_countries.csv`
+  - `analytics/website_browsers.csv`
+  - `analytics/website_operating_systems.csv`
+  - `analytics/website_devices.csv`
+
+Automation:
+
+- `cache-website-analytics.yml` runs hourly (and on manual dispatch), captures the latest window, regenerates derived outputs, validates that only expected website analytics files changed, and updates a bot PR.
+
 ## Map Demand Stats
 
 Map manifests now support auto-derived demand metrics from map ZIPs:
