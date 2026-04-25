@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-25T20:49:25.731Z",
+  "generated_at": "2026-04-25T21:47:43.240Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -3695,6 +3695,59 @@
           },
           "fingerprint": "rules:v6:sha256:66185202c0dae40e185c4689680ecc2475880fca01fbf3ab3c569c6dd13038e9",
           "checked_at": "2026-04-21T04:23:42.604Z"
+        }
+      }
+    },
+    "guangzhou": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CAN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 370.61,
+          "file_sizes": {
+            "CAN.pmtiles": 243.62,
+            "buildings_index.json": 488.95,
+            "config.json": 0,
+            "demand_data.json": 22.93,
+            "roads.geojson": 59.2,
+            "runways_taxiways.geojson": 2.61
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "kronifer/sb-guangzhou-map",
+            "tag": "v1.0.0",
+            "asset_name": "CAN.zip",
+            "download_url": "https://github.com/Kronifer/sb-guangzhou-map/releases/download/v1.0.0/CAN.zip"
+          },
+          "fingerprint": "rules:v6:github:kronifer/sb-guangzhou-map:v1.0.0:CAN.zip",
+          "checked_at": "2026-04-25T21:47:43.240Z"
         }
       }
     },
