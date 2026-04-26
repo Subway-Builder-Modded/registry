@@ -1,12 +1,12 @@
 # 中海 (Nakaumi)
 
-### IZO · v0.2.0
+### IZO · v0.3.0
 
 Part of the [Japan Map Pack](https://ahkimn.github.io/subwaybuilder-jp-maps).
 
-Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 Japanese government statistics. This map centers on the shores of 中海, a brackish lake between 鳥取県 (Tottori Prefecture) and 島根県 (Shimane Prefecture) in western Japan. The map includes the cities of 米子 (Yonago), 松江 (Matsue), and 出雲 (Izumo), as well as 9 surrounding municipalities.
+Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 Japanese government statistics.
 
-![Map Coverage](../maps/yukina-nakaumi/gallery/preview.png)
+![Map Coverage](preview.png)
 
 ## Coverage
 
@@ -42,23 +42,23 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 <table style="width: auto">
 <tr><td><strong>Total Population</strong></td><td align="right">674,313</td></tr>
 <tr><td><strong>Working Age Population</strong></td><td align="right">367,180</td></tr>
-<tr><td><strong>Total Modeled Demand</strong></td><td align="right">472,059</td></tr>
+<tr><td><strong>Total Modeled Demand</strong></td><td align="right">472,700</td></tr>
 <tr><td><strong>Modeled Normal Demand</strong></td><td align="right">336,035</td></tr>
-<tr><td><strong>Modeled Special Demand</strong></td><td align="right">136,024</td></tr>
+<tr><td><strong>Modeled Special Demand</strong></td><td align="right">136,665</td></tr>
 </table>
 
 ## Map Statistics
 
 <table style="width: auto">
 <tr><td><strong>Buildings Indexed</strong></td><td align="right">359,769</td></tr>
-<tr><td><strong>Demand Points</strong></td><td align="right">6,443</td></tr>
-<tr><td><strong>Populations</strong></td><td align="right">15,789</td></tr>
-<tr><td><strong>Median Point Size</strong></td><td align="right">72</td></tr>
-<tr><td><strong>Mean Point Size</strong></td><td align="right">135.6</td></tr>
-<tr><td><strong>Median Population Size</strong></td><td align="right">25</td></tr>
-<tr><td><strong>Mean Population Size</strong></td><td align="right">28.7</td></tr>
-<tr><td><strong>Median Commute Distance</strong></td><td align="right">6.55 km</td></tr>
-<tr><td><strong>Mean Commute Distance</strong></td><td align="right">10.71 km</td></tr>
+<tr><td><strong>Demand Points</strong></td><td align="right">6,448</td></tr>
+<tr><td><strong>Populations</strong></td><td align="right">15,820</td></tr>
+<tr><td><strong>Median Point Size</strong></td><td align="right">78</td></tr>
+<tr><td><strong>Mean Point Size</strong></td><td align="right">146.6</td></tr>
+<tr><td><strong>Median Population Size</strong></td><td align="right">26</td></tr>
+<tr><td><strong>Mean Population Size</strong></td><td align="right">29.9</td></tr>
+<tr><td><strong>Median Commute Distance</strong></td><td align="right">7.04 km</td></tr>
+<tr><td><strong>Mean Commute Distance</strong></td><td align="right">11.17 km</td></tr>
 </table>
 
 ## Special Demand
@@ -85,7 +85,7 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 
 </details>
 <details>
-<summary>病院 (Hospitals) — 15,333 Patients (3.25% of Total Demand)</summary>
+<summary>病院 (Hospitals) — 15,333 Patients (3.24% of Total Demand)</summary>
 
 <table style="width: auto">
 <tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Bed Capacity&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Est. Outpatient&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 病院 Demand&nbsp;&nbsp;</th></tr>
@@ -141,7 +141,7 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 ### Education
 
 <details>
-<summary>小学校 (Elementary Schools) — 33,599 Students (7.12% of Total Demand)</summary>
+<summary>小学校 (Elementary Schools) — 33,599 Students (7.11% of Total Demand)</summary>
 
 <table style="width: auto">
 <tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 小学校 Demand&nbsp;&nbsp;</th></tr>
@@ -444,7 +444,7 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 
 </details>
 <details>
-<summary>大学 (Universities) — 8,285 Students (1.76% of Total Demand)</summary>
+<summary>大学 (Universities) — 8,285 Students (1.75% of Total Demand)</summary>
 
 <table style="width: auto">
 <tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Enrollment&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 大学 Demand&nbsp;&nbsp;</th></tr>
@@ -479,21 +479,22 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 ### Attractions
 
 <details>
-<summary>美術館 (Art Museums) — 3,138 Visitors (0.66% of Total Demand)</summary>
+<summary>美術館 (Art Museums) — 3,294 Visitors (0.70% of Total Demand)</summary>
 
 <table style="width: auto">
 <tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 美術館 Demand&nbsp;&nbsp;</th></tr>
-<tr><td align="left">&nbsp;&nbsp;足立美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;546,583&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1,497&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;47.71%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;島根県立美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;240,645&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;659&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;21.00%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;八重垣神社収蔵庫&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;209,555&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;574&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;18.29%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;清水寺宝蔵&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;101,500&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;278&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;8.86%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;月山富田城跡&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;17,012&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;47&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1.50%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;月照寺宝物殿&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;13,118&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;36&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1.15%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;安来市立加納美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;5,942&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;16&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.51%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;田部美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;4,030&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;11&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.35%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;出雲民芸館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;3,180&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;9&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.29%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;安部榮四郎記念館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;2,829&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;8&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.25%&nbsp;&nbsp;</td></tr>
-<tr><td align="left">&nbsp;&nbsp;手錢記念館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1,131&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;3&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.10%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;足立美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;546,583&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1,497&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;45.45%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;島根県立美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;240,645&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;659&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;20.01%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;八重垣神社収蔵庫&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;209,555&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;574&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;17.43%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;清水寺宝蔵&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;101,500&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;278&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;8.44%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;米子市美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;56,807&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;156&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;4.74%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;月山富田城跡&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;17,012&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;47&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1.43%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;月照寺宝物殿&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;13,118&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;36&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1.09%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;安来市立加納美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;5,942&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;16&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.49%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;田部美術館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;4,030&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;11&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.33%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;出雲民芸館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;3,180&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;9&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.27%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;安部榮四郎記念館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;2,829&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;8&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.24%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;手錢記念館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1,131&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;3&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;0.09%&nbsp;&nbsp;</td></tr>
 </table>
 
 </details>
@@ -545,10 +546,10 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 
 </details>
 <details>
-<summary>hot_spring (Hot Springs) — 5,219 Visitors (1.11% of Total Demand)</summary>
+<summary>温泉 (Hot Springs) — 5,219 Visitors (1.10% of Total Demand)</summary>
 
 <table style="width: auto">
-<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of hot_spring Demand&nbsp;&nbsp;</th></tr>
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 温泉 Demand&nbsp;&nbsp;</th></tr>
 <tr><td align="left">&nbsp;&nbsp;玉造温泉&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;504,502&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1,175&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;22.51%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;皆生温泉&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;407,020&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;948&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;18.16%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;松江しんじ湖温泉&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;305,830&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;712&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;13.64%&nbsp;&nbsp;</td></tr>
@@ -569,10 +570,10 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 
 </details>
 <details>
-<summary>natural_feature (Natural Features) — 3,391 Visitors (0.72% of Total Demand)</summary>
+<summary>自然景勝地 (Natural Features) — 3,391 Visitors (0.72% of Total Demand)</summary>
 
 <table style="width: auto">
-<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of natural_feature Demand&nbsp;&nbsp;</th></tr>
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 自然景勝地 Demand&nbsp;&nbsp;</th></tr>
 <tr><td align="left">&nbsp;&nbsp;日御碕&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;864,940&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;2,133&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;62.90%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;美保関灯台&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;397,763&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;981&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;28.93%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;立久恵峡&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;91,356&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;225&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;6.64%&nbsp;&nbsp;</td></tr>
@@ -581,10 +582,10 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 
 </details>
 <details>
-<summary>park_general (Parks) — 995 Visitors (0.21% of Total Demand)</summary>
+<summary>公園 (Parks) — 995 Visitors (0.21% of Total Demand)</summary>
 
 <table style="width: auto">
-<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of park_general Demand&nbsp;&nbsp;</th></tr>
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 公園 Demand&nbsp;&nbsp;</th></tr>
 <tr><td align="left">&nbsp;&nbsp;由志園&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;223,185&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;550&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;55.28%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;宍道湖グリーンパーク&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;82,997&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;205&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;20.60%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;しまね花の郷&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;71,074&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;175&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;17.59%&nbsp;&nbsp;</td></tr>
@@ -593,19 +594,29 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 
 </details>
 <details>
-<summary>park_sports_complex (Sports Complexes) — 255 Visitors (0.05% of Total Demand)</summary>
+<summary>運動施設 (Sports Complexes) — 255 Visitors (0.05% of Total Demand)</summary>
 
 <table style="width: auto">
-<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of park_sports_complex Demand&nbsp;&nbsp;</th></tr>
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 運動施設 Demand&nbsp;&nbsp;</th></tr>
 <tr><td align="left">&nbsp;&nbsp;出雲ゆうプラザ&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;132,959&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;255&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;100.00%&nbsp;&nbsp;</td></tr>
 </table>
 
 </details>
 <details>
-<summary>shrine (Shrines) — 19,192 Visitors (4.07% of Total Demand)</summary>
+<summary>商業施設 (Shopping Center) — 485 Visitors (0.10% of Total Demand)</summary>
 
 <table style="width: auto">
-<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of shrine Demand&nbsp;&nbsp;</th></tr>
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 商業施設 Demand&nbsp;&nbsp;</th></tr>
+<tr><td align="left">&nbsp;&nbsp;島根県物産観光館&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;140,788&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;270&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;55.67%&nbsp;&nbsp;</td></tr>
+<tr><td align="left">&nbsp;&nbsp;カラコロ工房&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;112,320&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;215&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;44.33%&nbsp;&nbsp;</td></tr>
+</table>
+
+</details>
+<details>
+<summary>神社 (Shrines) — 19,192 Visitors (4.06% of Total Demand)</summary>
+
+<table style="width: auto">
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 神社 Demand&nbsp;&nbsp;</th></tr>
 <tr><td align="left">&nbsp;&nbsp;出雲大社&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;6,982,000&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;15,303&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;79.74%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;美保神社&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;784,400&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1,719&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;8.96%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;熊野大社&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;274,000&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;601&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;3.13%&nbsp;&nbsp;</td></tr>
@@ -619,19 +630,19 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 
 </details>
 <details>
-<summary>temple (Temples) — 683 Visitors (0.14% of Total Demand)</summary>
+<summary>寺院 (Temples) — 683 Visitors (0.14% of Total Demand)</summary>
 
 <table style="width: auto">
-<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of temple Demand&nbsp;&nbsp;</th></tr>
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 寺院 Demand&nbsp;&nbsp;</th></tr>
 <tr><td align="left">&nbsp;&nbsp;一畑薬師&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;277,000&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;683&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;100.00%&nbsp;&nbsp;</td></tr>
 </table>
 
 </details>
 <details>
-<summary>theme_park (Theme Parks) — 2,252 Visitors (0.48% of Total Demand)</summary>
+<summary>テーマパーク (Theme Parks) — 2,252 Visitors (0.48% of Total Demand)</summary>
 
 <table style="width: auto">
-<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of theme_park Demand&nbsp;&nbsp;</th></tr>
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of テーマパーク Demand&nbsp;&nbsp;</th></tr>
 <tr><td align="left">&nbsp;&nbsp;島根ワイナリー&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;438,738&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;1,202&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;53.37%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;松江フォーゲルパーク&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;193,122&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;529&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;23.49%&nbsp;&nbsp;</td></tr>
 <tr><td align="left">&nbsp;&nbsp;ぐるっと松江堀川めぐり&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;190,207&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;521&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;23.13%&nbsp;&nbsp;</td></tr>
@@ -639,10 +650,10 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 
 </details>
 <details>
-<summary>track (Racing Tracks) — 150 Visitors (0.03% of Total Demand)</summary>
+<summary>競走場 (Racing Tracks) — 150 Visitors (0.03% of Total Demand)</summary>
 
 <table style="width: auto">
-<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of track Demand&nbsp;&nbsp;</th></tr>
+<tr><th align="left">&nbsp;&nbsp;Name&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Annual Visitors&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;Modeled Demand&nbsp;&nbsp;</th><th align="right">&nbsp;&nbsp;% of 競走場 Demand&nbsp;&nbsp;</th></tr>
 <tr><td align="left">&nbsp;&nbsp;ボートピア松江&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;54,924&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;150&nbsp;&nbsp;</td><td align="right">&nbsp;&nbsp;100.00%&nbsp;&nbsp;</td></tr>
 </table>
 
@@ -657,9 +668,9 @@ Highly-detailed map of the 中海 (Nakaumi) metropolitan region using 2020/2021 
 - **Ocean Foundations** — A depth-colored ocean floor layer is included, providing a visual representation of ocean and coastal bathymetry visible on the in-game map.
 
 - **Neighborhood Labels** — Three layers of place name labels are embedded in the map:
-  - _City labels_ — Major designated city names (政令指定都市) at the metropolitan scale.
-  - _Municipality labels_ — Names of all cities, towns, and villages (市区町村) within the map boundary.
-  - _Neighborhood labels_ — Sub-municipal district names corresponding to hamlet and village subdivisions (大字, ōaza) from MLIT National Land Numerical Information (国土数値情報), with automatic fallback to block-level names (町丁目, chōchō) where subdivision boundary data is unavailable.
+  - *City labels* — Major designated city names (政令指定都市) at the metropolitan scale.
+  - *Municipality labels* — Names of all cities, towns, and villages (市区町村) within the map boundary.
+  - *Neighborhood labels* — Sub-municipal district names corresponding to hamlet and village subdivisions (大字, ōaza) from MLIT National Land Numerical Information (国土数値情報), with automatic fallback to block-level names (町丁目, chōchō) where subdivision boundary data is unavailable.
 
 ## Methodology
 
@@ -695,7 +706,7 @@ All demand modeling in this map is derived from freely available Japanese govern
 
 ## License
 
-This map data is released under the [MIT License](https://opensource.org/licenses/MIT).
+This map data is released under the [GNU General Public License v3.0](https://github.com/ahkimn/subwaybuilder-jp-maps/blob/main/LICENSE).
 
 ## Credits
 
