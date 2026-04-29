@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T17:44:12.548Z",
+  "generated_at": "2026-04-29T18:05:29.349Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -3840,14 +3840,14 @@
     },
     "guangzhou": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.0.0",
+      "latest_semver_version": "1.0.0",
       "latest_semver_complete": true,
       "complete_versions": [
-        "v1.0.0"
+        "1.0.0"
       ],
       "incomplete_versions": [],
       "versions": {
-        "v1.0.0": {
+        "1.0.0": {
           "is_complete": true,
           "errors": [],
           "required_checks": {
@@ -3880,14 +3880,14 @@
             "runways_taxiways.geojson": 2.61
           },
           "source": {
-            "update_type": "github",
-            "repo": "kronifer/sb-guangzhou-map",
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
             "tag": "v1.0.0",
             "asset_name": "CAN.zip",
-            "download_url": "https://github.com/Kronifer/sb-guangzhou-map/releases/download/v1.0.0/CAN.zip"
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.0.0/CAN.zip"
           },
-          "fingerprint": "rules:v6:github:kronifer/sb-guangzhou-map:v1.0.0:CAN.zip",
-          "checked_at": "2026-04-25T21:47:43.240Z"
+          "fingerprint": "rules:v6:sha256:f39ddb3670ef7804cba0039357f495099fe0cc55b9d34b09db4a9c4e166106f9",
+          "checked_at": "2026-04-29T18:05:29.349Z"
         }
       }
     },
@@ -9340,6 +9340,59 @@
           },
           "fingerprint": "rules:v6:sha256:3936e32fbe8cf7a8168bc527962f7b5710365af5bb78c5f68f4b5ad5595f6835",
           "checked_at": "2026-04-23T17:26:29.560Z"
+        }
+      }
+    },
+    "shanghai": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SHA.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 222.87,
+          "file_sizes": {
+            "SHA.pmtiles": 160.27,
+            "buildings_index.json": 281.73,
+            "config.json": 0,
+            "demand_data.json": 20.37,
+            "roads.geojson": 42,
+            "runways_taxiways.geojson": 2.04
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.1.0",
+            "asset_name": "SHA.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.1.0/SHA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:91aca774ac3c0a872d8afc6a28aa40de551d2f2d7bd83e7fb799a7d1ca12e0b3",
+          "checked_at": "2026-04-29T18:05:29.349Z"
         }
       }
     },
