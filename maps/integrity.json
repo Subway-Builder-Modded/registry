@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-04-29T18:14:10.600Z",
+  "generated_at": "2026-04-29T19:22:14.109Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -9858,6 +9858,61 @@
           },
           "fingerprint": "rules:v6:github:willbarouch/subwaybuilder-sydney:1.2.0:syd.zip",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        }
+      }
+    },
+    "syracuse-ny": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SYR.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 35.32,
+          "file_sizes": {
+            "SYR.pmtiles": 17.45,
+            "__MACOSX/._config.json": 0,
+            "buildings_index.json": 64.49,
+            "config.json": 0,
+            "demand_data.json": 3.07,
+            "ocean_depth_index.json": 0.8,
+            "roads.geojson": 4.8,
+            "runways_taxiways.geojson": 0.34
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "pswbsf/syracuse-ny",
+            "tag": "1.0.0",
+            "asset_name": "Syracuse.zip",
+            "download_url": "https://github.com/PSWBSF/syracuse-ny/releases/download/1.0.0/Syracuse.zip"
+          },
+          "fingerprint": "rules:v6:github:pswbsf/syracuse-ny:1.0.0:Syracuse.zip",
+          "checked_at": "2026-04-29T19:22:14.109Z"
         }
       }
     },
