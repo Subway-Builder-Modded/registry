@@ -3477,23 +3477,52 @@
       }
     },
     "greater-newyork": {
-      "V1.0.1": {
-        "fingerprint": "rules:v6:github:chasemanning040911-afk/greater-new-york:V1.0.1:greater-newyorkV1.0.1.zip",
-        "last_checked_at": "2026-05-01T19:13:42.066Z",
+      "v1.0.1": {
+        "fingerprint": "rules:v6:github:chasemanning040911-afk/greater-new-york:v1.0.1:greater-newyorkv1.0.1.zip",
+        "last_checked_at": "2026-05-01T19:51:52.659Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'V1.0.1'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "NYC_AREA_BOUNDARY.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 343.09,
+          "file_sizes": {
+            "NYC_AREA_BOUNDARY.pmtiles": 286.06,
+            "NYC_AREA_BOUNDARY.svg": 0,
+            "buildings_index.json": 151.33,
+            "config.json": 0,
+            "demand_data.json": 51.68,
+            "ocean_depth_index.json": 8.38,
+            "roads.geojson": 50.75,
+            "runways_taxiways.geojson": 0.08
+          },
           "source": {
             "update_type": "github",
             "repo": "chasemanning040911-afk/greater-new-york",
-            "tag": "V1.0.1"
+            "tag": "v1.0.1",
+            "asset_name": "greater-newyorkv1.0.1.zip",
+            "download_url": "https://github.com/chasemanning040911-afk/greater-new-york/releases/download/v1.0.1/greater-newyorkv1.0.1.zip"
           },
-          "fingerprint": "rules:v6:github:chasemanning040911-afk/greater-new-york:V1.0.1:greater-newyorkV1.0.1.zip",
-          "checked_at": "2026-05-01T19:13:42.066Z"
+          "fingerprint": "rules:v6:github:chasemanning040911-afk/greater-new-york:v1.0.1:greater-newyorkv1.0.1.zip",
+          "checked_at": "2026-05-01T19:51:52.659Z"
         }
       }
     },
