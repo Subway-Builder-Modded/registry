@@ -39,5 +39,82 @@
   "special_demand": [
     "airports"
   ],
-  "file_sizes": {}
+  "file_sizes": {},
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.23795948119840638,
+      "p25": 0.27087292744529234,
+      "p50": 0.3287885632046215,
+      "p75": 0.46004448914327595,
+      "p90": 0.6481022374826446,
+      "mean": 0.39485460472674627
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1724227764322742,
+      "p25": 0.19984143137680194,
+      "p50": 0.2769811783106766,
+      "p75": 0.388119984503598,
+      "p90": 0.569986061233995,
+      "mean": 0.33045923517505915
+    },
+    "commuteDistanceKm": {
+      "p10": 4042,
+      "p25": 10026,
+      "p50": 20840,
+      "p75": 38095,
+      "p90": 57694,
+      "mean": 26408.31621076715
+    },
+    "residentCellDensity": {
+      "p10": 123,
+      "p25": 286,
+      "p50": 642,
+      "p75": 1406,
+      "p90": 3713,
+      "mean": 1534.2704119850187
+    },
+    "workerCellDensity": {
+      "p10": 69,
+      "p25": 172,
+      "p50": 461,
+      "p75": 1150,
+      "p90": 2605,
+      "mean": 1534.9921289355323
+    },
+    "detail": {
+      "radiusKm": 0.3017751541321625,
+      "expectedPointSpacingKm": 0.6694780331124268,
+      "normalizedRadius": 0.4507618461044931,
+      "activityPerPoint": 685.6418410041841,
+      "playableAreaKm2": 3296,
+      "playableAreaPerPointKm2": 0.55163179916318,
+      "playableCatchmentRadiusKm": 0.41903443200647783,
+      "localityScore": 0.7321161752245906,
+      "deaggregationScore": 1,
+      "score": 0.8556378762213549
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.8020010228231832,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -73.82014598638062,
+            "latitude": 40.7613665854035,
+            "massShare": 1,
+            "assignedMass": 8193420,
+            "assignedPointCount": 5975,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  }
 }
