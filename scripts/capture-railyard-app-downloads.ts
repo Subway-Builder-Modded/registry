@@ -112,6 +112,19 @@ async function run(): Promise<void> {
   const snapshotKey = toHourBucketIso(now);
   const releases = await fetchAllReleases(cli.repo, cli.token);
   const snapshot = buildRailyardAppHistorySnapshot(releases, snapshotKey);
+  const trackedVersions = Object.keys(snapshot.versions).length;
+  const trackedAssets = Object.values(snapshot.versions)
+    .reduce((sum, version) => sum + Object.keys(version.assets).length, 0);
+
+  // Guard against transient API failures (e.g. GitHub outages returning empty release lists).
+  // Writing an empty snapshot would create a ghost data point that can poison window analytics.
+  if (trackedVersions === 0) {
+    console.log(
+      `[railyard-app-downloads] repo=${cli.repo} snapshot=${snapshotKey} versions=0 — skipping write (treating empty release list as transient failure)`,
+    );
+    return;
+  }
+
   const existingHistory = loadRailyardAppDownloadHistory(cli.repoRoot, cli.repo, nowIso);
   const history = upsertRailyardAppHistorySnapshot({
     history: existingHistory.repo === cli.repo ? existingHistory : createEmptyRailyardAppDownloadHistory(cli.repo, nowIso),
@@ -121,10 +134,6 @@ async function run(): Promise<void> {
   });
 
   writeRailyardAppDownloadHistory(cli.repoRoot, history);
-
-  const trackedVersions = Object.keys(snapshot.versions).length;
-  const trackedAssets = Object.values(snapshot.versions)
-    .reduce((sum, version) => sum + Object.keys(version.assets).length, 0);
 
   console.log(
     `[railyard-app-downloads] repo=${cli.repo} snapshot=${snapshotKey} versions=${trackedVersions} assets=${trackedAssets}`,
