@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-03T03:51:54.628Z",
+  "generated_at": "2026-05-03T06:31:44.382Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -1747,9 +1747,10 @@
     },
     "ciudad-de-mexico": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.1",
+      "latest_semver_version": "1.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.2.0",
         "1.1.1",
         "1.1.0",
         "1.0.0"
@@ -1881,6 +1882,48 @@
           },
           "fingerprint": "rules:v6:sha256:08a6d8fbacb53d614081548a2b536efcb47fed70e1afba9db887102bd27dad1f",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        },
+        "1.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CDMX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 166.67,
+          "file_sizes": {
+            "CDMX.pmtiles": 93.79,
+            "buildings_index.json": 275.05,
+            "config.json": 0,
+            "demand_data.json": 16.74,
+            "roads.geojson": 74.99,
+            "runways_taxiways.geojson": 1.31
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.1",
+            "asset_name": "CDMX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.1/CDMX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:965aac7dde584db1f931952e2e8a665c60d898453e3689926d4de383b7b49ea5",
+          "checked_at": "2026-05-03T06:31:44.382Z"
         }
       }
     },
