@@ -10216,6 +10216,54 @@
         }
       }
     },
+    "tijuana-san-diego": {
+      "1.0.0": {
+        "fingerprint": "rules:v6:sha256:bb019e6c5193be404a0d2722c33530aac58a99cc31c0eb7d6e1f7a888a5a2cfc",
+        "last_checked_at": "2026-05-07T17:53:13.834Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TIJ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 188.41,
+          "file_sizes": {
+            "TIJ.pmtiles": 118.46,
+            "buildings_index.json": 290.46,
+            "config.json": 0,
+            "demand_data.json": 19.86,
+            "roads.geojson": 49.65,
+            "runways_taxiways.geojson": 0.88
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.1",
+            "asset_name": "TIJ.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.1/TIJ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:bb019e6c5193be404a0d2722c33530aac58a99cc31c0eb7d6e1f7a888a5a2cfc",
+          "checked_at": "2026-05-07T17:53:13.834Z"
+        }
+      }
+    },
     "toledo-oh": {
       "1.0.0": {
         "fingerprint": "rules:v6:github:bean1322/toledo-oh-map:1.0.0:Toledo.zip",
