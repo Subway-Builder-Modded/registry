@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-08T03:36:56.258Z",
+  "generated_at": "2026-05-08T06:03:02.706Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -1632,6 +1632,59 @@
           },
           "fingerprint": "rules:v6:sha256:1225725bebdbd10d01fe58ec72c7ab734f576d2df5da7753789ed8d386bfadf1",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        }
+      }
+    },
+    "cdmx-core": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CDMC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 73.09,
+          "file_sizes": {
+            "CDMC.pmtiles": 41.43,
+            "buildings_index.json": 119.82,
+            "config.json": 0,
+            "demand_data.json": 12.82,
+            "roads.geojson": 26.22,
+            "runways_taxiways.geojson": 0.66
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.2",
+            "asset_name": "CDMC.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.2/CDMC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:b5a0158f0f2a38684513373f8c5d64ebfe46eb5576aac1e4a7ac9fe90b3b0be9",
+          "checked_at": "2026-05-08T06:03:02.706Z"
         }
       }
     },
