@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "id": "satellite-overlay",
+  "name": "Satellite Overlay",
+  "author": "TransitCore",
+  "github_id": 269214546,
+  "description": "🛰 Satellite Overlay\nSee the real world beneath your subway network. This mod overlays live satellite\nimagery directly on the game map, aligned to your city's actual geographic\ncoordinates — so you can plan routes along real streets, spot landmarks, and see\nexactly where your stations land in the real city.\nToggle the satellite layer on and off, adjust opacity to blend it with the base map,\nand hide individual map elements like buildings, water, or roads to get the exact\nlook you want.\nBuilt using MapTiler's satellite tile API routed through a local proxy to work around\nthe game's network restrictions.\n\nHow to Install & Use\nBefore you start you'll need:\nNode.js (LTS version — free)\nA free MapTiler account\n\nStep 1 — Create a MapTiler account\nGo to cloud.maptiler.com and sign up for free. Once logged in, go to Account →\nAPI Keys and copy your key. It looks something like n8sXxXXXXXXXXXXXf1.\n\nStep 2 — Download the mod\nDownload and unzip the mod folder. Place it in your Subway Builder mods\ndirectory:\nMac: ~/Library/Application Support/metro-maker4/mods/\nWindows: %APPDATA%\\metro-maker4\\mods\\\nThen enable it in Settings → Mods inside the game.\n\nStep 3 — Add your API key\nOpen proxy.js in a text editor and find line 22:\nconst KEY = 'YOUR_MAPTILER_KEY';\nReplace YOUR_MAPTILER_KEY with the key you copied from MapTiler. For example if your tiles URL looks like:\nhttps://api.maptiler.com/maps/satellite-v4/tiles.json?key=justthispartonly\nThen you want just the part after key=\n\nStep 4 — Run the proxy\nEvery time you want to download new tiles with the satellite overlay, open Terminal (Mac) or\nCommand Prompt (Windows) and run:\nMac: node ~/Library/Application\\ Support/metro-maker4/mods/\nsatellite-overlay/proxy.js\nWindows: node \"%APPDATA%\\metro-maker4\\mods\\satellite-overlay\\proxy.js\"\n\nYou should see:\nSatellite tile proxy running\nTiles: http://127.0.0.1:8080/tile/{z}/{x}/{y}.jpg\nHealth: http://127.0.0.1:8080/health\nLeave this terminal open the whole time you're playing. Press Ctrl+C to stop it when you're done.\n\nStep 5 — Load a city\nLaunch Subway Builder and open any city. The satellite layer appears automatically. Click the Satellite toolbar button to open the control panel where you can:\n-Toggle the overlay on/off\n-Adjust opacity (blend satellite with the base map)\n-Hide/show individual map layers (buildings, water, roads, parks, etc.)\n\nNotes\n1. Tile cache: Tiles are saved to a tile-cache/ folder inside the mod\ndirectory after the first load. Revisiting the same area won't need a\nnetwork request, which means you only need to run the proxy when first loading a map.\n\n2. Layer resets: Switching between 2D/3D view or opening windows like\nconstruction costs or demand stats can cause tiles to temporarily\ndisappear. Just toggle any button in the satellite panel to restore them\ninstantly.\n\n3. The proxy is required — the game's security policy blocks direct\nconnections to MapTiler, so the proxy runs locally to forward requests on\nyour behalf.\nTile data © MapTiler © OpenStreetMap contributors",
+  "tags": [
+    "cosmetic",
+    "gameplay",
+    "ui"
+  ],
+  "gallery": [
+    "gallery/screenshot1.png",
+    "gallery/screenshot2.png",
+    "gallery/screenshot3.png",
+    "gallery/screenshot4.png"
+  ],
+  "is_test": false,
+  "source": "https://github.com/TransitCore/Satellite-Overview",
+  "update": {
+    "type": "github",
+    "repo": "TransitCore/Satellite-Overview"
+  }
+}
