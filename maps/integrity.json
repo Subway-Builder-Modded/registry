@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-11T21:22:22.117Z",
+  "generated_at": "2026-05-11T22:27:00.050Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -9847,6 +9847,59 @@
           },
           "fingerprint": "rules:v6:sha256:91aca774ac3c0a872d8afc6a28aa40de551d2f2d7bd83e7fb799a7d1ca12e0b3",
           "checked_at": "2026-04-29T18:05:29.349Z"
+        }
+      }
+    },
+    "shenzhen": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SZX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 237.09,
+          "file_sizes": {
+            "SZX.pmtiles": 167.14,
+            "buildings_index.json": 329.39,
+            "config.json": 0,
+            "demand_data.json": 40.3,
+            "roads.geojson": 36.97,
+            "runways_taxiways.geojson": 1.11
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.3.0",
+            "asset_name": "SZX.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.3.0/SZX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:88fd3cea5d484e3767076a8e7e6923a4e0d1824ce50af81afcfe54ba19c4cf39",
+          "checked_at": "2026-05-11T22:27:00.050Z"
         }
       }
     },
