@@ -1,0 +1,45 @@
+{
+  "schema_version": 1,
+  "id": "shenzhen",
+  "name": "Shenzhen",
+  "author": "Kronifer",
+  "github_id": 44979306,
+  "description": "<h1>深圳 <strong>(Shenzhen)</strong></h1><h3><strong>SZX · v1.0.0</strong></h3><p>Detailed map of the prefecture-level cities of 深圳 (Shenzhen), 东莞 (Dongguan), and 惠阳区 (Huiyang District, Huizhou) based off data from the 2023 5th National Economic Census.</p><h2><strong>Coverage</strong></h2><p><strong>Playable Area:</strong> 6,500 km²</p><h2><strong>Population Summary</strong></h2><p><strong>Total Population:</strong> 28,688,800</p><p><strong>Modeled Demand:</strong> 20,442,339</p><h2><strong>Map Statistics</strong></h2><p><strong>Buildings Indexed:</strong> 1,825,647</p><p><strong>Demand Points:</strong> 9,626</p><p><strong>Populations</strong>: 202,083</p><p><strong>Mean Point Size:</strong> 2,123</p><p><strong>Median Point Size:</strong> 931</p><p><strong>Mean Pop Size:</strong> 101</p><p><strong>Median Pop Size</strong>: 98</p><h2><strong>Special Demand</strong></h2><h3><strong>Airports</strong></h3><ul><li>Shenzhen Bao&#39;an International Airport: 101,136 daily arrivals/departures modeled</li></ul><h3><strong>Universities</strong></h3><ul><li><p>Shenzhen University: 35,455 students modeled</p></li><li><p>Chinese University of Hong Kong, Shenzhen Campus: 13,000 students modeled</p></li><li><p>MSU: 4,500 students modeled</p></li><li><p>PUSGS: 3,764 students modeled</p></li></ul><h2><strong>Additional Features</strong></h2><ul><li><p><strong>Building Collision</strong> — A buildings index is included for all non-filtered buildings, assigning each a flat foundation depth of <strong>−10 m</strong> in-game. This provides underground collision geometry so that tunnels interact correctly with building footprints.</p></li><li><p><strong>Neighborhood Labels</strong> — Three layers of place name labels are embedded in the map:</p><ul><li><p><em>City labels</em> — Prefecture-Level Cities, Districts</p></li><li><p><em>Municipality labels</em> — Subdistricts, Counties, County-Level Cities</p></li><li><p><em>Neighborhood labels</em> — Towns, Townships, Neighbourhoods, Villages</p></li></ul></li></ul><h2><strong>Methodology</strong></h2><p>This map was created using a multi-step methodology, sourcing data from the individual districts of Shenzhen, Huiyang District, and Dongguan (Dongguan has no county-level divisions).</p><h3><strong>Data Collection</strong></h3><p>5th Economic Census data was fetched from each individual District or City. Specifically, Communique/Bulletin no. 7, focusing on employees per subdistrict was obtained.</p><h3><strong>Spatial Assignment</strong></h3><p>Population and Employee data for each subdistrict based on the above bulletins were assigned to the geometry of each subdistrict using a Shapefile.</p><h3><strong>Geographical Processing - Stage 1</strong></h3><p>Data was disaggregated to the individual building level by assigning a building a usage metric based off of total commercial/residential volume within a Subdistrict.</p><h3><strong>Geographical Processing - Stage 2</strong></h3><p>Data was aggregated up to a hexagonal grid with side length n=400m for commute modelling.</p><h3><strong>Commute Modelling</strong></h3><p>O/D pairs were created using a Gravity Model, the source for which can be found in the sources linked below.</p><h3><strong>Map Data</strong></h3><p>Map Data was fetched from OpenStreetMap, Overture, and 3D-GloBFP and processed by RSlurry&#39;s <code>depot</code> package.</p><h2><strong>Sources</strong></h2><p>All data used in the creation of this map was obtained from freely available sources.</p><ul><li>Depot: <a href=\"https://github.com/rslurry/depot\"><strong>GitHub</strong></a></li><li>3D-GloBFP: <a href=\"https://zenodo.org/records/15459025/\"><strong>Zenodo</strong></a></li><li><a href=\"https://overturemaps.org/\"><strong>Overture Maps</strong></a></li><li><a href=\"https://openstreetmap.org/\"><strong>OpenStreetMap</strong></a></li><li>Futian District: <strong><a href=\"https://www.szft.gov.cn/xxgk/zwgk/tjxx/tjgb/content/post_12453664.html\">https://www.szft.gov.cn/xxgk/zwgk/tjxx/tjgb/content/post_12453664.html</a></strong></li><li>Nanshan District: <strong><a href=\"https://www.szns.gov.cn/xxgk/qzfxxgkml/tjxx/tjgb/content/post_12475404.html\">https://www.szns.gov.cn/xxgk/qzfxxgkml/tjxx/tjgb/content/post_12475404.html</a></strong></li><li>Bao&#39;An District: <strong><a href=\"https://www.baoan.gov.cn/tjj/zwfw/tjsj_137617/tjgb_137620/content/post_12555395.html\">https://www.baoan.gov.cn/tjj/zwfw/tjsj_137617/tjgb_137620/content/post_12555395.html</a></strong></li><li>Guangming District: <strong><a href=\"https://www.szgm.gov.cn/xxgk/xqgwhxxgkml/tjxx/tjgb/content/post_12579966.html\">https://www.szgm.gov.cn/xxgk/xqgwhxxgkml/tjxx/tjgb/content/post_12579966.html</a></strong></li><li>Longhua District: <strong><a href=\"https://www.szlhq.gov.cn/xxgk/tjsj/tjgb/content/post_12470372.html\">https://www.szlhq.gov.cn/xxgk/tjsj/tjgb/content/post_12470372.html</a></strong></li><li>Longgang District: <strong><a href=\"https://www.lg.gov.cn/xxgk/zwgk/tjsj/tjgb/content/post_12551328.html\">https://www.lg.gov.cn/xxgk/zwgk/tjsj/tjgb/content/post_12551328.html</a></strong></li><li>Pingshan District:  <strong><a href=\"https://www.szpsq.gov.cn/pstjj/gkmlpt/content/12/12524/post_12524533.html#24443\">https://www.szpsq.gov.cn/pstjj/gkmlpt/content/12/12524/post_12524533.html#24443</a></strong></li><li>Dapeng New Area: <strong><a href=\"https://www.dpxq.gov.cn/xxgk/xxgk/tjsj/tjgb/content/post_12569202.html\">https://www.dpxq.gov.cn/xxgk/xxgk/tjsj/tjgb/content/post_12569202.html</a></strong></li><li>Luohu District: <strong><a href=\"https://www.szlh.gov.cn/lhtjj/gkmlpt/content/12/12490/post_12490888.html\">https://www.szlh.gov.cn/lhtjj/gkmlpt/content/12/12490/post_12490888.html</a></strong></li><li>Yantian District: <strong><a href=\"https://www.yantian.gov.cn/cn/zwgk/tj/tjgb/content/post_12582061.html\">https://www.yantian.gov.cn/cn/zwgk/tj/tjgb/content/post_12582061.html</a></strong></li><li>Huiyang District: <strong><a href=\"https://www.huiyang.gov.cn/zwgk/sjfb/tjgb/content/post_5583407.html\">https://www.huiyang.gov.cn/zwgk/sjfb/tjgb/content/post_5583407.html</a></strong></li><li>Dongguan: <strong><a href=\"https://tjj.dg.gov.cn/gkmlpt/content/4/4389/post_4389736.html#832\">https://tjj.dg.gov.cn/gkmlpt/content/4/4389/post_4389736.html#832</a></strong></li></ul><h2><strong>Credits</strong></h2><p>Map authored by <a href=\"https://github.com/kronifer\"><strong><u>Kronifer</u></strong></a></p>",
+  "tags": [
+    "east-asia",
+    "airports",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.png",
+    "gallery/screenshot2.png",
+    "gallery/screenshot3.png"
+  ],
+  "is_test": false,
+  "source": "https://github.com/kronifer/sb-chinese-maps",
+  "update": {
+    "type": "custom",
+    "url": "https://raw.githubusercontent.com/Kronifer/sb-chinese-maps/refs/heads/main/SZX/SZX.json"
+  },
+  "city_code": "SZX",
+  "country": "CN",
+  "population": 20432780,
+  "residents_total": 20432780,
+  "points_count": 9626,
+  "population_count": 202083,
+  "initial_view_state": {
+    "latitude": 22.54094,
+    "longitude": 114.053793,
+    "zoom": 11,
+    "bearing": 0
+  },
+  "data_source": "5th National Economic Census",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "east-asia",
+  "special_demand": [
+    "airports",
+    "universities"
+  ],
+  "file_sizes": {}
+}
