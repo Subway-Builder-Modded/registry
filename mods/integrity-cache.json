@@ -4,7 +4,7 @@
     "advanced-analytics": {
       "target-1.1.0": {
         "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-05-12T00:56:02.322Z",
+        "last_checked_at": "2026-05-12T01:29:35.656Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -18,7 +18,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-05-12T00:56:02.322Z"
+          "checked_at": "2026-05-12T01:29:35.656Z"
         }
       },
       "v0.9.1": {
@@ -1786,37 +1786,34 @@
       }
     },
     "mode-manager": {
-      "v1.1.0": {
-        "fingerprint": "rules:v6:github:mpfk/subway-builder-mode-manager:v1.1.0:mode-manager.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-05-12T00:56:02.322Z",
+      "v1.1.1": {
+        "fingerprint": "rules:v6:github:mpfk/subway-builder-mode-manager:v1.1.1:mode-manager.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-05-12T01:29:35.656Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "asset 'mode-manager.zip': missing top-level manifest.json in ZIP",
-            "asset 'mode-manager.zip': manifest.json version '(missing)' does not match release tag 'v1.1.0' (expected '1.1.0')"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "release_manifest_asset": true,
-            "zip_manifest_json": false,
+            "zip_manifest_json": true,
             "security_scan_passed": true,
-            "manifest_version_matches_tag": false
+            "manifest_version_matches_tag": true
           },
           "matched_files": {
             "release_manifest_asset": "manifest.json",
-            "zip_manifest_json": null,
+            "zip_manifest_json": "manifest.json",
             "security_scan_passed": "passed",
-            "manifest_version_matches_tag": null
+            "manifest_version_matches_tag": "manifest.json"
           },
-          "release_size": 0.03,
+          "release_size": 0.02,
           "source": {
             "update_type": "github",
             "repo": "mpfk/subway-builder-mode-manager",
-            "tag": "v1.1.0",
+            "tag": "v1.1.1",
             "asset_name": "mode-manager.zip",
-            "download_url": "https://github.com/Mpfk/subway-builder-mode-manager/releases/download/v1.1.0/mode-manager.zip"
+            "download_url": "https://github.com/Mpfk/subway-builder-mode-manager/releases/download/v1.1.1/mode-manager.zip"
           },
-          "fingerprint": "rules:v6:github:mpfk/subway-builder-mode-manager:v1.1.0:mode-manager.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-05-12T00:56:02.322Z"
+          "fingerprint": "rules:v6:github:mpfk/subway-builder-mode-manager:v1.1.1:mode-manager.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-05-12T01:29:35.656Z"
         }
       }
     },
@@ -2682,7 +2679,7 @@
       },
       "v1.0": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-05-12T00:56:02.322Z",
+        "last_checked_at": "2026-05-12T01:29:35.656Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2696,12 +2693,12 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-05-12T00:56:02.322Z"
+          "checked_at": "2026-05-12T01:29:35.656Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-05-12T00:56:02.322Z",
+        "last_checked_at": "2026-05-12T01:29:35.656Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2715,7 +2712,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-05-12T00:56:02.322Z"
+          "checked_at": "2026-05-12T01:29:35.656Z"
         }
       }
     }
