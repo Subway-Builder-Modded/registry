@@ -10690,6 +10690,94 @@
         }
       }
     },
+    "tri-cities": {
+      "1.0.0": {
+        "fingerprint": "rules:v6:sha256:6f448d2dcf091a2f18acbc3406249109e6c844af1a9a6dd5be8614f24d364b1e",
+        "last_checked_at": "2026-05-15T04:00:26.629Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PSC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 10.98,
+          "file_sizes": {
+            "PSC.pmtiles": 7.34,
+            "buildings_index.json": 12.39,
+            "config.json": 0,
+            "demand_data.json": 0.99,
+            "roads.geojson": 3.09,
+            "runways_taxiways.geojson": 0.43
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.0.0-psc",
+            "asset_name": "PSC.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.0-psc/PSC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:6f448d2dcf091a2f18acbc3406249109e6c844af1a9a6dd5be8614f24d364b1e",
+          "checked_at": "2026-05-15T04:00:26.629Z"
+        }
+      },
+      "1.0.1": {
+        "fingerprint": "rules:v6:sha256:9eee4102cf696f4b33cff6fbf9e3870b9703afdb15d959808523817c32ade481",
+        "last_checked_at": "2026-05-15T04:00:26.629Z",
+        "result": {
+          "is_complete": false,
+          "errors": [
+            "config.json version '1.0.0' does not match release tag '1.0.1' (expected '1.0.1')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PSC.pmtiles",
+            "config_version_matches_tag": null
+          },
+          "release_size": 10.98,
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.0.1-psc",
+            "asset_name": "PSC.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.1-psc/PSC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:9eee4102cf696f4b33cff6fbf9e3870b9703afdb15d959808523817c32ade481",
+          "checked_at": "2026-05-15T04:00:26.629Z"
+        }
+      }
+    },
     "trondheim-val": {
       "1.0.0": {
         "fingerprint": "rules:v6:sha256:465a6d00ac0e3744606b2f9131427aa28f5e403f7bf1f68427d1e335528d1343",
