@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-17T04:00:55.014Z",
+  "generated_at": "2026-05-17T09:52:45.887Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -6513,6 +6513,59 @@
           },
           "fingerprint": "rules:v6:sha256:87d8f1440c45def305cb017f6c7f4875d15f00014c5bb4700f16ede557162bed",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        }
+      }
+    },
+    "mexicali": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "MXL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 53.48,
+          "file_sizes": {
+            "MXL.pmtiles": 32.99,
+            "buildings_index.json": 98.2,
+            "config.json": 0,
+            "demand_data.json": 2.93,
+            "roads.geojson": 12.01,
+            "runways_taxiways.geojson": 0.35
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.2",
+            "asset_name": "MXL.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.2/MXL.zip"
+          },
+          "fingerprint": "rules:v6:sha256:1381db3865dd35e1593a7d31ba1b371d3403f068009c0b0f6601c263fe632578",
+          "checked_at": "2026-05-17T09:52:45.887Z"
         }
       }
     },
