@@ -4,7 +4,7 @@
     "advanced-analytics": {
       "target-1.1.0": {
         "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-05-21T18:05:07.560Z",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -18,7 +18,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-05-21T18:05:07.560Z"
+          "checked_at": "2026-05-21T21:31:07.375Z"
         }
       },
       "v0.9.1": {
@@ -1314,7 +1314,161 @@
         }
       }
     },
-    "citymapper": {},
+    "citymapper": {
+      "0.1.0": {
+        "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:0.1.0:citymapper.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
+        "result": {
+          "is_complete": false,
+          "errors": [
+            "asset 'citymapper.zip': missing top-level manifest.json in ZIP",
+            "asset 'citymapper.zip': manifest.json version '(missing)' does not match release tag '0.1.0' (expected '0.1.0')"
+          ],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": false,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": false
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": null,
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": null
+          },
+          "release_size": 0.01,
+          "source": {
+            "update_type": "github",
+            "repo": "gio1112/subway-builder-citymapper",
+            "tag": "0.1.0",
+            "asset_name": "citymapper.zip",
+            "download_url": "https://github.com/Gio1112/subway-builder-citymapper/releases/download/0.1.0/citymapper.zip"
+          },
+          "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:0.1.0:citymapper.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-05-21T21:31:07.375Z"
+        }
+      },
+      "0.1.2": {
+        "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:0.1.2:mod.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.01,
+          "source": {
+            "update_type": "github",
+            "repo": "gio1112/subway-builder-citymapper",
+            "tag": "0.1.2",
+            "asset_name": "mod.zip",
+            "download_url": "https://github.com/Gio1112/subway-builder-citymapper/releases/download/0.1.2/mod.zip"
+          },
+          "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:0.1.2:mod.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-05-21T21:31:07.375Z"
+        }
+      },
+      "v0.2.0": {
+        "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:v0.2.0:index.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.02,
+          "source": {
+            "update_type": "github",
+            "repo": "gio1112/subway-builder-citymapper",
+            "tag": "v0.2.0",
+            "asset_name": "index.zip",
+            "download_url": "https://github.com/Gio1112/subway-builder-citymapper/releases/download/v0.2.0/index.zip"
+          },
+          "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:v0.2.0:index.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-05-21T21:31:07.375Z"
+        }
+      },
+      "v0.2.1": {
+        "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:v0.2.1:mod.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.02,
+          "source": {
+            "update_type": "github",
+            "repo": "gio1112/subway-builder-citymapper",
+            "tag": "v0.2.1",
+            "asset_name": "mod.zip",
+            "download_url": "https://github.com/Gio1112/subway-builder-citymapper/releases/download/v0.2.1/mod.zip"
+          },
+          "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:v0.2.1:mod.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-05-21T21:31:07.375Z"
+        }
+      },
+      "v0.2.2": {
+        "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:v0.2.2:index.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.02,
+          "source": {
+            "update_type": "github",
+            "repo": "gio1112/subway-builder-citymapper",
+            "tag": "v0.2.2",
+            "asset_name": "index.zip",
+            "download_url": "https://github.com/Gio1112/subway-builder-citymapper/releases/download/v0.2.2/index.zip"
+          },
+          "fingerprint": "rules:v6:github:gio1112/subway-builder-citymapper:v0.2.2:index.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-05-21T21:31:07.375Z"
+        }
+      }
+    },
     "danield1909-dantrains": {
       "v1.0.0": {
         "fingerprint": "rules:v6:github:danield1909/dantrains:v1.0.0:danTrains-1_0_0-Phoenix.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
@@ -2631,6 +2785,38 @@
         }
       }
     },
+    "tod": {
+      "v0.2.0": {
+        "fingerprint": "rules:v6:github:hsullivan1201/sb-tod:v0.2.0:sb-tod-v0.2.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.02,
+          "source": {
+            "update_type": "github",
+            "repo": "hsullivan1201/sb-tod",
+            "tag": "v0.2.0",
+            "asset_name": "sb-tod-v0.2.0.zip",
+            "download_url": "https://github.com/hsullivan1201/sb-tod/releases/download/v0.2.0/sb-tod-v0.2.0.zip"
+          },
+          "fingerprint": "rules:v6:github:hsullivan1201/sb-tod:v0.2.0:sb-tod-v0.2.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-05-21T21:31:07.375Z"
+        }
+      }
+    },
     "transit-overlay": {
       "1.5.0": {
         "fingerprint": "rules:v6:github:barkuperman/transit-overlay-subway-builder-mod:1.5.0:transit-overlay.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
@@ -2887,7 +3073,7 @@
       },
       "v1.0": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-05-21T18:05:07.560Z",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2901,12 +3087,12 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-05-21T18:05:07.560Z"
+          "checked_at": "2026-05-21T21:31:07.375Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-05-21T18:05:07.560Z",
+        "last_checked_at": "2026-05-21T21:31:07.375Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2920,7 +3106,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-05-21T18:05:07.560Z"
+          "checked_at": "2026-05-21T21:31:07.375Z"
         }
       }
     }
