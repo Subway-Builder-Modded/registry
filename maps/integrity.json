@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-23T06:39:17.653Z",
+  "generated_at": "2026-05-23T06:52:04.694Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -11226,6 +11226,59 @@
           },
           "fingerprint": "rules:v6:sha256:4ed2073f41bd94ed1c370715a10beff5d194e456e9bf3e42a2616a098cf7d955",
           "checked_at": "2026-05-15T07:31:38.618Z"
+        }
+      }
+    },
+    "tromso-no": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TOS.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 12.66,
+          "file_sizes": {
+            "TOS.pmtiles": 11.3,
+            "buildings_index.json": 4.99,
+            "config.json": 0,
+            "demand_data.json": 0.39,
+            "roads.geojson": 1.5,
+            "runways_taxiways.geojson": 0.06
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.2",
+            "asset_name": "TOS.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.2/TOS.zip"
+          },
+          "fingerprint": "rules:v6:sha256:bfafc260e34bda1092e5a68684edf413533f7399392cc16d5c8c267b23eec29b",
+          "checked_at": "2026-05-23T06:52:04.694Z"
         }
       }
     },
