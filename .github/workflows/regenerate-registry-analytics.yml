@@ -54,7 +54,6 @@ jobs:
       - name: Generate map registry analytics
         id: generate_map_analytics
         env:
-          DISCORD_ANNOUNCEMENT_WEBHOOK_URL: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK_URL }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run generate-registry-analytics:maps -- --strict-fingerprint-cache
 
@@ -68,6 +67,7 @@ jobs:
             maps/integrity.json
             maps/integrity-cache.json
             maps/download-attribution-delta.json
+            maps/pending-announcements.json
           if-no-files-found: error
 
   generate-mods:
@@ -109,7 +109,6 @@ jobs:
         id: generate_mod_analytics
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DISCORD_ANNOUNCEMENT_WEBHOOK_URL: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK_URL }}
         run: pnpm --dir scripts run generate-registry-analytics:mods -- --strict-fingerprint-cache
 
       - name: Upload mod downloads artifact
@@ -122,6 +121,7 @@ jobs:
             mods/integrity.json
             mods/integrity-cache.json
             mods/download-attribution-delta.json
+            mods/pending-announcements.json
           if-no-files-found: error
 
   generate-map-demand-stats:
@@ -245,6 +245,8 @@ jobs:
           MOD_INTEGRITY_CACHE_FILE="$(find /tmp/download-artifacts/mods -type f -name integrity-cache.json | head -n 1 || true)"
           MAP_ATTR_DELTA_FILE="$(find /tmp/download-artifacts/maps -type f -name download-attribution-delta.json | head -n 1 || true)"
           MOD_ATTR_DELTA_FILE="$(find /tmp/download-artifacts/mods -type f -name download-attribution-delta.json | head -n 1 || true)"
+          MAP_PENDING_ANNOUNCEMENTS_FILE="$(find /tmp/download-artifacts/maps -type f -name pending-announcements.json | head -n 1 || true)"
+          MOD_PENDING_ANNOUNCEMENTS_FILE="$(find /tmp/download-artifacts/mods -type f -name pending-announcements.json | head -n 1 || true)"
           DEMAND_ARTIFACT_FILE="$(find /tmp/download-artifacts/demand -type f -name maps-demand-stats.tar | head -n 1 || true)"
 
           if [ -z "${MAP_ARTIFACT_FILE}" ]; then
@@ -297,6 +299,12 @@ jobs:
           fi
           if [ -n "${MOD_ATTR_DELTA_FILE}" ]; then
             cp "${MOD_ATTR_DELTA_FILE}" mods/download-attribution-delta.json
+          fi
+          if [ -n "${MAP_PENDING_ANNOUNCEMENTS_FILE}" ]; then
+            cp "${MAP_PENDING_ANNOUNCEMENTS_FILE}" maps/pending-announcements.json
+          fi
+          if [ -n "${MOD_PENDING_ANNOUNCEMENTS_FILE}" ]; then
+            cp "${MOD_PENDING_ANNOUNCEMENTS_FILE}" mods/pending-announcements.json
           fi
           tar -xf "${DEMAND_ARTIFACT_FILE}" -C .
 
@@ -480,6 +488,18 @@ jobs:
           echo "committed=true" >> "$GITHUB_OUTPUT"
           echo "commit_sha=${HEAD_SHA:0:7}" >> "$GITHUB_OUTPUT"
           echo "pull_request_url=${{ steps.bot_pr.outputs.pr_url }}" >> "$GITHUB_OUTPUT"
+
+      - name: Send new content announcements
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        env:
+          DISCORD_ANNOUNCEMENT_WEBHOOK_URL: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK_URL }}
+        run: |
+          if [ -z "${DISCORD_ANNOUNCEMENT_WEBHOOK_URL}" ]; then
+            echo "DISCORD_ANNOUNCEMENT_WEBHOOK_URL not set; skipping announcements."
+            exit 0
+          fi
+
+          pnpm --dir scripts run send-pending-announcements -- --file maps/pending-announcements.json --file mods/pending-announcements.json
 
       - name: Notify Discord (Downloads + Integrity)
         if: always()

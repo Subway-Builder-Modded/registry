@@ -42,6 +42,14 @@ function warn(warnings: string[], message: string): void {
   warnings.push(message);
 }
 
+function isTransientGraphqlHttpStatus(status: number): boolean {
+  return status === 401 || status === 408 || status === 409 || status === 425 || status === 429 || status >= 500;
+}
+
+function areGraphqlErrorsTransient(errors: Array<{ message: string }>): boolean {
+  return !errors.some((error) => /could not resolve to a repository/i.test(error.message));
+}
+
 function updateGraphqlUsage(
   usageState: D.GraphqlUsageState,
   rateLimit: D.GraphqlRateLimitInfo | undefined,
@@ -114,7 +122,11 @@ async function requestRepoReleasesPage(
     );
   } catch (error) {
     const errorMessage = (error as Error).message;
-    return { ok: false, error: `repo=${repo}: GraphQL request failed (${errorMessage})` };
+    return {
+      ok: false,
+      error: `repo=${repo}: GraphQL request failed (${errorMessage})`,
+      unavailable: true,
+    };
   }
 
   if (!response.ok) {
@@ -122,28 +134,45 @@ async function requestRepoReleasesPage(
       const authHint = token
         ? "token is set but appears invalid or lacks access"
         : "token is missing/empty";
-      return { ok: false, error: `repo=${repo}: GraphQL returned HTTP 401 (${authHint})` };
+      return {
+        ok: false,
+        error: `repo=${repo}: GraphQL returned HTTP 401 (${authHint})`,
+        unavailable: true,
+      };
     }
-    return { ok: false, error: `repo=${repo}: GraphQL returned HTTP ${response.status}` };
+    return {
+      ok: false,
+      error: `repo=${repo}: GraphQL returned HTTP ${response.status}`,
+      unavailable: isTransientGraphqlHttpStatus(response.status),
+    };
   }
 
   let payload: D.GraphqlReleasesResponse;
   try {
     payload = await response.json() as D.GraphqlReleasesResponse;
   } catch {
-    return { ok: false, error: `repo=${repo}: GraphQL returned non-JSON response` };
+    return {
+      ok: false,
+      error: `repo=${repo}: GraphQL returned non-JSON response`,
+      unavailable: true,
+    };
   }
 
   if (Array.isArray(payload.errors) && payload.errors.length > 0) {
     return {
       ok: false,
       error: `repo=${repo}: GraphQL errors: ${payload.errors.map((error) => error.message).join("; ")}`,
+      unavailable: areGraphqlErrorsTransient(payload.errors),
     };
   }
 
   const releases = payload.data?.repository?.releases;
   if (!releases) {
-    return { ok: false, error: `repo=${repo}: repository not found or no releases access` };
+    return {
+      ok: false,
+      error: `repo=${repo}: repository not found or no releases access`,
+      unavailable: false,
+    };
   }
 
   return {
@@ -202,7 +231,7 @@ async function fetchGraphqlReleaseIndexForRepo(
   warnings: string[],
   rateLimitWarningState: D.RateLimitWarningState,
   usageState: D.GraphqlUsageState,
-): Promise<D.RepoReleaseIndex | null> {
+): Promise<{ index: D.RepoReleaseIndex | null; unavailable: boolean }> {
   // TODO: Performance optimization for larger registries:
   // Batch multiple repositories into a single GraphQL operation using aliases
   // (e.g., r0: repository(...), r1: repository(...)) while tracking per-repo
@@ -211,7 +240,7 @@ async function fetchGraphqlReleaseIndexForRepo(
   const repoParts = splitRepo(repo);
   if (!repoParts) {
     warn(warnings, `repo=${repo}: invalid owner/repo format`);
-    return null;
+    return { index: null, unavailable: false };
   }
 
   const byTag = new Map<string, D.RepoReleaseTagData>();
@@ -228,7 +257,7 @@ async function fetchGraphqlReleaseIndexForRepo(
     );
     if (!pageResult.ok) {
       warn(warnings, pageResult.error);
-      return null;
+      return { index: null, unavailable: pageResult.unavailable };
     }
     const { releases, rateLimit } = pageResult.page;
 
@@ -266,7 +295,7 @@ async function fetchGraphqlReleaseIndexForRepo(
     if (!cursor) break;
   }
 
-  return { byTag };
+  return { index: { byTag }, unavailable: false };
 }
 
 export function createGraphqlUsageState(): D.GraphqlUsageState {
@@ -307,19 +336,21 @@ export async function fetchRepoReleaseIndexes(
   },
 ): Promise<{
   repoIndexes: Map<string, D.RepoReleaseIndex>;
+  unavailableRepos: Set<string>;
   usageState: D.GraphqlUsageState;
 }> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const usageState = options.usageState ?? createGraphqlUsageState();
   const rateLimitWarningState: D.RateLimitWarningState = { warned: false };
   const repoIndexes = new Map<string, D.RepoReleaseIndex>();
+  const unavailableRepos = new Set<string>();
 
   const repoList = Array.from(new Set(Array.from(repos)))
     .map((repo) => repo.toLowerCase())
     .sort();
 
   for (const repo of repoList) {
-    const index = await fetchGraphqlReleaseIndexForRepo(
+    const result = await fetchGraphqlReleaseIndexForRepo(
       repo,
       fetchImpl,
       options.token,
@@ -327,12 +358,14 @@ export async function fetchRepoReleaseIndexes(
       rateLimitWarningState,
       usageState,
     );
-    if (index) {
-      repoIndexes.set(repo, index);
+    if (result.index) {
+      repoIndexes.set(repo, result.index);
+    } else if (result.unavailable) {
+      unavailableRepos.add(repo);
     }
   }
 
-  return { repoIndexes, usageState };
+  return { repoIndexes, unavailableRepos, usageState };
 }
 
 export function isSupportedReleaseTag(tag: string): boolean {

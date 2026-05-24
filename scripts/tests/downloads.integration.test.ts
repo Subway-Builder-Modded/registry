@@ -397,6 +397,155 @@ test("custom mixed versions produce explicit invalid integrity entries and hard-
   });
 });
 
+test("download-only mode preserves previous downloads when a GitHub repo is temporarily unavailable", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["github-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "github-mod", {
+      ...makeBaseModManifest("github-mod"),
+      update: { type: "github", repo: "owner/good" },
+    });
+    writeJson(join(repoRoot, "mods", "downloads.json"), {
+      "github-mod": {
+        "v2.0.0": 14,
+      },
+    });
+    writeJson(join(repoRoot, "mods", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-31T00:00:00.000Z",
+      listings: {
+        "github-mod": {
+          has_complete_version: true,
+          latest_semver_version: "v2.0.0",
+          latest_semver_complete: true,
+          complete_versions: ["v2.0.0"],
+          incomplete_versions: [],
+          versions: {
+            "v2.0.0": {
+              is_complete: true,
+              errors: [],
+              required_checks: {},
+              matched_files: {},
+              source: { update_type: "github", repo: "owner/good", tag: "v2.0.0" },
+              fingerprint: "fp",
+              checked_at: "2026-03-31T00:00:00.000Z",
+            },
+          },
+        },
+      },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => new Response("upstream unavailable", { status: 503 }),
+      },
+    ]);
+
+    const { downloads, warnings } = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      mode: "download-only",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.deepEqual(downloads, {
+      "github-mod": {
+        "v2.0.0": 14,
+      },
+    });
+    assert.ok(
+      warnings.some((warning) => warning.includes("preserved previous github-release downloads (repo unavailable)")),
+    );
+  });
+});
+
+test("full mode preserves previous integrity and downloads when a GitHub repo is temporarily unavailable", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["github-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "github-mod", {
+      ...makeBaseModManifest("github-mod"),
+      update: { type: "github", repo: "owner/good" },
+    });
+    writeJson(join(repoRoot, "mods", "downloads.json"), {
+      "github-mod": {
+        "v2.0.0": 14,
+      },
+    });
+    writeJson(join(repoRoot, "mods", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-31T00:00:00.000Z",
+      listings: {
+        "github-mod": {
+          has_complete_version: true,
+          latest_semver_version: "v2.0.0",
+          latest_semver_complete: true,
+          complete_versions: ["v2.0.0"],
+          incomplete_versions: [],
+          versions: {
+            "v2.0.0": {
+              is_complete: true,
+              errors: [],
+              required_checks: {},
+              matched_files: {},
+              source: { update_type: "github", repo: "owner/good", tag: "v2.0.0" },
+              fingerprint: "fp",
+              checked_at: "2026-03-31T00:00:00.000Z",
+            },
+          },
+        },
+      },
+    });
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), {
+      schema_version: 1,
+      entries: {
+        "github-mod": {
+          "v2.0.0": {
+            fingerprint: "fp",
+            last_checked_at: "2026-03-31T00:00:00.000Z",
+            result: {
+              is_complete: true,
+              errors: [],
+              required_checks: {},
+              matched_files: {},
+              source: { update_type: "github", repo: "owner/good", tag: "v2.0.0" },
+              fingerprint: "fp",
+              checked_at: "2026-03-31T00:00:00.000Z",
+            },
+          },
+        },
+      },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => new Response("upstream unavailable", { status: 503 }),
+      },
+    ]);
+
+    const { downloads, integrity, warnings } = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.deepEqual(downloads, {
+      "github-mod": {
+        "v2.0.0": 14,
+      },
+    });
+    assert.equal(integrity.listings["github-mod"]?.has_complete_version, true);
+    assert.equal(integrity.listings["github-mod"]?.versions["v2.0.0"]?.is_complete, true);
+    assert.ok(
+      warnings.some((warning) => warning.includes("preserved previous integrity and download state (repo unavailable)")),
+    );
+  });
+});
+
 test("custom versions sharing the same release asset reuse a single ZIP inspection", async () => {
   await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
     writeIndex("mods", ["shared-asset-mod"]);

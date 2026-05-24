@@ -17,6 +17,7 @@ import {
   getIndexIds,
   getManifest,
   loadIntegrityCache,
+  loadDownloadsSnapshot,
   loadIntegritySnapshot,
   sortObjectByKeys,
   warnListing,
@@ -37,6 +38,7 @@ export async function generateDownloadsDataDownloadOnly(
   const attributionDelta = options.attribution?.delta
     ?? createDownloadAttributionDelta(`runtime:${listingType}:download-only`, undefined, nowIso);
   const loadedIntegrity = loadIntegritySnapshot(repoRoot, dir);
+  const previousDownloads = loadDownloadsSnapshot(repoRoot, dir);
   const integrity = loadedIntegrity ?? emptyIntegrity(nowIso);
   const hasIntegritySnapshot = loadedIntegrity !== null && Object.keys(loadedIntegrity.listings).length > 0;
 
@@ -87,7 +89,7 @@ export async function generateDownloadsDataDownloadOnly(
   }
 
   const usageState = createGraphqlUsageState();
-  const { repoIndexes } = await fetchRepoReleaseIndexes(repoSet, {
+  const { repoIndexes, unavailableRepos } = await fetchRepoReleaseIndexes(repoSet, {
     fetchImpl,
     token,
     warnings,
@@ -104,9 +106,14 @@ export async function generateDownloadsDataDownloadOnly(
     if (!context) continue;
 
     if (context.update.type === "github") {
+      if (unavailableRepos.has(context.update.repo)) {
+        downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
+        warnListing(warnings, id, "preserved previous github-release downloads (repo unavailable)");
+        continue;
+      }
       const repoIndex = repoIndexes.get(context.update.repo);
       if (!repoIndex) {
-        warnListing(warnings, id, "skipped all github-release versions (repo unavailable)");
+        warnListing(warnings, id, "skipped all github-release versions (repository not found or inaccessible)");
         continue;
       }
 
@@ -177,8 +184,23 @@ export async function generateDownloadsDataDownloadOnly(
       }
 
       const repoIndex = repoIndexes.get(candidate.parsed.repo);
+      if (unavailableRepos.has(candidate.parsed.repo)) {
+        const previousCount = previousDownloads[id]?.[candidate.version];
+        if (typeof previousCount === "number") {
+          downloadsByListing[id][candidate.version] = previousCount;
+          warnListing(
+            warnings,
+            id,
+            "preserved previous GitHub release download count (repo unavailable)",
+            candidate.version,
+          );
+        } else {
+          warnListing(warnings, id, "skipped (repo unavailable, no previous count to preserve)", candidate.version);
+        }
+        continue;
+      }
       if (!repoIndex) {
-        warnListing(warnings, id, "skipped (repo unavailable)", candidate.version);
+        warnListing(warnings, id, "skipped (repository not found or inaccessible)", candidate.version);
         continue;
       }
       const release = repoIndex.byTag.get(candidate.parsed.tag);
