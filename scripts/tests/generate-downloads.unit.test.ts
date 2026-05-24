@@ -1,7 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import {
   buildZeroValidSemverWarnings,
+  buildPendingAnnouncements,
   getAnnouncementListingIds,
   listZeroValidSemverListings,
 } from "../generate-downloads.js";
@@ -147,4 +151,93 @@ test("getAnnouncementListingIds includes brand-new complete listings and existin
     getAnnouncementListingIds(newIntegrity, previousIntegrity).sort(),
     ["brand-new-complete", "bucharest-medium"],
   );
+});
+
+test("buildPendingAnnouncements writes only non-test listings that became complete", () => {
+  const previousIntegrity: IntegrityOutput = {
+    schema_version: 1,
+    generated_at: "2026-03-31T16:28:29.630Z",
+    listings: {
+      "already-complete": {
+        has_complete_version: true,
+        latest_semver_version: "v1.0.0",
+        latest_semver_complete: true,
+        complete_versions: ["v1.0.0"],
+        incomplete_versions: [],
+        versions: {
+          "v1.0.0": makeVersionEntry(true, []),
+        },
+      },
+    },
+  };
+  const newIntegrity: IntegrityOutput = {
+    schema_version: 1,
+    generated_at: "2026-03-31T16:57:42.842Z",
+    listings: {
+      "already-complete": {
+        has_complete_version: true,
+        latest_semver_version: "v1.0.0",
+        latest_semver_complete: true,
+        complete_versions: ["v1.0.0"],
+        incomplete_versions: [],
+        versions: {
+          "v1.0.0": makeVersionEntry(true, []),
+        },
+      },
+      "brand-new-complete": {
+        has_complete_version: true,
+        latest_semver_version: "v0.1.0",
+        latest_semver_complete: true,
+        complete_versions: ["v0.1.0"],
+        incomplete_versions: [],
+        versions: {
+          "v0.1.0": makeVersionEntry(true, []),
+        },
+      },
+      "test-listing": {
+        has_complete_version: true,
+        latest_semver_version: "v0.2.0",
+        latest_semver_complete: true,
+        complete_versions: ["v0.2.0"],
+        incomplete_versions: [],
+        versions: {
+          "v0.2.0": makeVersionEntry(true, []),
+        },
+      },
+    },
+  };
+
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-pending-announcements-"));
+  try {
+    mkdirSync(join(repoRoot, "maps", "test-listing"), { recursive: true });
+    writeFileSync(
+      join(repoRoot, "maps", "test-listing", "manifest.json"),
+      `${JSON.stringify({ is_test: true }, null, 2)}\n`,
+      "utf8",
+    );
+    const previousIntegrityPath = join(repoRoot, "maps", "integrity.json");
+    mkdirSync(join(repoRoot, "maps"), { recursive: true });
+    writeFileSync(previousIntegrityPath, `${JSON.stringify(previousIntegrity, null, 2)}\n`, "utf8");
+
+    const pending = buildPendingAnnouncements(
+      newIntegrity,
+      previousIntegrityPath,
+      "map",
+      repoRoot,
+    );
+
+    assert.deepEqual(pending, {
+      schema_version: 1,
+      generated_at: "2026-03-31T16:57:42.842Z",
+      listing_type: "map",
+      listings: [
+        {
+          listing_id: "brand-new-complete",
+          manifest_path: join("maps", "brand-new-complete", "manifest.json"),
+        },
+      ],
+    });
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
 });

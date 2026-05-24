@@ -156,7 +156,7 @@ export interface RepoReleasesPage {
 
 export type RepoReleasesPageResult =
   | { ok: true; page: RepoReleasesPage }
-  | { ok: false; error: string };
+  | { ok: false; error: string; unavailable: boolean };
 
 export const GRAPHQL_RATE_LIMIT_WARN_THRESHOLD = 200;
 export const GRAPHQL_ENDPOINT = "https://api.github.com/graphql";

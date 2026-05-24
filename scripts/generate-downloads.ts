@@ -1,8 +1,7 @@
 import { readFileSync } from "node:fs";
 import { writeJsonFile } from "./lib/json-utils.js";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import { makeAnnouncement } from "./make-announcement.js";
 import { generateDownloadsData } from "./lib/downloads.js";
 import {
   createDownloadAttributionDelta,
@@ -31,6 +30,18 @@ import {
 import { compareStableSemverAsc, isStableSemverTag } from "./lib/semver.js";
 import { filterListingMessages, isTestListing } from "./lib/test-listings.js";
 
+export interface PendingAnnouncementEntry {
+  listing_id: string;
+  manifest_path: string;
+}
+
+export interface PendingAnnouncementsFile {
+  schema_version: 1;
+  generated_at: string;
+  listing_type: ManifestType;
+  listings: PendingAnnouncementEntry[];
+}
+
 export function getAnnouncementListingIds(
   newIntegrity: IntegrityOutput,
   previousIntegrity: IntegrityOutput,
@@ -53,12 +64,12 @@ export function buildZeroValidSemverWarnings(integrity: IntegrityOutput): string
     .map((listingId) => `listing=${listingId}: no valid semver release tags found`);
 }
 
-async function announceNewAssets(
+export function buildPendingAnnouncements(
   newIntegrity: IntegrityOutput,
   integrityPath: string,
   listingType: ManifestType,
   repoRoot: string,
-): Promise<void> {
+): PendingAnnouncementsFile {
   let previousIntegrity: IntegrityOutput = {
     schema_version: 1,
     generated_at: "",
@@ -72,24 +83,27 @@ async function announceNewAssets(
   }
 
   const newListings = getAnnouncementListingIds(newIntegrity, previousIntegrity);
+  const listings: PendingAnnouncementEntry[] = [];
   for (const listingId of newListings) {
     if (isTestListing(repoRoot, listingType === "map" ? "maps" : "mods", listingId)) {
       continue;
     }
-    const manifestPath = resolve(
-      repoRoot,
-      listingType === "map" ? "maps" : "mods",
-      listingId,
-      "manifest.json",
-    );
-    try {
-      await makeAnnouncement(manifestPath);
-    } catch (error) {
-      console.warn(
-        `[downloads] announcement skipped for ${listingId} (${(error as Error).message})`,
-      );
-    }
+    listings.push({
+      listing_id: listingId,
+      manifest_path: join(
+        listingType === "map" ? "maps" : "mods",
+        listingId,
+        "manifest.json",
+      ),
+    });
   }
+
+  return {
+    schema_version: 1,
+    generated_at: newIntegrity.generated_at,
+    listing_type: listingType,
+    listings,
+  };
 }
 
 function getArgValue(name: string): string | undefined {
@@ -278,6 +292,9 @@ async function run(): Promise<void> {
   const versionBucketLedger = loadDownloadVersionBucketLedger(repoRoot, listingType);
   const outputDir = listingType === "map" ? "maps" : "mods";
   const outputPath = resolve(repoRoot, outputDir, "downloads.json");
+  const integrityPath = resolve(repoRoot, outputDir, "integrity.json");
+  const integrityCachePath = resolve(repoRoot, outputDir, "integrity-cache.json");
+  const pendingAnnouncementsPath = resolve(repoRoot, outputDir, "pending-announcements.json");
   const defaultAttributionDeltaPath = resolve(repoRoot, outputDir, "download-attribution-delta.json");
   const attributionDeltaPath = (
     getArgValue("attribution-delta-path")
@@ -335,15 +352,28 @@ async function run(): Promise<void> {
   const grandfathered = loadGrandfatheredDownloads(repoRoot, listingType);
   const downloads = mergeGrandfatheredDownloads(bucketDownloads, grandfathered);
 
-  const integrityPath = resolve(repoRoot, outputDir, "integrity.json");
-  const integrityCachePath = resolve(repoRoot, outputDir, "integrity-cache.json");
   writeJsonFile(outputPath, downloads);
   writeDownloadVersionBucketLedger(repoRoot, listingType, versionBucketLedger);
   if (mode === "full") {
-    await announceNewAssets(integrity, integrityPath, listingType, repoRoot);
+    const pendingAnnouncements = buildPendingAnnouncements(
+      integrity,
+      integrityPath,
+      listingType,
+      repoRoot,
+    );
     writeJsonFile(integrityPath, integrity);
     writeJsonFile(integrityCachePath, integrityCache);
+    writeJsonFile(pendingAnnouncementsPath, pendingAnnouncements);
     writeDownloadAttributionDeltaFile(attributionDeltaPath, attributionDelta);
+    console.log(
+      pendingAnnouncements.listings.length > 0
+        ? `[downloads] Pending announcements: ${pendingAnnouncements.listings.map((entry) => entry.listing_id).join(", ")}`
+        : "[downloads] Pending announcements: none",
+    );
+    appendGitHubOutput([
+      `pending_announcement_count=${pendingAnnouncements.listings.length}`,
+      `pending_announcements_json=${JSON.stringify(pendingAnnouncements.listings.map((entry) => entry.listing_id))}`,
+    ]);
   }
 
   for (const warning of warnings) {
