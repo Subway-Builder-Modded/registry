@@ -85,9 +85,9 @@ async function makeModZipWithSources(
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
-async function makeMapZip(cityCode: string): Promise<Buffer> {
+async function makeMapZip(cityCode: string, version = "1.0.0"): Promise<Buffer> {
   const zip = new JSZip();
-  zip.file("config.json", JSON.stringify({ code: cityCode }));
+  zip.file("config.json", JSON.stringify({ code: cityCode, version }));
   zip.file("demand_data.json", JSON.stringify({
     points: [
       { id: "pt1", location: [0, 0], jobs: 1, residents: 1 },
@@ -109,9 +109,10 @@ async function makeMapZip(cityCode: string): Promise<Buffer> {
 async function makeMapZipWithPointLocations(
   cityCode: string,
   locations: Array<{ id: string; location: [number, number] }>,
+  version = "1.0.0",
 ): Promise<Buffer> {
   const zip = new JSZip();
-  zip.file("config.json", JSON.stringify({ code: cityCode }));
+  zip.file("config.json", JSON.stringify({ code: cityCode, version }));
   zip.file("demand_data.json", JSON.stringify({
     points: locations.map((point) => ({
       id: point.id,
