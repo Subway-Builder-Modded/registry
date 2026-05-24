@@ -18,6 +18,8 @@ import {
   getIndexIds,
   getManifest,
   loadIntegrityCache,
+  loadDownloadsSnapshot,
+  loadIntegritySnapshot,
   shouldUseCachedIntegrity,
   sortObjectByKeys,
   warnListing,
@@ -56,6 +58,25 @@ interface AdjustedVersionCount {
   subtractedTotal: number;
   clamped: boolean;
   bucketInputs: D.DownloadVersionBucketInput[];
+}
+
+function countIntegrityVersions(entry: ListingIntegrityEntry | undefined): {
+  complete: number;
+  incomplete: number;
+} {
+  if (!entry) {
+    return { complete: 0, incomplete: 0 };
+  }
+  let complete = 0;
+  let incomplete = 0;
+  for (const version of Object.values(entry.versions)) {
+    if (version.is_complete) {
+      complete += 1;
+    } else {
+      incomplete += 1;
+    }
+  }
+  return { complete, incomplete };
 }
 
 function getAdjustedGithubZipTotal(params: {
@@ -184,6 +205,8 @@ export async function generateDownloadsDataFull(
   const attributionDelta = options.attribution?.delta
     ?? createDownloadAttributionDelta(`runtime:${listingType}:full`, undefined, nowIso);
   const modSecurityRules = resolveModSecurityRules(listingType, repoRoot);
+  const previousIntegrity = loadIntegritySnapshot(repoRoot, dir);
+  const previousDownloads = loadDownloadsSnapshot(repoRoot, dir);
 
   const cache = loadIntegrityCache(repoRoot, dir);
   const nextCache: IntegrityCache = {
@@ -236,7 +259,7 @@ export async function generateDownloadsDataFull(
   }
 
   const usageState = createGraphqlUsageState();
-  const { repoIndexes } = await fetchRepoReleaseIndexes(repoSet, {
+  const { repoIndexes, unavailableRepos } = await fetchRepoReleaseIndexes(repoSet, {
     fetchImpl,
     token,
     warnings,
@@ -278,9 +301,20 @@ export async function generateDownloadsDataFull(
 
     if (context.update.type === "github") {
       const repo = context.update.repo;
+      if (unavailableRepos.has(repo)) {
+        const preservedListing = previousIntegrity?.listings[id];
+        downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
+        integrityListings[id] = preservedListing ?? createListingIntegrityEntry({});
+        nextCache.entries[id] = sortObjectByKeys(listingCacheEntries);
+        const preservedCounts = countIntegrityVersions(preservedListing);
+        completeVersions += preservedCounts.complete;
+        incompleteVersions += preservedCounts.incomplete;
+        warnListing(warnings, id, "preserved previous integrity and download state (repo unavailable)");
+        continue;
+      }
       const repoIndex = repoIndexes.get(repo);
       if (!repoIndex) {
-        warnListing(warnings, id, "skipped all github-release versions (repo unavailable)");
+        warnListing(warnings, id, "skipped all github-release versions (repository not found or inaccessible)");
         integrityListings[id] = createListingIntegrityEntry(versionEntries);
         nextCache.entries[id] = nextListingCacheEntries;
         continue;
@@ -574,8 +608,35 @@ export async function generateDownloadsDataFull(
             result,
           };
         } else {
+          const previousVersionEntry = previousIntegrity?.listings[id]?.versions?.[versionKey];
           const repoIndex = repoIndexes.get(candidate.parsed.repo);
-          if (!repoIndex) {
+          if (unavailableRepos.has(candidate.parsed.repo)) {
+            if (previousVersionEntry) {
+              versionEntries[versionKey] = previousVersionEntry;
+              if (cached) {
+                nextListingCacheEntries[versionKey] = cached;
+              }
+              warnListing(
+                warnings,
+                id,
+                "preserved previous integrity state (repo unavailable)",
+                versionKey,
+              );
+            } else {
+              const result = buildIncompleteVersionEntry(
+                sourceBase,
+                fingerprint,
+                nowIso,
+                ["repository is unavailable via GitHub GraphQL and no previous integrity result exists"],
+              );
+              versionEntries[versionKey] = result;
+              nextListingCacheEntries[versionKey] = {
+                fingerprint,
+                last_checked_at: nowIso,
+                result,
+              };
+            }
+          } else if (!repoIndex) {
             const result = buildIncompleteVersionEntry(
               sourceBase,
               fingerprint,
@@ -693,7 +754,18 @@ export async function generateDownloadsDataFull(
           const result = versionEntries[versionKey];
           let downloadCount: number | undefined;
           let versionBucketsForVersion: D.DownloadVersionBucketInput[] = [];
-          if (candidate.parsed) {
+          if (candidate.parsed && unavailableRepos.has(candidate.parsed.repo)) {
+            const previousCount = previousDownloads[id]?.[versionKey];
+            if (typeof previousCount === "number") {
+              downloadCount = previousCount;
+              warnListing(
+                warnings,
+                id,
+                "preserved previous GitHub release download count (repo unavailable)",
+                versionKey,
+              );
+            }
+          } else if (candidate.parsed) {
             const asset = repoIndexes
               .get(candidate.parsed.repo)
               ?.byTag

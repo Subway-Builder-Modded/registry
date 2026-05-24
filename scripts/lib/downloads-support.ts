@@ -95,6 +95,10 @@ function getIntegrityPath(repoRoot: string, dir: ManifestDirectory): string {
   return resolve(repoRoot, dir, "integrity.json");
 }
 
+function getDownloadsPath(repoRoot: string, dir: ManifestDirectory): string {
+  return resolve(repoRoot, dir, "downloads.json");
+}
+
 function getEmptyCache(): IntegrityCache {
   return {
     schema_version: 1,
@@ -193,6 +197,35 @@ export function loadIntegritySnapshot(repoRoot: string, dir: ManifestDirectory):
     };
   } catch {
     return null;
+  }
+}
+
+export function loadDownloadsSnapshot(repoRoot: string, dir: ManifestDirectory): D.DownloadsByListing {
+  const path = getDownloadsPath(repoRoot, dir);
+  if (!existsSync(path)) {
+    return {};
+  }
+  try {
+    const parsed = readJsonFile<unknown>(path);
+    if (typeof parsed !== "object" || parsed === null || Array.isArray(parsed)) {
+      return {};
+    }
+    const downloads: D.DownloadsByListing = {};
+    for (const [listingId, listingValue] of Object.entries(parsed)) {
+      if (typeof listingValue !== "object" || listingValue === null || Array.isArray(listingValue)) {
+        continue;
+      }
+      const versions: Record<string, number> = {};
+      for (const [version, count] of Object.entries(listingValue)) {
+        if (typeof count === "number" && Number.isFinite(count) && count >= 0) {
+          versions[version] = count;
+        }
+      }
+      downloads[listingId] = sortObjectByKeys(versions);
+    }
+    return sortObjectByKeys(downloads);
+  } catch {
+    return {};
   }
 }
 
