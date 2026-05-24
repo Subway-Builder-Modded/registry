@@ -234,6 +234,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p maps mods
+          mkdir -p /tmp/pending-announcements
 
           MAP_ARTIFACT_FILE="$(find /tmp/download-artifacts/maps -type f -name downloads.json | head -n 1 || true)"
           MOD_ARTIFACT_FILE="$(find /tmp/download-artifacts/mods -type f -name downloads.json | head -n 1 || true)"
@@ -301,10 +302,10 @@ jobs:
             cp "${MOD_ATTR_DELTA_FILE}" mods/download-attribution-delta.json
           fi
           if [ -n "${MAP_PENDING_ANNOUNCEMENTS_FILE}" ]; then
-            cp "${MAP_PENDING_ANNOUNCEMENTS_FILE}" maps/pending-announcements.json
+            cp "${MAP_PENDING_ANNOUNCEMENTS_FILE}" /tmp/pending-announcements/maps-pending-announcements.json
           fi
           if [ -n "${MOD_PENDING_ANNOUNCEMENTS_FILE}" ]; then
-            cp "${MOD_PENDING_ANNOUNCEMENTS_FILE}" mods/pending-announcements.json
+            cp "${MOD_PENDING_ANNOUNCEMENTS_FILE}" /tmp/pending-announcements/mods-pending-announcements.json
           fi
           tar -xf "${DEMAND_ARTIFACT_FILE}" -C .
 
@@ -334,6 +335,9 @@ jobs:
 
       - name: Sync map manifest file sizes from integrity
         run: pnpm --dir scripts run sync-map-file-sizes
+
+      - name: Record content announcements
+        run: pnpm --dir scripts run record-content-announcements -- --file /tmp/pending-announcements/maps-pending-announcements.json --file /tmp/pending-announcements/mods-pending-announcements.json
 
       - name: Compute download change stats
         id: download_stats
@@ -440,7 +444,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-stats-cache.json history/registry-download-attribution.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -499,7 +503,7 @@ jobs:
             exit 0
           fi
 
-          pnpm --dir scripts run send-pending-announcements -- --file maps/pending-announcements.json --file mods/pending-announcements.json
+          pnpm --dir scripts run send-pending-announcements -- --file /tmp/pending-announcements/maps-pending-announcements.json --file /tmp/pending-announcements/mods-pending-announcements.json
 
       - name: Notify Discord (Downloads + Integrity)
         if: always()

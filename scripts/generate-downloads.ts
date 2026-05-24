@@ -1,6 +1,5 @@
-import { readFileSync } from "node:fs";
 import { writeJsonFile } from "./lib/json-utils.js";
-import { join, resolve } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { generateDownloadsData } from "./lib/downloads.js";
 import {
@@ -17,6 +16,9 @@ import {
   loadGrandfatheredDownloads,
   mergeGrandfatheredDownloads,
 } from "./lib/grandfathered-downloads.js";
+import { loadContentAnnouncementLedger } from "./lib/content-announcements.js";
+import { loadIntegritySnapshot } from "./lib/downloads-support.js";
+import { buildPendingAnnouncements } from "./lib/pending-announcements.js";
 import type { IntegrityOutput } from "./lib/integrity.js";
 import type { ManifestType } from "./lib/manifests.js";
 import type { SecurityFinding } from "./lib/mod-security.js";
@@ -30,28 +32,6 @@ import {
 import { compareStableSemverAsc, isStableSemverTag } from "./lib/semver.js";
 import { filterListingMessages, isTestListing } from "./lib/test-listings.js";
 
-export interface PendingAnnouncementEntry {
-  listing_id: string;
-  manifest_path: string;
-}
-
-export interface PendingAnnouncementsFile {
-  schema_version: 1;
-  generated_at: string;
-  listing_type: ManifestType;
-  listings: PendingAnnouncementEntry[];
-}
-
-export function getAnnouncementListingIds(
-  newIntegrity: IntegrityOutput,
-  previousIntegrity: IntegrityOutput,
-): string[] {
-  return Object.entries(newIntegrity.listings)
-    .filter(([, listing]) => listing.has_complete_version)
-    .filter(([id]) => !previousIntegrity.listings[id]?.has_complete_version)
-    .map(([id]) => id);
-}
-
 export function listZeroValidSemverListings(integrity: IntegrityOutput): string[] {
   return Object.entries(integrity.listings)
     .filter(([, listing]) => listing.latest_semver_version === null && Object.keys(listing.versions).length > 0)
@@ -62,48 +42,6 @@ export function listZeroValidSemverListings(integrity: IntegrityOutput): string[
 export function buildZeroValidSemverWarnings(integrity: IntegrityOutput): string[] {
   return listZeroValidSemverListings(integrity)
     .map((listingId) => `listing=${listingId}: no valid semver release tags found`);
-}
-
-export function buildPendingAnnouncements(
-  newIntegrity: IntegrityOutput,
-  integrityPath: string,
-  listingType: ManifestType,
-  repoRoot: string,
-): PendingAnnouncementsFile {
-  let previousIntegrity: IntegrityOutput = {
-    schema_version: 1,
-    generated_at: "",
-    listings: {},
-  };
-  try {
-    const previousIntegrityContent = readFileSync(integrityPath, "utf8");
-    previousIntegrity = JSON.parse(previousIntegrityContent) as IntegrityOutput;
-  } catch {
-    // No prior integrity file is acceptable on first run.
-  }
-
-  const newListings = getAnnouncementListingIds(newIntegrity, previousIntegrity);
-  const listings: PendingAnnouncementEntry[] = [];
-  for (const listingId of newListings) {
-    if (isTestListing(repoRoot, listingType === "map" ? "maps" : "mods", listingId)) {
-      continue;
-    }
-    listings.push({
-      listing_id: listingId,
-      manifest_path: join(
-        listingType === "map" ? "maps" : "mods",
-        listingId,
-        "manifest.json",
-      ),
-    });
-  }
-
-  return {
-    schema_version: 1,
-    generated_at: newIntegrity.generated_at,
-    listing_type: listingType,
-    listings,
-  };
 }
 
 function getArgValue(name: string): string | undefined {
@@ -355,12 +293,14 @@ async function run(): Promise<void> {
   writeJsonFile(outputPath, downloads);
   writeDownloadVersionBucketLedger(repoRoot, listingType, versionBucketLedger);
   if (mode === "full") {
-    const pendingAnnouncements = buildPendingAnnouncements(
-      integrity,
-      integrityPath,
+    const previousIntegrity = loadIntegritySnapshot(repoRoot, outputDir);
+    const pendingAnnouncements = buildPendingAnnouncements({
+      newIntegrity: integrity,
+      previousIntegrity,
       listingType,
       repoRoot,
-    );
+      announcementLedger: loadContentAnnouncementLedger(repoRoot),
+    });
     writeJsonFile(integrityPath, integrity);
     writeJsonFile(integrityCachePath, integrityCache);
     writeJsonFile(pendingAnnouncementsPath, pendingAnnouncements);

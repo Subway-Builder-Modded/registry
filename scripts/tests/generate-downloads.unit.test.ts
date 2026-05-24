@@ -5,10 +5,12 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import {
   buildZeroValidSemverWarnings,
-  buildPendingAnnouncements,
-  getAnnouncementListingIds,
   listZeroValidSemverListings,
 } from "../generate-downloads.js";
+import {
+  buildPendingAnnouncements,
+  getAnnouncementListingIds,
+} from "../lib/pending-announcements.js";
 import type { IntegrityOutput, IntegrityVersionEntry } from "../lib/integrity.js";
 
 function makeVersionEntry(
@@ -219,12 +221,17 @@ test("buildPendingAnnouncements writes only non-test listings that became comple
     mkdirSync(join(repoRoot, "maps"), { recursive: true });
     writeFileSync(previousIntegrityPath, `${JSON.stringify(previousIntegrity, null, 2)}\n`, "utf8");
 
-    const pending = buildPendingAnnouncements(
+    const pending = buildPendingAnnouncements({
       newIntegrity,
-      previousIntegrityPath,
-      "map",
+      previousIntegrity,
+      listingType: "map",
       repoRoot,
-    );
+      announcementLedger: {
+        schema_version: 1,
+        updated_at: "2026-03-31T16:57:42.842Z",
+        entries: {},
+      },
+    });
 
     assert.deepEqual(pending, {
       schema_version: 1,
@@ -237,6 +244,82 @@ test("buildPendingAnnouncements writes only non-test listings that became comple
         },
       ],
     });
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("buildPendingAnnouncements excludes listings already present in the announcement ledger", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-pending-announcements-ledger-"));
+  try {
+    mkdirSync(join(repoRoot, "history"), { recursive: true });
+    mkdirSync(join(repoRoot, "maps"), { recursive: true });
+    const previousIntegrity: IntegrityOutput = {
+      schema_version: 1,
+      generated_at: "2026-03-31T16:28:29.630Z",
+      listings: {},
+    };
+    writeFileSync(
+      join(repoRoot, "maps", "integrity.json"),
+      `${JSON.stringify(previousIntegrity, null, 2)}\n`,
+      "utf8",
+    );
+    writeFileSync(
+      join(repoRoot, "history", "content-announcements.json"),
+      `${JSON.stringify({
+        schema_version: 1,
+        updated_at: "2026-03-31T16:57:42.842Z",
+        entries: {
+          "map:brand-new-complete": {
+            listing_id: "brand-new-complete",
+            listing_type: "map",
+            latest_semver_version: "v0.1.0",
+            recorded_at: "2026-03-31T16:57:42.842Z",
+            source: "bootstrap:test",
+          },
+        },
+      }, null, 2)}\n`,
+      "utf8",
+    );
+
+    const newIntegrity: IntegrityOutput = {
+      schema_version: 1,
+      generated_at: "2026-03-31T16:57:42.842Z",
+      listings: {
+        "brand-new-complete": {
+          has_complete_version: true,
+          latest_semver_version: "v0.1.0",
+          latest_semver_complete: true,
+          complete_versions: ["v0.1.0"],
+          incomplete_versions: [],
+          versions: {
+            "v0.1.0": makeVersionEntry(true, []),
+          },
+        },
+      },
+    };
+
+    const pending = buildPendingAnnouncements({
+      newIntegrity,
+      previousIntegrity,
+      listingType: "map",
+      repoRoot,
+      announcementLedger: {
+        schema_version: 1,
+        updated_at: "2026-03-31T16:57:42.842Z",
+        entries: {
+          "map:brand-new-complete": {
+            listing_id: "brand-new-complete",
+            listing_type: "map",
+            latest_semver_version: "v0.1.0",
+            recorded_at: "2026-03-31T16:57:42.842Z",
+            source: "bootstrap:test",
+          },
+        },
+      },
+    });
+
+    assert.deepEqual(pending.listings, []);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
