@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { createWriteStream, existsSync, mkdirSync } from "node:fs";
+import { once } from "node:events";
 import { dirname, resolve } from "node:path";
 import type {
   FeatureCollection,
@@ -21,12 +22,14 @@ const DEFAULT_OVERPASS_TIMEOUT_SECONDS = 90;
 const DEFAULT_FETCH_TIMEOUT_MS = 120_000;
 const DEFAULT_SVG_SIZE = 2048;
 const OVERPASS_USER_AGENT = "subway-builder-modded-registry-basemap/1.0";
+const OVERPASS_MAX_SUBDIVISION_DEPTH = 6;
 const INCLUDED_ROAD_CLASSES = new Set<RoadClass>([
   "primary",
   "trunk",
   "motorway",
 ]);
 const ROAD_STROKE_COLOR = "#7a7a7a";
+const MAX_POINTS_PER_PATH = 1200;
 
 const ROAD_RENDER_ORDER: RoadClass[] = ["primary", "trunk", "motorway"];
 
@@ -267,8 +270,15 @@ function projectLonLatToSvg(
   return { x, y };
 }
 
-function roadToPathData(road: RoadFeature, squareMercatorBounds: MercatorBbox, svgSize: number): string {
-  const points: string[] = [];
+function roadToPathDataChunks(
+  road: RoadFeature,
+  squareMercatorBounds: MercatorBbox,
+  svgSize: number,
+): string[] {
+  const chunks: string[] = [];
+  let currentParts: string[] = [];
+  let pointsInChunk = 0;
+
   for (const coordinate of road.coordinates) {
     const projected = projectLonLatToSvg(
       coordinate.lon,
@@ -276,9 +286,29 @@ function roadToPathData(road: RoadFeature, squareMercatorBounds: MercatorBbox, s
       squareMercatorBounds,
       svgSize,
     );
-    points.push(`${points.length === 0 ? "M" : "L"}${projected.x.toFixed(2)} ${projected.y.toFixed(2)}`);
+    const point = `${projected.x.toFixed(2)} ${projected.y.toFixed(2)}`;
+
+    if (pointsInChunk === 0) {
+      currentParts = [`M${point}`];
+      pointsInChunk = 1;
+      continue;
+    }
+
+    currentParts.push(`L${point}`);
+    pointsInChunk += 1;
+
+    if (pointsInChunk >= MAX_POINTS_PER_PATH) {
+      chunks.push(currentParts.join(" "));
+      currentParts = [`M${point}`];
+      pointsInChunk = 1;
+    }
   }
-  return points.join(" ");
+
+  if (pointsInChunk >= 2) {
+    chunks.push(currentParts.join(" "));
+  }
+
+  return chunks;
 }
 
 function buildOverpassQuery(bbox: LonLatBbox, timeoutSeconds: number): string {
@@ -316,7 +346,36 @@ function normalizeOverpassUrl(value: string): string {
   return parsed.toString();
 }
 
-async function fetchRoadsFromOverpass(
+function isOverpassResponseTooLargeError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  const normalized = message.toLowerCase();
+  return normalized.includes("cannot create a string longer") || normalized.includes("invalid string length");
+}
+
+function splitBboxIntoQuadrants(bbox: LonLatBbox): LonLatBbox[] {
+  const midLon = (bbox.minLon + bbox.maxLon) / 2;
+  const midLat = (bbox.minLat + bbox.maxLat) / 2;
+
+  return [
+    { minLon: bbox.minLon, minLat: bbox.minLat, maxLon: midLon, maxLat: midLat },
+    { minLon: midLon, minLat: bbox.minLat, maxLon: bbox.maxLon, maxLat: midLat },
+    { minLon: bbox.minLon, minLat: midLat, maxLon: midLon, maxLat: bbox.maxLat },
+    { minLon: midLon, minLat: midLat, maxLon: bbox.maxLon, maxLat: bbox.maxLat },
+  ];
+}
+
+function dedupeRoads(roads: RoadFeature[]): RoadFeature[] {
+  const deduped = new Map<string, RoadFeature>();
+  for (const road of roads) {
+    const existing = deduped.get(road.id);
+    if (!existing || road.coordinates.length > existing.coordinates.length) {
+      deduped.set(road.id, road);
+    }
+  }
+  return Array.from(deduped.values());
+}
+
+async function fetchRoadsFromOverpassSingleBbox(
   bbox: LonLatBbox,
   options: GenerateBasemapOptions,
 ): Promise<{ roads: RoadFeature[]; overpassUrl: string }> {
@@ -440,11 +499,50 @@ async function fetchRoadsFromOverpass(
     });
   }
 
-  const filteredRoads = roads.filter((road) => INCLUDED_ROAD_CLASSES.has(road.roadClass));
-  return { roads: filteredRoads, overpassUrl: selectedEndpoint };
+  return { roads, overpassUrl: selectedEndpoint };
 }
 
-function renderRoadsSvg(
+async function fetchRoadsFromOverpass(
+  bbox: LonLatBbox,
+  options: GenerateBasemapOptions,
+  depth = 0,
+): Promise<{ roads: RoadFeature[]; overpassUrl: string }> {
+  try {
+    const single = await fetchRoadsFromOverpassSingleBbox(bbox, options);
+    const filteredRoads = single.roads.filter((road) => INCLUDED_ROAD_CLASSES.has(road.roadClass));
+    return { roads: filteredRoads, overpassUrl: single.overpassUrl };
+  } catch (error) {
+    if (!isOverpassResponseTooLargeError(error) || depth >= OVERPASS_MAX_SUBDIVISION_DEPTH) {
+      throw error;
+    }
+
+    console.warn(
+      `[map-basemap] Overpass response too large at depth=${depth}; subdividing bbox (${bbox.minLat.toFixed(5)},${bbox.minLon.toFixed(5)},${bbox.maxLat.toFixed(5)},${bbox.maxLon.toFixed(5)})`,
+    );
+
+    const quadrants = splitBboxIntoQuadrants(bbox);
+    const mergedRoads: RoadFeature[] = [];
+    let selectedEndpoint = options.overpassUrl ?? process.env.OSM_OVERPASS_URL ?? DEFAULT_OVERPASS_URL;
+
+    for (const quadrant of quadrants) {
+      const result = await fetchRoadsFromOverpass(quadrant, options, depth + 1);
+      selectedEndpoint = result.overpassUrl;
+      mergedRoads.push(...result.roads);
+    }
+
+    const filteredRoads = dedupeRoads(mergedRoads).filter((road) => INCLUDED_ROAD_CLASSES.has(road.roadClass));
+    return { roads: filteredRoads, overpassUrl: selectedEndpoint };
+  }
+}
+
+async function writeChunk(stream: ReturnType<typeof createWriteStream>, chunk: string): Promise<void> {
+  if (!stream.write(chunk)) {
+    await once(stream, "drain");
+  }
+}
+
+async function writeRoadsSvgFile(
+  outputPath: string,
   listingId: string,
   roads: RoadFeature[],
   originalBbox: LonLatBbox,
@@ -452,27 +550,10 @@ function renderRoadsSvg(
   squareMercatorBounds: MercatorBbox,
   options: GenerateBasemapOptions,
   overpassUrl: string,
-): string {
+): Promise<void> {
   const svgSize = options.svgSize ?? DEFAULT_SVG_SIZE;
   if (!Number.isInteger(svgSize) || svgSize <= 0) {
     throw new Error("Invalid SVG size, expected a positive integer");
-  }
-
-  const roadPaths: string[] = [];
-
-  for (const roadClass of ROAD_RENDER_ORDER) {
-    for (const road of roads) {
-      if (road.roadClass !== roadClass) continue;
-      const pathData = roadToPathData(road, squareMercatorBounds, svgSize);
-      if (pathData === "") continue;
-
-      const strokeWidth = roadStrokeWidthForClass(roadClass);
-      const elementId = `${roadClass}-${road.id}`;
-
-      roadPaths.push(
-        `<path id="road-${escapeXml(elementId)}" class="road ${roadClass}" d="${pathData}" stroke="${ROAD_STROKE_COLOR}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`,
-      );
-    }
   }
 
   const metadata = {
@@ -485,16 +566,40 @@ function renderRoadsSvg(
     road_count: roads.length,
   };
 
-  return [
-    `<?xml version="1.0" encoding="UTF-8"?>`,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}" role="img" aria-label="Road basemap for ${escapeXml(listingId)}">`,
-    `<metadata>${escapeXml(JSON.stringify(metadata))}</metadata>`,
-    `<g id="roads">`,
-    ...roadPaths,
-    `</g>`,
-    `</svg>`,
-    "",
-  ].join("\n");
+  const stream = createWriteStream(outputPath, { encoding: "utf-8" });
+  try {
+    await writeChunk(stream, `<?xml version="1.0" encoding="UTF-8"?>\n`);
+    await writeChunk(
+      stream,
+      `<svg xmlns="http://www.w3.org/2000/svg" width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}" role="img" aria-label="Road basemap for ${escapeXml(listingId)}">\n`,
+    );
+    await writeChunk(stream, `<metadata>${escapeXml(JSON.stringify(metadata))}</metadata>\n`);
+    await writeChunk(stream, `<g id="roads">\n`);
+
+    for (const roadClass of ROAD_RENDER_ORDER) {
+      for (const road of roads) {
+        if (road.roadClass !== roadClass) continue;
+        const pathDataChunks = roadToPathDataChunks(road, squareMercatorBounds, svgSize);
+        if (pathDataChunks.length === 0) continue;
+
+        const strokeWidth = roadStrokeWidthForClass(roadClass);
+        const elementId = `${roadClass}-${road.id}`;
+        for (let index = 0; index < pathDataChunks.length; index += 1) {
+          const pathData = pathDataChunks[index];
+          const chunkSuffix = pathDataChunks.length > 1 ? `-${index + 1}` : "";
+          const line = `<path id="road-${escapeXml(elementId)}${chunkSuffix}" class="road ${roadClass}" d="${pathData}" stroke="${ROAD_STROKE_COLOR}" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round" fill="none"/>\n`;
+          await writeChunk(stream, line);
+        }
+      }
+    }
+
+    await writeChunk(stream, `</g>\n</svg>\n`);
+    stream.end();
+    await once(stream, "finish");
+  } catch (error) {
+    stream.destroy();
+    throw error;
+  }
 }
 
 function parseGridFeatureCollection(value: unknown, listingId: string): GridFeatureCollection {
@@ -590,7 +695,10 @@ export async function writeBasemapFromGrid(
   const squareBbox = mercatorBoundsToLonLatBbox(squareMercatorBounds);
 
   const { roads, overpassUrl } = await fetchRoadsFromOverpass(squareBbox, options);
-  const svg = renderRoadsSvg(
+  const outputPath = getBasemapPath(repoRoot, listingId);
+  mkdirSync(dirname(outputPath), { recursive: true });
+  await writeRoadsSvgFile(
+    outputPath,
     listingId,
     roads,
     originalBbox,
@@ -599,10 +707,6 @@ export async function writeBasemapFromGrid(
     options,
     overpassUrl,
   );
-
-  const outputPath = getBasemapPath(repoRoot, listingId);
-  mkdirSync(dirname(outputPath), { recursive: true });
-  writeFileSync(outputPath, svg, "utf-8");
 
   return {
     listingId,

@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { getMapIds } from "./lib/map-demand-stats/repo.js";
@@ -10,6 +10,27 @@ interface CliOptions {
   continueOnError: boolean;
   force: boolean;
   check: boolean;
+  retries: number;
+}
+
+function parsePositiveInteger(value: string, flagName: string): number {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new Error(`Invalid value for ${flagName}: '${value}'. Expected a non-negative integer.`);
+  }
+  return parsed;
+}
+
+function waitMs(ms: number): Promise<void> {
+  return new Promise((resolvePromise) => {
+    setTimeout(resolvePromise, ms);
+  });
+}
+
+function isBasemapStale(gridPath: string, basemapPath: string): boolean {
+  const gridMtimeMs = statSync(gridPath).mtimeMs;
+  const basemapMtimeMs = statSync(basemapPath).mtimeMs;
+  return basemapMtimeMs < gridMtimeMs;
 }
 
 function parseCliArgs(argv: string[]): CliOptions {
@@ -17,6 +38,7 @@ function parseCliArgs(argv: string[]): CliOptions {
   let continueOnError = false;
   let force = false;
   let check = false;
+  let retries = 3;
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -33,6 +55,23 @@ function parseCliArgs(argv: string[]): CliOptions {
     }
     if (arg === "--check") {
       check = true;
+      continue;
+    }
+    if (arg === "--retries") {
+      const value = argv[index + 1];
+      if (!value || value.startsWith("-")) {
+        throw new Error(`Missing retries value after '${arg}'`);
+      }
+      retries = parsePositiveInteger(value.trim(), "--retries");
+      index += 1;
+      continue;
+    }
+    if (arg.startsWith("--retries=")) {
+      const value = arg.slice(arg.indexOf("=") + 1).trim();
+      if (value === "") {
+        throw new Error(`Missing retries value in '${arg}'`);
+      }
+      retries = parsePositiveInteger(value, "--retries");
       continue;
     }
     if (arg === "--id" || arg === "-id") {
@@ -53,7 +92,7 @@ function parseCliArgs(argv: string[]): CliOptions {
       continue;
     }
     throw new Error(
-      `Unknown argument '${arg}'. Supported flags: --id <map-id>, -id <map-id>, --continue-on-error, --force, --check.`,
+      `Unknown argument '${arg}'. Supported flags: --id <map-id>, -id <map-id>, --continue-on-error, --force, --check, --retries <count>.`,
     );
   }
 
@@ -61,7 +100,7 @@ function parseCliArgs(argv: string[]): CliOptions {
     throw new Error("--force and --check cannot be used together");
   }
 
-  return { mapId, continueOnError, force, check };
+  return { mapId, continueOnError, force, check, retries };
 }
 
 async function run(): Promise<void> {
@@ -80,10 +119,13 @@ async function run(): Promise<void> {
   let skippedExisting = 0;
   let missingGrid = 0;
   let missingBasemap = 0;
+  let staleBasemap = 0;
+  let regeneratedStale = 0;
 
   if (!cli.force && !cli.check) {
-    console.log("[map-basemap] Mode: backfill (existing basemaps are skipped; use --force to regenerate)");
+    console.log("[map-basemap] Mode: backfill (up-to-date basemaps are skipped; stale/missing basemaps are generated; use --force to regenerate all)");
   }
+  console.log(`[map-basemap] Retry policy: retries=${cli.retries}, maxAttempts=${cli.retries + 1}`);
 
   if (cli.check) {
     console.log("[map-basemap] Mode: check (no files will be written)");
@@ -103,13 +145,20 @@ async function run(): Promise<void> {
         console.warn(`[map-basemap] listing=${listingId}: missing basemap (${basemapPath})`);
         continue;
       }
+
+      if (isBasemapStale(gridPath, basemapPath)) {
+        staleBasemap += 1;
+        console.warn(`[map-basemap] listing=${listingId}: stale basemap (older than grid: ${basemapPath})`);
+        continue;
+      }
+
       skippedExisting += 1;
       console.log(`[map-basemap] listing=${listingId}: ok (${basemapPath})`);
     }
 
-    const checkFailures = missingGrid + missingBasemap;
+    const checkFailures = missingGrid + missingBasemap + staleBasemap;
     console.log(
-      `[map-basemap] Summary: checked=${selectedMapIds.length}, ok=${skippedExisting}, missing_grid=${missingGrid}, missing_basemap=${missingBasemap}`,
+      `[map-basemap] Summary: checked=${selectedMapIds.length}, ok=${skippedExisting}, missing_grid=${missingGrid}, missing_basemap=${missingBasemap}, stale_basemap=${staleBasemap}`,
     );
     if (checkFailures > 0) {
       throw new Error(`[map-basemap] Check failed: missing entries=${checkFailures}`);
@@ -119,15 +168,50 @@ async function run(): Promise<void> {
 
   for (const listingId of selectedMapIds) {
     const basemapPath = getBasemapPath(repoRoot, listingId);
+    const gridPath = resolve(repoRoot, "maps", listingId, "grid.geojson");
     if (!cli.force && existsSync(basemapPath)) {
-      skipped += 1;
-      skippedExisting += 1;
-      console.log(`[map-basemap] listing=${listingId}: skipped (existing basemap at ${basemapPath})`);
-      continue;
+      if (existsSync(gridPath) && isBasemapStale(gridPath, basemapPath)) {
+        staleBasemap += 1;
+        regeneratedStale += 1;
+        console.log(`[map-basemap] listing=${listingId}: stale basemap detected, regenerating (${basemapPath})`);
+      } else {
+        skipped += 1;
+        skippedExisting += 1;
+        console.log(`[map-basemap] listing=${listingId}: skipped (existing basemap at ${basemapPath})`);
+        continue;
+      }
     }
 
     try {
-      const result = await writeBasemapFromGridFile(repoRoot, listingId);
+      let result: Awaited<ReturnType<typeof writeBasemapFromGridFile>> | null = null;
+      let lastError: unknown;
+      const maxAttempts = cli.retries + 1;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        try {
+          result = await writeBasemapFromGridFile(repoRoot, listingId);
+          break;
+        } catch (error) {
+          lastError = error;
+          if (error instanceof MissingGridGeoJsonError) {
+            throw error;
+          }
+          if (attempt >= maxAttempts) {
+            throw error;
+          }
+          const nextAttempt = attempt + 1;
+          const message = error instanceof Error ? error.message : String(error);
+          console.warn(
+            `[map-basemap] listing=${listingId}: attempt ${attempt}/${maxAttempts} failed (${message}); retrying attempt ${nextAttempt}/${maxAttempts}`,
+          );
+          await waitMs(1000 * attempt);
+        }
+      }
+
+      if (!result) {
+        throw (lastError instanceof Error ? lastError : new Error(String(lastError)));
+      }
+
       written += 1;
       console.log(`[map-basemap] listing=${listingId}: wrote ${result.outputPath} roads=${result.roadCount}`);
     } catch (error) {
@@ -148,7 +232,7 @@ async function run(): Promise<void> {
   }
 
   console.log(
-    `[map-basemap] Summary: written=${written}, failed=${failed}, skipped=${skipped}, skipped_existing=${skippedExisting}, missing_grid=${missingGrid}`,
+    `[map-basemap] Summary: written=${written}, failed=${failed}, skipped=${skipped}, skipped_existing=${skippedExisting}, stale_detected=${staleBasemap}, stale_regenerated=${regeneratedStale}, missing_grid=${missingGrid}`,
   );
 }
 
