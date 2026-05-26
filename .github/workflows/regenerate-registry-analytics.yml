@@ -166,10 +166,17 @@ jobs:
             pnpm --dir scripts run generate-registry-demand-stats -- --strict-fingerprint-cache
           fi
 
+      - name: Generate map basemaps
+        working-directory: scripts
+        env:
+          OSM_OVERPASS_URL: https://overpass-api.de/api/interpreter
+        run: pnpm run generate-map-basemaps -- --continue-on-error
+
       - name: Build map demand stats artifact
         run: |
           set -euo pipefail
-          tar -cf /tmp/maps-demand-stats.tar maps/demand-stats-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-attribution-delta.json
+          BASEMAP_FILES="$(find maps -mindepth 2 -maxdepth 2 -type f -name basemap.svg -print)"
+          tar -cf /tmp/maps-demand-stats.tar maps/demand-stats-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-attribution-delta.json ${BASEMAP_FILES}
 
       - name: Upload map demand stats artifact
         uses: actions/upload-artifact@v4
@@ -444,7 +451,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/*/grid.geojson maps/*/basemap.svg maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
