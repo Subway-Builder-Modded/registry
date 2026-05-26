@@ -218,6 +218,20 @@ function resolveRoadClass(highway: string): RoadClass {
   return "other";
 }
 
+function shouldExcludeLoopLikeWay(highway: string, tags: Record<string, unknown>): boolean {
+  const normalized = highway.toLowerCase();
+  if (normalized.endsWith("_link")) {
+    return true;
+  }
+
+  const junction = typeof tags.junction === "string" ? tags.junction.toLowerCase() : "";
+  if (junction === "roundabout" || junction === "circular") {
+    return true;
+  }
+
+  return false;
+}
+
 function roadStrokeWidthForClass(roadClass: RoadClass): number {
   switch (roadClass) {
     case "motorway":
@@ -402,6 +416,7 @@ async function fetchRoadsFromOverpass(
 
     const highwayValue = tags.highway;
     if (typeof highwayValue !== "string" || highwayValue.trim() === "") continue;
+    if (shouldExcludeLoopLikeWay(highwayValue, tags)) continue;
 
     const geometry = Array.isArray(element.geometry) ? element.geometry : [];
     const coordinates: Array<{ lon: number; lat: number }> = [];
