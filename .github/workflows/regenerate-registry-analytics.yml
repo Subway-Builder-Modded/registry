@@ -170,7 +170,7 @@ jobs:
         working-directory: scripts
         env:
           OSM_OVERPASS_URL: https://overpass-api.de/api/interpreter
-        run: pnpm run generate-map-basemaps -- --continue-on-error
+        run: pnpm run generate-map-basemaps:backfill -- --continue-on-error
 
       - name: Build map demand stats artifact
         run: |
