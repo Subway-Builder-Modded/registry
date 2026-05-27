@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { getMapIds } from "./lib/map-demand-stats/repo.js";
 import { getBasemapPath, MissingGridGeoJsonError, writeBasemapFromGridFile } from "./lib/map-basemap.js";
+import { isObject, readJsonFile, writeJsonFile } from "./lib/json-utils.js";
 import { resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
 
 interface CliOptions {
@@ -10,7 +11,29 @@ interface CliOptions {
   continueOnError: boolean;
   force: boolean;
   check: boolean;
+  populateCompletenessOnly: boolean;
   retries: number;
+}
+
+interface IntegrityListingVersionMeta {
+  version: string | null;
+  fingerprint: string | null;
+}
+
+interface BasemapCompletenessListingEntry {
+  listing_id: string;
+  version: string | null;
+  fingerprint: string | null;
+  basemap_complete: boolean;
+  checked_at: string;
+  reason: string;
+}
+
+interface BasemapCompletenessFile {
+  schema_version: 1;
+  generated_at: string;
+  by_fingerprint: Record<string, boolean>;
+  listings: Record<string, BasemapCompletenessListingEntry>;
 }
 
 function parsePositiveInteger(value: string, flagName: string): number {
@@ -33,11 +56,124 @@ function isBasemapStale(gridPath: string, basemapPath: string): boolean {
   return basemapMtimeMs < gridMtimeMs;
 }
 
+function getBasemapCompletenessPath(repoRoot: string): string {
+  return resolve(repoRoot, "maps", "basemap-completeness.json");
+}
+
+function loadIntegrityListingMeta(repoRoot: string): Record<string, IntegrityListingVersionMeta> {
+  const integrityPath = resolve(repoRoot, "maps", "integrity.json");
+  if (!existsSync(integrityPath)) {
+    return {};
+  }
+
+  try {
+    const parsed = readJsonFile<unknown>(integrityPath);
+    if (!isObject(parsed) || !isObject(parsed.listings)) {
+      return {};
+    }
+
+    const result: Record<string, IntegrityListingVersionMeta> = {};
+    for (const [listingId, listingValue] of Object.entries(parsed.listings)) {
+      if (!isObject(listingValue)) continue;
+      const latestVersion = typeof listingValue.latest_semver_version === "string"
+        ? listingValue.latest_semver_version
+        : null;
+      const versions = isObject(listingValue.versions) ? listingValue.versions : null;
+      const versionEntry = latestVersion && versions && isObject(versions[latestVersion])
+        ? versions[latestVersion]
+        : null;
+      const fingerprint = versionEntry && typeof versionEntry.fingerprint === "string"
+        ? versionEntry.fingerprint
+        : null;
+
+      result[listingId] = {
+        version: latestVersion,
+        fingerprint,
+      };
+    }
+
+    return result;
+  } catch {
+    return {};
+  }
+}
+
+function loadBasemapCompletenessFile(repoRoot: string): BasemapCompletenessFile {
+  const path = getBasemapCompletenessPath(repoRoot);
+  if (!existsSync(path)) {
+    return {
+      schema_version: 1,
+      generated_at: new Date(0).toISOString(),
+      by_fingerprint: {},
+      listings: {},
+    };
+  }
+
+  try {
+    const parsed = readJsonFile<unknown>(path);
+    if (!isObject(parsed) || parsed.schema_version !== 1) {
+      throw new Error("invalid schema");
+    }
+    const byFingerprint = isObject(parsed.by_fingerprint)
+      ? Object.fromEntries(Object.entries(parsed.by_fingerprint).filter(([, value]) => typeof value === "boolean"))
+      : {};
+    const listings = isObject(parsed.listings)
+      ? Object.fromEntries(Object.entries(parsed.listings).filter(([, value]) => isObject(value))) as Record<string, BasemapCompletenessListingEntry>
+      : {};
+
+    return {
+      schema_version: 1,
+      generated_at: typeof parsed.generated_at === "string" ? parsed.generated_at : new Date(0).toISOString(),
+      by_fingerprint: byFingerprint,
+      listings,
+    };
+  } catch {
+    return {
+      schema_version: 1,
+      generated_at: new Date(0).toISOString(),
+      by_fingerprint: {},
+      listings: {},
+    };
+  }
+}
+
+function writeBasemapCompletenessFile(
+  repoRoot: string,
+  integrityMeta: Record<string, IntegrityListingVersionMeta>,
+  updates: Record<string, { basemap_complete: boolean; reason: string; checked_at: string }>,
+): void {
+  if (Object.keys(updates).length === 0) {
+    return;
+  }
+
+  const existing = loadBasemapCompletenessFile(repoRoot);
+
+  for (const [listingId, update] of Object.entries(updates)) {
+    const meta = integrityMeta[listingId] ?? { version: null, fingerprint: null };
+    existing.listings[listingId] = {
+      listing_id: listingId,
+      version: meta.version,
+      fingerprint: meta.fingerprint,
+      basemap_complete: update.basemap_complete,
+      checked_at: update.checked_at,
+      reason: update.reason,
+    };
+
+    if (meta.fingerprint) {
+      existing.by_fingerprint[meta.fingerprint] = update.basemap_complete;
+    }
+  }
+
+  existing.generated_at = new Date().toISOString();
+  writeJsonFile(getBasemapCompletenessPath(repoRoot), existing);
+}
+
 function parseCliArgs(argv: string[]): CliOptions {
   let mapId: string | undefined;
   let continueOnError = false;
   let force = false;
   let check = false;
+  let populateCompletenessOnly = false;
   let retries = 3;
 
   for (let index = 0; index < argv.length; index += 1) {
@@ -55,6 +191,10 @@ function parseCliArgs(argv: string[]): CliOptions {
     }
     if (arg === "--check") {
       check = true;
+      continue;
+    }
+    if (arg === "--populate-completeness-only") {
+      populateCompletenessOnly = true;
       continue;
     }
     if (arg === "--retries") {
@@ -92,15 +232,18 @@ function parseCliArgs(argv: string[]): CliOptions {
       continue;
     }
     throw new Error(
-      `Unknown argument '${arg}'. Supported flags: --id <map-id>, -id <map-id>, --continue-on-error, --force, --check, --retries <count>.`,
+      `Unknown argument '${arg}'. Supported flags: --id <map-id>, -id <map-id>, --continue-on-error, --force, --check, --populate-completeness-only, --retries <count>.`,
     );
   }
 
   if (force && check) {
     throw new Error("--force and --check cannot be used together");
   }
+  if (populateCompletenessOnly && (force || check)) {
+    throw new Error("--populate-completeness-only cannot be combined with --force or --check");
+  }
 
-  return { mapId, continueOnError, force, check, retries };
+  return { mapId, continueOnError, force, check, populateCompletenessOnly, retries };
 }
 
 async function run(): Promise<void> {
@@ -113,6 +256,8 @@ async function run(): Promise<void> {
   }
 
   const selectedMapIds = cli.mapId ? [cli.mapId] : mapIds;
+  const integrityMeta = loadIntegrityListingMeta(repoRoot);
+  const completenessUpdates: Record<string, { basemap_complete: boolean; reason: string; checked_at: string }> = {};
   let written = 0;
   let failed = 0;
   let skipped = 0;
@@ -122,10 +267,66 @@ async function run(): Promise<void> {
   let staleBasemap = 0;
   let regeneratedStale = 0;
 
-  if (!cli.force && !cli.check) {
+  if (!cli.force && !cli.check && !cli.populateCompletenessOnly) {
     console.log("[map-basemap] Mode: backfill (up-to-date basemaps are skipped; stale/missing basemaps are generated; use --force to regenerate all)");
   }
+  if (cli.populateCompletenessOnly) {
+    console.log("[map-basemap] Mode: populate-completeness-only (no basemap generation)");
+  }
   console.log(`[map-basemap] Retry policy: retries=${cli.retries}, maxAttempts=${cli.retries + 1}`);
+
+  if (cli.populateCompletenessOnly) {
+    let complete = 0;
+    for (const listingId of selectedMapIds) {
+      const basemapPath = getBasemapPath(repoRoot, listingId);
+      const gridPath = resolve(repoRoot, "maps", listingId, "grid.geojson");
+      const hasGrid = existsSync(gridPath);
+      const hasBasemap = existsSync(basemapPath);
+
+      if (!hasGrid) {
+        missingGrid += 1;
+        completenessUpdates[listingId] = {
+          basemap_complete: false,
+          reason: "missing_grid",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      }
+
+      if (!hasBasemap) {
+        missingBasemap += 1;
+        completenessUpdates[listingId] = {
+          basemap_complete: false,
+          reason: "missing_basemap",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      }
+
+      if (isBasemapStale(gridPath, basemapPath)) {
+        staleBasemap += 1;
+        completenessUpdates[listingId] = {
+          basemap_complete: false,
+          reason: "stale_basemap",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      }
+
+      complete += 1;
+      completenessUpdates[listingId] = {
+        basemap_complete: true,
+        reason: "ok",
+        checked_at: new Date().toISOString(),
+      };
+    }
+
+    writeBasemapCompletenessFile(repoRoot, integrityMeta, completenessUpdates);
+    console.log(
+      `[map-basemap] Summary: populated=${selectedMapIds.length}, complete=${complete}, missing_grid=${missingGrid}, missing_basemap=${missingBasemap}, stale_basemap=${staleBasemap}`,
+    );
+    return;
+  }
 
   if (cli.check) {
     console.log("[map-basemap] Mode: check (no files will be written)");
@@ -138,23 +339,45 @@ async function run(): Promise<void> {
       if (!hasGrid) {
         missingGrid += 1;
         console.warn(`[map-basemap] listing=${listingId}: missing grid (${gridPath})`);
+        completenessUpdates[listingId] = {
+          basemap_complete: false,
+          reason: "missing_grid",
+          checked_at: new Date().toISOString(),
+        };
         continue;
       }
       if (!hasBasemap) {
         missingBasemap += 1;
         console.warn(`[map-basemap] listing=${listingId}: missing basemap (${basemapPath})`);
+        completenessUpdates[listingId] = {
+          basemap_complete: false,
+          reason: "missing_basemap",
+          checked_at: new Date().toISOString(),
+        };
         continue;
       }
 
       if (isBasemapStale(gridPath, basemapPath)) {
         staleBasemap += 1;
         console.warn(`[map-basemap] listing=${listingId}: stale basemap (older than grid: ${basemapPath})`);
+        completenessUpdates[listingId] = {
+          basemap_complete: false,
+          reason: "stale_basemap",
+          checked_at: new Date().toISOString(),
+        };
         continue;
       }
 
       skippedExisting += 1;
       console.log(`[map-basemap] listing=${listingId}: ok (${basemapPath})`);
+      completenessUpdates[listingId] = {
+        basemap_complete: true,
+        reason: "ok",
+        checked_at: new Date().toISOString(),
+      };
     }
+
+    writeBasemapCompletenessFile(repoRoot, integrityMeta, completenessUpdates);
 
     const checkFailures = missingGrid + missingBasemap + staleBasemap;
     console.log(
@@ -178,6 +401,11 @@ async function run(): Promise<void> {
         skipped += 1;
         skippedExisting += 1;
         console.log(`[map-basemap] listing=${listingId}: skipped (existing basemap at ${basemapPath})`);
+        completenessUpdates[listingId] = {
+          basemap_complete: true,
+          reason: "skipped_existing",
+          checked_at: new Date().toISOString(),
+        };
         continue;
       }
     }
@@ -214,6 +442,11 @@ async function run(): Promise<void> {
 
       written += 1;
       console.log(`[map-basemap] listing=${listingId}: wrote ${result.outputPath} roads=${result.roadCount}`);
+      completenessUpdates[listingId] = {
+        basemap_complete: true,
+        reason: "generated",
+        checked_at: new Date().toISOString(),
+      };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (cli.continueOnError) {
@@ -221,15 +454,27 @@ async function run(): Promise<void> {
           skipped += 1;
           missingGrid += 1;
           console.warn(`[map-basemap] listing=${listingId}: skipped (${message})`);
+          completenessUpdates[listingId] = {
+            basemap_complete: false,
+            reason: "missing_grid",
+            checked_at: new Date().toISOString(),
+          };
         } else {
           failed += 1;
           console.warn(`[map-basemap] listing=${listingId}: failed (${message})`);
+          completenessUpdates[listingId] = {
+            basemap_complete: false,
+            reason: "generation_failed",
+            checked_at: new Date().toISOString(),
+          };
         }
         continue;
       }
       throw new Error(`[map-basemap] listing=${listingId}: ${message}`);
     }
   }
+
+  writeBasemapCompletenessFile(repoRoot, integrityMeta, completenessUpdates);
 
   console.log(
     `[map-basemap] Summary: written=${written}, failed=${failed}, skipped=${skipped}, skipped_existing=${skippedExisting}, stale_detected=${staleBasemap}, stale_regenerated=${regeneratedStale}, missing_grid=${missingGrid}`,
