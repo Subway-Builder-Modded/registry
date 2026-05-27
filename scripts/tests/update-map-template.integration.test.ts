@@ -18,6 +18,7 @@ type IssueTemplateField = {
     options?: Array<{ label: string; required?: boolean }> | string[];
     value?: string;
     placeholder?: string;
+    description?: string;
   };
   validations?: {
     required?: boolean;
@@ -31,6 +32,15 @@ function getField(body: unknown[], id: string): IssueTemplateField {
   });
   assert.ok(field, `Expected field '${id}' in template`);
   return field as IssueTemplateField;
+}
+
+function getFieldIndex(body: unknown[], id: string): number {
+  const index = body.findIndex((item) => {
+    if (typeof item !== "object" || item === null) return false;
+    return (item as { id?: string }).id === id;
+  });
+  assert.notEqual(index, -1, `Expected field '${id}' in template`);
+  return index;
 }
 
 function parseTemplate(templateName: "publish-map.yml" | "update-map.yml"): {
@@ -105,6 +115,19 @@ test("publish-map.yml enforces required publish fields with blank dropdown defau
 
   const publishMapId = getField(parsed.body, "map-id");
   assert.equal(publishMapId.validations?.required, true);
+
+  const collaboratorsIndex = getFieldIndex(parsed.body, "collaborators");
+  const collaboratorsSection = parsed.body[collaboratorsIndex - 1] as {
+    type?: string;
+    attributes?: { value?: string };
+  };
+  assert.equal(collaboratorsSection.type, "markdown");
+  assert.equal(collaboratorsSection.attributes?.value, "## Collaborators.");
+  const collaborators = getField(parsed.body, "collaborators");
+  assert.equal(collaborators.type, "input");
+  assert.equal(collaborators.attributes?.description, "Optional comma-separated collaborator GitHub user IDs. Each ID must belong to an existing GitHub account.");
+  assert.equal(collaborators.attributes?.placeholder, "123456789, 987654321");
+  assert.equal(collaborators.validations?.required, false);
 });
 
 test("update-map.yml keeps map-id/terms required and makes other fields optional", () => {
@@ -127,6 +150,7 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
     "gallery",
     "source",
     "update-type",
+    "collaborators",
   ];
   for (const id of optionalUpdateFields) {
     const field = getField(parsed.body, id);
@@ -171,6 +195,7 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
     "source",
     "github-repo",
     "custom-update-url",
+    "collaborators",
   ];
   for (const id of updateFieldsWithoutInheritedHints) {
     const field = getField(parsed.body, id);
@@ -185,4 +210,17 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
       `Expected '${id}' to have no inherited default value in update-map.yml`,
     );
   }
+
+  const collaboratorsIndex = getFieldIndex(parsed.body, "collaborators");
+  const collaboratorsSection = parsed.body[collaboratorsIndex - 1] as {
+    type?: string;
+    attributes?: { value?: string };
+  };
+  assert.equal(collaboratorsSection.type, "markdown");
+  assert.equal(collaboratorsSection.attributes?.value, "## Collaborators.");
+  const collaborators = getField(parsed.body, "collaborators");
+  assert.equal(
+    collaborators.attributes?.description,
+    "Leave blank to keep current collaborators. Enter `None` to clear. Otherwise, enter comma-separated GitHub user IDs to replace current collaborators.",
+  );
 });

@@ -225,6 +225,11 @@ function withTemplatePolicy(baseDoc: TemplateDoc, mode: TemplateMode): TemplateD
       field.attributes.description =
         "Select tags only if you want to replace current special demand tags. Leave all unchecked to keep current tags.";
     }
+
+    if (mode === "update" && id === "collaborators" && field.attributes) {
+      field.attributes.description =
+        "Leave blank to keep current collaborators. Enter `None` to clear. Otherwise, enter comma-separated GitHub user IDs to replace current collaborators.";
+    }
   }
 
   return doc;
@@ -348,6 +353,17 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
     "Custom Update URL",
     "Required ONLY if you selected Custom URL. The full URL to your self-hosted update.json file. The file must follow the Railyard update.json schema. Leave blank if using GitHub Releases.",
     { placeholder: "https://example.com/sb-raleigh/update.json" },
+  ),
+  spacer(),
+  // ===== Collaborators ===== //
+  markdown(
+    "## Collaborators.",
+  ),
+  input(
+    "collaborators",
+    "Collaborators",
+    "Optional comma-separated collaborator GitHub user IDs. Each ID must belong to an existing GitHub account.",
+    { placeholder: "123456789, 987654321", required: false },
   ),
   spacer(),
   // ===== Authorization ===== //

@@ -10,11 +10,42 @@ function parseGitHubReleaseTagUrl(url: string): { repo: string; tag: string } | 
 
 import { validateModManifest } from "./mod-manifest.js";
 
-export async function validateGitHubRepo(repo: string, sourceUrl?: string, listingType?: string, modId?: string): Promise<string[]> {
-  const errors: string[] = [];
+export interface GitHubUser {
+  id: number;
+  login: string;
+}
+
+export function getGitHubApiHeaders(): Record<string, string> {
   const token = process.env.GITHUB_TOKEN;
   const headers: Record<string, string> = { Accept: "application/vnd.github.v3+json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
+  return headers;
+}
+
+export async function fetchGitHubUserById(githubId: number): Promise<GitHubUser | null> {
+  const userRes = await fetch(`https://api.github.com/user/${githubId}`, {
+    headers: getGitHubApiHeaders(),
+  });
+  if (!userRes.ok) return null;
+
+  const raw = await userRes.json() as unknown;
+  if (
+    !raw
+    || typeof raw !== "object"
+    || typeof (raw as { id?: unknown }).id !== "number"
+    || typeof (raw as { login?: unknown }).login !== "string"
+  ) {
+    return null;
+  }
+
+  const user = raw as { id: number; login: string };
+  if (user.id !== githubId || user.login.trim() === "") return null;
+  return { id: user.id, login: user.login };
+}
+
+export async function validateGitHubRepo(repo: string, sourceUrl?: string, listingType?: string, modId?: string): Promise<string[]> {
+  const errors: string[] = [];
+  const headers = getGitHubApiHeaders();
 
   // 1. Check repo exists
   const repoRes = await fetch(`https://api.github.com/repos/${repo}`, { headers });

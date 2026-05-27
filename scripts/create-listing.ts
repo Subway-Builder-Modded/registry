@@ -12,6 +12,10 @@ import {
   normalizeSourceQualityForDataSource,
 } from "./lib/map-field-utils.js";
 import {
+  ensureCollaboratorAuthorAliasPrefills,
+  resolvePublishCollaborators,
+} from "./lib/collaborators.js";
+import {
   type MapManifest,
   type ModManifest,
   resolveListingIdAndDir,
@@ -117,6 +121,11 @@ async function main() {
   const listingDir = resolve(REPO_ROOT, dir, id);
   const galleryDir = resolve(listingDir, "gallery");
   const description = getOptionalIssueValue(data.description);
+  const collaboratorResult = await resolvePublishCollaborators(data.collaborators);
+  if (collaboratorResult.errors.length > 0) {
+    throw new Error(`Invalid collaborators: ${collaboratorResult.errors.join("; ")}`);
+  }
+  const collaborators = collaboratorResult.collaborators;
 
   if (!description) {
     throw new Error("description is required");
@@ -142,6 +151,7 @@ async function main() {
     name: String(data.name),
     author: issueAuthorLogin,
     github_id: issueAuthorGithubId,
+    ...(collaborators.length > 0 ? { collaborators } : {}),
     description,
     tags,
     gallery: galleryPaths,
@@ -159,6 +169,13 @@ async function main() {
   if (authorPrefillResult.created) {
     console.log(`Updated ${authorPrefillResult.path} with author '${issueAuthorLogin}'`);
   }
+  const createdCollaboratorAliases = ensureCollaboratorAuthorAliasPrefills(
+    REPO_ROOT,
+    collaboratorResult.users,
+  );
+  if (createdCollaboratorAliases.length > 0) {
+    console.log(`Updated authors/index.json with collaborator(s): ${createdCollaboratorAliases.join(", ")}`);
+  }
 
   assertValidRegistryManifest(
     manifest,
@@ -174,4 +191,3 @@ async function main() {
 }
 
 main();
-
