@@ -18,6 +18,7 @@ interface CliOptions {
 interface IntegrityListingVersionMeta {
   version: string | null;
   fingerprint: string | null;
+  eligible: boolean;
 }
 
 interface BasemapCompletenessListingEntry {
@@ -78,6 +79,7 @@ function loadIntegrityListingMeta(repoRoot: string): Record<string, IntegrityLis
       const latestVersion = typeof listingValue.latest_semver_version === "string"
         ? listingValue.latest_semver_version
         : null;
+      const latestSemverComplete = listingValue.latest_semver_complete === true;
       const versions = isObject(listingValue.versions) ? listingValue.versions : null;
       const versionEntry = latestVersion && versions && isObject(versions[latestVersion])
         ? versions[latestVersion]
@@ -85,10 +87,12 @@ function loadIntegrityListingMeta(repoRoot: string): Record<string, IntegrityLis
       const fingerprint = versionEntry && typeof versionEntry.fingerprint === "string"
         ? versionEntry.fingerprint
         : null;
+      const versionIsComplete = versionEntry?.is_complete === true;
 
       result[listingId] = {
         version: latestVersion,
         fingerprint,
+        eligible: latestSemverComplete && versionIsComplete,
       };
     }
 
@@ -149,7 +153,21 @@ function writeBasemapCompletenessFile(
   const existing = loadBasemapCompletenessFile(repoRoot);
 
   for (const [listingId, update] of Object.entries(updates)) {
-    const meta = integrityMeta[listingId] ?? { version: null, fingerprint: null };
+    const meta = integrityMeta[listingId] ?? { version: null, fingerprint: null, eligible: false };
+
+    if (update.reason === "integrity_incomplete") {
+      const existingFingerprint = existing.listings[listingId]?.fingerprint;
+      delete existing.listings[listingId];
+
+      if (meta.fingerprint) {
+        delete existing.by_fingerprint[meta.fingerprint];
+      }
+      if (existingFingerprint && existingFingerprint !== meta.fingerprint) {
+        delete existing.by_fingerprint[existingFingerprint];
+      }
+      continue;
+    }
+
     existing.listings[listingId] = {
       listing_id: listingId,
       version: meta.version,
@@ -246,6 +264,13 @@ function parseCliArgs(argv: string[]): CliOptions {
   return { mapId, continueOnError, force, check, populateCompletenessOnly, retries };
 }
 
+function isListingEligibleForBasemap(
+  integrityMeta: Record<string, IntegrityListingVersionMeta>,
+  listingId: string,
+): boolean {
+  return integrityMeta[listingId]?.eligible === true;
+}
+
 async function run(): Promise<void> {
   const cli = parseCliArgs(process.argv.slice(2));
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
@@ -278,6 +303,15 @@ async function run(): Promise<void> {
   if (cli.populateCompletenessOnly) {
     let complete = 0;
     for (const listingId of selectedMapIds) {
+      if (!isListingEligibleForBasemap(integrityMeta, listingId)) {
+        completenessUpdates[listingId] = {
+          basemap_complete: false,
+          reason: "integrity_incomplete",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      }
+
       const basemapPath = getBasemapPath(repoRoot, listingId);
       const gridPath = resolve(repoRoot, "maps", listingId, "grid.geojson");
       const hasGrid = existsSync(gridPath);
@@ -331,6 +365,15 @@ async function run(): Promise<void> {
   if (cli.check) {
     console.log("[map-basemap] Mode: check (no files will be written)");
     for (const listingId of selectedMapIds) {
+      if (!isListingEligibleForBasemap(integrityMeta, listingId)) {
+        completenessUpdates[listingId] = {
+          basemap_complete: false,
+          reason: "integrity_incomplete",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      }
+
       const basemapPath = getBasemapPath(repoRoot, listingId);
       const gridPath = resolve(repoRoot, "maps", listingId, "grid.geojson");
       const hasGrid = existsSync(gridPath);
@@ -390,6 +433,17 @@ async function run(): Promise<void> {
   }
 
   for (const listingId of selectedMapIds) {
+    if (!isListingEligibleForBasemap(integrityMeta, listingId)) {
+      skipped += 1;
+      completenessUpdates[listingId] = {
+        basemap_complete: false,
+        reason: "integrity_incomplete",
+        checked_at: new Date().toISOString(),
+      };
+      console.log(`[map-basemap] listing=${listingId}: skipped (latest semver version is not integrity-complete)`);
+      continue;
+    }
+
     const basemapPath = getBasemapPath(repoRoot, listingId);
     const gridPath = resolve(repoRoot, "maps", listingId, "grid.geojson");
     if (!cli.force && existsSync(basemapPath)) {
