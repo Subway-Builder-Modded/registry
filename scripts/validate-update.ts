@@ -9,6 +9,7 @@ import {
   resolveListingIdAndDir,
   resolveManifestType as resolveManifestType,
 } from "./lib/manifests.js";
+import { resolveCollaboratorUpdate } from "./lib/collaborators.js";
 import { VANILLA_CITY_CODE_SET } from "./lib/map-constants.js";
 import { isPresentIssueValue } from "./lib/map-field-utils.js";
 import { validateMapUpdateFields } from "./lib/map-update-logic.js";
@@ -143,6 +144,13 @@ async function main() {
 
   await validateGitHubUpdate(updateType, githubRepo, sourceUrl, manifestType, errors);
   await validateCustomUrlUpdate(updateType, customUpdateUrl, manifestType, errors);
+  try {
+    const collaboratorResult = await resolveCollaboratorUpdate(data.collaborators);
+    errors.push(...collaboratorResult.errors.map((message) => `**collaborators**: ${message}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`**collaborators**: ${message}`);
+  }
 
   if (errors.length > 0) {
     const errorMessage = [

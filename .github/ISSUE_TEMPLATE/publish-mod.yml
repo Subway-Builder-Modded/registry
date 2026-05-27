@@ -109,6 +109,19 @@ body:
         Drag and drop screenshots here, or paste image URLs (one per line).
         These will be displayed in the mod browser. At least one image is recommended.
 
+  - type: markdown
+    attributes:
+      value: |
+        ## Collaborators.
+
+  - type: input
+    id: collaborators
+    attributes:
+      label: Collaborators
+      description: >
+        Optional comma-separated collaborator GitHub user IDs. Each ID must belong to an existing GitHub account.
+      placeholder: 123456789, 987654321
+
   - type: checkboxes
     id: terms
     attributes:

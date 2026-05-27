@@ -226,3 +226,38 @@ test("publish validation rejects mod ID that matches an existing map", () => {
   const output = readValidationError();
   assert.match(output, /\*\*mod-id\*\*: A map with ID `albany` already exists\. Listing IDs must be unique across maps and mods\./);
 });
+
+test("publish validation rejects malformed collaborators", () => {
+  const result = runScript("validate-publish", {
+    LISTING_TYPE: "mod",
+    ISSUE_JSON: JSON.stringify({
+      "mod-id": `zz-test-mod-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+      name: "Test Mod",
+      description: "Test description.",
+      source: "https://example.com/test-mod",
+      collaborators: "19807509,,12345678",
+      "update-type": "GitHub Releases",
+      "github-repo": "invalid-repo-format",
+    }),
+  });
+
+  assert.notEqual(result.status, 0, "Validation should fail for malformed collaborators");
+  const output = readValidationError();
+  assert.match(output, /\*\*collaborators\*\*: Collaborators must be a comma-separated list of GitHub user IDs with no empty entries\./);
+});
+
+test("update validation rejects malformed collaborators", () => {
+  const issue = {
+    "map-id": `zz-missing-map-${Date.now()}-${Math.floor(Math.random() * 10000)}`,
+    collaborators: "19807509,",
+  };
+  const result = runScript("validate-update", {
+    LISTING_TYPE: "map",
+    ISSUE_AUTHOR_ID: "1",
+    ISSUE_JSON: JSON.stringify(issue),
+  });
+
+  assert.notEqual(result.status, 0, "Validation should fail for malformed collaborators");
+  const output = readValidationError();
+  assert.match(output, /\*\*collaborators\*\*: Collaborators must be a comma-separated list of GitHub user IDs with no empty entries\./);
+});
