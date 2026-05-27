@@ -3,7 +3,10 @@ import assert from "node:assert/strict";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { generateMapDemandStats } from "../lib/map-demand-stats.js";
+import {
+  generateMapDemandStats,
+  resolveDemandStatsForMapUpdate,
+} from "../lib/map-demand-stats.js";
 import { GRID_SCHEMA_VERSION } from "../lib/map-demand-stats/constants.js";
 import { createDownloadAttributionDelta } from "../lib/download-attribution.js";
 import { DEFAULT_INITIAL_VIEW_STATE, makeDemandZip, makeFetchRouter, writeJson } from "./map-demand-stats/helpers.js";
@@ -612,6 +615,209 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
     assert.equal(result.skippedMaps, 1);
     assert.equal(result.skippedUnchanged, 1);
     assert.equal(result.extractionFailures, 0);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("resolveDemandStatsForMapUpdate uses cached stats for unchanged github fingerprint regardless of cache age", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-update-demand-cache-github-"));
+  mkdirSync(join(repoRoot, "maps", "cached-github-map"), { recursive: true });
+
+  writeDemandStatsCacheV2(repoRoot, {
+    "cached-github-map": {
+      source_fingerprint: "github:v1.2.0|map.zip",
+      last_checked_at: new Date(Date.now() - (30 * 24 * 60 * 60 * 1000)).toISOString(),
+      stats: {
+        residents_total: 1234,
+        points_count: 12,
+        population_count: 34,
+        initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+      },
+      grid: {
+        schema_version: GRID_SCHEMA_VERSION,
+      },
+    },
+  });
+  writeJson(join(repoRoot, "maps", "cached-github-map", "grid.geojson"), {
+    type: "FeatureCollection",
+    features: [],
+    properties: {},
+  });
+
+  const fetchMock = makeFetchRouter([
+    {
+      match: (url) => url === "https://api.github.com/graphql",
+      handle: () => new Response(JSON.stringify({
+        data: {
+          repository: {
+            releases: {
+              nodes: [
+                {
+                  tagName: "v1.2.0",
+                  releaseAssets: {
+                    nodes: [
+                      {
+                        name: "map.zip",
+                        downloadCount: 10,
+                        downloadUrl: "https://downloads.example.com/should-not-be-fetched.zip",
+                      },
+                    ],
+                    pageInfo: { hasNextPage: false, endCursor: null },
+                  },
+                },
+              ],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+          rateLimit: {
+            remaining: 4999,
+            cost: 1,
+            resetAt: "2026-03-11T00:00:00Z",
+          },
+        },
+      })),
+    },
+  ]);
+
+  try {
+    const result = await resolveDemandStatsForMapUpdate(
+      "cached-github-map",
+      { type: "github", repo: "owner/repo" },
+      {
+        repoRoot,
+        fetchImpl: fetchMock,
+        token: "test-token",
+      },
+    );
+
+    assert.equal(result.skippedUnchanged, true);
+    assert.equal(result.sourceFingerprint, "github:v1.2.0|map.zip");
+    assert.deepEqual(result.stats, {
+      residents_total: 1234,
+      points_count: 12,
+      population_count: 34,
+      initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+    });
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("resolveDemandStatsForMapUpdate fetches and extracts when custom sha fingerprint changes", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-update-demand-cache-custom-"));
+  mkdirSync(join(repoRoot, "maps", "changed-custom-map"), { recursive: true });
+
+  writeDemandStatsCacheV2(repoRoot, {
+    "changed-custom-map": {
+      source_fingerprint: "sha256:old",
+      last_checked_at: new Date().toISOString(),
+      stats: {
+        residents_total: 1,
+        points_count: 1,
+        population_count: 1,
+        initial_view_state: DEFAULT_INITIAL_VIEW_STATE,
+      },
+      grid: {
+        schema_version: GRID_SCHEMA_VERSION,
+      },
+    },
+  });
+  writeJson(join(repoRoot, "maps", "changed-custom-map", "grid.geojson"), {
+    type: "FeatureCollection",
+    features: [],
+    properties: {},
+  });
+
+  const zip = await makeDemandZip([5, 6]);
+  let zipFetches = 0;
+  const fetchMock = makeFetchRouter([
+    {
+      match: (url) => url === "https://example.com/changed-update.json",
+      handle: () => new Response(JSON.stringify({
+        schema_version: 1,
+        versions: [
+          {
+            version: "1.0.0",
+            sha256: "new",
+            download: "https://downloads.example.com/changed-custom-map.zip",
+          },
+        ],
+      })),
+    },
+    {
+      match: (url) => url === "https://downloads.example.com/changed-custom-map.zip",
+      handle: () => {
+        zipFetches += 1;
+        return new Response(new Uint8Array(zip));
+      },
+    },
+  ]);
+
+  try {
+    const result = await resolveDemandStatsForMapUpdate(
+      "changed-custom-map",
+      { type: "custom", url: "https://example.com/changed-update.json" },
+      {
+        repoRoot,
+        fetchImpl: fetchMock,
+      },
+    );
+
+    assert.equal(result.skippedUnchanged, false);
+    assert.equal(result.sourceFingerprint, "sha256:new");
+    assert.equal(zipFetches, 1);
+    assert.equal(result.stats.residents_total, 11);
+    assert.equal(result.stats.points_count, 2);
+    assert.equal(result.stats.population_count, 2);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("resolveDemandStatsForMapUpdate fetches when no unchanged cache entry exists", async () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-update-demand-cache-missing-"));
+  mkdirSync(join(repoRoot, "maps"), { recursive: true });
+
+  const zip = await makeDemandZip([2, 3]);
+  let zipFetches = 0;
+  const fetchMock = makeFetchRouter([
+    {
+      match: (url) => url === "https://example.com/missing-cache-update.json",
+      handle: () => new Response(JSON.stringify({
+        schema_version: 1,
+        versions: [
+          {
+            version: "1.0.0",
+            sha256: "missing-cache",
+            download: "https://downloads.example.com/missing-cache-map.zip",
+          },
+        ],
+      })),
+    },
+    {
+      match: (url) => url === "https://downloads.example.com/missing-cache-map.zip",
+      handle: () => {
+        zipFetches += 1;
+        return new Response(new Uint8Array(zip));
+      },
+    },
+  ]);
+
+  try {
+    const result = await resolveDemandStatsForMapUpdate(
+      "missing-cache-map",
+      { type: "custom", url: "https://example.com/missing-cache-update.json" },
+      {
+        repoRoot,
+        fetchImpl: fetchMock,
+      },
+    );
+
+    assert.equal(result.skippedUnchanged, false);
+    assert.equal(result.sourceFingerprint, "sha256:missing-cache");
+    assert.equal(zipFetches, 1);
+    assert.equal(result.stats.residents_total, 5);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }

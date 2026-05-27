@@ -357,7 +357,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   spacer(),
   // ===== Collaborators ===== //
   markdown(
-    "## Collaborators.",
+    "## Collaborators",
   ),
   input(
     "collaborators",
@@ -368,7 +368,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   spacer(),
   // ===== Authorization ===== //
   markdown(
-    "## Authorization.",
+    "## Authorization",
   ),
   {
     type: "checkboxes",

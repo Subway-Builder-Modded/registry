@@ -84,6 +84,41 @@ function gridStatisticsChanged(
   return JSON.stringify(manifest.grid_statistics ?? {}) !== JSON.stringify(nextGridStatistics);
 }
 
+function emitWarnings(warnings: string[]): void {
+  for (const warning of warnings) {
+    console.warn(`[map-demand-stats] ${warning}`);
+  }
+}
+
+async function extractDemandStatsFromResolvedSource(
+  listingId: string,
+  resolvedSource: ResolvedInstallTarget,
+  fetchImpl: typeof fetch,
+  warnings: string[],
+  options: {
+    requireResidentTotalsMatch?: boolean;
+  } = {},
+): Promise<DemandStats> {
+  const zipBuffer = await fetchZipBuffer(
+    listingId,
+    resolvedSource.zipUrl,
+    fetchImpl,
+    warnings,
+    undefined,
+    `fetch-zip listing=${listingId}${resolvedSource.attributionAssetKey ? ` assetKey=${resolvedSource.attributionAssetKey}` : ""} zipUrl=${resolvedSource.zipUrl}`,
+  );
+  if (!zipBuffer) {
+    throw new Error(warnings[0] ?? `listing=${listingId}: failed to fetch map ZIP`);
+  }
+
+  const extraction = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, {
+    warnings,
+    requireResidentTotalsMatch: options.requireResidentTotalsMatch,
+  });
+  emitWarnings(warnings);
+  return extraction.stats;
+}
+
 export async function resolveAndExtractDemandStatsForMapSource(
   listingId: string,
   update: MapUpdateSource,
@@ -109,26 +144,69 @@ export async function resolveAndExtractDemandStatsForMapSource(
     throw new Error(warnings[0] ?? `listing=${listingId}: failed to resolve map ZIP URL`);
   }
 
-  const zipBuffer = await fetchZipBuffer(
-    listingId,
-    resolvedSource.zipUrl,
-    fetchImpl,
-    warnings,
-    undefined,
-    `fetch-zip listing=${listingId}${resolvedSource.attributionAssetKey ? ` assetKey=${resolvedSource.attributionAssetKey}` : ""} zipUrl=${resolvedSource.zipUrl}`,
-  );
-  if (!zipBuffer) {
-    throw new Error(warnings[0] ?? `listing=${listingId}: failed to fetch map ZIP`);
-  }
-
-  const extraction = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, {
-    warnings,
+  return extractDemandStatsFromResolvedSource(listingId, resolvedSource, fetchImpl, warnings, {
     requireResidentTotalsMatch: options.requireResidentTotalsMatch,
   });
-  for (const warning of warnings) {
-    console.warn(`[map-demand-stats] ${warning}`);
+}
+
+export async function resolveDemandStatsForMapUpdate(
+  listingId: string,
+  update: MapUpdateSource,
+  options: {
+    repoRoot: string;
+    fetchImpl?: typeof fetch;
+    token?: string;
+    requireResidentTotalsMatch?: boolean;
+    sourceUrl?: string;
+  },
+): Promise<{
+  stats: DemandStats;
+  sourceFingerprint: string;
+  skippedUnchanged: boolean;
+}> {
+  const warnings: string[] = [];
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const resolvedSource = await resolveZipUrlForMapSource(
+    listingId,
+    options.sourceUrl,
+    update,
+    fetchImpl,
+    options.token,
+    warnings,
+  );
+  if (!resolvedSource) {
+    throw new Error(warnings[0] ?? `listing=${listingId}: failed to resolve map ZIP URL`);
   }
-  return extraction.stats;
+
+  const cache = loadDemandStatsCache(options.repoRoot);
+  const cacheEntry = cache[listingId];
+  if (shouldSkipUnchanged(
+    options.repoRoot,
+    listingId,
+    cacheEntry,
+    resolvedSource.sourceFingerprint,
+    new Date(),
+    true,
+  )) {
+    emitWarnings(warnings);
+    console.log(
+      `[map-demand-stats] listing=${listingId}: source fingerprint unchanged (${resolvedSource.sourceFingerprint}); using cached demand stats.`,
+    );
+    return {
+      stats: cacheEntry.stats as DemandStats,
+      sourceFingerprint: resolvedSource.sourceFingerprint,
+      skippedUnchanged: true,
+    };
+  }
+
+  const stats = await extractDemandStatsFromResolvedSource(listingId, resolvedSource, fetchImpl, warnings, {
+    requireResidentTotalsMatch: options.requireResidentTotalsMatch,
+  });
+  return {
+    stats,
+    sourceFingerprint: resolvedSource.sourceFingerprint,
+    skippedUnchanged: false,
+  };
 }
 
 export async function generateMapDemandStats(
