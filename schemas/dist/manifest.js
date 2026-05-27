@@ -76,6 +76,7 @@ const BaseManifestSchema = z.object({
     name: z.string().min(1),
     author: z.string().min(1),
     github_id: z.number().int().min(1),
+    collaborators: z.array(z.number().int().min(1)).refine((a) => new Set(a).size === a.length, { message: "collaborators must be unique" }).optional(),
     description: z.string().min(1),
     tags: z.array(z.string().min(1)).refine((a) => new Set(a).size === a.length, { message: "tags must be unique" }),
     gallery: z.array(z.string().min(1)),

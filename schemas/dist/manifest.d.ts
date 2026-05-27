@@ -610,6 +610,7 @@ export declare const ModManifestSchema: z.ZodObject<{
     name: z.ZodString;
     author: z.ZodString;
     github_id: z.ZodNumber;
+    collaborators: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodNumber, "many">, number[], number[]>>;
     description: z.ZodString;
     tags: z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>;
     gallery: z.ZodArray<z.ZodString, "many">;
@@ -652,6 +653,7 @@ export declare const ModManifestSchema: z.ZodObject<{
         type: "custom";
         url: string;
     };
+    collaborators?: number[] | undefined;
 }, {
     schema_version: 1;
     source: string;
@@ -670,6 +672,7 @@ export declare const ModManifestSchema: z.ZodObject<{
         type: "custom";
         url: string;
     };
+    collaborators?: number[] | undefined;
 }>;
 export declare const MapManifestSchema: z.ZodObject<{
     schema_version: z.ZodLiteral<1>;
@@ -677,6 +680,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     name: z.ZodString;
     author: z.ZodString;
     github_id: z.ZodNumber;
+    collaborators: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodNumber, "many">, number[], number[]>>;
     description: z.ZodString;
     tags: z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>;
     is_test: z.ZodBoolean;
@@ -1182,6 +1186,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     location: "caribbean" | "central-america" | "central-asia" | "east-africa" | "east-asia" | "europe" | "middle-east" | "north-africa" | "north-america" | "oceania" | "south-america" | "south-asia" | "southeast-asia" | "southern-africa" | "west-africa";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
+    collaborators?: number[] | undefined;
     grid_statistics?: {
         residentWeightedNearestNeighborKm: {
             p10: number;
@@ -1295,6 +1300,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     location: "caribbean" | "central-america" | "central-asia" | "east-africa" | "east-asia" | "europe" | "middle-east" | "north-africa" | "north-america" | "oceania" | "south-america" | "south-asia" | "southeast-asia" | "southern-africa" | "west-africa";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
+    collaborators?: number[] | undefined;
     grid_statistics?: {
         residentWeightedNearestNeighborKm: {
             p10: number;
@@ -1378,6 +1384,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     name: z.ZodString;
     author: z.ZodString;
     github_id: z.ZodNumber;
+    collaborators: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodNumber, "many">, number[], number[]>>;
     description: z.ZodString;
     tags: z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>;
     is_test: z.ZodBoolean;
@@ -1883,6 +1890,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     location: "caribbean" | "central-america" | "central-asia" | "east-africa" | "east-asia" | "europe" | "middle-east" | "north-africa" | "north-america" | "oceania" | "south-america" | "south-asia" | "southeast-asia" | "southern-africa" | "west-africa";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
+    collaborators?: number[] | undefined;
     grid_statistics?: {
         residentWeightedNearestNeighborKm: {
             p10: number;
@@ -1996,6 +2004,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     location: "caribbean" | "central-america" | "central-asia" | "east-africa" | "east-asia" | "europe" | "middle-east" | "north-africa" | "north-america" | "oceania" | "south-america" | "south-asia" | "southeast-asia" | "southern-africa" | "west-africa";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
+    collaborators?: number[] | undefined;
     grid_statistics?: {
         residentWeightedNearestNeighborKm: {
             p10: number;
@@ -2078,6 +2087,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     name: z.ZodString;
     author: z.ZodString;
     github_id: z.ZodNumber;
+    collaborators: z.ZodOptional<z.ZodEffects<z.ZodArray<z.ZodNumber, "many">, number[], number[]>>;
     description: z.ZodString;
     tags: z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>;
     gallery: z.ZodArray<z.ZodString, "many">;
@@ -2120,6 +2130,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         type: "custom";
         url: string;
     };
+    collaborators?: number[] | undefined;
 }, {
     schema_version: 1;
     source: string;
@@ -2138,6 +2149,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         type: "custom";
         url: string;
     };
+    collaborators?: number[] | undefined;
 }>]>;
 export type UpdateConfig = z.infer<typeof UpdateConfigSchema>;
 export type InitialViewState = z.infer<typeof InitialViewStateSchema>;

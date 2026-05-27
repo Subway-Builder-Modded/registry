@@ -15,6 +15,10 @@ import {
   getOptionalIssueValue,
   isPresentIssueValue,
 } from "./lib/map-field-utils.js";
+import {
+  ensureCollaboratorAuthorAliasPrefills,
+  resolveCollaboratorUpdate,
+} from "./lib/collaborators.js";
 import { applyMapManifestUpdates } from "./lib/map-update-logic.js";
 import { resolveAndExtractDemandStatsForMapSource } from "./lib/map-demand-stats.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
@@ -98,6 +102,22 @@ async function main() {
     | MapManifest;
 
   applyCommonMetadataUpdates(manifest, data);
+  const collaboratorUpdate = await resolveCollaboratorUpdate(data.collaborators);
+  if (collaboratorUpdate.errors.length > 0) {
+    throw new Error(`Invalid collaborators: ${collaboratorUpdate.errors.join("; ")}`);
+  }
+  if (collaboratorUpdate.kind === "clear") {
+    delete manifest.collaborators;
+  } else if (collaboratorUpdate.kind === "replace") {
+    manifest.collaborators = collaboratorUpdate.collaborators;
+    const createdCollaboratorAliases = ensureCollaboratorAuthorAliasPrefills(
+      REPO_ROOT,
+      collaboratorUpdate.users,
+    );
+    if (createdCollaboratorAliases.length > 0) {
+      console.log(`Updated authors/index.json with collaborator(s): ${createdCollaboratorAliases.join(", ")}`);
+    }
+  }
   if (typeof manifest.is_test !== "boolean") {
     manifest.is_test = false;
   }
