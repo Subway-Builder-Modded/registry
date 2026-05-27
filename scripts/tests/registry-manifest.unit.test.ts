@@ -2,7 +2,10 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { assertValidRegistryManifest } from "../lib/registry-manifest.js";
 
-function makeMapManifest(fileSizes: unknown): Record<string, unknown> {
+function makeMapManifest(
+  fileSizes: unknown,
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
   return {
     schema_version: 1,
     id: "manifest-schema-map",
@@ -33,6 +36,26 @@ function makeMapManifest(fileSizes: unknown): Record<string, unknown> {
     location: "north-america",
     special_demand: [],
     file_sizes: fileSizes,
+    ...overrides,
+  };
+}
+
+function makeModManifest(
+  overrides: Record<string, unknown> = {},
+): Record<string, unknown> {
+  return {
+    schema_version: 1,
+    id: "manifest-schema-mod",
+    name: "Schema Test Mod",
+    author: "tester",
+    github_id: 1,
+    description: "desc",
+    tags: ["trains"],
+    gallery: ["gallery/1.webp"],
+    is_test: false,
+    source: "https://example.com",
+    update: { type: "github", repo: "owner/repo" },
+    ...overrides,
   };
 }
 
@@ -64,6 +87,45 @@ test("registry schema rejects map manifests with negative or non-numeric file_si
         "config.json": "1.2",
       }),
       "invalid manifest non-numeric",
+    );
+  });
+});
+
+test("registry schema accepts optional collaborators on manifests", () => {
+  assert.doesNotThrow(() => {
+    assertValidRegistryManifest(
+      makeModManifest({ collaborators: [19807509, 12345678] }),
+      "valid mod manifest with collaborators",
+    );
+  });
+
+  assert.doesNotThrow(() => {
+    assertValidRegistryManifest(
+      makeMapManifest({}, { collaborators: [19807509] }),
+      "valid map manifest with collaborators",
+    );
+  });
+});
+
+test("registry schema rejects invalid collaborators", () => {
+  assert.throws(() => {
+    assertValidRegistryManifest(
+      makeModManifest({ collaborators: [19807509, 19807509] }),
+      "invalid collaborators",
+    );
+  });
+
+  assert.throws(() => {
+    assertValidRegistryManifest(
+      makeMapManifest({}, { collaborators: "19807509" }),
+      "invalid collaborators string",
+    );
+  });
+
+  assert.throws(() => {
+    assertValidRegistryManifest(
+      makeMapManifest({}, { collaborators: [0] }),
+      "invalid collaborator id",
     );
   });
 });

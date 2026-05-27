@@ -199,6 +199,10 @@ Maps include all mod fields plus map-specific metadata:
 }
 ```
 
+Optional common fields:
+
+- `collaborators`: array of GitHub user IDs for non-owner contributors; supplied in issue forms as comma-separated integers and prefilled into `authors/index.json` when missing
+
 Map-specific fields:
 
 - `city_code`: `^[A-Z0-9]{2,4}$`

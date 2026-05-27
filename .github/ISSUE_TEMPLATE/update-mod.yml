@@ -91,3 +91,16 @@ body:
       description: >
         Drag and drop new screenshots here, or paste image URLs (one per line).
         If provided, these will REPLACE the current gallery. Leave blank to keep current.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Collaborators.
+
+  - type: input
+    id: collaborators
+    attributes:
+      label: Collaborators
+      description: >
+        Leave blank to keep current collaborators. Enter `None` to clear. Otherwise, enter comma-separated
+        GitHub user IDs to replace current collaborators.

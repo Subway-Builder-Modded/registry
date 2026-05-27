@@ -4,6 +4,7 @@ import { z } from "zod";
 import { validateCustomUpdateUrl } from "./lib/custom-url.js";
 import { validateGitHubRepo } from "./lib/github.js";
 import { parseGalleryImages } from "./lib/gallery.js";
+import { resolvePublishCollaborators } from "./lib/collaborators.js";
 import {
   DEFAULT_MAP_DATA_SOURCE,
   LEVEL_OF_DETAIL_VALUES,
@@ -30,6 +31,7 @@ const PublishModInput = z.object({
   name: z.string().min(1, "Display name is required"),
   description: z.string().min(1, "Description is required"),
   source: z.string().url("Source must be a valid URL"),
+  collaborators: z.string().optional(),
   "update-type": z.enum(["GitHub Releases", "Custom URL"]),
   "github-repo": z.string().optional(),
   "custom-update-url": z.string().optional(),
@@ -84,6 +86,13 @@ async function validateMod(data: Record<string, string>): Promise<ValidationResu
   if (!getOptionalIssueValue(parsed.data.description)) {
     errors.push("**description**: Description is required.");
   }
+  try {
+    const collaboratorResult = await resolvePublishCollaborators(parsed.data.collaborators);
+    errors.push(...collaboratorResult.errors.map((message) => `**collaborators**: ${message}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`**collaborators**: ${message}`);
+  }
 
   if (parsed.data["update-type"] === "GitHub Releases") {
     if (!parsed.data["github-repo"] || !/^[^/]+\/[^/]+$/.test(parsed.data["github-repo"])) {
@@ -130,6 +139,13 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
   errors.push(...checkCrossTypeIdUniqueness({ repoRoot: REPO_ROOT, id, currentType: "map" }));
   if (!getOptionalIssueValue(parsed.data.description)) {
     errors.push("**description**: Description is required.");
+  }
+  try {
+    const collaboratorResult = await resolvePublishCollaborators(parsed.data.collaborators);
+    errors.push(...collaboratorResult.errors.map((message) => `**collaborators**: ${message}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`**collaborators**: ${message}`);
   }
 
   if (VANILLA_CITY_CODE_SET.has(parsed.data["city-code"])) {
