@@ -119,7 +119,10 @@ function loadBasemapCompletenessFile(repoRoot: string): BasemapCompletenessFile 
       throw new Error("invalid schema");
     }
     const byFingerprint = isObject(parsed.by_fingerprint)
-      ? Object.fromEntries(Object.entries(parsed.by_fingerprint).filter(([, value]) => typeof value === "boolean"))
+      ? Object.fromEntries(
+        Object.entries(parsed.by_fingerprint)
+          .filter((entry): entry is [string, boolean] => typeof entry[1] === "boolean"),
+      )
       : {};
     const listings = isObject(parsed.listings)
       ? Object.fromEntries(Object.entries(parsed.listings).filter(([, value]) => isObject(value))) as Record<string, BasemapCompletenessListingEntry>
@@ -184,6 +187,32 @@ function writeBasemapCompletenessFile(
 
   existing.generated_at = new Date().toISOString();
   writeJsonFile(getBasemapCompletenessPath(repoRoot), existing);
+}
+
+export function isBasemapCacheHit(
+  completeness: BasemapCompletenessFile,
+  integrityMeta: Record<string, IntegrityListingVersionMeta>,
+  listingId: string,
+): boolean {
+  const meta = integrityMeta[listingId];
+  if (!meta?.fingerprint) return false;
+
+  const listingEntry = completeness.listings[listingId];
+  if (
+    listingEntry?.fingerprint === meta.fingerprint
+    && listingEntry.basemap_complete === true
+  ) {
+    return true;
+  }
+
+  return completeness.by_fingerprint[meta.fingerprint] === true;
+}
+
+function hasBasemapFingerprint(
+  integrityMeta: Record<string, IntegrityListingVersionMeta>,
+  listingId: string,
+): boolean {
+  return typeof integrityMeta[listingId]?.fingerprint === "string";
 }
 
 function parseCliArgs(argv: string[]): CliOptions {
@@ -282,6 +311,7 @@ async function run(): Promise<void> {
 
   const selectedMapIds = cli.mapId ? [cli.mapId] : mapIds;
   const integrityMeta = loadIntegrityListingMeta(repoRoot);
+  const basemapCompleteness = loadBasemapCompletenessFile(repoRoot);
   const completenessUpdates: Record<string, { basemap_complete: boolean; reason: string; checked_at: string }> = {};
   let written = 0;
   let failed = 0;
@@ -291,6 +321,7 @@ async function run(): Promise<void> {
   let missingBasemap = 0;
   let staleBasemap = 0;
   let regeneratedStale = 0;
+  let basemapCacheHits = 0;
 
   if (!cli.force && !cli.check && !cli.populateCompletenessOnly) {
     console.log("[map-basemap] Mode: backfill (up-to-date basemaps are skipped; stale/missing basemaps are generated; use --force to regenerate all)");
@@ -332,6 +363,16 @@ async function run(): Promise<void> {
         completenessUpdates[listingId] = {
           basemap_complete: false,
           reason: "missing_basemap",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      }
+
+      if (isBasemapCacheHit(basemapCompleteness, integrityMeta, listingId)) {
+        complete += 1;
+        completenessUpdates[listingId] = {
+          basemap_complete: true,
+          reason: "cache_hit",
           checked_at: new Date().toISOString(),
         };
         continue;
@@ -400,6 +441,17 @@ async function run(): Promise<void> {
         continue;
       }
 
+      if (isBasemapCacheHit(basemapCompleteness, integrityMeta, listingId)) {
+        skippedExisting += 1;
+        console.log(`[map-basemap] listing=${listingId}: ok via cache (${basemapPath})`);
+        completenessUpdates[listingId] = {
+          basemap_complete: true,
+          reason: "cache_hit",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      }
+
       if (isBasemapStale(gridPath, basemapPath)) {
         staleBasemap += 1;
         console.warn(`[map-basemap] listing=${listingId}: stale basemap (older than grid: ${basemapPath})`);
@@ -447,7 +499,24 @@ async function run(): Promise<void> {
     const basemapPath = getBasemapPath(repoRoot, listingId);
     const gridPath = resolve(repoRoot, "maps", listingId, "grid.geojson");
     if (!cli.force && existsSync(basemapPath)) {
-      if (existsSync(gridPath) && isBasemapStale(gridPath, basemapPath)) {
+      if (isBasemapCacheHit(basemapCompleteness, integrityMeta, listingId)) {
+        skipped += 1;
+        skippedExisting += 1;
+        basemapCacheHits += 1;
+        console.log(`[map-basemap] listing=${listingId}: skipped (basemap cache hit for current fingerprint at ${basemapPath})`);
+        completenessUpdates[listingId] = {
+          basemap_complete: true,
+          reason: "cache_hit",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      }
+
+      if (hasBasemapFingerprint(integrityMeta, listingId)) {
+        staleBasemap += 1;
+        regeneratedStale += 1;
+        console.log(`[map-basemap] listing=${listingId}: basemap cache miss for current fingerprint, regenerating (${basemapPath})`);
+      } else if (existsSync(gridPath) && isBasemapStale(gridPath, basemapPath)) {
         staleBasemap += 1;
         regeneratedStale += 1;
         console.log(`[map-basemap] listing=${listingId}: stale basemap detected, regenerating (${basemapPath})`);
@@ -531,7 +600,7 @@ async function run(): Promise<void> {
   writeBasemapCompletenessFile(repoRoot, integrityMeta, completenessUpdates);
 
   console.log(
-    `[map-basemap] Summary: written=${written}, failed=${failed}, skipped=${skipped}, skipped_existing=${skippedExisting}, stale_detected=${staleBasemap}, stale_regenerated=${regeneratedStale}, missing_grid=${missingGrid}`,
+    `[map-basemap] Summary: written=${written}, failed=${failed}, skipped=${skipped}, skipped_existing=${skippedExisting}, basemap_cache_hits=${basemapCacheHits}, stale_detected=${staleBasemap}, stale_regenerated=${regeneratedStale}, missing_grid=${missingGrid}`,
   );
 }
 

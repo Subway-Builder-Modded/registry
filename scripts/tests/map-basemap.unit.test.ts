@@ -10,6 +10,7 @@ import {
   squareBboxFromLonLatBbox,
   writeBasemapFromGrid,
 } from "../lib/map-basemap.js";
+import { isBasemapCacheHit } from "../generate-map-basemaps.js";
 
 function toMercator(lon: number, lat: number): { x: number; y: number } {
   const radius = 6_378_137;
@@ -24,6 +25,56 @@ function toMercator(lon: number, lat: number): { x: number; y: number } {
 test("getBasemapPath writes to maps/<id>/basemap.svg", () => {
   const outputPath = getBasemapPath("/repo", "guangzhou");
   assert.equal(outputPath, resolve("/repo", "maps", "guangzhou", "basemap.svg"));
+});
+
+test("isBasemapCacheHit accepts current listing or fingerprint cache entries", () => {
+  const integrityMeta = {
+    "sample-map": {
+      version: "1.0.0",
+      fingerprint: "rules:v6:sha256:current",
+      eligible: true,
+    },
+    "shared-map": {
+      version: "1.0.0",
+      fingerprint: "rules:v6:sha256:shared",
+      eligible: true,
+    },
+    "changed-map": {
+      version: "2.0.0",
+      fingerprint: "rules:v6:sha256:new",
+      eligible: true,
+    },
+  };
+  const completeness = {
+    schema_version: 1 as const,
+    generated_at: "2026-05-27T00:00:00.000Z",
+    by_fingerprint: {
+      "rules:v6:sha256:shared": true,
+    },
+    listings: {
+      "sample-map": {
+        listing_id: "sample-map",
+        version: "1.0.0",
+        fingerprint: "rules:v6:sha256:current",
+        basemap_complete: true,
+        checked_at: "2026-05-27T00:00:00.000Z",
+        reason: "ok",
+      },
+      "changed-map": {
+        listing_id: "changed-map",
+        version: "1.0.0",
+        fingerprint: "rules:v6:sha256:old",
+        basemap_complete: true,
+        checked_at: "2026-05-27T00:00:00.000Z",
+        reason: "ok",
+      },
+    },
+  };
+
+  assert.equal(isBasemapCacheHit(completeness, integrityMeta, "sample-map"), true);
+  assert.equal(isBasemapCacheHit(completeness, integrityMeta, "shared-map"), true);
+  assert.equal(isBasemapCacheHit(completeness, integrityMeta, "changed-map"), false);
+  assert.equal(isBasemapCacheHit(completeness, integrityMeta, "missing-map"), false);
 });
 
 test("computeGridBbox returns lon/lat bounds for polygon + multipolygon grids", () => {
