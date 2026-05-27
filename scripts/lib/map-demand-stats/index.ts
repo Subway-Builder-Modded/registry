@@ -4,4 +4,5 @@ export { parseDemandGridData } from "./extraction.js";
 export {
   generateMapDemandStats,
   resolveAndExtractDemandStatsForMapSource,
+  resolveDemandStatsForMapUpdate,
 } from "./generate.js";

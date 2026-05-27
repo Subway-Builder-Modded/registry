@@ -122,7 +122,7 @@ test("publish-map.yml enforces required publish fields with blank dropdown defau
     attributes?: { value?: string };
   };
   assert.equal(collaboratorsSection.type, "markdown");
-  assert.equal(collaboratorsSection.attributes?.value, "## Collaborators.");
+  assert.equal(collaboratorsSection.attributes?.value, "## Collaborators");
   const collaborators = getField(parsed.body, "collaborators");
   assert.equal(collaborators.type, "input");
   assert.equal(collaborators.attributes?.description, "Optional comma-separated collaborator GitHub user IDs. Each ID must belong to an existing GitHub account.");
@@ -217,7 +217,7 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
     attributes?: { value?: string };
   };
   assert.equal(collaboratorsSection.type, "markdown");
-  assert.equal(collaboratorsSection.attributes?.value, "## Collaborators.");
+  assert.equal(collaboratorsSection.attributes?.value, "## Collaborators");
   const collaborators = getField(parsed.body, "collaborators");
   assert.equal(
     collaborators.attributes?.description,
