@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-26T21:51:01.923Z",
+  "generated_at": "2026-05-28T22:03:39.081Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -595,6 +595,59 @@
           },
           "fingerprint": "rules:v6:sha256:fbe628e9901eb82cfb0a97c595e00ef02631951e2d9cb1d19947ab23a20a69c9",
           "checked_at": "2026-04-10T17:31:22.373Z"
+        }
+      }
+    },
+    "bergen-stavanger-no": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "BGSV.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 198.11,
+          "file_sizes": {
+            "BGSV.pmtiles": 171.95,
+            "buildings_index.json": 94.53,
+            "config.json": 0,
+            "demand_data.json": 6.34,
+            "roads.geojson": 29.57,
+            "runways_taxiways.geojson": 0.36
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.2",
+            "asset_name": "BGSV.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.2/BGSV.zip"
+          },
+          "fingerprint": "rules:v6:sha256:3c57d6b59ee5883bac39b6dd32df2187f94513f8add6ffedf4b4d74e9ea01a8e",
+          "checked_at": "2026-05-28T05:15:47.458Z"
         }
       }
     },
