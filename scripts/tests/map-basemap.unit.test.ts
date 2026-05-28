@@ -185,6 +185,7 @@ test("writeBasemapFromGrid renders square SVG and writes maps/<id>/basemap.svg",
     assert.match(svg, /<g id="roads">/);
     assert.match(svg, /class="road primary"/);
     assert.match(svg, /stroke="#7a7a7a"/);
+    assert.match(svg, /class="road primary"[^\n]*stroke-width="6"/);
     assert.doesNotMatch(svg, /<rect /);
     assert.doesNotMatch(svg, /class="road service"/);
     assert.match(svg, /square_bbox/);
