@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "opo-pt-metropolitan",
+  "name": "Porto, Portugal",
+  "author": "bquelhas",
+  "github_id": 403544,
+  "description": "**Porto Metropolitan Area (AMP)** — 17 municipalities, 1.7M inhabitants.\n\n(Vibecoded with Claude )\n\n## Demand Model\n- 59,992 O/D pairs generated from **INE BGRI 2021** (census tract level)\n- **1.20M simulated passengers** — 70.6% population coverage\n- Realistic urban drive-times (20/30/60 km/h by zone + 20% congestion penalty)\n- Captive boost for low car-ownership areas (Porto ×1.8, Gaia ×1.6, Matosinhos ×1.35)\n\n## Points of Interest\n- Francisco Sá Carneiro Airport, Port of Leixões, Cruise Terminal\n- Major hospitals (São João, Santo António, Pedro Hispano) and universities (UP, FEUP, ISEP)\n- CP rail stations (Campanhã, São Bento, Devesas) and bus terminals\n- 30+ tourist POIs: Ribeira, Torre dos Clérigos, Serralves, Casa da Música, Port Wine Caves\n\n## Coverage\n- Full detail up to zoom 15 across the AMP\n- Northern Portugal at low zoom (Braga, Aveiro, Viana do Castelo, Bragança) for geographic context",
+  "tags": [
+    "europe",
+    "airports",
+    "hospitals",
+    "schools",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.png",
+    "gallery/screenshot2.png",
+    "gallery/screenshot3.png"
+  ],
+  "is_test": false,
+  "source": "https://github.com/bquelhas/subwaybuilder-map-opo",
+  "update": {
+    "type": "github",
+    "repo": "bquelhas/subwaybuilder-map-opo"
+  },
+  "city_code": "OPO",
+  "country": "PT",
+  "population": 1199840,
+  "residents_total": 1199840,
+  "points_count": 24817,
+  "population_count": 59992,
+  "initial_view_state": {
+    "latitude": 41.1496,
+    "longitude": -8.611,
+    "zoom": 11,
+    "bearing": 0
+  },
+  "data_source": "OSM, INE",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "europe",
+  "special_demand": [
+    "airports",
+    "hospitals",
+    "schools",
+    "universities"
+  ],
+  "file_sizes": {}
+}
