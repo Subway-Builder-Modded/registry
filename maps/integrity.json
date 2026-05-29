@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-29T21:57:28.732Z",
+  "generated_at": "2026-05-29T23:01:53.768Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -7886,26 +7886,52 @@
     },
     "opo-pt-metropolitan": {
       "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
+      "latest_semver_version": "v0.1.0",
+      "latest_semver_complete": false,
       "complete_versions": [],
-      "incomplete_versions": [],
+      "incomplete_versions": [
+        "v0.1.0"
+      ],
       "versions": {
-        "v0.1.0-beta": {
+        "v0.1.0": {
           "is_complete": false,
           "errors": [
-            "non-semver release tag 'v0.1.0-beta'"
+            "asset 'OPO_porto_amp_v0.1.0.zip': missing top-level config.json",
+            "asset 'OPO_porto_amp_v0.1.0.zip': missing top-level demand_data.json or demand_data.json.gz",
+            "asset 'OPO_porto_amp_v0.1.0.zip': missing top-level buildings_index.json or buildings_index.json.gz",
+            "asset 'OPO_porto_amp_v0.1.0.zip': missing top-level roads.geojson or roads.geojson.gz",
+            "asset 'OPO_porto_amp_v0.1.0.zip': missing top-level runways_taxiways.geojson or runways_taxiways.geojson.gz",
+            "asset 'OPO_porto_amp_v0.1.0.zip': missing code in config.json for PMTiles validation (registry city_code 'OPO')",
+            "asset 'OPO_porto_amp_v0.1.0.zip': config.json version '(missing)' does not match release tag 'v0.1.0' (expected '0.1.0')"
           ],
-          "required_checks": {},
-          "matched_files": {},
+          "required_checks": {
+            "config_json": false,
+            "demand_data": false,
+            "buildings_index": false,
+            "roads_geojson": false,
+            "runways_taxiways_geojson": false,
+            "city_pmtiles": false,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": null,
+            "demand_data": null,
+            "buildings_index": null,
+            "roads_geojson": null,
+            "runways_taxiways_geojson": null,
+            "city_pmtiles": null,
+            "config_version_matches_tag": null
+          },
+          "release_size": 63.91,
           "source": {
             "update_type": "github",
             "repo": "bquelhas/subwaybuilder-map-opo",
-            "tag": "v0.1.0-beta"
+            "tag": "v0.1.0",
+            "asset_name": "OPO_porto_amp_v0.1.0.zip",
+            "download_url": "https://github.com/bquelhas/subwaybuilder-map-opo/releases/download/v0.1.0/OPO_porto_amp_v0.1.0.zip"
           },
-          "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.1.0-beta:OPO_porto_amp_v0.1.0.zip",
-          "checked_at": "2026-05-29T21:50:26.898Z",
-          "release_size": 63.91
+          "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.1.0:OPO_porto_amp_v0.1.0.zip",
+          "checked_at": "2026-05-29T23:01:53.768Z"
         }
       }
     },
