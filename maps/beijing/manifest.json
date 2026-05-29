@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "id": "beijing",
+  "name": "Beijing",
+  "author": "Kronifer",
+  "github_id": 44979306,
+  "description": "<h1>北京 (Beijing)</h1><h3>PEK · v1.0.0</h3><p>Detailed map of 北京 (Beijing) containing data from all 16 districts.</p><p><img src=\"screenshot1.png\" alt=\"Map Preview\"></p><h2>Coverage</h2><table style=\"width: auto\"><tr><td><strong>Region</strong></td><td>Northern China</td></tr><tr><td><strong>Districts / Municipalities</strong></td><td>16</td></tr><tr><td><strong>Playable Area</strong></td><td>12,000 km²</td></tr></table><details><summary>District list</summary><table style=\"width: auto\"><tr><th align=\"left\">District</th><th align=\"right\">Population</th></tr><tr><td>Xicheng District</td><td align=\"right\">1,123,000</td></tr><tr><td>Dongcheng District</td><td align=\"right\">708,829</td></tr><tr><td>Chaoyang District</td><td align=\"right\">3,452,460</td></tr><tr><td>Haidian District</td><td align=\"right\">3,054,744</td></tr><tr><td>Fengtai District</td><td align=\"right\">2,017,868</td></tr><tr><td>Shijingshan District</td><td align=\"right\">616,000</td></tr><tr><td>Mentougou District</td><td align=\"right\">392,606</td></tr><tr><td>Fangshan District</td><td align=\"right\">945,814</td></tr><tr><td>Tongzhou District</td><td align=\"right\">1,920,000</td></tr><tr><td>Shunyi District</td><td align=\"right\">1,322,000</td></tr><tr><td>Changping District</td><td align=\"right\">2,269,000</td></tr><tr><td>Daxing District</td><td align=\"right\">2,007,000</td></tr><tr><td>Huairou District</td><td align=\"right\">441,000</td></tr><tr><td>Pinggu District</td><td align=\"right\">446,000</td></tr><tr><td>Miyun District</td><td align=\"right\">468,000</td></tr><tr><td>Yanqing District</td><td align=\"right\">350,000</td></tr></table></details><h2>Population Summary</h2><table style=\"width: auto\"><tr><td><strong>Total Population</strong></td><td align=\"right\">21,893,095</td></tr><tr><td><strong>Total Modeled Demand</strong></td><td align=\"right\">14,311,785</td></tr><tr><td><strong>Modeled Normal Demand</strong></td><td align=\"right\">12,861,915</td></tr><tr><td><strong>Modeled Special Demand</strong></td><td align=\"right\">1,449,870</td></tr></table><h2>Map Statistics</h2><table style=\"width: auto\"><tr><td><strong>Buildings Indexed</strong></td><td align=\"right\">1,496,224</td></tr><tr><td><strong>Demand Points</strong></td><td align=\"right\">20,382</td></tr><tr><td><strong>Populations</strong></td><td align=\"right\">209,639</td></tr><tr><td><strong>Median Point Size</strong></td><td align=\"right\">19</td></tr><tr><td><strong>Median Pop Size</strong></td><td align=\"right\">50</td></tr><!-- Optional distribution stats — add rows here if your pipeline computes them.     Common examples:       Median / Mean Point Size      (demand points per population node)       Median / Mean Population Size (residents per population node)       Median / Mean Commute Distance--></table><h2>Special Demand</h2><!-- ================================================================     INSTRUCTIONS FOR MAP CREATORS     The sections below are EXAMPLES organized by category. You should     customize them to match your map's actual special demand types.     To add a category:       1. Choose a unique code (e.g. \"metro_station\", \"football_stadium\")       2. Copy one of the {{#IF}}... blocks below       3. Replace the code, display label, and stat column header       4. Add the code to your config.json specialDemandTypes array     To remove a category:       Delete the entire {{#IF code}}... block.     The stat column (e.g. \"Annual Passengers\", \"Bed Capacity\") should     reflect the real-world metric used to estimate demand for that type.     If no source stat is available, use a 3-column table without it.     Common stat columns by type:       Airports / Ports / Stations    -> Annual Passengers       Hospitals / Clinics            -> Bed Capacity       Schools / Universities         -> Enrollment       Attractions / Landmarks        -> Annual Visitors       Shopping / Commercial          -> Floor Area (m²)       Sports Venues / Stadiums       -> Seat Capacity     ================================================================ --><h3>Infrastructure</h3><details><summary>Airports — 211,774 (14.6%)</summary><table style=\"width: auto\"><tr><th align=\"left\">Name</th><th align=\"right\">Annual Passengers</th><th align=\"right\">Modeled Demand</th><th align=\"right\">% of Section</th></tr><tr><th align=\"left\">Beijing Capital International Airport</th><th align=\"right\">70,742,712</th><th align=\"right\">116,289</th><th align=\"right\">54.9%</th></tr><tr><th align=\"left\">Beijing Daxing International Airport</th><th align=\"right\">53,618,949</th><th align=\"right\">95,485</th><th align=\"right\">45.1%</th></tr></table></details><details><summary>Rail Stations — 791,669 (54.6%)</summary><table style=\"width: auto\"><tr><th align=\"left\">Name</th><th align=\"right\">Daily Ridership</th><th align=\"right\">Modeled Demand</th><th align=\"right\">% of Section</th></tr><tr><th align=\"left\">Beijing South Railway Station</th><th align=\"right\">397,260</th><th align=\"right\">278,082</th><th align=\"right\">35.1%</th></tr><tr><th align=\"left\">Beijing West Railway Station</th><th align=\"right\">358,356</th><th align=\"right\">250,849</th><th align=\"right\">31.7%</th></tr><tr><th align=\"left\">Beijing Railway Station</th><th align=\"right\">164,383</th><th align=\"right\">115,068</th><th align=\"right\">14.5%</th></tr><tr><th align=\"left\">Beijing Fengtai Railway Station</th><th align=\"right\">150,684</th><th align=\"right\">105,479</th><th align=\"right\">13.3%</th></tr><tr><th align=\"left\">Beijing North Railway Station</th><th align=\"right\">60,273</th><th align=\"right\">42,191</th><th align=\"right\">5.3%</th></tr></table></details><h3>Education</h3><details><summary>Universities — 446,427 (30.8%)</summary><table style=\"width: auto\"><tr><th align=\"left\">Name</th><th align=\"right\">Modeled Demand</th><th align=\"right\">% of Section</th></tr><tr><th align=\"left\">Tsinghua University</th><th align=\"right\">62,496</th><th align=\"right\">14.0%</th></tr><tr><th align=\"left\">University of Chinese Academy of Sciences (UCAS)</th><th align=\"right\">57,651</th><th align=\"right\">12.9%</th></tr><tr><th align=\"left\">Peking University</th><th align=\"right\">49,821</th><th align=\"right\">11.2%</th></tr><tr><th align=\"left\">Beijing Normal University</th><th align=\"right\">38,718</th><th align=\"right\">8.7%</th></tr><tr><th align=\"left\">China University of Mining and Technology (CUMT)</th><th align=\"right\">35,000</th><th align=\"right\">7.8%</th></tr><tr><th align=\"left\">Renmin University of China</th><th align=\"right\">27,810</th><th align=\"right\">6.2%</th></tr><tr><th align=\"left\">Beijing University of Posts and Telecommunications (BUPT)</th><th align=\"right\">27,000</th><th align=\"right\">6.0%</th></tr><tr><th align=\"left\">University of Science and Technology Beijing (USTB)</th><th align=\"right\">27,311</th><th align=\"right\">6.1%</th></tr><tr><th align=\"left\">Beijing Institute of Technology (BIT)</th><th align=\"right\">26,358</th><th align=\"right\">5.9%</th></tr><tr><th align=\"left\">Beijing Jiaotong University</th><th align=\"right\">22,656</th><th align=\"right\">5.1%</th></tr><tr><th align=\"left\">Beihang University</th><th align=\"right\">22,805</th><th align=\"right\">5.1%</th></tr><tr><th align=\"left\">Beijing Forestry University</th><th align=\"right\">18,378</th><th align=\"right\">4.1%</th></tr><tr><th align=\"left\">Minzu University of China</th><th align=\"right\">15,800</th><th align=\"right\">3.5%</th></tr><tr><th align=\"left\">China Communication University (CUC)</th><th align=\"right\">14,623</th><th align=\"right\">3.3%</th></tr></table></details><h2>Additional Features</h2><!-- ================================================================     ADDITIONAL FEATURES — FREEFORM SECTION     Describe any optional map features beyond the core demand model.     Add or remove bullet points as appropriate for your map.     Common examples:       - Building collision data (buildings index with depth values)       - Ocean bathymetry / ocean foundations layer       - Neighborhood / district label overlays       - Custom road or terrain overlays     ================================================================ --><!-- Replace the bullets below with features your map actually includes. --><ul><li><strong>Building Collision</strong> — A buildings index is included, providing in-game collision geometry for all non-filtered buildings.</li><li><strong>Neighborhood Labels</strong> — Neighborhood Labels — Three layers of place name labels are embedded in the map:<ul><li><p>City labels — Prefecture-Level Cities, Districts</p></li><li><p>Municipality labels — Subdistricts, Counties, County-Level Cities</p></li><li><p>Neighborhood labels — Towns, Townships, Neighbourhoods, Villages</p></li></ul></li></ul><h2>Methodology</h2><p>A multi-step methodology was used to create this map, sourcing data from all 16 Districts of Beijing.</p><h3>Data Collection</h3><p>Bulletin 7 of the 5th National Economic Census was collected per-district to obtain a subdistrict-level breakdown of employment in Beijing.</p><h3>Spatial Assignment</h3><p>Population and Employee data for each subdistrict based on the above bulletins were assigned to the geometry of each subdistrict using a Shapefile.</p><h3>Geographical Processing - Stage 1</h3><p>Data was disaggregated to the individual building level by assigning a building a usage metric based off of total commercial/residential volume within a Subdistrict.</p><h3>Geographical Processing - Stage 2</h3><p>Data was aggregated up to a hexagonal grid with side length n=400m for commute modelling.</p><h3>Commute Modelling</h3><p>O/D pairs were created using a Gravity Model, the source for which can be found in the sources linked below.</p><h3>Map Data</h3><p>Map Data was fetched from OpenStreetMap, Overture, and 3D-GloBFP and processed by RSlurry&#39;s <code>depot</code> package.</p><h2>Data Sources</h2><ul><li>Depot (RSlurry): <a href=\"https://github.com/subway-builder-modded/depot/\"><strong>GitHub</strong></a></li><li>Gravity Model (Kronifer): <a href=\"https://github.com/kronifer/sb-chinese-maps/tree/main/PEK/generate_demand.js\"><strong>GitHub</strong></a></li><li><a href=\"https://openstreetmap.org/\"><strong>OpenStreetMap</strong></a></li><li><a href=\"https://overturemaps.org/\"><strong>Overture Maps</strong></a></li><li>3D-GloBFP: <a href=\"https://zenodo.org/records/15487006/\"><strong>Zenodo</strong></a></li><li>Xicheng District: <strong><a href=\"https://www.bjxch.gov.cn/file/20250609/1749462206658075467.pdf\">https://www.bjxch.gov.cn/file/20250609/1749462206658075467.pdf</a></strong></li><li>Dongcheng District: <strong><a href=\"https://www.bjdch.gov.cn/zwgk/sjgk/tjgb/202506/P020250620534747176158.pdf\">https://www.bjdch.gov.cn/zwgk/sjgk/tjgb/202506/P020250620534747176158.pdf</a></strong></li><li>Chaoyang District: <strong><a href=\"http://www.bjchy.gov.cn/UserFiles/File/0c463e6aae884d5c8888f1c978f0c913.pdf\">http://www.bjchy.gov.cn/UserFiles/File/0c463e6aae884d5c8888f1c978f0c913.pdf</a></strong></li><li>Fengtai District: <strong><a href=\"https://www.bjft.gov.cn/ftq/pcgb/202506/P020251129695737987540.pdf\">https://www.bjft.gov.cn/ftq/pcgb/202506/P020251129695737987540.pdf</a></strong></li><li>Shijingshan District: <strong><a href=\"https://www.bjsjs.gov.cn/gongkai/zwgkpd/ztzl/2023/sjkfzl/sjtj/gbnj/202510/P020250628561231418219.pdf\">https://www.bjsjs.gov.cn/gongkai/zwgkpd/ztzl/2023/sjkfzl/sjtj/gbnj/202510/P020250628561231418219.pdf</a></strong></li><li>Haidian District: <strong><a href=\"https://zyk.bjhd.gov.cn/sjkf/tjgb/202509/P020260106395599950311.pdf\">https://zyk.bjhd.gov.cn/sjkf/tjgb/202509/P020260106395599950311.pdf</a></strong></li><li>Mentougou District: <strong><a href=\"https://www.bjmtg.gov.cn/bjmtg/zwxx/tjxx/202506/3beb6818b5e747369ab279183cbafa99.shtml\">https://www.bjmtg.gov.cn/bjmtg/zwxx/tjxx/202506/3beb6818b5e747369ab279183cbafa99.shtml</a></strong></li><li>Fangshan District: <strong><a href=\"https://www.bjfsh.gov.cn/zhxw/sukfpt/tjsj/tjgb/202506/P020250623360546346886.pdf\">https://www.bjfsh.gov.cn/zhxw/sukfpt/tjsj/tjgb/202506/P020250623360546346886.pdf</a></strong></li><li>Tongzhou District: <strong><a href=\"https://www.bjtzh.gov.cn/bjtz/xxfb/202506/1757772/files/2862952f73944a2b86a9749cbf4d3bf0.pdf\">https://www.bjtzh.gov.cn/bjtz/xxfb/202506/1757772/files/2862952f73944a2b86a9749cbf4d3bf0.pdf</a></strong></li><li>Changping District: <strong><a href=\"https://www.bjchp.gov.cn/cpqzf/ztzl/tjxx/tjgb/2025062514101330989/2025062514095037220.pdf\">https://www.bjchp.gov.cn/cpqzf/ztzl/tjxx/tjgb/2025062514101330989/2025062514095037220.pdf</a></strong></li><li>Daxing District: <strong><a href=\"https://www.bjdx.gov.cn/bjsdxqrmzf/zwfw/tjxx/tjsj/2247438/2025061814181461427.pdf\">https://www.bjdx.gov.cn/bjsdxqrmzf/zwfw/tjxx/tjsj/2247438/2025061814181461427.pdf</a></strong></li><li>Huairou District: <strong><a href=\"https://www.bjhr.gov.cn/zwgk/sj/tjgb/202505/t20250523_4096371.html\">https://www.bjhr.gov.cn/zwgk/sj/tjgb/202505/t20250523_4096371.html</a></strong></li><li>Pinggu District: <strong><a href=\"https://www.bjpg.gov.cn/pgqrmzf/bm/tjj60/tjxx46/1084689/%E5%B9%B3%E8%B0%B7%E5%8C%BA%E7%AC%AC%E4%BA%94%E6%AC%A1%E5%85%A8%E5%9B%BD%E7%BB%8F%E6%B5%8E%E6%99%AE%E6%9F%A5%E5%85%AC%E6%8A%A5.docx\">https://www.bjpg.gov.cn/pgqrmzf/bm/tjj60/tjxx46/1084689/平谷区第五次全国经济普查公报.docx</a></strong></li><li>Miyun District: <strong><a href=\"https://www.bjmy.gov.cn/zwgk/tj/tjgb/202506/P020250630575362219418.pdf\">https://www.bjmy.gov.cn/zwgk/tj/tjgb/202506/P020250630575362219418.pdf</a></strong></li></ul><h2>Credits</h2><p>Map authored by <a href=\"https://github.com/kronifer\"><strong>Kronifer</strong></a></p>",
+  "tags": [
+    "east-asia",
+    "airports",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.png",
+    "gallery/screenshot2.png",
+    "gallery/screenshot3.png",
+    "gallery/screenshot4.png",
+    "gallery/screenshot5.png",
+    "gallery/screenshot6.png"
+  ],
+  "is_test": false,
+  "source": "https://github.com/kronifer/sb-chinese-maps",
+  "update": {
+    "type": "custom",
+    "url": "https://raw.githubusercontent.com/Kronifer/sb-chinese-maps/refs/heads/main/PEK/PEK.json"
+  },
+  "city_code": "PEK",
+  "country": "CN",
+  "population": 14311785,
+  "residents_total": 14311785,
+  "points_count": 20382,
+  "population_count": 209639,
+  "initial_view_state": {
+    "latitude": 39.9042,
+    "longitude": 116.4074,
+    "zoom": 11,
+    "bearing": 0
+  },
+  "data_source": "Chinese 5th National Economic Census",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "east-asia",
+  "special_demand": [
+    "airports",
+    "universities"
+  ],
+  "file_sizes": {
+    "PEK.pmtiles": 155.33,
+    "buildings_index.json": 276.37,
+    "config.json": 0,
+    "demand_data.json": 43.81,
+    "roads.geojson": 42.47,
+    "runways_taxiways.geojson": 3.36
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.6928203212840383,
+      "p25": 0.6928203212840383,
+      "p50": 0.6928203212840383,
+      "p75": 0.6928203212848284,
+      "p90": 0.6928203212848284,
+      "mean": 0.6930051277738107
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.6928203212840383,
+      "p25": 0.6928203212840383,
+      "p50": 0.6928203212840383,
+      "p75": 0.6928203212848284,
+      "p90": 0.6928203212848284,
+      "mean": 0.696147983577426
+    },
+    "commuteDistanceKm": {
+      "p10": 5682,
+      "p25": 9972,
+      "p50": 17761,
+      "p75": 31874,
+      "p90": 62528,
+      "mean": 27178.032327000223
+    },
+    "residentCellDensity": {
+      "p10": 6,
+      "p25": 56,
+      "p50": 469,
+      "p75": 1408,
+      "p90": 3558,
+      "mean": 1290.956702146852
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 39,
+      "p50": 195,
+      "p75": 922,
+      "p90": 3704,
+      "mean": 1739.422586520947
+    },
+    "detail": {
+      "radiusKm": 0.6928203212840383,
+      "expectedPointSpacingKm": 0.7828752964307626,
+      "normalizedRadius": 0.8849689400632547,
+      "activityPerPoint": 702.4808000332099,
+      "playableAreaKm2": 14640,
+      "playableAreaPerPointKm2": 0.7182808360317927,
+      "playableCatchmentRadiusKm": 0.47815885557550636,
+      "localityScore": 0.017832609338831185,
+      "deaggregationScore": 1,
+      "score": 0.13353879338540986
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.7956931126052853,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 116.40985782472252,
+            "latitude": 39.95323478892807,
+            "massShare": 1,
+            "assignedMass": 28635930,
+            "assignedPointCount": 18849,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  }
+}

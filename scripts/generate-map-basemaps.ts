@@ -274,6 +274,11 @@ function parseCliArgs(argv: string[]): CliOptions {
     throw new Error("--populate-completeness-only cannot be combined with --force or --check");
   }
 
+  // Force backfills should prefer maximum progress across listings.
+  if (force) {
+    continueOnError = true;
+  }
+
   return { mapId, continueOnError, force, check, populateCompletenessOnly, retries };
 }
 
@@ -336,6 +341,7 @@ async function run(): Promise<void> {
   let regeneratedStale = 0;
   let basemapCacheHits = 0;
   let cacheMiss = 0;
+  let regeneratedCacheMiss = 0;
 
   if (!cli.force && !cli.check && !cli.populateCompletenessOnly) {
     console.log("[map-basemap] Mode: backfill (up-to-date basemaps are skipped; stale/missing basemaps are generated; use --force to regenerate all)");
@@ -359,6 +365,13 @@ async function run(): Promise<void> {
         staleBasemap += 1;
       } else if (status.reason === "cache_miss") {
         cacheMiss += 1;
+        complete += 1;
+        completenessUpdates[listingId] = {
+          basemap_complete: true,
+          reason: "adopted_existing",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
       }
 
       completenessUpdates[listingId] = {
@@ -448,15 +461,21 @@ async function run(): Promise<void> {
         continue;
       }
 
-      if (status.reason === "cache_miss" || status.reason === "stale_basemap") {
+      if (status.reason === "cache_miss") {
+        cacheMiss += 1;
+        skipped += 1;
+        skippedExisting += 1;
+        console.log(`[map-basemap] listing=${listingId}: cache miss for current fingerprint/version in basemap-completeness.json, adopting existing basemap (${basemapPath})`);
+        completenessUpdates[listingId] = {
+          basemap_complete: true,
+          reason: "adopted_existing",
+          checked_at: new Date().toISOString(),
+        };
+        continue;
+      } else if (status.reason === "stale_basemap") {
         staleBasemap += 1;
         regeneratedStale += 1;
-        if (status.reason === "cache_miss") {
-          cacheMiss += 1;
-          console.log(`[map-basemap] listing=${listingId}: cache miss for current fingerprint/version in basemap-completeness.json, regenerating (${basemapPath})`);
-        } else {
-          console.log(`[map-basemap] listing=${listingId}: stale basemap detected, regenerating (${basemapPath})`);
-        }
+        console.log(`[map-basemap] listing=${listingId}: stale basemap detected, regenerating (${basemapPath})`);
       } else if (status.reason === "missing_grid") {
         skipped += 1;
         missingGrid += 1;
@@ -555,7 +574,7 @@ async function run(): Promise<void> {
   writeBasemapCompletenessFile(repoRoot, integrityMeta, completenessUpdates);
 
   console.log(
-    `[map-basemap] Summary: written=${written}, failed=${failed}, skipped=${skipped}, skipped_existing=${skippedExisting}, basemap_cache_hits=${basemapCacheHits}, cache_miss=${cacheMiss}, stale_detected=${staleBasemap}, stale_regenerated=${regeneratedStale}, missing_grid=${missingGrid}`,
+    `[map-basemap] Summary: written=${written}, failed=${failed}, skipped=${skipped}, skipped_existing=${skippedExisting}, basemap_cache_hits=${basemapCacheHits}, cache_miss=${cacheMiss}, cache_miss_regenerated=${regeneratedCacheMiss}, stale_detected=${staleBasemap}, stale_regenerated=${regeneratedStale}, missing_grid=${missingGrid}`,
   );
 
   if (fatalError) {
