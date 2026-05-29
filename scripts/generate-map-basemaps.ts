@@ -308,14 +308,16 @@ function evaluateBasemapStatus(
   if (!existsSync(basemapPath)) {
     return { basemap_complete: false, reason: "missing_basemap" };
   }
+  // Check fingerprint cache before mtime — git checkout resets mtimes and would
+  // otherwise cause every basemap to appear stale on a fresh CI checkout.
+  if (isBasemapCacheHit(completeness, integrityMeta, listingId)) {
+    return { basemap_complete: true, reason: "ok" };
+  }
   if (isBasemapStale(gridPath, basemapPath)) {
     return { basemap_complete: false, reason: "stale_basemap" };
   }
-  if (!isBasemapCacheHit(completeness, integrityMeta, listingId)) {
-    return { basemap_complete: false, reason: "cache_miss" };
-  }
 
-  return { basemap_complete: true, reason: "ok" };
+  return { basemap_complete: false, reason: "cache_miss" };
 }
 
 async function run(): Promise<void> {
