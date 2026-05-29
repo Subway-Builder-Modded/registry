@@ -34,10 +34,10 @@ const MAX_POINTS_PER_PATH = 1200;
 const ROAD_RENDER_ORDER: RoadClass[] = ["primary", "trunk", "motorway"];
 
 const ROAD_STROKE_WIDTH_BY_CLASS: Record<RoadClass, number> = {
-  motorway: 15,
-  trunk: 10,
-  primary: 7,
-  secondary: 5,
+  motorway: 12,
+  trunk: 8,
+  primary: 5,
+  secondary: 4,
   tertiary: 3,
   local: 2,
   service: 2,
