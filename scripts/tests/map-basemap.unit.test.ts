@@ -27,7 +27,7 @@ test("getBasemapPath writes to maps/<id>/basemap.svg", () => {
   assert.equal(outputPath, resolve("/repo", "maps", "guangzhou", "basemap.svg"));
 });
 
-test("isBasemapCacheHit accepts current listing or fingerprint cache entries", () => {
+test("isBasemapCacheHit requires a current listing-level fingerprint/version entry", () => {
   const integrityMeta = {
     "sample-map": {
       version: "1.0.0",
@@ -72,7 +72,7 @@ test("isBasemapCacheHit accepts current listing or fingerprint cache entries", (
   };
 
   assert.equal(isBasemapCacheHit(completeness, integrityMeta, "sample-map"), true);
-  assert.equal(isBasemapCacheHit(completeness, integrityMeta, "shared-map"), true);
+  assert.equal(isBasemapCacheHit(completeness, integrityMeta, "shared-map"), false);
   assert.equal(isBasemapCacheHit(completeness, integrityMeta, "changed-map"), false);
   assert.equal(isBasemapCacheHit(completeness, integrityMeta, "missing-map"), false);
 });
@@ -236,6 +236,7 @@ test("writeBasemapFromGrid renders square SVG and writes maps/<id>/basemap.svg",
     assert.match(svg, /<g id="roads">/);
     assert.match(svg, /class="road primary"/);
     assert.match(svg, /stroke="#7a7a7a"/);
+    assert.match(svg, /class="road primary"[^\n]*stroke-width="5"/);
     assert.doesNotMatch(svg, /<rect /);
     assert.doesNotMatch(svg, /class="road service"/);
     assert.match(svg, /square_bbox/);
