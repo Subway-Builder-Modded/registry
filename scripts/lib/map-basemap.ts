@@ -33,6 +33,18 @@ const MAX_POINTS_PER_PATH = 1200;
 
 const ROAD_RENDER_ORDER: RoadClass[] = ["primary", "trunk", "motorway"];
 
+const ROAD_STROKE_WIDTH_BY_CLASS: Record<RoadClass, number> = {
+  motorway: 12,
+  trunk: 8,
+  primary: 5,
+  secondary: 4,
+  tertiary: 3,
+  local: 2,
+  service: 2,
+  path: 1,
+  other: 1,
+};
+
 export interface LonLatBbox {
   minLon: number;
   minLat: number;
@@ -236,20 +248,7 @@ function shouldExcludeLoopLikeWay(highway: string, tags: Record<string, unknown>
 }
 
 function roadStrokeWidthForClass(roadClass: RoadClass): number {
-  switch (roadClass) {
-    case "motorway":
-      return 9;
-    case "trunk":
-      return 8;
-    case "primary":
-      return 7;
-    case "secondary":
-      return 6;
-    case "tertiary":
-      return 5;
-    default:
-      return 5;
-  }
+  return ROAD_STROKE_WIDTH_BY_CLASS[roadClass];
 }
 
 function projectLonLatToSvg(
