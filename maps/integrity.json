@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-30T06:53:17.194Z",
+  "generated_at": "2026-05-30T10:06:14.520Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -7886,12 +7886,13 @@
     },
     "opo-pt-metropolitan": {
       "has_complete_version": true,
-      "latest_semver_version": "v0.1.1",
-      "latest_semver_complete": true,
+      "latest_semver_version": "v0.2.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "v0.1.1"
       ],
       "incomplete_versions": [
+        "v0.2.0",
         "v0.1.0"
       ],
       "versions": {
@@ -7977,6 +7978,42 @@
           },
           "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.1.1:OPO_porto_amp_v0.1.1.zip",
           "checked_at": "2026-05-30T03:54:14.680Z"
+        },
+        "v0.2.0": {
+          "is_complete": false,
+          "errors": [
+            "asset 'OPO_porto_amp_v0.2.0.zip': demand_data contains 1 isolated point(s) with nearest-neighbor distance >100km: j_025006=153.4km"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": false,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "buildings_index": "buildings_index.json.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "OPO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 64.22,
+          "source": {
+            "update_type": "github",
+            "repo": "bquelhas/subwaybuilder-map-opo",
+            "tag": "v0.2.0",
+            "asset_name": "OPO_porto_amp_v0.2.0.zip",
+            "download_url": "https://github.com/bquelhas/subwaybuilder-map-opo/releases/download/v0.2.0/OPO_porto_amp_v0.2.0.zip"
+          },
+          "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.2.0:OPO_porto_amp_v0.2.0.zip",
+          "checked_at": "2026-05-30T10:06:14.520Z"
         }
       }
     },
