@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-29T23:01:53.768Z",
+  "generated_at": "2026-05-30T03:54:14.680Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -7885,10 +7885,12 @@
       }
     },
     "opo-pt-metropolitan": {
-      "has_complete_version": false,
-      "latest_semver_version": "v0.1.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "v0.1.1",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v0.1.1"
+      ],
       "incomplete_versions": [
         "v0.1.0"
       ],
@@ -7932,6 +7934,49 @@
           },
           "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.1.0:OPO_porto_amp_v0.1.0.zip",
           "checked_at": "2026-05-29T23:01:53.768Z"
+        },
+        "v0.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "buildings_index": "buildings_index.json.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "OPO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 63.9,
+          "file_sizes": {
+            "OPO.pmtiles": 41.94,
+            "buildings_index.json.gz": 15.25,
+            "config.json": 0,
+            "demand_data.json.gz": 1.48,
+            "ocean_depth_index.json.gz": 0,
+            "roads.geojson.gz": 5.15,
+            "runways_taxiways.geojson.gz": 0.1
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "bquelhas/subwaybuilder-map-opo",
+            "tag": "v0.1.1",
+            "asset_name": "OPO_porto_amp_v0.1.1.zip",
+            "download_url": "https://github.com/bquelhas/subwaybuilder-map-opo/releases/download/v0.1.1/OPO_porto_amp_v0.1.1.zip"
+          },
+          "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.1.1:OPO_porto_amp_v0.1.1.zip",
+          "checked_at": "2026-05-30T03:54:14.680Z"
         }
       }
     },
