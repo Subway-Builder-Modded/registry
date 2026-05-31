@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-05-30T21:07:06.845Z",
+  "generated_at": "2026-05-31T04:24:22.920Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -11224,9 +11224,10 @@
     },
     "tijuana-san-diego": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.1",
+      "latest_semver_version": "1.0.2",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.0.2",
         "1.0.1",
         "1.0.0"
       ],
@@ -11315,6 +11316,48 @@
           },
           "fingerprint": "rules:v6:sha256:bb71d0efbac60df8180d7a20ad832a245d44b8324bce21b9616a1b9c9df95ff1",
           "checked_at": "2026-05-08T03:36:56.258Z"
+        },
+        "1.0.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TIJ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 188.41,
+          "file_sizes": {
+            "TIJ.pmtiles": 118.46,
+            "buildings_index.json": 290.46,
+            "config.json": 0,
+            "demand_data.json": 19.87,
+            "roads.geojson": 49.65,
+            "runways_taxiways.geojson": 0.88
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.3",
+            "asset_name": "TIJ.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.3/TIJ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:d056f9607dc09ea0f7a1398a1a5aef52d69a7902d95f1f61f1aa45635f1dff17",
+          "checked_at": "2026-05-31T04:24:22.920Z"
         }
       }
     },
