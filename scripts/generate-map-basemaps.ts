@@ -282,23 +282,12 @@ function parseCliArgs(argv: string[]): CliOptions {
   return { mapId, continueOnError, force, check, populateCompletenessOnly, retries };
 }
 
-function isListingEligibleForBasemap(
-  integrityMeta: Record<string, IntegrityListingVersionMeta>,
-  listingId: string,
-): boolean {
-  return integrityMeta[listingId]?.eligible === true;
-}
-
 function evaluateBasemapStatus(
   repoRoot: string,
   completeness: BasemapCompletenessFile,
   integrityMeta: Record<string, IntegrityListingVersionMeta>,
   listingId: string,
 ): BasemapStatus {
-  if (!isListingEligibleForBasemap(integrityMeta, listingId)) {
-    return { basemap_complete: false, reason: "integrity_incomplete" };
-  }
-
   const basemapPath = getBasemapPath(repoRoot, listingId);
   const gridPath = resolve(repoRoot, "maps", listingId, "grid.geojson");
 
@@ -437,17 +426,6 @@ async function run(): Promise<void> {
   let fatalError: Error | null = null;
   for (const listingId of selectedMapIds) {
     const status = evaluateBasemapStatus(repoRoot, basemapCompleteness, integrityMeta, listingId);
-    if (status.reason === "integrity_incomplete") {
-      skipped += 1;
-      completenessUpdates[listingId] = {
-        basemap_complete: false,
-        reason: "integrity_incomplete",
-        checked_at: new Date().toISOString(),
-      };
-      console.log(`[map-basemap] listing=${listingId}: skipped (latest semver version is not integrity-complete)`);
-      continue;
-    }
-
     const basemapPath = getBasemapPath(repoRoot, listingId);
     if (!cli.force) {
       if (status.basemap_complete) {
