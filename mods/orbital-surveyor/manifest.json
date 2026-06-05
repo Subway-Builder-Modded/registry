@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "orbital-surveyor",
+  "name": "Orbital Surveyor",
+  "author": "BarKuperman",
+  "github_id": 102868699,
+  "description": "# Orbital Surveyor\n\nOrbital Surveyor adds satellite imagery, 3D terrain, and Street View availability overlays to Subway Builder's in-game MapLibre map.\n\nUse it to inspect real-world map context while planning: compare the in-game city against satellite imagery, check terrain shape, view Street View coverage, and temporarily hide built-in map layers that get in the way.\n\n## Features\n\n- Satellite imagery overlays from supported tile providers.\n- 3D terrain using MapLibre terrain data.\n- Street View availability overlay.\n- Click-to-open Google Street View in your external browser.\n- Map layer filtering for buildings, water, parks, roads, airports, and area labels.\n\n-----------------\n\n## Requirements\n\n- **[Node.js](https://nodejs.org/) installed on your system.**\n- The Orbital Surveyor local proxy running while using satellite, terrain, or Street View overlays.\n\n## Quick Start Guide\n\n#### 1. Install The Mod:\n\nInstall Orbital Surveyor through Railyard, or place the mod folder in your Subway Builder mods folder manually.\n\n#### 2. Start The Proxy:\n\nBefore opening or reloading the mod, start the proxy from the Orbital Surveyor mod folder:\n\n- Windows: double-click `start-proxy-windows.cmd`.\n- macOS: double-click `start-proxy-macos.command`.\n- Linux: run `start-proxy-linux.sh`.\n\nOn Linux, if the launcher is not executable yet, run this once from the mod folder:\n\n```bash\nchmod +x start-proxy-linux.sh\n```\n\nYou can also start the proxy manually:\n\n```bash\nnode proxy.js\n```\n\nLeave the proxy window open while playing.\n\n#### 3. Enable The Mod:\n\nIn Subway Builder, go to `Settings > Mods` and enable Orbital Surveyor.\n\n#### 4. Use The Panel:\n\nOpen the Orbital Surveyor panel in-game and enable Satellite, Terrain, or Street View as needed.\n\n## Notes\n\n- Additional details in the [README](https://github.com/BarKuperman/orbital-surveyor#orbital-surveyor)\n\n- Terrain mode is heavier than the normal map and may briefly reload when changing views or map layers. Tracks and stations may be less visible or temporarily hidden while Terrain is enabled, especially in 3D view.\n\n- Third-party map tiles, imagery, terrain data, and Street View data remain subject to their respective provider licenses, attribution requirements, and usage policies.",
+  "tags": [
+    "cosmetic",
+    "gameplay",
+    "misc",
+    "ui"
+  ],
+  "gallery": [
+    "gallery/screenshot1.png",
+    "gallery/screenshot2.png",
+    "gallery/screenshot3.png",
+    "gallery/screenshot4.png"
+  ],
+  "is_test": false,
+  "source": "https://github.com/BarKuperman/orbital-surveyor",
+  "update": {
+    "type": "github",
+    "repo": "BarKuperman/orbital-surveyor"
+  }
+}
