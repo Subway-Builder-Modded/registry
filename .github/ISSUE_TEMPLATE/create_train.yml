@@ -1,0 +1,224 @@
+name: Create Train
+description: Create a new Train for the Registry.
+title: "[Create Train]: "
+labels:
+  - create_train
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Custom Train Request
+
+        Fill out every field below so the train can be reviewed and modeled consistently.
+        The form mirrors the datatype required by Subway Builder.
+
+  - type: input
+    id: train-id
+    attributes:
+      label: Train ID
+      description: Unique machine-readable identifier for the train. Use lowercase letters, numbers, and hyphens.
+      placeholder: better-train
+    validations:
+      required: true
+
+  - type: input
+    id: name
+    attributes:
+      label: Display Name
+      description: Human-readable train name shown in the UI.
+      placeholder: Better Train
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Short description of the train and what makes it distinct.
+      placeholder: A high-capacity regional train with improved acceleration and modern styling.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Performance Stats
+
+  - type: input
+    id: max-acceleration
+    attributes:
+      label: Max Acceleration
+      description: Maximum acceleration value.
+      placeholder: "1.5"
+    validations:
+      required: true
+
+  - type: input
+    id: max-deceleration
+    attributes:
+      label: Max Deceleration
+      description: Maximum deceleration value.
+      placeholder: "1.4"
+    validations:
+      required: true
+
+  - type: input
+    id: max-speed
+    attributes:
+      label: Max Speed
+      description: Maximum top speed value (m/s).
+      placeholder: "120"
+    validations:
+      required: true
+
+  - type: input
+    id: max-speed-local-station
+    attributes:
+      label: Max Speed at Local Station
+      description: Maximum speed when approaching or leaving a local station.
+      placeholder: "60"
+    validations:
+      required: true
+
+  - type: input
+    id: capacity-per-car
+    attributes:
+      label: Capacity Per Car
+      description: Number of passengers each car can carry.
+      placeholder: "90"
+    validations:
+      required: true
+
+  - type: input
+    id: car-length
+    attributes:
+      label: Car Length
+      description: Length of each car.
+      placeholder: "22.5"
+    validations:
+      required: true
+
+  - type: input
+    id: min-cars
+    attributes:
+      label: Minimum Cars
+      description: Smallest allowed train length.
+      placeholder: "2"
+    validations:
+      required: true
+
+  - type: input
+    id: max-cars
+    attributes:
+      label: Maximum Cars
+      description: Largest allowed train length.
+      placeholder: "8"
+    validations:
+      required: true
+
+  - type: input
+    id: cars-per-car-set
+    attributes:
+      label: Cars Per Car Set
+      description: Number of cars grouped into one set.
+      placeholder: "2"
+    validations:
+      required: true
+
+  - type: input
+    id: car-cost
+    attributes:
+      label: Car Cost
+      description: Purchase cost of one car.
+      placeholder: "250000"
+    validations:
+      required: true
+
+  - type: input
+    id: train-width
+    attributes:
+      label: Train Width
+      description: Physical width of the train.
+      placeholder: "3.2"
+    validations:
+      required: true
+
+  - type: input
+    id: min-station-length
+    attributes:
+      label: Minimum Station Length
+      description: Minimum station length required for this train.
+      placeholder: "100"
+    validations:
+      required: true
+
+  - type: input
+    id: max-station-length
+    attributes:
+      label: Maximum Station Length
+      description: Maximum station length supported by this train.
+      placeholder: "240"
+    validations:
+      required: true
+
+  - type: input
+    id: base-track-cost
+    attributes:
+      label: Base Track Cost
+      description: Baseline track construction cost.
+      placeholder: "40000"
+    validations:
+      required: true
+
+  - type: input
+    id: base-station-cost
+    attributes:
+      label: Base Station Cost
+      description: Baseline station construction cost.
+      placeholder: "30000000"
+    validations:
+      required: true
+
+  - type: input
+    id: train-operational-cost-per-hour
+    attributes:
+      label: Train Operational Cost Per Hour
+      description: Operating cost for the full train per hour.
+      placeholder: "500"
+    validations:
+      required: true
+
+  - type: input
+    id: car-operational-cost-per-hour
+    attributes:
+      label: Car Operational Cost Per Hour
+      description: Operating cost per car per hour.
+      placeholder: "75"
+    validations:
+      required: true
+
+  - type: input
+    id: scissors-crossover-cost
+    attributes:
+      label: Scissors Crossover Cost
+      description: Cost associated with scissors crossover usage.
+      placeholder: "20000000"
+    validations:
+      required: true
+
+  - type: input
+    id: color
+    attributes:
+      label: Appearance Color
+      description: Hex color used for the train appearance.
+      placeholder: "#4a90e2"
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmation
+      options:
+        - label: I confirm the train details are accurate and complete.
+          required: true
