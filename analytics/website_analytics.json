@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-06-07T15:08:30.062Z",
+  "generated_at": "2026-06-07T16:50:08.711Z",
   "valid_paths": [
     "/",
     "/contribute",
@@ -482,6 +482,7 @@
     "/railyard/mods/lrt-trains",
     "/railyard/mods/mode-manager",
     "/railyard/mods/mode-manager/changelog/v1.1.1",
+    "/railyard/mods/network-planner",
     "/railyard/mods/network-status",
     "/railyard/mods/network-status/changelog/v0.1.2",
     "/railyard/mods/orbital-surveyor",
@@ -855,11 +856,11 @@
   "path_aliases": {},
   "summary": {
     "latest_day": "2026-06-07",
-    "latest_hour": "2026-06-07T15:00:00.000Z",
+    "latest_hour": "2026-06-07T16:00:00.000Z",
     "total_days": 52,
-    "total_hours": 600,
-    "latest_day_visits": 73,
-    "latest_hour_visits": 5
+    "total_hours": 601,
+    "latest_day_visits": 130,
+    "latest_hour_visits": 57
   },
   "time_series": {
     "by_day": [
@@ -1069,7 +1070,7 @@
       },
       {
         "date": "2026-06-07",
-        "visits": 73
+        "visits": 130
       }
     ],
     "by_hour": [
@@ -3472,6 +3473,10 @@
       {
         "hour": "2026-06-07T15:00:00.000Z",
         "visits": 5
+      },
+      {
+        "hour": "2026-06-07T16:00:00.000Z",
+        "visits": 57
       }
     ]
   },
@@ -10739,22 +10744,26 @@
       }
     },
     "2026-06-07": {
-      "captured_at": "2026-06-07T15:08:28.002Z",
+      "captured_at": "2026-06-07T16:50:05.200Z",
       "window_start": "2026-06-07T05:00:00.000Z",
-      "window_end": "2026-06-07T16:00:00.000Z",
+      "window_end": "2026-06-07T17:00:00.000Z",
       "totals": {
-        "visits": 73
+        "visits": 130
       },
       "pages": {
-        "/": 8,
+        "/": 17,
         "/license": 1,
-        "/railyard": 9,
-        "/railyard/browse": 3,
-        "/railyard/docs": 2,
-        "/railyard/docs/latest/players/github-token": 4,
+        "/railyard": 13,
+        "/railyard/browse": 10,
+        "/railyard/docs": 6,
+        "/railyard/docs/latest/players/github-token": 7,
         "/railyard/docs/v0.2/players/github-token": 1,
+        "/railyard/maps/calgary/changelog/1.0.1": 1,
+        "/railyard/maps/greatertwincities": 1,
+        "/railyard/maps/helsinki": 1,
         "/railyard/maps/helsinki/changelog/1.2.0": 1,
         "/railyard/maps/rome": 1,
+        "/railyard/maps/valencia/changelog/1.0.2": 1,
         "/railyard/maps/vancouver/changelog/1.0.1": 1,
         "/railyard/maps/yukina-cz-brno": 3,
         "/railyard/maps/yukina-pl-lublin": 1,
@@ -10763,11 +10772,15 @@
         "/railyard/mods/any-money": 3,
         "/railyard/mods/game-speedup": 1,
         "/railyard/mods/lrt-trains": 1,
-        "/railyard/mods/tod": 5,
-        "/railyard/mods/track-anarchy": 8,
+        "/railyard/mods/network-planner": 13,
+        "/railyard/mods/tod": 7,
+        "/railyard/mods/track-anarchy": 9,
         "/railyard/mods/track-visualizer": 4,
+        "/railyard/mods/transit-overlay": 2,
+        "/railyard/updates": 7,
         "/railyard/updates/v0.1.5": 1,
         "/railyard/updates/v0.2.0": 1,
+        "/registry": 1,
         "/registry/authors/BarKuperman": 1,
         "/registry/maps/bergen-stavanger-no": 3,
         "/registry/maps/iquitos": 1,
@@ -10780,46 +10793,52 @@
         "/website/updates/v1.0.0": 1
       },
       "countries": {
+        "AU": 3,
         "AZ": 1,
         "BE": 1,
         "BH": 2,
         "CA": 1,
         "CL": 1,
-        "DE": 5,
+        "DE": 13,
+        "DK": 7,
         "ES": 1,
-        "GB": 13,
-        "HU": 1,
+        "FI": 12,
+        "GB": 16,
+        "HU": 3,
         "IT": 1,
         "MY": 7,
-        "NL": 4,
+        "NL": 5,
+        "PK": 4,
         "PL": 2,
+        "SA": 1,
         "SG": 2,
         "SK": 1,
-        "US": 28,
+        "TR": 1,
+        "US": 43,
         "VN": 2
       },
       "browsers": {
-        "BingBot": 11,
-        "Chrome": 14,
-        "ChromeMobile": 8,
-        "Edge": 4,
-        "Firefox": 16,
-        "GoogleBot": 7,
-        "MobileSafari": 1,
-        "Opera": 1,
-        "Safari": 1,
-        "Unknown": 10
+        "BingBot": 13,
+        "Chrome": 30,
+        "ChromeMobile": 13,
+        "Edge": 16,
+        "Firefox": 20,
+        "GoogleBot": 10,
+        "MobileSafari": 3,
+        "Opera": 3,
+        "Safari": 8,
+        "Unknown": 14
       },
       "operating_systems": {
-        "Android": 12,
-        "MacOSX": 15,
-        "Unknown": 22,
-        "Windows": 21,
-        "iOS": 3
+        "Android": 19,
+        "MacOSX": 34,
+        "Unknown": 29,
+        "Windows": 41,
+        "iOS": 7
       },
       "devices": {
-        "desktop": 58,
-        "mobile": 15
+        "desktop": 104,
+        "mobile": 26
       }
     }
   }
