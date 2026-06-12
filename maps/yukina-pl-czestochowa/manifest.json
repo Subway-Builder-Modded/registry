@@ -24,13 +24,13 @@
   },
   "city_code": "CZE",
   "country": "PL",
-  "population": 285415,
-  "residents_total": 285415,
-  "points_count": 11642,
-  "population_count": 15207,
+  "population": 296810,
+  "residents_total": 296810,
+  "points_count": 11646,
+  "population_count": 15411,
   "initial_view_state": {
-    "latitude": 50.889128,
-    "longitude": 19.177105,
+    "latitude": 50.886762,
+    "longitude": 19.175002,
     "zoom": 12,
     "bearing": 0
   },
@@ -43,5 +43,94 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {}
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 17.43,
+    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/special_demand_types.json": 0.05,
+    "CZE.pmtiles": 52.18,
+    "buildings_index.json": 80.75,
+    "config.json": 0,
+    "demand_data.json": 35.52,
+    "ocean_depth_index.json": 11.62,
+    "roads.geojson": 5.98,
+    "runways_taxiways.geojson": 0.06,
+    "water.geojson": 12.74
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.08744912094865684,
+      "p25": 0.10392525478554751,
+      "p50": 0.13386952048183978,
+      "p75": 0.18739993313929101,
+      "p90": 0.2874852137681196,
+      "mean": 0.17405436221764814
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.08080453142196406,
+      "p25": 0.10099383271897389,
+      "p50": 0.13954911805832057,
+      "p75": 0.19255500262122605,
+      "p90": 0.25483722724228497,
+      "mean": 0.1616757563524594
+    },
+    "commuteDistanceKm": {
+      "p10": 2528,
+      "p25": 4922,
+      "p50": 8821,
+      "p75": 16626,
+      "p90": 30440,
+      "mean": 13290.466549866978
+    },
+    "residentCellDensity": {
+      "p10": 13,
+      "p25": 20,
+      "p50": 37,
+      "p75": 76,
+      "p90": 147,
+      "mean": 91.08599508599508
+    },
+    "workerCellDensity": {
+      "p10": 13,
+      "p25": 22,
+      "p50": 47,
+      "p75": 118,
+      "p90": 323,
+      "mean": 157.66950053134963
+    },
+    "detail": {
+      "radiusKm": 0.13667982118122274,
+      "expectedPointSpacingKm": 0.5471108134036697,
+      "normalizedRadius": 0.24982109260629348,
+      "activityPerPoint": 25.486003778121244,
+      "playableAreaKm2": 5092,
+      "playableAreaPerPointKm2": 0.4372316675253306,
+      "playableCatchmentRadiusKm": 0.3730618746614789,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.9149009386042114,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 19.17321000781892,
+            "latitude": 50.88659158292268,
+            "massShare": 1,
+            "assignedMass": 593620,
+            "assignedPointCount": 11646,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  }
 }
