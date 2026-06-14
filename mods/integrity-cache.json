@@ -4,7 +4,7 @@
     "advanced-analytics": {
       "target-1.1.0": {
         "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-06-14T06:18:36.910Z",
+        "last_checked_at": "2026-06-14T06:43:09.446Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -18,7 +18,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-06-14T06:18:36.910Z"
+          "checked_at": "2026-06-14T06:43:09.446Z"
         }
       },
       "v0.9.1": {
@@ -2054,23 +2054,34 @@
       }
     },
     "improved-schematics": {
-      "v1.0": {
-        "fingerprint": "rules:v6:github:martig7/improved-schematics:v1.0:improved-sechematics-v1.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-06-14T06:18:36.910Z",
+      "v1.0.0": {
+        "fingerprint": "rules:v6:github:martig7/improved-schematics:v1.0.0:improved-sechematics-v1.0.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-06-14T06:43:09.446Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'v1.0'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.07,
           "source": {
             "update_type": "github",
             "repo": "martig7/improved-schematics",
-            "tag": "v1.0"
+            "tag": "v1.0.0",
+            "asset_name": "improved-sechematics-v1.0.0.zip",
+            "download_url": "https://github.com/martig7/Improved-Schematics/releases/download/v1.0.0/improved-sechematics-v1.0.0.zip"
           },
-          "fingerprint": "rules:v6:github:martig7/improved-schematics:v1.0:improved-sechematics-v1.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-06-14T06:18:36.910Z"
+          "fingerprint": "rules:v6:github:martig7/improved-schematics:v1.0.0:improved-sechematics-v1.0.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-06-14T06:43:09.446Z"
         }
       }
     },
@@ -3884,7 +3895,7 @@
       },
       "v1.0": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-06-14T06:18:36.910Z",
+        "last_checked_at": "2026-06-14T06:43:09.446Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -3898,12 +3909,12 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-06-14T06:18:36.910Z"
+          "checked_at": "2026-06-14T06:43:09.446Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-06-14T06:18:36.910Z",
+        "last_checked_at": "2026-06-14T06:43:09.446Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -3917,7 +3928,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-06-14T06:18:36.910Z"
+          "checked_at": "2026-06-14T06:43:09.446Z"
         }
       }
     }
