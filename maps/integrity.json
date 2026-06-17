@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-17T12:22:21.122Z",
+  "generated_at": "2026-06-17T18:26:47.138Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -13838,9 +13838,10 @@
     },
     "yukina-cz-brno": {
       "has_complete_version": true,
-      "latest_semver_version": "0.2.1",
+      "latest_semver_version": "0.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.3.0",
         "0.2.1",
         "0.2.0",
         "0.1.1",
@@ -14031,14 +14032,62 @@
           },
           "fingerprint": "rules:v6:sha256:4a22a202535fe366d7c258530d3b6faf4b58e0151ed8013e5775c94cc69eb6ed",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "BRQ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 119.96,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 13.94,
+            ".railyard_map/special_demand_points.json": 0.07,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "BRQ.pmtiles": 60.46,
+            "buildings_index.json": 85.26,
+            "config.json": 0.01,
+            "demand_data.json": 152.56,
+            "ocean_depth_index.json": 4.96,
+            "roads.geojson": 10.53,
+            "runways_taxiways.geojson": 1,
+            "water.geojson": 4.77
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "BRQ.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/BRQ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:31cb386b2513991fb4e56065941d532a75d180bf53ad792f53bb388a673aa627",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
     "yukina-cz-ceske-budejovice": {
       "has_complete_version": true,
-      "latest_semver_version": "0.1.0",
+      "latest_semver_version": "0.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.2.0",
         "0.1.0"
       ],
       "incomplete_versions": [],
@@ -14088,14 +14137,62 @@
           },
           "fingerprint": "rules:v6:sha256:4bb783bcefdbb0e813be8cf2abce712f6152b79ec7f512bd5ffcfa14248f5b6d",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CBS.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 72.78,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 9.5,
+            ".railyard_map/special_demand_points.json": 0.02,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "CBS.pmtiles": 39.77,
+            "buildings_index.json": 43.52,
+            "config.json": 0.01,
+            "demand_data.json": 40.04,
+            "ocean_depth_index.json": 10.96,
+            "roads.geojson": 5.94,
+            "runways_taxiways.geojson": 0.69,
+            "water.geojson": 10.77
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "CBS.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/CBS.zip"
+          },
+          "fingerprint": "rules:v6:sha256:71db8ffe22e2b576bce29f5b3a0a86b88d91126c80b13a076aea04e62360de50",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
     "yukina-cz-hradec-pardubice": {
       "has_complete_version": true,
-      "latest_semver_version": "0.2.1",
+      "latest_semver_version": "0.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.3.0",
         "0.2.1",
         "0.2.0",
         "0.1.0"
@@ -14239,14 +14336,178 @@
           },
           "fingerprint": "rules:v6:sha256:1a5f17ce826c37e2d65b880027ea5049e5e265a2d77bab8c06cd0239c4e9624b",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "HKP.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 107.78,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 14.12,
+            ".railyard_map/special_demand_points.json": 0.04,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "HKP.pmtiles": 54.95,
+            "buildings_index.json": 66.15,
+            "config.json": 0.01,
+            "demand_data.json": 94.11,
+            "ocean_depth_index.json": 7.52,
+            "roads.geojson": 10.63,
+            "runways_taxiways.geojson": 0.67,
+            "water.geojson": 7.61
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "HKP.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/HKP.zip"
+          },
+          "fingerprint": "rules:v6:sha256:2d74f2fb18b0b6b857235451571634d896a601aa9f83402d0eeafa940e49f36c",
+          "checked_at": "2026-06-17T18:26:47.138Z"
+        }
+      }
+    },
+    "yukina-cz-jihlava": {
+      "has_complete_version": true,
+      "latest_semver_version": "0.1.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "JIH.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 85.87,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 17.13,
+            ".railyard_map/special_demand_points.json": 0.02,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "JIH.pmtiles": 41.95,
+            "buildings_index.json": 40.48,
+            "config.json": 0.01,
+            "demand_data.json": 52.92,
+            "ocean_depth_index.json": 11.69,
+            "roads.geojson": 6.33,
+            "runways_taxiways.geojson": 0.06,
+            "water.geojson": 12.01
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "JIH.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/JIH.zip"
+          },
+          "fingerprint": "rules:v6:sha256:2761e25a928872f259f8cc4402b9e7f22303cf5000a0e50af5c3c44d5103c94d",
+          "checked_at": "2026-06-17T18:26:47.138Z"
+        }
+      }
+    },
+    "yukina-cz-karlovy-vary": {
+      "has_complete_version": true,
+      "latest_semver_version": "0.1.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "KVY.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 56.38,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 13.2,
+            ".railyard_map/special_demand_points.json": 0.02,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "KVY.pmtiles": 27.86,
+            "buildings_index.json": 24.49,
+            "config.json": 0.01,
+            "demand_data.json": 37.74,
+            "ocean_depth_index.json": 4.74,
+            "roads.geojson": 4.51,
+            "runways_taxiways.geojson": 0.21,
+            "water.geojson": 4.79
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "KVY.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/KVY.zip"
+          },
+          "fingerprint": "rules:v6:sha256:a1486ea1c970c7c143620d2012dfc37ac9bd86738ed8f63c05f37b3e9cceefec",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
     "yukina-cz-liberec-jablonec": {
       "has_complete_version": true,
-      "latest_semver_version": "0.1.0",
+      "latest_semver_version": "0.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.2.0",
         "0.1.0"
       ],
       "incomplete_versions": [],
@@ -14296,14 +14557,62 @@
           },
           "fingerprint": "rules:v6:sha256:2e92a1cccb9611888db0dacd28772bbbafbe5d9564733bce632fb3142ff4124a",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "LBC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 83.77,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 13.86,
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "LBC.pmtiles": 41.87,
+            "buildings_index.json": 44.09,
+            "config.json": 0.01,
+            "demand_data.json": 79.09,
+            "ocean_depth_index.json": 5.05,
+            "roads.geojson": 8.21,
+            "runways_taxiways.geojson": 0.07,
+            "water.geojson": 5.22
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "LBC.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/LBC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:56608839090590d836ba4452295187179e5ea8b4ce521c2b6d3f766bd800f1f1",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
     "yukina-cz-olomouc": {
       "has_complete_version": true,
-      "latest_semver_version": "0.2.1",
+      "latest_semver_version": "0.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.3.0",
         "0.2.1",
         "0.2.0",
         "0.1.0"
@@ -14447,14 +14756,62 @@
           },
           "fingerprint": "rules:v6:sha256:c1b5a7143270a3afec7b3dc49cdcb6f9a333751ffde19da5698bb8bc325244d6",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "OLO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 72.14,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 8.52,
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "OLO.pmtiles": 38.38,
+            "buildings_index.json": 47.17,
+            "config.json": 0.01,
+            "demand_data.json": 63.4,
+            "ocean_depth_index.json": 4.59,
+            "roads.geojson": 8.23,
+            "runways_taxiways.geojson": 0.53,
+            "water.geojson": 4.57
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "OLO.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/OLO.zip"
+          },
+          "fingerprint": "rules:v6:sha256:949e940d58cdd8ada466e390369831c8c08e84f05d6ec4d6d7cf9557aa786df9",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
     "yukina-cz-ostrava": {
       "has_complete_version": true,
-      "latest_semver_version": "0.2.1",
+      "latest_semver_version": "0.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.3.0",
         "0.2.1",
         "0.2.0",
         "0.1.1",
@@ -14645,14 +15002,62 @@
           },
           "fingerprint": "rules:v6:sha256:ce81eaf6a32ed96824524722a07ad40e3cfb20e3be27ba48c17adf45d705bee9",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "OSR.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 128.23,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 17.22,
+            ".railyard_map/special_demand_points.json": 0.06,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "OSR.pmtiles": 62.3,
+            "buildings_index.json": 84.91,
+            "config.json": 0.01,
+            "demand_data.json": 141.79,
+            "ocean_depth_index.json": 6.89,
+            "roads.geojson": 12.77,
+            "runways_taxiways.geojson": 0.37,
+            "water.geojson": 7.97
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "OSR.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/OSR.zip"
+          },
+          "fingerprint": "rules:v6:sha256:6f4a6a39d5bf1194764f1f052af6ceaffffcc3f8c60ae05c3490d2f4f8a3a929",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
     "yukina-cz-plzen": {
       "has_complete_version": true,
-      "latest_semver_version": "0.2.1",
+      "latest_semver_version": "0.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.3.0",
         "0.2.1",
         "0.2.0",
         "0.1.1",
@@ -14843,14 +15248,62 @@
           },
           "fingerprint": "rules:v6:sha256:a2c346783fcaf66c4e9391bdefc7f2985dd0a8e98132258c0c98c40d0095b93c",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PLZ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 75.1,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 12.96,
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "PLZ.pmtiles": 38.38,
+            "buildings_index.json": 42.99,
+            "config.json": 0.01,
+            "demand_data.json": 55.19,
+            "ocean_depth_index.json": 6.62,
+            "roads.geojson": 6.73,
+            "runways_taxiways.geojson": 0.42,
+            "water.geojson": 6.82
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "PLZ.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/PLZ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:fc3aff6b5653d7d31f20716d2a428b5bc0cec26a4716269073f3d9615916e2c1",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
     "yukina-cz-praha": {
       "has_complete_version": true,
-      "latest_semver_version": "0.2.1",
+      "latest_semver_version": "0.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.3.0",
         "0.2.1",
         "0.2.0",
         "0.1.1",
@@ -15041,14 +15494,62 @@
           },
           "fingerprint": "rules:v6:sha256:e5d22de242d823694b6f9f9788a7dd5f5177d52614703b5cd13517d54f9f88e9",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PRG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 216.71,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 22.48,
+            ".railyard_map/special_demand_points.json": 0.14,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "PRG.pmtiles": 103.98,
+            "buildings_index.json": 173.95,
+            "config.json": 0.01,
+            "demand_data.json": 248.83,
+            "ocean_depth_index.json": 11.16,
+            "roads.geojson": 27.05,
+            "runways_taxiways.geojson": 1.51,
+            "water.geojson": 10.83
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "PRG.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/PRG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:2fb98d91c013257a046e2c12fc7f84332935a6141a0518e2698ff5ecee5d15f3",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
     "yukina-cz-ustecko-chomutov": {
       "has_complete_version": true,
-      "latest_semver_version": "0.2.1",
+      "latest_semver_version": "0.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.3.0",
         "0.2.1",
         "0.2.0",
         "0.1.0"
@@ -15192,6 +15693,111 @@
           },
           "fingerprint": "rules:v6:sha256:82c8837b2ff1175c490b2431c8365a9a69a91df4f697d0692fe7d7a2ef144eeb",
           "checked_at": "2026-05-18T04:17:40.005Z"
+        },
+        "0.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "UCH.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 103.05,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 16.59,
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "UCH.pmtiles": 52.22,
+            "buildings_index.json": 56.84,
+            "config.json": 0.01,
+            "demand_data.json": 96.58,
+            "ocean_depth_index.json": 5.99,
+            "roads.geojson": 9.29,
+            "runways_taxiways.geojson": 0.09,
+            "water.geojson": 5.94
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "UCH.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/UCH.zip"
+          },
+          "fingerprint": "rules:v6:sha256:5ad9bcd76da65eb171f2e6d4735ad88eadb8ee65c6fa2decfb607dd3fd2eb4e3",
+          "checked_at": "2026-06-17T18:26:47.138Z"
+        }
+      }
+    },
+    "yukina-cz-zlin": {
+      "has_complete_version": true,
+      "latest_semver_version": "0.1.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.0"
+      ],
+      "incomplete_versions": [],
+      "versions": {
+        "0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ZLN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 93.83,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 15.9,
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0.05,
+            "ZLN.pmtiles": 45.58,
+            "buildings_index.json": 61,
+            "config.json": 0.01,
+            "demand_data.json": 85.5,
+            "ocean_depth_index.json": 4.2,
+            "roads.geojson": 9.24,
+            "runways_taxiways.geojson": 0.34,
+            "water.geojson": 4
+          },
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.3.2",
+            "asset_name": "ZLN.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.3.2/ZLN.zip"
+          },
+          "fingerprint": "rules:v6:sha256:854c51db029c4e7482959c271be5336f06a4b2190c6751135fda851ace0a7209",
+          "checked_at": "2026-06-17T18:26:47.138Z"
         }
       }
     },
