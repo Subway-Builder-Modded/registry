@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-18T22:20:22.665Z",
+  "generated_at": "2026-06-19T05:01:33.556Z",
   "listings": {
     "advanced-analytics": {
       "has_complete_version": true,
@@ -45,7 +45,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-06-18T22:20:22.665Z"
+          "checked_at": "2026-06-19T05:01:33.556Z"
         },
         "v0.9.1": {
           "is_complete": false,
@@ -1877,14 +1877,15 @@
     },
     "distance-circles": {
       "has_complete_version": true,
-      "latest_semver_version": "0.5.0",
+      "latest_semver_version": "0.5.2",
       "latest_semver_complete": false,
       "complete_versions": [
         "0.4.0",
         "0.3.3"
       ],
       "incomplete_versions": [
-        "0.5.0"
+        "0.5.2",
+        "0.5.1"
       ],
       "versions": {
         "0.3.3": {
@@ -1939,33 +1940,61 @@
           "fingerprint": "rules:v6:github:crumpetime/subway_builder_distance_circles:0.4.0:distanceCircles.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
           "checked_at": "2026-04-10T17:31:23.904Z"
         },
-        "0.5.0": {
+        "0.5.1": {
           "is_complete": false,
           "errors": [
-            "asset 'distanceCircles.zip': manifest.json version '0.4.0' does not match release tag '0.5.0' (expected '0.5.0')"
+            "asset 'distanceCircles.zip': release asset manifest.json is missing"
           ],
           "required_checks": {
-            "release_manifest_asset": true,
+            "release_manifest_asset": false,
             "zip_manifest_json": true,
             "security_scan_passed": true,
-            "manifest_version_matches_tag": false
+            "manifest_version_matches_tag": true
           },
           "matched_files": {
-            "release_manifest_asset": "manifest.json",
+            "release_manifest_asset": null,
             "zip_manifest_json": "manifest.json",
             "security_scan_passed": "passed",
-            "manifest_version_matches_tag": null
+            "manifest_version_matches_tag": "manifest.json"
           },
           "release_size": 0.01,
           "source": {
             "update_type": "github",
             "repo": "crumpetime/subway_builder_distance_circles",
-            "tag": "0.5.0",
+            "tag": "0.5.1",
             "asset_name": "distanceCircles.zip",
-            "download_url": "https://github.com/crumpetime/subway_builder_distance_circles/releases/download/0.5.0/distanceCircles.zip"
+            "download_url": "https://github.com/crumpetime/subway_builder_distance_circles/releases/download/0.5.1/distanceCircles.zip"
           },
-          "fingerprint": "rules:v6:github:crumpetime/subway_builder_distance_circles:0.5.0:distanceCircles.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-06-18T11:55:00.004Z"
+          "fingerprint": "rules:v6:github:crumpetime/subway_builder_distance_circles:0.5.1:distanceCircles.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-06-19T05:01:33.556Z"
+        },
+        "0.5.2": {
+          "is_complete": false,
+          "errors": [
+            "asset 'distanceCircles.zip': release asset manifest.json is missing"
+          ],
+          "required_checks": {
+            "release_manifest_asset": false,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": null,
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.01,
+          "source": {
+            "update_type": "github",
+            "repo": "crumpetime/subway_builder_distance_circles",
+            "tag": "0.5.2",
+            "asset_name": "distanceCircles.zip",
+            "download_url": "https://github.com/crumpetime/subway_builder_distance_circles/releases/download/0.5.2/distanceCircles.zip"
+          },
+          "fingerprint": "rules:v6:github:crumpetime/subway_builder_distance_circles:0.5.2:distanceCircles.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-06-19T05:01:33.556Z"
         }
       }
     },
@@ -3886,7 +3915,7 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-06-18T22:20:22.665Z"
+          "checked_at": "2026-06-19T05:01:33.556Z"
         },
         "v1.1": {
           "is_complete": false,
@@ -3901,7 +3930,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-06-18T22:20:22.665Z"
+          "checked_at": "2026-06-19T05:01:33.556Z"
         }
       }
     }
