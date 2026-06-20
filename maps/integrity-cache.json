@@ -7396,14 +7396,12 @@
           "checked_at": "2026-06-18T11:55:03.881Z"
         }
       },
-      "0.5.1": {
-        "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:0.5.1:HKG.zip",
-        "last_checked_at": "2026-06-20T04:01:49.467Z",
+      "0.5.2": {
+        "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:0.5.2:HKG.zip",
+        "last_checked_at": "2026-06-20T10:37:03.764Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "asset 'HKG.zip': config.json version '0.5.0' does not match release tag '0.5.1' (expected '0.5.1')"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -7412,7 +7410,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -7422,18 +7420,27 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "HKG.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 48.49,
+          "file_sizes": {
+            "HKG.pmtiles": 36.36,
+            "buildings_index.json": 20.38,
+            "config.json": 0,
+            "demand_data.json": 30.56,
+            "ocean_depth_index.json": 0.72,
+            "roads.geojson": 16.65,
+            "runways_taxiways.geojson": 1.61
+          },
           "source": {
             "update_type": "github",
             "repo": "crumpetime/sb-maps-hkg",
-            "tag": "0.5.1",
+            "tag": "0.5.2",
             "asset_name": "HKG.zip",
-            "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/0.5.1/HKG.zip"
+            "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/0.5.2/HKG.zip"
           },
-          "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:0.5.1:HKG.zip",
-          "checked_at": "2026-06-20T04:01:49.467Z"
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:0.5.2:HKG.zip",
+          "checked_at": "2026-06-20T10:37:03.764Z"
         }
       },
       "railyard": {
