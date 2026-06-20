@@ -99,6 +99,10 @@
                 }
               ]
             },
+            "last_updated": {
+              "type": "integer",
+              "minimum": 0
+            },
             "city_code": {
               "type": "string",
               "pattern": "^[A-Z0-9]{2,4}$"
@@ -653,6 +657,10 @@
                   "additionalProperties": false
                 }
               ]
+            },
+            "last_updated": {
+              "type": "integer",
+              "minimum": 0
             }
           },
           "required": [
