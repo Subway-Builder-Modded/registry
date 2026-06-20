@@ -1,7 +1,10 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import sharp from "sharp";
 
 const MIN_SCREENSHOT_SIZE = 5 * 1024; // 5KB — badges/icons are typically smaller
+// Matches scripts/convert-galleries-to-webp.ts; visually lossless for screenshots.
+const GALLERY_WEBP_QUALITY = 82;
 
 /**
  * Convert GitHub `/blob/` URLs to `/raw/` URLs so they return the actual file
@@ -170,20 +173,12 @@ export async function downloadGalleryImages(
         continue;
       }
 
-      const extMap: Record<string, string> = {
-        "image/png": "png",
-        "image/jpeg": "jpg",
-        "image/gif": "gif",
-        "image/webp": "webp",
-      };
-      const ext =
-        extMap[contentType] ||
-        url.match(/\.(png|jpg|jpeg|gif|webp)/i)?.[1] ||
-        "png";
-      const filename = `screenshot${screenshotIndex}.${ext}`;
-      const filePath = resolve(galleryDir, filename);
-
-      writeFileSync(filePath, buffer);
+      // Transcode all gallery screenshots to WebP to keep the registry (and the
+      // Railyard app's clone) small. The app has rendered image/webp since its
+      // first release, so WebP gallery paths are safe for every shipped version.
+      const webp = await sharp(buffer).webp({ quality: GALLERY_WEBP_QUALITY }).toBuffer();
+      const filename = `screenshot${screenshotIndex}.webp`;
+      writeFileSync(resolve(galleryDir, filename), webp);
       paths.push(`gallery/${filename}`);
       screenshotIndex++;
     } catch (err) {
