@@ -14,6 +14,12 @@ export const IntegrityVersionEntrySchema = z.object({
     matched_files: z.record(z.string().nullable()),
     release_size: z.number().optional(),
     file_sizes: z.record(z.number()).optional(),
+    // Game version constraint and mod dependencies parsed from the release's
+    // bundled manifest.json, so clients can resolve compatibility without
+    // fetching each release's manifest asset. Optional: only present once the
+    // version has been (re)checked since this field was introduced.
+    game_version: z.string().optional(),
+    dependencies: z.record(z.string()).optional(),
     security_issue: SecurityIssueSchema.optional(),
     source: IntegritySourceSchema,
     fingerprint: z.string(),

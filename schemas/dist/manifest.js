@@ -83,6 +83,11 @@ const BaseManifestSchema = z.object({
     is_test: z.boolean(),
     source: z.string().url(),
     update: UpdateConfigSchema,
+    // Epoch seconds of the listing's latest stable release, emitted by the
+    // analytics pipeline so clients can show "last updated" without resolving
+    // upstream releases at load time. Optional: not every manifest has been
+    // regenerated since this field was introduced.
+    last_updated: z.number().int().min(0).optional(),
 });
 export const ModManifestSchema = BaseManifestSchema.strict();
 export const MapManifestSchema = BaseManifestSchema.extend({

@@ -25,6 +25,8 @@ export declare const IntegrityVersionEntrySchema: z.ZodObject<{
     matched_files: z.ZodRecord<z.ZodString, z.ZodNullable<z.ZodString>>;
     release_size: z.ZodOptional<z.ZodNumber>;
     file_sizes: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
+    game_version: z.ZodOptional<z.ZodString>;
+    dependencies: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
     security_issue: z.ZodOptional<z.ZodObject<{
         findings: z.ZodArray<z.ZodObject<{
             rule_id: z.ZodString;
@@ -104,6 +106,8 @@ export declare const IntegrityVersionEntrySchema: z.ZodObject<{
     checked_at: string;
     file_sizes?: Record<string, number> | undefined;
     release_size?: number | undefined;
+    game_version?: string | undefined;
+    dependencies?: Record<string, string> | undefined;
     security_issue?: {
         findings: {
             type: "literal" | "regex" | "ast";
@@ -130,6 +134,8 @@ export declare const IntegrityVersionEntrySchema: z.ZodObject<{
     checked_at: string;
     file_sizes?: Record<string, number> | undefined;
     release_size?: number | undefined;
+    game_version?: string | undefined;
+    dependencies?: Record<string, string> | undefined;
     security_issue?: {
         findings: {
             type: "literal" | "regex" | "ast";
@@ -154,6 +160,8 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
         matched_files: z.ZodRecord<z.ZodString, z.ZodNullable<z.ZodString>>;
         release_size: z.ZodOptional<z.ZodNumber>;
         file_sizes: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
+        game_version: z.ZodOptional<z.ZodString>;
+        dependencies: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         security_issue: z.ZodOptional<z.ZodObject<{
             findings: z.ZodArray<z.ZodObject<{
                 rule_id: z.ZodString;
@@ -233,6 +241,8 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
         checked_at: string;
         file_sizes?: Record<string, number> | undefined;
         release_size?: number | undefined;
+        game_version?: string | undefined;
+        dependencies?: Record<string, string> | undefined;
         security_issue?: {
             findings: {
                 type: "literal" | "regex" | "ast";
@@ -259,6 +269,8 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
         checked_at: string;
         file_sizes?: Record<string, number> | undefined;
         release_size?: number | undefined;
+        game_version?: string | undefined;
+        dependencies?: Record<string, string> | undefined;
         security_issue?: {
             findings: {
                 type: "literal" | "regex" | "ast";
@@ -292,6 +304,8 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
         checked_at: string;
         file_sizes?: Record<string, number> | undefined;
         release_size?: number | undefined;
+        game_version?: string | undefined;
+        dependencies?: Record<string, string> | undefined;
         security_issue?: {
             findings: {
                 type: "literal" | "regex" | "ast";
@@ -325,6 +339,8 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
         checked_at: string;
         file_sizes?: Record<string, number> | undefined;
         release_size?: number | undefined;
+        game_version?: string | undefined;
+        dependencies?: Record<string, string> | undefined;
         security_issue?: {
             findings: {
                 type: "literal" | "regex" | "ast";
@@ -353,6 +369,8 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
             matched_files: z.ZodRecord<z.ZodString, z.ZodNullable<z.ZodString>>;
             release_size: z.ZodOptional<z.ZodNumber>;
             file_sizes: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
+            game_version: z.ZodOptional<z.ZodString>;
+            dependencies: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
             security_issue: z.ZodOptional<z.ZodObject<{
                 findings: z.ZodArray<z.ZodObject<{
                     rule_id: z.ZodString;
@@ -432,6 +450,8 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -458,6 +478,8 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -491,6 +513,8 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -524,6 +548,8 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -561,6 +587,8 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -598,6 +626,8 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -621,6 +651,8 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
         matched_files: z.ZodRecord<z.ZodString, z.ZodNullable<z.ZodString>>;
         release_size: z.ZodOptional<z.ZodNumber>;
         file_sizes: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
+        game_version: z.ZodOptional<z.ZodString>;
+        dependencies: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
         security_issue: z.ZodOptional<z.ZodObject<{
             findings: z.ZodArray<z.ZodObject<{
                 rule_id: z.ZodString;
@@ -700,6 +732,8 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
         checked_at: string;
         file_sizes?: Record<string, number> | undefined;
         release_size?: number | undefined;
+        game_version?: string | undefined;
+        dependencies?: Record<string, string> | undefined;
         security_issue?: {
             findings: {
                 type: "literal" | "regex" | "ast";
@@ -726,6 +760,8 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
         checked_at: string;
         file_sizes?: Record<string, number> | undefined;
         release_size?: number | undefined;
+        game_version?: string | undefined;
+        dependencies?: Record<string, string> | undefined;
         security_issue?: {
             findings: {
                 type: "literal" | "regex" | "ast";
@@ -756,6 +792,8 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
         checked_at: string;
         file_sizes?: Record<string, number> | undefined;
         release_size?: number | undefined;
+        game_version?: string | undefined;
+        dependencies?: Record<string, string> | undefined;
         security_issue?: {
             findings: {
                 type: "literal" | "regex" | "ast";
@@ -786,6 +824,8 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
         checked_at: string;
         file_sizes?: Record<string, number> | undefined;
         release_size?: number | undefined;
+        game_version?: string | undefined;
+        dependencies?: Record<string, string> | undefined;
         security_issue?: {
             findings: {
                 type: "literal" | "regex" | "ast";
@@ -810,6 +850,8 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
             matched_files: z.ZodRecord<z.ZodString, z.ZodNullable<z.ZodString>>;
             release_size: z.ZodOptional<z.ZodNumber>;
             file_sizes: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodNumber>>;
+            game_version: z.ZodOptional<z.ZodString>;
+            dependencies: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodString>>;
             security_issue: z.ZodOptional<z.ZodObject<{
                 findings: z.ZodArray<z.ZodObject<{
                     rule_id: z.ZodString;
@@ -889,6 +931,8 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -915,6 +959,8 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -945,6 +991,8 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -975,6 +1023,8 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -1007,6 +1057,8 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
@@ -1040,6 +1092,8 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
             checked_at: string;
             file_sizes?: Record<string, number> | undefined;
             release_size?: number | undefined;
+            game_version?: string | undefined;
+            dependencies?: Record<string, string> | undefined;
             security_issue?: {
                 findings: {
                     type: "literal" | "regex" | "ast";
