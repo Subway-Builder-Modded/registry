@@ -7,7 +7,9 @@ import type {
   IntegritySource,
   IntegrityVersionEntry,
   ListingIntegrityEntry,
+  ManifestGameDependency,
 } from "./integrity.js";
+import { parseManifestGameDependency } from "./integrity.js";
 import {
   type CustomVersionCandidate,
   type ListingContext,
@@ -183,6 +185,41 @@ function getAdjustedSingleAssetCount(params: {
   };
 }
 
+// resolveReleaseGameMeta fetches a release's manifest.json asset and parses the
+// game version constraint + mod dependencies. Returns {} on any failure (missing
+// asset, network error, unparseable body) so callers can attach it
+// unconditionally without affecting completeness.
+async function resolveReleaseGameMeta(
+  manifestAssetUrl: string | null,
+  fetchImpl: typeof fetch,
+): Promise<ManifestGameDependency> {
+  if (!manifestAssetUrl) return {};
+  try {
+    const resp = await fetchImpl(manifestAssetUrl, {
+      headers: { Accept: "application/octet-stream" },
+    });
+    if (!resp.ok) return {};
+    return parseManifestGameDependency(await resp.text());
+  } catch {
+    return {};
+  }
+}
+
+// maxReleaseEpoch returns the newest of the given release date strings as epoch
+// seconds, or undefined if none parse. Accepts RFC 3339 (github publishedAt) and
+// date-only "YYYY-MM-DD" (custom update JSON) — both are valid Date inputs.
+function maxReleaseEpoch(values: Array<string | null | undefined>): number | undefined {
+  let best: number | undefined;
+  for (const value of values) {
+    if (!value) continue;
+    const ms = Date.parse(value);
+    if (!Number.isFinite(ms)) continue;
+    const seconds = Math.floor(ms / 1000);
+    if (best === undefined || seconds > best) best = seconds;
+  }
+  return best;
+}
+
 export async function generateDownloadsDataFull(
   options: D.GenerateDownloadsOptions,
 ): Promise<D.GenerateDownloadsResult> {
@@ -286,6 +323,8 @@ export async function generateDownloadsDataFull(
     }
 
     const versionEntries: Record<string, IntegrityVersionEntry> = {};
+    // Newest release date for this listing (epoch seconds), synced to last_updated.
+    let lastUpdated: number | undefined;
     const listingCacheEntries = cache.entries[id] ?? {};
     const nextListingCacheEntries: Record<string, IntegrityCacheEntry> = {};
     const inspectZipWithMemo = createInspectZipWithMemo({
@@ -319,6 +358,9 @@ export async function generateDownloadsDataFull(
         nextCache.entries[id] = nextListingCacheEntries;
         continue;
       }
+      lastUpdated = maxReleaseEpoch(
+        [...repoIndex.byTag.values()].map((release) => release.publishedAt),
+      );
 
       for (const tag of [...repoIndex.byTag.keys()].sort()) {
         const releaseData = repoIndex.byTag.get(tag);
@@ -400,6 +442,12 @@ export async function generateDownloadsDataFull(
           };
         } else {
           const hasReleaseManifestAsset = releaseData.assets.has("manifest.json");
+          // Parse game_version/deps from the release's manifest.json asset once
+          // per fresh check (github only). Cached entries gain it on recheck.
+          const gameMeta = await resolveReleaseGameMeta(
+            hasReleaseManifestAsset ? releaseData.assets.get("manifest.json")?.downloadUrl ?? null : null,
+            fetchImpl,
+          );
           let selectedResult: IntegrityVersionEntry | null = null;
           let lastFailedResult: IntegrityVersionEntry | null = null;
           const attemptedErrors: string[] = [];
@@ -435,6 +483,7 @@ export async function generateDownloadsDataFull(
               fingerprint,
               nowIso,
               releaseSizeMiB,
+              gameMeta,
             );
             if (check.isComplete) {
               break;
@@ -503,6 +552,7 @@ export async function generateDownloadsDataFull(
         }
       }
     } else {
+      lastUpdated = maxReleaseEpoch(context.update.versions.map((candidate) => candidate.date));
       for (const candidate of context.update.versions) {
         const versionKey = candidate.version;
         versionsChecked += 1;
@@ -819,7 +869,7 @@ export async function generateDownloadsDataFull(
       }
     }
 
-    integrityListings[id] = createListingIntegrityEntry(versionEntries);
+    integrityListings[id] = createListingIntegrityEntry(versionEntries, lastUpdated);
     nextCache.entries[id] = sortObjectByKeys(nextListingCacheEntries);
   }
 

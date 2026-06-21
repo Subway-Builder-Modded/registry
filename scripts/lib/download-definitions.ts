@@ -21,6 +21,7 @@ export interface GraphqlReleaseAssetNode {
 
 export interface GraphqlReleaseNode {
   tagName: string;
+  publishedAt: string | null;
   releaseAssets: {
     nodes: GraphqlReleaseAssetNode[];
     pageInfo: {
@@ -54,6 +55,10 @@ export interface GraphqlReleasesResponse {
 
 export interface RepoReleaseTagData {
   zipTotal: number;
+  // ISO 8601 release publish timestamp; used to derive a listing's last_updated.
+  // Optional: only the full release-index path captures it (the download-count
+  // aggregation path leaves it undefined).
+  publishedAt?: string | null;
   assets: Map<string, {
     assetNodeId: string | null;
     downloadCount: number;
@@ -167,6 +172,7 @@ export const REPO_RELEASES_QUERY = `
       releases(first: 100, after: $cursor, orderBy: {field: CREATED_AT, direction: DESC}) {
         nodes {
           tagName
+          publishedAt
           releaseAssets(first: 100) {
             nodes {
               id
