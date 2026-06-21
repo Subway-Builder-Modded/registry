@@ -186,6 +186,7 @@ async function requestRepoReleasesPage(
 
 function aggregateReleaseDataByTag(releases: Array<{
   tagName: string;
+  publishedAt: string | null;
   assets: Array<{
     id: string | null;
     name: string;
@@ -218,7 +219,7 @@ function aggregateReleaseDataByTag(releases: Array<{
       }
     }
 
-    byTag.set(release.tagName, { zipTotal, assets });
+    byTag.set(release.tagName, { zipTotal, publishedAt: release.publishedAt, assets });
   }
 
   return byTag;
@@ -280,7 +281,7 @@ async function fetchGraphqlReleaseIndexForRepo(
       }
 
       const entries = aggregateReleaseDataByTag([
-        { tagName: release.tagName, assets },
+        { tagName: release.tagName, publishedAt: release.publishedAt ?? null, assets },
       ]);
       const data = entries.get(release.tagName);
       if (data) {

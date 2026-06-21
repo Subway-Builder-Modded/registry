@@ -10,6 +10,7 @@ import type {
   IntegritySource,
   IntegrityVersionEntry,
   ListingIntegrityEntry,
+  ManifestGameDependency,
   ZipCompletenessResult,
 } from "./integrity.js";
 import { fetchWithTimeout, resolveTimeoutMsFromEnv } from "./http.js";
@@ -27,6 +28,9 @@ export interface CustomVersionCandidate {
   parsed: D.ParsedReleaseAssetUrl | null;
   manifestUrl: string | null;
   parsedManifest: D.ParsedReleaseAssetUrl | null;
+  // Author-declared release date ("YYYY-MM-DD") from the custom update JSON, used
+  // to derive last_updated. Null when absent or malformed.
+  date: string | null;
   errors: string[];
 }
 
@@ -279,6 +283,7 @@ export function withCheckResult(
   fingerprint: string,
   checkedAt: string,
   releaseSizeMiB?: number,
+  gameMeta?: ManifestGameDependency,
 ): IntegrityVersionEntry {
   const normalizedFileSizes = (
     result.isComplete
@@ -295,6 +300,8 @@ export function withCheckResult(
     matched_files: result.matchedFiles,
     release_size: typeof releaseSizeMiB === "number" && Number.isFinite(releaseSizeMiB) ? releaseSizeMiB : undefined,
     file_sizes: normalizedFileSizes,
+    game_version: gameMeta?.game_version,
+    dependencies: gameMeta?.dependencies,
     security_issue: result.securityIssue,
     source,
     fingerprint,
@@ -423,6 +430,8 @@ export async function fetchCustomVersions(
     const sha256 = isNonEmptyString((entry as { sha256?: unknown }).sha256)
       ? normalizeWhitespace((entry as { sha256: string }).sha256)
       : null;
+    const rawDate = (entry as { date?: unknown }).date;
+    const date = isNonEmptyString(rawDate) ? normalizeWhitespace(rawDate) : null;
 
     const parsed = downloadUrl ? parseGitHubReleaseAssetDownloadUrl(downloadUrl) : null;
     const parsedManifest = manifestUrl ? parseGitHubReleaseAssetDownloadUrl(manifestUrl) : null;
@@ -444,6 +453,7 @@ export async function fetchCustomVersions(
       parsed,
       manifestUrl,
       parsedManifest,
+      date,
       errors,
     });
   }
@@ -495,6 +505,7 @@ export function aggregateZipDownloadCountsByTag(releases: Array<{
 
 export function createListingIntegrityEntry(
   versionEntries: Record<string, IntegrityVersionEntry>,
+  lastUpdated?: number,
 ): ListingIntegrityEntry {
   const semverVersions = Object.keys(versionEntries).filter((version) => isSupportedReleaseTag(version));
   const completeVersions = semverVersions
@@ -516,6 +527,7 @@ export function createListingIntegrityEntry(
     latest_semver_complete: latestSemverComplete,
     complete_versions: completeVersions,
     incomplete_versions: incompleteVersions,
+    last_updated: typeof lastUpdated === "number" && Number.isFinite(lastUpdated) ? lastUpdated : undefined,
     versions: sortObjectByKeys(versionEntries),
   };
 }

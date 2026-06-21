@@ -21,10 +21,56 @@ export interface IntegrityVersionEntry {
   matched_files: Record<string, string | null>;
   release_size?: number;
   file_sizes?: Record<string, number>;
+  // Game version constraint and mod dependencies parsed from the release's
+  // manifest.json asset (github sources only). Lets clients resolve
+  // compatibility without fetching each release's manifest. Populated on fresh
+  // integrity checks; cached entries gain it on their next recheck.
+  game_version?: string;
+  dependencies?: Record<string, string>;
   security_issue?: SecurityIssue;
   source: IntegritySource;
   fingerprint: string;
   checked_at: string;
+}
+
+// GAME_DEPENDENCY_KEY is the manifest dependency key declaring the required
+// Subway Builder version. Must match the app's constants.GameDependencyKey.
+export const GAME_DEPENDENCY_KEY = "subway-builder";
+
+export interface ManifestGameDependency {
+  game_version?: string;
+  dependencies?: Record<string, string>;
+}
+
+// parseManifestGameDependency extracts the game version constraint and the
+// remaining mod dependencies from a release manifest.json body. Returns an empty
+// object when the body is unparseable or has no dependencies, so callers can
+// attach it to an entry unconditionally.
+export function parseManifestGameDependency(raw: string): ManifestGameDependency {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return {};
+  }
+  if (typeof parsed !== "object" || parsed === null) return {};
+  const deps = (parsed as Record<string, unknown>).dependencies;
+  if (typeof deps !== "object" || deps === null) return {};
+
+  const result: ManifestGameDependency = {};
+  const otherDeps: Record<string, string> = {};
+  for (const [key, value] of Object.entries(deps as Record<string, unknown>)) {
+    if (typeof value !== "string") continue;
+    if (key === GAME_DEPENDENCY_KEY) {
+      result.game_version = value;
+    } else {
+      otherDeps[key] = value;
+    }
+  }
+  if (Object.keys(otherDeps).length > 0) {
+    result.dependencies = otherDeps;
+  }
+  return result;
 }
 
 export interface ListingIntegrityEntry {
@@ -33,6 +79,9 @@ export interface ListingIntegrityEntry {
   latest_semver_complete: boolean | null;
   complete_versions: string[];
   incomplete_versions: string[];
+  // Epoch seconds of the listing's newest release (max release/version date);
+  // synced into the manifest's last_updated. Optional until first regenerated.
+  last_updated?: number;
   versions: Record<string, IntegrityVersionEntry>;
 }
 

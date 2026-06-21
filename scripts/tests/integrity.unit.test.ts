@@ -1,8 +1,30 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import JSZip from "jszip";
-import { inspectZipCompleteness } from "../lib/integrity.js";
+import { inspectZipCompleteness, parseManifestGameDependency } from "../lib/integrity.js";
 import type { CompiledSecurityRule } from "../lib/mod-security.js";
+
+test("parseManifestGameDependency extracts game_version and other deps", () => {
+  const result = parseManifestGameDependency(
+    JSON.stringify({ dependencies: { "subway-builder": "<=1.3.0", "other-mod": "^2.0.0" } }),
+  );
+  assert.equal(result.game_version, "<=1.3.0");
+  assert.deepEqual(result.dependencies, { "other-mod": "^2.0.0" });
+});
+
+test("parseManifestGameDependency omits dependencies when only the game key is present", () => {
+  const result = parseManifestGameDependency(
+    JSON.stringify({ dependencies: { "subway-builder": "1.0.0" } }),
+  );
+  assert.equal(result.game_version, "1.0.0");
+  assert.equal(result.dependencies, undefined);
+});
+
+test("parseManifestGameDependency returns empty object for unparseable or depless input", () => {
+  assert.deepEqual(parseManifestGameDependency("not json"), {});
+  assert.deepEqual(parseManifestGameDependency(JSON.stringify({ name: "x" })), {});
+  assert.deepEqual(parseManifestGameDependency(JSON.stringify({ dependencies: null })), {});
+});
 
 async function makeZip(entries: Record<string, string>): Promise<Buffer> {
   const zip = new JSZip();

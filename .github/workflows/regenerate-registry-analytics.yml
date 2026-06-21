@@ -345,6 +345,9 @@ jobs:
       - name: Sync map manifest file sizes from integrity
         run: pnpm --dir scripts run sync-map-file-sizes
 
+      - name: Sync manifest last_updated from integrity
+        run: pnpm --dir scripts run sync-last-updated
+
       - name: Record content announcements
         run: pnpm --dir scripts run record-content-announcements -- --file /tmp/pending-announcements/maps-pending-announcements.json --file /tmp/pending-announcements/mods-pending-announcements.json
 
@@ -453,7 +456,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json maps/*/grid.geojson maps/*/basemap.svg maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json mods/*/manifest.json maps/*/grid.geojson maps/*/basemap.svg maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
