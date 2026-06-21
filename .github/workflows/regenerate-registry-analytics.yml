@@ -10,6 +10,14 @@ on:
         required: false
         type: boolean
         default: false
+      force_integrity_recheck:
+        description: >-
+          Re-inspect every release ZIP (ignore the integrity cache) to backfill
+          integrity-derived fields such as game_version. Independent of demand
+          stats: leave force_demand_stats off to avoid the slow grid recompute.
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -55,7 +63,12 @@ jobs:
         id: generate_map_analytics
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm --dir scripts run generate-registry-analytics:maps -- --strict-fingerprint-cache
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_integrity_recheck }}" = "true" ]; then
+            pnpm --dir scripts run generate-registry-analytics:maps -- --strict-fingerprint-cache --force-integrity
+          else
+            pnpm --dir scripts run generate-registry-analytics:maps -- --strict-fingerprint-cache
+          fi
 
       - name: Upload map downloads artifact
         uses: actions/upload-artifact@v4
@@ -109,7 +122,12 @@ jobs:
         id: generate_mod_analytics
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm --dir scripts run generate-registry-analytics:mods -- --strict-fingerprint-cache
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_integrity_recheck }}" = "true" ]; then
+            pnpm --dir scripts run generate-registry-analytics:mods -- --strict-fingerprint-cache --force-integrity
+          else
+            pnpm --dir scripts run generate-registry-analytics:mods -- --strict-fingerprint-cache
+          fi
 
       - name: Upload mod downloads artifact
         uses: actions/upload-artifact@v4
