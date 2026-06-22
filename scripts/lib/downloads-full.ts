@@ -9,12 +9,13 @@ import type {
   ListingIntegrityEntry,
   ManifestGameDependency,
 } from "./integrity.js";
-import { parseManifestGameDependency } from "./integrity.js";
+import { GAME_VERSION_REQUIRED_SINCE_EPOCH, parseManifestGameDependency } from "./integrity.js";
 import {
   type CustomVersionCandidate,
   type ListingContext,
   buildIncompleteVersionEntry,
   createListingIntegrityEntry,
+  enforceGameVersionRequirement,
   fetchCustomVersions,
   getDirectoryForType,
   getIndexIds,
@@ -323,6 +324,8 @@ export async function generateDownloadsDataFull(
     }
 
     const versionEntries: Record<string, IntegrityVersionEntry> = {};
+    // Per-version publish epoch (seconds); date-gates the game_version requirement.
+    const publishEpochByVersion = new Map<string, number | undefined>();
     // Newest release date for this listing (epoch seconds), synced to last_updated.
     let lastUpdated: number | undefined;
     const listingCacheEntries = cache.entries[id] ?? {};
@@ -361,6 +364,10 @@ export async function generateDownloadsDataFull(
       lastUpdated = maxReleaseEpoch(
         [...repoIndex.byTag.values()].map((release) => release.publishedAt),
       );
+      for (const [releaseTag, release] of repoIndex.byTag) {
+        const ms = Date.parse(release.publishedAt ?? "");
+        publishEpochByVersion.set(releaseTag, Number.isFinite(ms) ? Math.floor(ms / 1000) : undefined);
+      }
 
       for (const tag of [...repoIndex.byTag.keys()].sort()) {
         const releaseData = repoIndex.byTag.get(tag);
@@ -555,6 +562,8 @@ export async function generateDownloadsDataFull(
       lastUpdated = maxReleaseEpoch(context.update.versions.map((candidate) => candidate.date));
       for (const candidate of context.update.versions) {
         const versionKey = candidate.version;
+        const candidateMs = Date.parse(candidate.date ?? "");
+        publishEpochByVersion.set(versionKey, Number.isFinite(candidateMs) ? Math.floor(candidateMs / 1000) : undefined);
         versionsChecked += 1;
         const expectedReleaseManifestAssetName = resolveExpectedCustomReleaseManifestAssetName(
           candidate,
@@ -859,6 +868,14 @@ export async function generateDownloadsDataFull(
           }
         }
       }
+    }
+
+    for (const violation of enforceGameVersionRequirement(
+      versionEntries,
+      publishEpochByVersion,
+      GAME_VERSION_REQUIRED_SINCE_EPOCH,
+    )) {
+      warnListing(warnings, id, `game_version required [${listingType}]: ${violation.reason}`, violation.version);
     }
 
     for (const result of Object.values(versionEntries)) {

@@ -13,10 +13,11 @@ import type {
   ManifestGameDependency,
   ZipCompletenessResult,
 } from "./integrity.js";
+import { GAME_DEPENDENCY_KEY } from "./integrity.js";
 import { fetchWithTimeout, resolveTimeoutMsFromEnv } from "./http.js";
 import { readJsonFile, sortObjectByKeys } from "./json-utils.js";
 import { isSupportedReleaseTag, parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
-import { compareStableSemverDesc } from "./semver.js";
+import { compareStableSemverDesc, isValidGameVersionRange } from "./semver.js";
 
 export { sortObjectByKeys, bytesToMebibytesRounded } from "./json-utils.js";
 
@@ -307,6 +308,37 @@ export function withCheckResult(
     fingerprint,
     checked_at: checkedAt,
   };
+}
+
+export interface GameVersionViolation {
+  version: string;
+  reason: string;
+}
+
+// Hard-blocks versions published on/after cutoffEpoch (seconds) that lack a valid
+// game_version range; earlier versions are grandfathered. Mutates entries in place
+// and returns the violations for creator notification. Type-agnostic (maps + mods).
+export function enforceGameVersionRequirement(
+  versionEntries: Record<string, IntegrityVersionEntry>,
+  publishEpochByVersion: Map<string, number | undefined>,
+  cutoffEpoch: number,
+): GameVersionViolation[] {
+  const violations: GameVersionViolation[] = [];
+  for (const [version, entry] of Object.entries(versionEntries)) {
+    if (!entry.is_complete) continue;
+    const epoch = publishEpochByVersion.get(version);
+    if (typeof epoch !== "number" || epoch < cutoffEpoch) continue;
+    const gameVersion = entry.game_version;
+    if (isValidGameVersionRange(gameVersion)) continue;
+    const reason = gameVersion === undefined || gameVersion === ""
+      ? `no game_version found (declare a "${GAME_DEPENDENCY_KEY}" dependency range in the release manifest.json)`
+      : `game_version ${JSON.stringify(gameVersion)} is not a valid semver range`;
+    entry.is_complete = false;
+    entry.required_checks = { ...entry.required_checks, game_version_valid: false };
+    entry.errors = [...entry.errors, reason];
+    violations.push({ version, reason });
+  }
+  return violations;
 }
 
 export async function fetchZipBuffer(

@@ -1,3 +1,5 @@
+import semver from "semver";
+
 type StableSemverParts = readonly [number, number, number];
 
 export function parseStableSemverTag(tag: string): StableSemverParts | null {
@@ -38,4 +40,14 @@ export function compareStableSemverDesc(a: string, b: string): number {
   if (pa[1] !== pb[1]) return pb[1] - pa[1];
   if (pa[2] !== pb[2]) return pb[2] - pa[2];
   return b.localeCompare(a);
+}
+
+// Validates a game_version semver RANGE (e.g. "<=1.3.0", ">=1.0.0 <2.0.0", "^1.2.0",
+// "1.x", "1.2.3 - 1.4.0", "1.0.0 || 2.0.0"). Delegates to node-semver so it stays in
+// parity with the consumers: the frontend uses node-semver (semver.satisfies) and the
+// backend uses Masterminds/semver, which tracks node-semver. Empty is a violation
+// (semver.validRange("") is "", not null, so reject it explicitly).
+export function isValidGameVersionRange(value: unknown): boolean {
+  if (typeof value !== "string" || value.trim() === "") return false;
+  return semver.validRange(value.trim()) !== null;
 }

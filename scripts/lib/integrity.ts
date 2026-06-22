@@ -37,6 +37,12 @@ export interface IntegrityVersionEntry {
 // Subway Builder version. Must match the app's constants.GameDependencyKey.
 export const GAME_DEPENDENCY_KEY = "subway-builder";
 
+// A valid game_version range is REQUIRED on versions published on/after this cutoff
+// (epoch seconds); earlier versions are grandfathered. Bump to the enforcement merge date.
+export const GAME_VERSION_REQUIRED_SINCE_EPOCH = Math.floor(
+  Date.parse("2026-06-23T00:00:00Z") / 1000,
+);
+
 export interface ManifestGameDependency {
   game_version?: string;
   dependencies?: Record<string, string>;

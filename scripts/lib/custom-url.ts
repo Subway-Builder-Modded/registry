@@ -1,4 +1,5 @@
 import { validateModManifest } from "./mod-manifest.js";
+import { isValidGameVersionRange } from "./semver.js";
 
 export async function validateCustomUpdateUrl(url: string, listingType?: string, modId?: string): Promise<string[]> {
   const errors: string[] = [];
@@ -56,6 +57,15 @@ export async function validateCustomUpdateUrl(url: string, listingType?: string,
     if (typeof first[field] !== "string" || first[field] === "") {
       errors.push(`**custom-update-url**: First version entry is missing required field \`${field}\`.`);
     }
+  }
+
+  // game_version must be a valid semver range (parity with the app's parsers).
+  if (typeof first.game_version === "string" && first.game_version !== ""
+    && !isValidGameVersionRange(first.game_version)) {
+    errors.push(
+      `**custom-update-url**: \`game_version\` ${JSON.stringify(first.game_version)} ` +
+      `is not a valid semver range (e.g. \`<=1.4.0\`).`
+    );
   }
 
   // 6. (Mods only) Check first version entry has a manifest URL, fetch and validate it

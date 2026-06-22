@@ -9,6 +9,8 @@ function parseGitHubReleaseTagUrl(url: string): { repo: string; tag: string } | 
 }
 
 import { validateModManifest } from "./mod-manifest.js";
+import { parseManifestGameDependency } from "./integrity.js";
+import { isValidGameVersionRange } from "./semver.js";
 
 export interface GitHubUser {
   id: number;
@@ -69,25 +71,44 @@ export async function validateGitHubRepo(repo: string, sourceUrl?: string, listi
     errors.push(`**github-repo**: Latest release in \`${repo}\` has no .zip asset. Upload a .zip file to your release.`);
   }
 
-  // 3b. (Mods only) Check latest release has a manifest.json asset
-  if (listingType === "mod") {
-    const manifestAsset = assets.find((a) => a.name === "manifest.json");
-    if (!manifestAsset) {
-      errors.push(
-        `**github-repo**: Latest release in \`${repo}\` has no \`manifest.json\` asset. ` +
-        `Upload a manifest.json file to your release alongside the .zip.`
-      );
+  // 3b. Require a manifest.json asset declaring a valid game_version (the
+  //     `subway-builder` dependency range). Mods always required it; maps now
+  //     follow the same contract so every github version carries game_version.
+  const manifestAsset = assets.find((a) => a.name === "manifest.json");
+  if (!manifestAsset) {
+    errors.push(
+      `**github-repo**: Latest release in \`${repo}\` has no \`manifest.json\` asset. ` +
+      `Upload a manifest.json declaring a \`subway-builder\` dependency range ` +
+      `(e.g. \`"dependencies": { "subway-builder": "<=1.4.0" }\`) alongside the .zip.`
+    );
+  } else {
+    const manifestRes = await fetch(manifestAsset.browser_download_url, { headers });
+    if (!manifestRes.ok) {
+      errors.push(`**github-repo**: Could not fetch \`manifest.json\` from release (HTTP ${manifestRes.status}).`);
     } else {
-      const manifestRes = await fetch(manifestAsset.browser_download_url, { headers });
-      if (!manifestRes.ok) {
-        errors.push(`**github-repo**: Could not fetch \`manifest.json\` from release (HTTP ${manifestRes.status}).`);
-      } else {
-        try {
-          const manifestData = await manifestRes.json();
-          const manifestErrors = validateModManifest(manifestData, modId);
-          errors.push(...manifestErrors);
-        } catch {
-          errors.push("**github-repo**: `manifest.json` in release is not valid JSON.");
+      const manifestText = await manifestRes.text();
+      let manifestData: unknown;
+      try {
+        manifestData = JSON.parse(manifestText);
+      } catch {
+        errors.push("**github-repo**: `manifest.json` in release is not valid JSON.");
+      }
+      if (manifestData !== undefined) {
+        const { game_version: gameVersion } = parseManifestGameDependency(manifestText);
+        if (listingType === "mod") {
+          errors.push(...validateModManifest(manifestData, modId));
+          // validateModManifest checks presence; additionally require a valid range.
+          if (gameVersion !== undefined && !isValidGameVersionRange(gameVersion)) {
+            errors.push(
+              `**github-repo**: \`subway-builder\` dependency ${JSON.stringify(gameVersion)} ` +
+              `is not a valid semver range. Example: \`"<=1.4.0"\`.`
+            );
+          }
+        } else if (!isValidGameVersionRange(gameVersion)) {
+          errors.push(
+            `**github-repo**: \`manifest.json\` must declare a valid \`subway-builder\` dependency ` +
+            `range (game_version) — got ${JSON.stringify(gameVersion ?? null)}. Example: \`"<=1.4.0"\`.`
+          );
         }
       }
     }
