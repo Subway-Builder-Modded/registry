@@ -1,0 +1,37 @@
+name: Blob Budget Guard
+
+# Prevent large/relocated/raster blobs from landing on main and re-bloating the
+# registry clone (protects the WebP + grid/basemap-relocation wins). Budgets are
+# empirical; see scripts/check-blob-budget.sh.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  blob-budget:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check blob budget on added/modified files
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+            head="${{ github.event.pull_request.head.sha }}"
+          else
+            base="${{ github.event.before }}"
+            head="${{ github.sha }}"
+          fi
+          # New branch / first push reports an all-zero base; fall back to the parent.
+          if ! git rev-parse --verify "${base}^{commit}" >/dev/null 2>&1; then
+            base="$(git rev-parse "${head}~1" 2>/dev/null || git rev-parse "${head}")"
+          fi
+          bash scripts/check-blob-budget.sh "$base" "$head"
