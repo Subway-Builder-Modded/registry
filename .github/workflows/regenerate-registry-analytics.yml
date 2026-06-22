@@ -2,7 +2,8 @@ name: Regenerate Registry Analytics (Full)
 
 on:
   schedule:
-    - cron: "0 */4 * * *"
+    # Off-peak minute: GitHub throttles/drops :00 schedules under load.
+    - cron: "13 */4 * * *"
   workflow_dispatch:
     inputs:
       force_demand_stats:

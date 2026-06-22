@@ -2,7 +2,8 @@ name: Cache Website Analytics
 
 on:
   schedule:
-    - cron: "30 * * * *"
+    # Off-peak minute, staggered from the hourly downloads job (:23) to spread load.
+    - cron: "47 * * * *"
   workflow_dispatch:
 
 permissions:

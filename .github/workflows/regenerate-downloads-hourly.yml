@@ -2,7 +2,8 @@ name: Regenerate Download Counts (Hourly)
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    # Off-peak minute: GitHub throttles/drops :00 (and :30) schedules under load.
+    - cron: "23 * * * *"
   workflow_dispatch:
 
 permissions:
