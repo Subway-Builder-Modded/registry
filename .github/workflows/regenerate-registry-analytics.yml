@@ -173,6 +173,20 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: scripts
 
+      - name: Restore grid + basemap from map-data
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # map-data is the persistent store for grid/basemap (kept off main).
+          # Restore the prior snapshot so skip-unchanged can short-circuit stable maps.
+          if git fetch --depth 1 origin map-data 2>/dev/null; then
+            git checkout FETCH_HEAD -- maps 2>/dev/null || true
+            echo "Restored grid/basemap from map-data."
+          else
+            echo "map-data branch not found; grids/basemaps will be regenerated this run."
+          fi
+
       - name: Generate map demand stats
         id: generate_map_demand_stats
         env:
@@ -192,11 +206,47 @@ jobs:
           OSM_OVERPASS_URL: https://overpass-api.de/api/interpreter
         run: pnpm run generate-map-basemaps:backfill -- --continue-on-error
 
+      - name: Publish grid + basemap to map-data
+        if: ${{ always() }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(maps/*/grid.geojson maps/*/basemap.svg)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No grid/basemap files present; skipping map-data publish."
+            exit 0
+          fi
+          # Fresh orphan snapshot each run keeps map-data flat (no history accumulation).
+          snap="$(mktemp -d)"
+          for f in "${files[@]}"; do
+            mkdir -p "${snap}/$(dirname "$f")"
+            cp "$f" "${snap}/$f"
+          done
+          git -C "${snap}" init -q
+          git -C "${snap}" config user.name "github-actions[bot]"
+          git -C "${snap}" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "${snap}" checkout -q -b map-data
+          git -C "${snap}" add maps
+          git -C "${snap}" commit -q -m "chore: snapshot map demand grid + basemap"
+          # Push only when the snapshot differs from map-data. Git trees are
+          # content-addressed, so identical grid/basemap yields an identical
+          # maps tree hash -> skip the no-op force-push (the usual case).
+          new_tree="$(git -C "${snap}" rev-parse HEAD:maps)"
+          old_tree="$(git fetch --depth 1 origin map-data 2>/dev/null && git rev-parse FETCH_HEAD:maps 2>/dev/null || true)"
+          if [ "${new_tree}" = "${old_tree}" ]; then
+            echo "map-data unchanged (maps tree ${new_tree}); skipping push."
+            exit 0
+          fi
+          git -C "${snap}" push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" map-data:map-data
+          echo "Published ${#files[@]} grid/basemap files to map-data."
+
       - name: Build map demand stats artifact
         run: |
           set -euo pipefail
-          BASEMAP_FILES="$(find maps -mindepth 2 -maxdepth 2 -type f -name basemap.svg -print)"
-          tar -cf /tmp/maps-demand-stats.tar maps/demand-stats-cache.json maps/*/manifest.json maps/*/grid.geojson maps/demand-attribution-delta.json maps/basemap-completeness.json ${BASEMAP_FILES}
+          # grid/basemap relocated to the map-data branch; main keeps only the cache JSONs.
+          tar -cf /tmp/maps-demand-stats.tar maps/demand-stats-cache.json maps/*/manifest.json maps/demand-attribution-delta.json maps/basemap-completeness.json
 
       - name: Upload map demand stats artifact
         uses: actions/upload-artifact@v4
@@ -474,7 +524,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json mods/*/manifest.json maps/*/grid.geojson maps/*/basemap.svg maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json mods/*/manifest.json maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
