@@ -116,6 +116,29 @@ export function withReleaseSizeIfMissing(
   };
 }
 
+// Backfills the buildings-index presence keys onto a reused cache entry without
+// re-inspecting the zip. Entries written before the buildings_index_json/_bin split
+// only carry the combined buildings_index match; no release ships the binary twin yet,
+// so the binary is known-absent and the recorded buildings_index match is the JSON form.
+// This keeps the report homogeneous (every map entry has both keys) without a rules-version
+// bump that would force a full re-download. No-op for entries that already have the keys
+// (fresh inspections set them) and for non-map entries (no buildings_index key).
+export function withBuildingsIndexPresenceIfMissing(
+  result: IntegrityVersionEntry,
+): IntegrityVersionEntry {
+  const matched = result.matched_files;
+  if (!matched || !("buildings_index" in matched)) return result;
+  if ("buildings_index_json" in matched && "buildings_index_bin" in matched) return result;
+  return {
+    ...result,
+    matched_files: {
+      ...matched,
+      buildings_index_json: matched.buildings_index_json ?? matched.buildings_index ?? null,
+      buildings_index_bin: matched.buildings_index_bin ?? null,
+    },
+  };
+}
+
 export function resolveExpectedCustomReleaseManifestAssetName(
   candidate: CustomVersionCandidate,
   warnings: string[],

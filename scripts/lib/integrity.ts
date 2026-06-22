@@ -446,11 +446,22 @@ async function inspectMapZip(
     }
   }
 
-  const buildingsIndex = firstMatch(files, ["buildings_index.json", "buildings_index.json.gz"]);
-  requiredChecks.buildings_index = buildingsIndex !== null;
-  matchedFiles.buildings_index = buildingsIndex;
-  if (!buildingsIndex) {
-    errors.push("missing top-level buildings_index.json or buildings_index.json.gz");
+  // Buildings index ships as JSON and/or a packed binary twin (buildings_index.bin.gz).
+  // The sim reads JSON on builds <=1.3.0 and the binary on newer builds, so a release is
+  // complete as long as it carries at least one form. Both presences are recorded
+  // separately so a version's allowable game-version range can later be composed from
+  // which form(s) are present. No release carries the .bin yet, so buildings_index_bin
+  // is null across the board today.
+  const buildingsJson = firstMatch(files, ["buildings_index.json", "buildings_index.json.gz"]);
+  const buildingsBin = firstMatch(files, ["buildings_index.bin", "buildings_index.bin.gz"]);
+  requiredChecks.buildings_index = buildingsJson !== null || buildingsBin !== null;
+  matchedFiles.buildings_index = buildingsJson ?? buildingsBin;
+  matchedFiles.buildings_index_json = buildingsJson;
+  matchedFiles.buildings_index_bin = buildingsBin;
+  if (!buildingsJson && !buildingsBin) {
+    errors.push(
+      "missing top-level buildings index (need buildings_index.json/.json.gz or buildings_index.bin/.bin.gz)",
+    );
   }
 
   const roads = firstMatch(files, ["roads.geojson", "roads.geojson.gz"]);
