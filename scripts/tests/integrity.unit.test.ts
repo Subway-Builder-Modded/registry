@@ -2,7 +2,21 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import JSZip from "jszip";
 import { inspectZipCompleteness, parseManifestGameDependency } from "../lib/integrity.js";
+import type { IntegrityVersionEntry } from "../lib/integrity.js";
 import type { CompiledSecurityRule } from "../lib/mod-security.js";
+import { withBuildingsIndexPresenceIfMissing } from "../lib/downloads-full/integrity-completeness.js";
+
+function makeCachedEntry(matchedFiles: Record<string, string | null>): IntegrityVersionEntry {
+  return {
+    is_complete: true,
+    errors: [],
+    required_checks: { buildings_index: true },
+    matched_files: matchedFiles,
+    source: { update_type: "github", repo: "owner/repo", tag: "v1.0.0" },
+    fingerprint: "rules:v6:github:owner/repo:v1.0.0",
+    checked_at: "2026-01-01T00:00:00Z",
+  };
+}
 
 test("parseManifestGameDependency extracts game_version and other deps", () => {
   const result = parseManifestGameDependency(
@@ -72,9 +86,67 @@ test("map integrity requires exact top-level files including city pmtiles", asyn
   assert.equal(result.requiredChecks.roads_geojson, true);
   assert.equal(result.requiredChecks.runways_taxiways_geojson, true);
   assert.equal(result.requiredChecks.city_pmtiles, true);
+  // JSON-only buildings index: json form recorded, binary twin absent.
+  assert.equal(result.matchedFiles.buildings_index, "buildings_index.json");
+  assert.equal(result.matchedFiles.buildings_index_json, "buildings_index.json");
+  assert.equal(result.matchedFiles.buildings_index_bin, null);
   assert.ok(result.fileSizes);
   assert.equal(typeof result.fileSizes?.["config.json"], "number");
   assert.equal(typeof result.fileSizes?.["ABC.pmtiles"], "number");
+});
+
+test("map integrity accepts a binary-only buildings index", async () => {
+  const zipBuffer = await makeZip({
+    "config.json": "{\"code\":\"ABC\"}",
+    "demand_data.json": "{}",
+    "buildings_index.bin.gz": "stub",
+    "roads.geojson": "{}",
+    "runways_taxiways.geojson": "{}",
+    "ABC.pmtiles": "stub",
+  });
+
+  const result = await inspectZipCompleteness("map", zipBuffer, { cityCode: "ABC" });
+  assert.equal(result.isComplete, true);
+  assert.equal(result.requiredChecks.buildings_index, true);
+  assert.equal(result.matchedFiles.buildings_index, "buildings_index.bin.gz");
+  assert.equal(result.matchedFiles.buildings_index_json, null);
+  assert.equal(result.matchedFiles.buildings_index_bin, "buildings_index.bin.gz");
+});
+
+test("map integrity records both buildings index forms when present", async () => {
+  const zipBuffer = await makeZip({
+    "config.json": "{\"code\":\"ABC\"}",
+    "demand_data.json": "{}",
+    "buildings_index.json": "{}",
+    "buildings_index.bin.gz": "stub",
+    "roads.geojson": "{}",
+    "runways_taxiways.geojson": "{}",
+    "ABC.pmtiles": "stub",
+  });
+
+  const result = await inspectZipCompleteness("map", zipBuffer, { cityCode: "ABC" });
+  assert.equal(result.isComplete, true);
+  assert.equal(result.requiredChecks.buildings_index, true);
+  // Combined key prefers the JSON form; both presences recorded separately.
+  assert.equal(result.matchedFiles.buildings_index, "buildings_index.json");
+  assert.equal(result.matchedFiles.buildings_index_json, "buildings_index.json");
+  assert.equal(result.matchedFiles.buildings_index_bin, "buildings_index.bin.gz");
+});
+
+test("map integrity fails when neither buildings index form is present", async () => {
+  const zipBuffer = await makeZip({
+    "config.json": "{\"code\":\"ABC\"}",
+    "demand_data.json": "{}",
+    "roads.geojson": "{}",
+    "runways_taxiways.geojson": "{}",
+    "ABC.pmtiles": "stub",
+  });
+
+  const result = await inspectZipCompleteness("map", zipBuffer, { cityCode: "ABC" });
+  assert.equal(result.isComplete, false);
+  assert.equal(result.requiredChecks.buildings_index, false);
+  assert.equal(result.matchedFiles.buildings_index, null);
+  assert.ok(result.errors.some((error) => error.includes("buildings index")));
 });
 
 test("map integrity rejects nested paths and missing top-level city pmtiles", async () => {
@@ -235,4 +307,30 @@ test("mod integrity records security WARNING rule without blocking completion", 
   assert.equal(result.requiredChecks.security_scan_passed, true);
   assert.ok(result.warnings.some((warning) => warning.includes("security scan detected")));
   assert.equal(result.securityIssue?.findings[0]?.severity, "WARNING");
+});
+
+test("withBuildingsIndexPresenceIfMissing backfills legacy map cache entries", async () => {
+  // Pre-split cache entry: only the combined buildings_index match, no per-form keys.
+  const legacy = makeCachedEntry({ buildings_index: "buildings_index.json" });
+  const patched = withBuildingsIndexPresenceIfMissing(legacy);
+  // Binary is known-absent; JSON form derived from the recorded match. No re-inspection.
+  assert.equal(patched.matched_files.buildings_index_json, "buildings_index.json");
+  assert.equal(patched.matched_files.buildings_index_bin, null);
+  assert.equal(patched.matched_files.buildings_index, "buildings_index.json");
+});
+
+test("withBuildingsIndexPresenceIfMissing leaves already-split entries untouched", async () => {
+  const fresh = makeCachedEntry({
+    buildings_index: "buildings_index.bin.gz",
+    buildings_index_json: null,
+    buildings_index_bin: "buildings_index.bin.gz",
+  });
+  const patched = withBuildingsIndexPresenceIfMissing(fresh);
+  assert.equal(patched, fresh); // no-op: returns the same reference
+});
+
+test("withBuildingsIndexPresenceIfMissing ignores non-map (mod) entries", async () => {
+  const mod = makeCachedEntry({ release_manifest_asset: "manifest.json", zip_manifest_json: "manifest.json" });
+  const patched = withBuildingsIndexPresenceIfMissing(mod);
+  assert.equal(patched, mod); // no buildings_index key → untouched
 });

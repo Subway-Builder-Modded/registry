@@ -36,6 +36,7 @@ import {
   resolveExpectedCustomReleaseManifestAssetName,
   versionedFingerprint,
   withReleaseSizeIfMissing,
+  withBuildingsIndexPresenceIfMissing,
 } from "./downloads-full/integrity-completeness.js";
 import {
   getSecurityFingerprintPart,
@@ -412,9 +413,11 @@ export async function generateDownloadsDataFull(
               : undefined
           );
           const representativeAsset = matchedAsset ?? (zipAssets.length === 1 ? zipAssets[0][1] : undefined);
-          const result = withReleaseSizeIfMissing(
-            cached.result,
-            releaseSizeFromBytes(representativeAsset?.sizeBytes),
+          const result = withBuildingsIndexPresenceIfMissing(
+            withReleaseSizeIfMissing(
+              cached.result,
+              releaseSizeFromBytes(representativeAsset?.sizeBytes),
+            ),
           );
           versionEntries[tag] = result;
           nextListingCacheEntries[tag] = {
@@ -621,7 +624,9 @@ export async function generateDownloadsDataFull(
               )
               : undefined
           );
-          const result = withReleaseSizeIfMissing(cached.result, sizeFromMetadata);
+          const result = withBuildingsIndexPresenceIfMissing(
+            withReleaseSizeIfMissing(cached.result, sizeFromMetadata),
+          );
           versionEntries[versionKey] = result;
           nextListingCacheEntries[versionKey] = {
             ...cached,
