@@ -45,6 +45,11 @@ function parseTags(raw: unknown): string[] {
   return raw.split(",").map((t) => t.trim()).filter(Boolean);
 }
 
+function parseCommaSeparated(raw: unknown): string[] {
+  if (!raw || typeof raw !== "string") return [];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
 function buildUpdate(data: Record<string, unknown>): ModManifest["update"] {
   if (data["update-type"] === "GitHub Releases") {
     return { type: "github", repo: String(data["github-repo"]) };
@@ -81,6 +86,8 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
     },
   );
 
+  const includedCities = parseCommaSeparated(data["included-cities"]);
+
   return {
     tags: combineMapTags(location, specialDemand),
     mapFields: {
@@ -97,6 +104,7 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
       location: location as LocationTag,
       special_demand: specialDemand as SpecialDemandTag[],
       file_sizes: {},
+      ...(includedCities.length > 0 ? { included_cities: includedCities } : {}),
     },
   };
 }

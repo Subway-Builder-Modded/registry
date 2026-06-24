@@ -31,6 +31,8 @@ export const ListingIntegrityEntrySchema = z.object({
     latest_semver_complete: z.boolean().nullable(),
     complete_versions: z.array(z.string()),
     incomplete_versions: z.array(z.string()),
+    // Epoch seconds of the listing's newest release; synced into manifest.last_updated.
+    last_updated: z.number().int().min(0).optional(),
     versions: z.record(IntegrityVersionEntrySchema),
 });
 export const IntegrityOutputSchema = z.object({

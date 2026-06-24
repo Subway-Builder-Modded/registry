@@ -47,6 +47,18 @@
     "validations":
       "required": true
   - "type": "input"
+    "id": "included-cities"
+    "attributes":
+      "label": "Additional Cities"
+      "description": "Optional. Comma-separated list of major cities whose territory this map
+        covers but whose names are not in the map name. Used to improve search
+        discoverability — e.g. enter `Gdynia, Sopot` for a Gdańsk map, or `Bytom, Gliwice,
+        Zabrze` for a Katowice map. Leave blank if the map name already reflects the
+        coverage."
+      "placeholder": "Gdynia, Sopot"
+    "validations":
+      "required": false
+  - "type": "input"
     "id": "city-code"
     "attributes":
       "label": "City Code"

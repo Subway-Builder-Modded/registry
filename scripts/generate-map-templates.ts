@@ -230,6 +230,11 @@ function withTemplatePolicy(baseDoc: TemplateDoc, mode: TemplateMode): TemplateD
       field.attributes.description =
         "Leave blank to keep current collaborators. Enter `None` to clear. Otherwise, enter comma-separated GitHub user IDs to replace current collaborators.";
     }
+
+    if (mode === "update" && id === "included-cities" && field.attributes) {
+      field.attributes.description =
+        "Leave blank to keep current additional cities. Enter `None` to clear. Otherwise, enter a comma-separated list to replace (e.g. `Gdynia, Sopot`).";
+    }
   }
 
   return doc;
@@ -242,6 +247,12 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
     "City Name",
     "The human-readable city name shown in Railyard. This is the title of the map that people will see when downloading it.",
     { placeholder: "Raleigh", required: true },
+  ),
+  input(
+    "included-cities",
+    "Additional Cities",
+    "Optional. Comma-separated list of major cities whose territory this map covers but whose names are not in the map name. Used to improve search discoverability — e.g. enter `Gdynia, Sopot` for a Gdańsk map, or `Bytom, Gliwice, Zabrze` for a Katowice map. Leave blank if the map name already reflects the coverage.",
+    { placeholder: "Gdynia, Sopot", required: false },
   ),
   input(
     "city-code",
