@@ -636,6 +636,7 @@ export declare const ModManifestSchema: z.ZodObject<{
         url: string;
     }>]>;
     last_updated: z.ZodOptional<z.ZodNumber>;
+    search_aliases: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strict", z.ZodTypeAny, {
     schema_version: 1;
     source: string;
@@ -656,6 +657,7 @@ export declare const ModManifestSchema: z.ZodObject<{
     };
     collaborators?: number[] | undefined;
     last_updated?: number | undefined;
+    search_aliases?: string[] | undefined;
 }, {
     schema_version: 1;
     source: string;
@@ -676,6 +678,7 @@ export declare const ModManifestSchema: z.ZodObject<{
     };
     collaborators?: number[] | undefined;
     last_updated?: number | undefined;
+    search_aliases?: string[] | undefined;
 }>;
 export declare const MapManifestSchema: z.ZodObject<{
     schema_version: z.ZodLiteral<1>;
@@ -708,6 +711,7 @@ export declare const MapManifestSchema: z.ZodObject<{
         url: string;
     }>]>;
     last_updated: z.ZodOptional<z.ZodNumber>;
+    search_aliases: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 } & {
     gallery: z.ZodArray<z.ZodString, "many">;
     city_code: z.ZodString;
@@ -1153,6 +1157,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     location: z.ZodEnum<["caribbean", "central-america", "central-asia", "east-africa", "east-asia", "europe", "middle-east", "north-africa", "north-america", "oceania", "south-america", "south-asia", "southeast-asia", "southern-africa", "west-africa"]>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
     file_sizes: z.ZodRecord<z.ZodString, z.ZodNumber>;
+    included_cities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strict", z.ZodTypeAny, {
     schema_version: 1;
     source: string;
@@ -1192,6 +1197,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
     last_updated?: number | undefined;
+    search_aliases?: string[] | undefined;
     grid_statistics?: {
         residentWeightedNearestNeighborKm: {
             p10: number;
@@ -1268,6 +1274,7 @@ export declare const MapManifestSchema: z.ZodObject<{
             };
         };
     } | undefined;
+    included_cities?: string[] | undefined;
 }, {
     schema_version: 1;
     source: string;
@@ -1307,6 +1314,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
     last_updated?: number | undefined;
+    search_aliases?: string[] | undefined;
     grid_statistics?: {
         residentWeightedNearestNeighborKm: {
             p10: number;
@@ -1383,6 +1391,7 @@ export declare const MapManifestSchema: z.ZodObject<{
             };
         };
     } | undefined;
+    included_cities?: string[] | undefined;
 }>;
 export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     schema_version: z.ZodLiteral<1>;
@@ -1415,6 +1424,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         url: string;
     }>]>;
     last_updated: z.ZodOptional<z.ZodNumber>;
+    search_aliases: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 } & {
     gallery: z.ZodArray<z.ZodString, "many">;
     city_code: z.ZodString;
@@ -1860,6 +1870,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     location: z.ZodEnum<["caribbean", "central-america", "central-asia", "east-africa", "east-asia", "europe", "middle-east", "north-africa", "north-america", "oceania", "south-america", "south-asia", "southeast-asia", "southern-africa", "west-africa"]>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
     file_sizes: z.ZodRecord<z.ZodString, z.ZodNumber>;
+    included_cities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strict", z.ZodTypeAny, {
     schema_version: 1;
     source: string;
@@ -1899,6 +1910,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
     last_updated?: number | undefined;
+    search_aliases?: string[] | undefined;
     grid_statistics?: {
         residentWeightedNearestNeighborKm: {
             p10: number;
@@ -1975,6 +1987,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
             };
         };
     } | undefined;
+    included_cities?: string[] | undefined;
 }, {
     schema_version: 1;
     source: string;
@@ -2014,6 +2027,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
     last_updated?: number | undefined;
+    search_aliases?: string[] | undefined;
     grid_statistics?: {
         residentWeightedNearestNeighborKm: {
             p10: number;
@@ -2090,6 +2104,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
             };
         };
     } | undefined;
+    included_cities?: string[] | undefined;
 }>, z.ZodObject<{
     schema_version: z.ZodLiteral<1>;
     id: z.ZodString;
@@ -2122,6 +2137,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         url: string;
     }>]>;
     last_updated: z.ZodOptional<z.ZodNumber>;
+    search_aliases: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strict", z.ZodTypeAny, {
     schema_version: 1;
     source: string;
@@ -2142,6 +2158,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     };
     collaborators?: number[] | undefined;
     last_updated?: number | undefined;
+    search_aliases?: string[] | undefined;
 }, {
     schema_version: 1;
     source: string;
@@ -2162,6 +2179,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     };
     collaborators?: number[] | undefined;
     last_updated?: number | undefined;
+    search_aliases?: string[] | undefined;
 }>]>;
 export type UpdateConfig = z.infer<typeof UpdateConfigSchema>;
 export type InitialViewState = z.infer<typeof InitialViewStateSchema>;

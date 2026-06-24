@@ -56,9 +56,11 @@ const ALLOWED_LANG_CODES = new Set([
 interface City {
   geonameid: string;
   name: string;
+  asciiname: string;
   lat: number;
   lon: number;
   population: number;
+  country: string;
 }
 
 interface AliasEntry {
@@ -103,6 +105,59 @@ function findBestCity(lat: number, lon: number, cities: City[]): City | null {
     }
   }
   return best;
+}
+
+// Case-insensitive index by both `name` and `asciiname` so that diacritic-
+// free spellings (e.g. "Usti nad Labem") match GeoNames entries with diacritics
+// ("Ústí nad Labem") via the asciiname column.
+function buildCityNameIndex(cities: City[]): Map<string, City[]> {
+  const index = new Map<string, City[]>();
+  const add = (key: string, city: City) => {
+    const k = key.toLowerCase();
+    const existing = index.get(k);
+    if (existing) existing.push(city);
+    else index.set(k, [city]);
+  };
+  for (const city of cities) {
+    add(city.name, city);
+    if (city.asciiname && city.asciiname !== city.name) add(city.asciiname, city);
+  }
+  return index;
+}
+
+// Splits a map name containing multiple city names into individual tokens.
+// "Shizuoka & Hamamatsu" → ["Shizuoka", "Hamamatsu"]
+// "Usti nad Labem - Chomutov" → ["Usti nad Labem", "Chomutov"]
+// "Gdansk / Gdynia" → ["Gdansk", "Gdynia"]
+// Single-city names ("Warsaw") → ["Warsaw"] (single-element array)
+function extractCityTokensFromName(name: string): string[] {
+  const tokens = name
+    .split(/\s*[&/·]\s*|\s+-\s+/)
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0);
+  return tokens.length > 1 ? tokens : [name.trim()];
+}
+
+// Looks up a city by name string, disambiguating by country then proximity.
+function findCityByName(
+  name: string,
+  countryCode: string,
+  refLat: number,
+  refLon: number,
+  nameIndex: Map<string, City[]>,
+): City | null {
+  const candidates = nameIndex.get(name.toLowerCase().trim()) ?? [];
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+
+  const sameCountry = candidates.filter((c) => c.country === countryCode);
+  const pool = sameCountry.length > 0 ? sameCountry : candidates;
+  // Among the filtered pool, pick the closest to the map's reference coordinates.
+  return pool.reduce((best, c) =>
+    haversineKm(refLat, refLon, c.lat, c.lon) < haversineKm(refLat, refLon, best.lat, best.lon)
+      ? c
+      : best,
+  );
 }
 
 // --- Network / extraction ---
@@ -154,16 +209,20 @@ async function parseCities15000(dataDir: string): Promise<City[]> {
     if (parts.length < 15) continue;
     const geonameid = parts[0];
     const name = parts[1];
+    const asciiname = parts[2];
     const lat = parseFloat(parts[4]);
     const lon = parseFloat(parts[5]);
+    const country = parts[8];
     const population = parseInt(parts[14], 10);
     if (!geonameid || !isFinite(lat) || !isFinite(lon)) continue;
     cities.push({
       geonameid,
       name,
+      asciiname,
       lat,
       lon,
       population: isFinite(population) ? population : 0,
+      country,
     });
   }
 
@@ -306,6 +365,7 @@ async function run(): Promise<void> {
 
   const cities = await parseCities15000(dataDir);
   const cityGeonameIds = new Set(cities.map((c) => c.geonameid));
+  const cityNameIndex = buildCityNameIndex(cities);
   const aliasIndex = await buildAliasIndex(dataDir, cityGeonameIds);
 
   const mapsDir = resolve(repoRoot, 'maps');
@@ -338,23 +398,70 @@ async function run(): Promise<void> {
       continue;
     }
 
-    const city = findBestCity(viewState['latitude'] as number, viewState['longitude'] as number, cities);
-    if (!city) {
+    const lat = viewState['latitude'] as number;
+    const lon = viewState['longitude'] as number;
+    const countryCode = String(manifest['country'] ?? '');
+    const mapName = String(manifest['name'] ?? '');
+
+    // Collect geonameids from up to three sources:
+    // 1. Coordinate match — highest-population city within CITY_MATCH_RADIUS_KM.
+    // 2. Name tokens — cities parsed from multi-city map names ("A & B", "A / B", "A - B").
+    // 3. included_cities — explicitly listed by the map author in the manifest.
+    const cityIds = new Set<string>();
+    const matchedCityNames: string[] = [];
+
+    const primaryCity = findBestCity(lat, lon, cities);
+    if (primaryCity) {
+      cityIds.add(primaryCity.geonameid);
+      matchedCityNames.push(primaryCity.name);
+    }
+
+    const nameTokens = extractCityTokensFromName(mapName);
+    if (nameTokens.length > 1) {
+      for (const token of nameTokens) {
+        const c = findCityByName(token, countryCode, lat, lon, cityNameIndex);
+        if (c && !cityIds.has(c.geonameid)) {
+          cityIds.add(c.geonameid);
+          matchedCityNames.push(c.name);
+        } else if (!c) {
+          console.warn(`[generate-search-aliases] ${mapId}: no GeoNames match for name token "${token}"`);
+        }
+      }
+    }
+
+    const includedCities = manifest['included_cities'];
+    if (Array.isArray(includedCities)) {
+      for (const entry of includedCities) {
+        const c = findCityByName(String(entry), countryCode, lat, lon, cityNameIndex);
+        if (c && !cityIds.has(c.geonameid)) {
+          cityIds.add(c.geonameid);
+          matchedCityNames.push(c.name);
+        } else if (!c) {
+          console.warn(`[generate-search-aliases] ${mapId}: no GeoNames match for included_city "${entry}"`);
+        }
+      }
+    }
+
+    if (cityIds.size === 0) {
       console.warn(
-        `[generate-search-aliases] ${mapId}: no city within ${CITY_MATCH_RADIUS_KM}km of ` +
-          `(${viewState['latitude']}, ${viewState['longitude']}), skipping`,
+        `[generate-search-aliases] ${mapId}: no city matched within ${CITY_MATCH_RADIUS_KM}km of ` +
+          `(${lat}, ${lon}), skipping`,
       );
       noCity++;
       continue;
     }
 
-    const rawEntries = aliasIndex.get(city.geonameid) ?? [];
-    const aliases = selectAliases(rawEntries, String(manifest['name'] ?? ''), MAX_ALIASES_PER_MAP);
+    // Collect alias entries from all matched cities and select the best set.
+    const allEntries: AliasEntry[] = [];
+    for (const geonameid of cityIds) {
+      allEntries.push(...(aliasIndex.get(geonameid) ?? []));
+    }
+    const aliases = selectAliases(allEntries, mapName, MAX_ALIASES_PER_MAP);
 
     const preview = aliases.slice(0, 5).join(', ') + (aliases.length > 5 ? '...' : '');
     console.log(
-      `[generate-search-aliases] ${mapId} → ${city.name} [${city.geonameid}] ` +
-        `(pop ${city.population.toLocaleString()}): [${preview || '(no aliases)'}]`,
+      `[generate-search-aliases] ${mapId} → [${matchedCityNames.join(' + ')}]: ` +
+        `[${preview || '(no aliases)'}]`,
     );
 
     if (!dryRun) {

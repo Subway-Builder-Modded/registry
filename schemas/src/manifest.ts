@@ -142,6 +142,11 @@ export const MapManifestSchema = BaseManifestSchema.extend({
     { message: "special_demand must be unique" },
   ),
   file_sizes: z.record(z.number().min(0)),
+  // Author-provided list of major cities whose territory this map covers but
+  // whose names are not reflected in the map name (e.g. a "Gdańsk" map that
+  // also covers Gdynia and Sopot). Used by generate-search-aliases to collect
+  // GeoNames alternate names for those additional cities.
+  included_cities: z.array(z.string().min(1)).optional(),
 }).strict();
 
 export const ListingManifestSchema = z.union([MapManifestSchema, ModManifestSchema]);

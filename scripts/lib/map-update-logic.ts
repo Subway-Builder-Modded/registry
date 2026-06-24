@@ -117,6 +117,17 @@ export function applyMapManifestUpdates(
     }
   }
 
+  // included_cities: blank keeps current; "None" clears; otherwise replaces with new comma-separated list.
+  const rawIncludedCities = data["included-cities"];
+  if (isPresentIssueValue(rawIncludedCities) && typeof rawIncludedCities === "string") {
+    if (rawIncludedCities.trim() === "None") {
+      delete manifest.included_cities;
+    } else {
+      const parsed = rawIncludedCities.split(",").map((s) => s.trim()).filter(Boolean);
+      if (parsed.length > 0) manifest.included_cities = parsed;
+    }
+  }
+
   // Cap OSM quality to be medium quality since high-quality OSM data is generally not available
   if (
     isOsmDataSource(manifest.data_source)

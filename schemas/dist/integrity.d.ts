@@ -153,6 +153,7 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
     latest_semver_complete: z.ZodNullable<z.ZodBoolean>;
     complete_versions: z.ZodArray<z.ZodString, "many">;
     incomplete_versions: z.ZodArray<z.ZodString, "many">;
+    last_updated: z.ZodOptional<z.ZodNumber>;
     versions: z.ZodRecord<z.ZodString, z.ZodObject<{
         is_complete: z.ZodBoolean;
         errors: z.ZodArray<z.ZodString, "many">;
@@ -317,6 +318,7 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
             }[];
         } | undefined;
     }>;
+    last_updated?: number | undefined;
 }, {
     has_complete_version: boolean;
     latest_semver_version: string | null;
@@ -352,6 +354,7 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
             }[];
         } | undefined;
     }>;
+    last_updated?: number | undefined;
 }>;
 export declare const IntegrityOutputSchema: z.ZodObject<{
     schema_version: z.ZodLiteral<1>;
@@ -362,6 +365,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
         latest_semver_complete: z.ZodNullable<z.ZodBoolean>;
         complete_versions: z.ZodArray<z.ZodString, "many">;
         incomplete_versions: z.ZodArray<z.ZodString, "many">;
+        last_updated: z.ZodOptional<z.ZodNumber>;
         versions: z.ZodRecord<z.ZodString, z.ZodObject<{
             is_complete: z.ZodBoolean;
             errors: z.ZodArray<z.ZodString, "many">;
@@ -526,6 +530,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                 }[];
             } | undefined;
         }>;
+        last_updated?: number | undefined;
     }, {
         has_complete_version: boolean;
         latest_semver_version: string | null;
@@ -561,6 +566,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                 }[];
             } | undefined;
         }>;
+        last_updated?: number | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
     schema_version: 1;
@@ -600,6 +606,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                 }[];
             } | undefined;
         }>;
+        last_updated?: number | undefined;
     }>;
 }, {
     schema_version: 1;
@@ -639,6 +646,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                 }[];
             } | undefined;
         }>;
+        last_updated?: number | undefined;
     }>;
 }>;
 export declare const IntegrityCacheEntrySchema: z.ZodObject<{
