@@ -38,7 +38,7 @@ const ALT_NAMES_ZIP_URL = 'https://download.geonames.org/export/dump/alternateNa
 // closest city, to avoid matching on districts/boroughs (e.g. Mitte < Berlin).
 const CITY_MATCH_RADIUS_KM = 50;
 
-const MAX_ALIASES_PER_MAP = 20;
+const MAX_ALIASES_PER_MAP = 40;
 
 // Natural-language ISO 639 codes to accept from alternateNamesV2.
 // Excludes non-linguistic codes: 'iata', 'icao', 'faac', 'faa', 'link',
@@ -456,6 +456,20 @@ async function run(): Promise<void> {
     for (const geonameid of cityIds) {
       allEntries.push(...(aliasIndex.get(geonameid) ?? []));
     }
+
+    // Always add the raw included_cities strings to the pool so they appear
+    // in search_aliases even when GeoNames has no match or doesn't list that
+    // exact spelling as an alternate name (e.g. 黒部 Kurobe, Dąbrowa Górnicza).
+    // Marked isPreferred:true so they sort ahead of non-preferred GeoNames entries
+    // and are not squeezed out on maps with many included cities. selectAliases
+    // deduplicates case-insensitively, so any overlap with GeoNames is collapsed.
+    if (Array.isArray(includedCities)) {
+      for (const entry of includedCities) {
+        const raw = String(entry).trim();
+        if (raw) allEntries.push({ name: raw, lang: '', isPreferred: true });
+      }
+    }
+
     const aliases = selectAliases(allEntries, mapName, MAX_ALIASES_PER_MAP);
 
     const preview = aliases.slice(0, 5).join(', ') + (aliases.length > 5 ? '...' : '');

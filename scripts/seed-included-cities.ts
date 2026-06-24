@@ -18,33 +18,34 @@ import { resolveRepoRoot, runAndExitOnError } from './lib/script-runtime.js';
 
 const SEED: Record<string, string[]> = {
   // --- Japan: regional names with no city in the map name ---
-  'yukina-nakaumi':       ['Matsue', 'Yonago', 'Izumo'],
-  'yukina-tsugaru':       ['Aomori', 'Hirosaki', 'Goshogawara'],
-  'yukina-nakadoori':     ['Fukushima', 'Kōriyama'],
-  'yukina-okinawa':       ['Naha', 'Okinawa', 'Urasoe', 'Ginowan', 'Uruma', 'Itoman'],
+  // Each entry pairs romaji (for GeoNames lookup) with kanji (direct fallback search term).
+  'yukina-nakaumi':       ['Matsue', '松江', 'Yonago', '米子', 'Izumo', '出雲'],
+  'yukina-tsugaru':       ['Aomori', '青森', 'Hirosaki', '弘前', 'Goshogawara', '五所川原'],
+  'yukina-nakadoori':     ['Fukushima', '福島', 'Kōriyama', '郡山'],
+  'yukina-okinawa':       ['Naha', '那覇', 'Okinawa', '沖縄市', 'Urasoe', '浦添', 'Ginowan', '宜野湾', 'Uruma', 'うるま市', 'Itoman', '糸満'],
   // 福北 (Fukuoka & Kitakyūshū) — '&' split yields CJK fragments, neither matches GeoNames
-  'yukina-northern-kyushu': ['Fukuoka', 'Kitakyushu', 'Kurume', 'Saga', 'Iizuka'],
+  'yukina-northern-kyushu': ['Fukuoka', '福岡', 'Kitakyushu', '北九州', 'Kurume', '久留米', 'Saga', '佐賀', 'Iizuka', '飯塚'],
 
   // --- Japan: secondary city in map ID but absent from manifest name ---
   // All use "漢字 (Primary-city-only)" format; tokeniser cannot extract secondary
-  'yukina-hiroshima-kure':        ['Kure', 'Higashihiroshima', 'Hatsukaichi'],
-  'yukina-kagoshima-kirishima':   ['Kirishima', 'Aira', 'Kanoya'],
-  'yukina-kobe-akashi':           ['Akashi', 'Nishinomiya', 'Amagasaki', 'Himeji', 'Kakogawa'],
-  'yukina-kitakyushu-shimonoseki':['Shimonoseki', 'Ube'],
-  'yukina-sapporo-chitose':       ['Chitose', 'Eniwa', 'Kitahiroshima', 'Ishikari', 'Ebetsu', 'Otaru'],
+  'yukina-hiroshima-kure':        ['Kure', '呉', 'Higashihiroshima', '東広島', 'Hatsukaichi', '廿日市'],
+  'yukina-kagoshima-kirishima':   ['Kirishima', '霧島', 'Aira', '姶良', 'Kanoya', '鹿屋'],
+  'yukina-kobe-akashi':           ['Akashi', '明石', 'Nishinomiya', '西宮', 'Amagasaki', '尼崎', 'Himeji', '姫路', 'Kakogawa', '加古川'],
+  'yukina-kitakyushu-shimonoseki':['Shimonoseki', '下関', 'Ube', '宇部'],
+  'yukina-sapporo-chitose':       ['Chitose', '千歳', 'Eniwa', '恵庭', 'Kitahiroshima', '北広島', 'Ishikari', '石狩', 'Ebetsu', '江別', 'Otaru', '小樽'],
   // 静岡・浜松 (Shizuoka/Hamamatsu) — '·' + '/' split yields broken CJK fragments
-  'yukina-shizuoka-hamamatsu':    ['Hamamatsu', 'Shizuoka', 'Fuji', 'Yaizu', 'Kakegawa'],
+  'yukina-shizuoka-hamamatsu':    ['Hamamatsu', '浜松', 'Shizuoka', '静岡', 'Fuji', '富士', 'Yaizu', '焼津', 'Kakegawa', '掛川'],
 
   // --- Japan: single-city name, major satellite not reachable by coordinate match alone ---
-  'yukina-okayama': ['Kurashiki', 'Sōja', 'Tamano'],          // Kurashiki = 67 % of Okayama
-  'yukina-nagoya':  ['Toyota', 'Okazaki', 'Ichinomiya', 'Kasugai', 'Gifu'],
-  'yukina-osaka':   ['Sakai', 'Higashiōsaka', 'Toyonaka', 'Suita', 'Hirakata'],
-  'yukina-kyoto':   ['Uji', 'Nara'],
-  'yukina-toyama':  ['Takaoka', 'Imizu', 'Kurobe'],            // Takaoka = 41 %
-  'yukina-niigata': ['Nagaoka', 'Sanjō', 'Tsubame'],
-  'yukina-nagasaki':['Isahaya', 'Ōmura', 'Sasebo'],
-  'yukina-fukuoka': ['Kasuga', 'Dazaifu', 'Itoshima', 'Munakata'],
-  'yukina-yamagata':['Tendō', 'Higashine'],
+  'yukina-okayama': ['Kurashiki', '倉敷', 'Sōja', '総社', 'Tamano', '玉野'],   // Kurashiki = 67 %
+  'yukina-nagoya':  ['Toyota', '豊田', 'Okazaki', '岡崎', 'Ichinomiya', '一宮', 'Kasugai', '春日井', 'Gifu', '岐阜'],
+  'yukina-osaka':   ['Sakai', '堺', 'Higashiōsaka', '東大阪', 'Toyonaka', '豊中', 'Suita', '吹田', 'Hirakata', '枚方'],
+  'yukina-kyoto':   ['Uji', '宇治', 'Nara', '奈良'],
+  'yukina-toyama':  ['Takaoka', '高岡', 'Imizu', '射水', 'Kurobe', '黒部'],     // Takaoka = 41 %
+  'yukina-niigata': ['Nagaoka', '長岡', 'Sanjō', '三条', 'Tsubame', '燕'],
+  'yukina-nagasaki':['Isahaya', '諫早', 'Ōmura', '大村', 'Sasebo', '佐世保'],
+  'yukina-fukuoka': ['Kasuga', '春日', 'Dazaifu', '太宰府', 'Itoshima', '糸島', 'Munakata', '宗像'],
+  'yukina-yamagata':['Tendō', '天童', 'Higashine', '東根'],
 
   // --- Poland ---
   'yukina-pl-gdansk':       ['Gdynia', 'Sopot', 'Rumia', 'Wejherowo'],  // Gdynia = 52 %
@@ -74,10 +75,10 @@ const SEED: Record<string, string[]> = {
   'yukina-ee-ida-viru': ['Narva', 'Kohtla-Järve', 'Jõhvi', 'Sillamäe'],
 
   // --- Taiwan ---
-  'yukina-tw-taipei':    ['New Taipei', 'Keelung', 'Taoyuan'],
-  'yukina-tw-taichung':  ['Changhua'],
-  'yukina-tw-kaohsiung': ['Pingtung'],
-  'yukina-tw-hsinchu':   ['Miaoli'],
+  'yukina-tw-taipei':    ['New Taipei', '新北市', 'Keelung', '基隆', 'Taoyuan', '桃園'],
+  'yukina-tw-taichung':  ['Changhua', '彰化'],
+  'yukina-tw-kaohsiung': ['Pingtung', '屏東'],
+  'yukina-tw-hsinchu':   ['Miaoli', '苗栗'],
 };
 
 // ---------------------------------------------------------------------------
