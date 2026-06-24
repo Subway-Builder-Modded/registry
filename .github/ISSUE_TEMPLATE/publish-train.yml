@@ -1,0 +1,128 @@
+name: Publish New Train
+description: Submit a new train to The Railyard registry.
+title: "[Publish Train]: "
+labels: ["publish-train"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Publish a New Train
+
+        Fill out the form below to submit your train to The Railyard. A pull request will be automatically created for review.
+
+        If validation fails, you can edit this issue and comment **revalidate** to retry.
+
+        The train should be formatted in JSON like below following the schema defined [here](https://www.subwaybuilder.com/docs/v1.0.0/api-reference/trains#train-type-properties).
+
+        ```json
+        {
+          "id": "commuter-rail",
+          "name": "Commuter Rail",
+          "description": "High-capacity regional rail for longer distances",
+          "stats": {
+            "maxAcceleration": 0.8,
+            "maxDeceleration": 1.0,
+            "maxSpeed": 40,
+            "maxSpeedLocalStation": 15,
+            "capacityPerCar": 150,
+            "carLength": 25,
+            "minCars": 4,
+            "maxCars": 12,
+            "carsPerCarSet": 2,
+            "carCost": 3000000,
+            "trainWidth": 3.2,
+            "minStationLength": 200,
+            "maxStationLength": 400,
+            "baseTrackCost": 40000,
+            "baseStationCost": 60000000,
+            "trainOperationalCostPerHour": 600,
+            "carOperationalCostPerHour": 60,
+            "scissorsCrossoverCost": 20000000
+          },
+          "compatibleTrackTypes": ["commuter-rail"],
+          "appearance": {
+            "color": "#8b5cf6"
+          }
+        }
+        ```
+
+  - type: textarea
+    id: trainJSON
+    attributes:
+      label: Train JSON
+      description: >
+        The JSON configuration for your train model. This will be used to define the train's properties and behavior. **DO NOT USE MARKDOWN FORMATTING, JUST COPY AND PASTE.**
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Categories
+
+        Categorization will help users filter and find your train according to set characteristics. Please select a value for all categories.
+
+  - type: dropdown
+    id: category-type
+    attributes:
+      label: Categories - Type
+      description: Select the type of train you are submitting.
+      options:
+        - ""
+        - "metro"
+        - "commuter"
+        - "intercity"
+        - "lrt"
+        - "tram"
+        - "other"
+      validations:
+        required: true
+  
+  - type: dropdown
+    id: category-usage
+    attributes:
+      label: Categories - Speed
+      description: Select the speed category that best describes your train, relative to its type (a medium-speed commuter rail train is not the same as a medium-speed tram).
+      options:
+        - ""
+        - "high"
+        - "medium"
+        - "low"
+      validations:
+        required: true
+
+  - type: dropdown
+    id: category-capacity
+    attributes:
+      label: Categories - Capacity
+      description: Select the capacity category that best describes your train, relative to its type (a high-capacity tram is not the same as a high-capacity intercity train).
+      options:
+        - ""
+        - "high"
+        - "medium"
+        - "low"
+      validations:
+        required: true
+
+  - type: dropdown
+    id: category-Locale
+    attributes:
+      label: Categories - Locale
+      description: Select the region of the world that your train is designed for/used in.
+      options:
+        - ""
+        - "caribbean"
+        - "central-america"
+        - "central-asia"
+        - "east-africa"
+        - "east-asia"
+        - "europe"
+        - "middle-east"
+        - "north-africa"
+        - "north-america"
+        - "oceania"
+        - "south-america"
+        - "south-asia"
+        - "southeast-asia"
+        - "southern-africa"
+        - "west-africa"
+      validations:
+        required: true
