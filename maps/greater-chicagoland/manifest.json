@@ -42,7 +42,14 @@
     "entertainment",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "GCHI.pmtiles": 250.2,
+    "buildings_index.json": 503.03,
+    "config.json": 0,
+    "demand_data.json": 95.14,
+    "roads.geojson": 72.05,
+    "runways_taxiways.geojson": 2.2
+  },
   "included_cities": [
     "Gary",
     "Aurora",
@@ -51,5 +58,91 @@
     "McHenry",
     "Crystal Lake",
     "Elgin"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.44751408865074366,
+      "p25": 0.5037796245716002,
+      "p50": 0.5467739741291792,
+      "p75": 0.5941634781027795,
+      "p90": 0.6395003013356182,
+      "mean": 0.5431284227441412
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.2252460029706681,
+      "p25": 0.30410241509656843,
+      "p50": 0.48542266107967125,
+      "p75": 0.5589209539971703,
+      "p90": 0.6183242261488793,
+      "mean": 0.43950378735412754
+    },
+    "commuteDistanceKm": {
+      "p10": 8249,
+      "p25": 16442,
+      "p50": 30550,
+      "p75": 50297,
+      "p90": 69663,
+      "mean": 35516.10457391082
+    },
+    "residentCellDensity": {
+      "p10": 13,
+      "p25": 45,
+      "p50": 171,
+      "p75": 505,
+      "p90": 1103,
+      "mean": 450.9956340956341
+    },
+    "workerCellDensity": {
+      "p10": 5,
+      "p25": 18,
+      "p50": 75,
+      "p75": 365,
+      "p90": 1001,
+      "mean": 557.8167673910248
+    },
+    "detail": {
+      "radiusKm": 0.5151858669751078,
+      "expectedPointSpacingKm": 0.7904084064175392,
+      "normalizedRadius": 0.6517970492117426,
+      "activityPerPoint": 267.7476704720765,
+      "playableAreaKm2": 8400,
+      "playableAreaPerPointKm2": 0.5183585313174947,
+      "playableCatchmentRadiusKm": 0.40620025246923297,
+      "localityScore": 0.34163540481508486,
+      "deaggregationScore": 1,
+      "score": 0.5844958552591155
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9974515647947846,
+        "continuousScore": 0.8259501726129745,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9949160856159658,
+        "largestCenterShare": 0.5252410142685241,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -88.01306798259887,
+            "latitude": 41.98007091953144,
+            "massShare": 0.5252410142685241,
+            "assignedMass": 4557885,
+            "assignedPointCount": 9830,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": -87.66965656756109,
+            "latitude": 41.80599218804234,
+            "massShare": 0.4747589857314759,
+            "assignedMass": 4119817,
+            "assignedPointCount": 5726,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1782327857
 }
