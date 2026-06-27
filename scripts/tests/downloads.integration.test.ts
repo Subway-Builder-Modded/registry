@@ -547,6 +547,73 @@ test("full mode preserves previous integrity and downloads when a GitHub repo is
   });
 });
 
+test("custom-update maps can use game_version from the custom JSON without a release manifest", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("maps", ["custom-json-map"]);
+    writeIndex("mods", []);
+    writeManifest("maps", "custom-json-map", {
+      ...makeBaseMapManifest("custom-json-map"),
+      update: { type: "custom", url: "https://example.com/custom-json-map-update.json" },
+    });
+
+    const validZip = await makeMapZip("ABC", "1.0.0");
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://example.com/custom-json-map-update.json",
+        handle: () => jsonResponse({
+          schema_version: 1,
+          versions: [
+            {
+              version: "1.0.0",
+              game_version: "<=1.4.0",
+              date: "2026-06-24",
+              download: "https://github.com/Owner/CustomJsonMap/releases/download/v1.0.0/map.zip",
+              sha256: "sha-custom-json-map",
+            },
+          ],
+        }),
+      },
+      {
+        match: (url) => url === "https://downloads.example.com/map.zip",
+        handle: () => new Response(new Uint8Array(validZip)),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "map.zip", downloadCount: 11, downloadUrl: "https://downloads.example.com/map.zip" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "map",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.equal(result.integrity.listings["custom-json-map"]?.versions["1.0.0"]?.is_complete, true);
+    assert.equal(result.downloads["custom-json-map"]?.["1.0.0"], 10);
+  });
+});
+
 test("custom versions sharing the same release asset reuse a single ZIP inspection", async () => {
   await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
     writeIndex("mods", ["shared-asset-mod"]);

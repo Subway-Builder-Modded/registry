@@ -32,6 +32,7 @@ export interface CustomVersionCandidate {
   // Author-declared release date ("YYYY-MM-DD") from the custom update JSON, used
   // to derive last_updated. Null when absent or malformed.
   date: string | null;
+  gameMeta?: ManifestGameDependency;
   errors: string[];
 }
 
@@ -464,6 +465,20 @@ export async function fetchCustomVersions(
       : null;
     const rawDate = (entry as { date?: unknown }).date;
     const date = isNonEmptyString(rawDate) ? normalizeWhitespace(rawDate) : null;
+    const rawGameVersion = (entry as { game_version?: unknown }).game_version;
+    const gameVersion = isNonEmptyString(rawGameVersion) ? normalizeWhitespace(rawGameVersion) : undefined;
+    const rawDependencies = (entry as { dependencies?: unknown }).dependencies;
+    const dependencies = (
+      typeof rawDependencies === "object"
+      && rawDependencies !== null
+      && !Array.isArray(rawDependencies)
+    )
+      ? Object.fromEntries(
+        Object.entries(rawDependencies as Record<string, unknown>)
+          .filter(([, value]) => typeof value === "string")
+          .map(([key, value]) => [key, value as string]),
+      )
+      : undefined;
 
     const parsed = downloadUrl ? parseGitHubReleaseAssetDownloadUrl(downloadUrl) : null;
     const parsedManifest = manifestUrl ? parseGitHubReleaseAssetDownloadUrl(manifestUrl) : null;
@@ -486,6 +501,9 @@ export async function fetchCustomVersions(
       manifestUrl,
       parsedManifest,
       date,
+      gameMeta: gameVersion || dependencies
+        ? { game_version: gameVersion, dependencies }
+        : undefined,
       errors,
     });
   }

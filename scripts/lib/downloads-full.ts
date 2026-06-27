@@ -801,6 +801,7 @@ export async function generateDownloadsDataFull(
                     fingerprint,
                     nowIso,
                     releaseSizeMiB,
+                    candidate.gameMeta,
                   );
                   versionEntries[versionKey] = result;
                   nextListingCacheEntries[versionKey] = {
