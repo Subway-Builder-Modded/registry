@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-27T10:22:19.492Z",
+  "generated_at": "2026-06-27T13:35:58.078Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -1055,99 +1055,18 @@
     },
     "bucharest-medium": {
       "has_complete_version": false,
-      "latest_semver_version": "v1.1.1",
+      "latest_semver_version": "1.1.2",
       "latest_semver_complete": false,
       "complete_versions": [],
       "incomplete_versions": [
-        "v1.1.1"
+        "1.1.2"
       ],
-      "last_updated": 1774976123,
+      "last_updated": 1782518400,
       "versions": {
-        "BUC-1.0": {
+        "1.1.2": {
           "is_complete": false,
           "errors": [
-            "non-semver release tag 'BUC-1.0'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
-          "source": {
-            "update_type": "github",
-            "repo": "metatablestudios/subwaybuilder-romania",
-            "tag": "BUC-1.0"
-          },
-          "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:BUC-1.0:BUC.zip",
-          "checked_at": "2026-06-21T07:16:20.303Z",
-          "release_size": 40.39
-        },
-        "BUC-1.1": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'BUC-1.1'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
-          "source": {
-            "update_type": "github",
-            "repo": "metatablestudios/subwaybuilder-romania",
-            "tag": "BUC-1.1"
-          },
-          "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:BUC-1.1:BUC.zip",
-          "checked_at": "2026-06-21T07:16:20.303Z",
-          "release_size": 39.15
-        },
-        "IAS-0.1": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'IAS-0.1'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
-          "source": {
-            "update_type": "github",
-            "repo": "metatablestudios/subwaybuilder-romania",
-            "tag": "IAS-0.1"
-          },
-          "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:IAS-0.1:IAS.zip",
-          "checked_at": "2026-06-21T07:16:20.303Z",
-          "release_size": 6.59
-        },
-        "v1.0": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'v1.0'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
-          "source": {
-            "update_type": "github",
-            "repo": "metatablestudios/subwaybuilder-romania",
-            "tag": "v1.0"
-          },
-          "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:v1.0:BUC.zip|CLJ.zip",
-          "checked_at": "2026-06-21T07:16:20.303Z"
-        },
-        "v1.1": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'v1.1'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
-          "source": {
-            "update_type": "github",
-            "repo": "metatablestudios/subwaybuilder-romania",
-            "tag": "v1.1"
-          },
-          "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:v1.1:BUC.zip|CLJ.zip|GLT.zip|IAS.zip",
-          "checked_at": "2026-06-21T07:16:20.303Z"
-        },
-        "v1.1.1": {
-          "is_complete": false,
-          "errors": [
-            "asset 'BUC.zip': config.json version '1.1' does not match release tag 'v1.1.1' (expected '1.1.1')",
-            "asset 'CLJ.zip': config.json version '1.0' does not match release tag 'v1.1.1' (expected '1.1.1')",
-            "asset 'GLT.zip': config.json version '1.0' does not match release tag 'v1.1.1' (expected '1.1.1')",
-            "asset 'IAS.zip': config.json version '1.0' does not match release tag 'v1.1.1' (expected '1.1.1')"
+            "no game_version found (declare a \"subway-builder\" dependency range in the release manifest.json)"
           ],
           "required_checks": {
             "config_json": true,
@@ -1157,30 +1076,39 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true,
+            "game_version_valid": false
           },
           "matched_files": {
             "config_json": "config.json",
             "demand_data": "demand_data.json",
             "demand_point_spacing": "demand_data.json",
             "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
-            "city_pmtiles": "IAS.pmtiles",
-            "config_version_matches_tag": null,
-            "buildings_index_json": "buildings_index.json",
-            "buildings_index_bin": null
+            "city_pmtiles": "BUC.pmtiles",
+            "config_version_matches_tag": "config.json"
           },
-          "release_size": 6.74,
+          "release_size": 36.47,
+          "file_sizes": {
+            "BUC.pmtiles": 23.43,
+            "buildings_index.json": 51.37,
+            "config.json": 0,
+            "demand_data.json": 9.09,
+            "roads.geojson": 9.86,
+            "runways_taxiways.geojson": 0.33
+          },
           "source": {
-            "update_type": "github",
+            "update_type": "custom",
             "repo": "metatablestudios/subwaybuilder-romania",
-            "tag": "v1.1.1",
-            "asset_name": "IAS.zip",
-            "download_url": "https://github.com/metatablestudios/subwaybuilder-romania/releases/download/v1.1.1/IAS.zip"
+            "tag": "v1.1.2",
+            "asset_name": "BUC.zip",
+            "download_url": "https://github.com/metatablestudios/subwaybuilder-romania/releases/download/v1.1.2/BUC.zip"
           },
-          "fingerprint": "rules:v6:github:metatablestudios/subwaybuilder-romania:v1.1.1:BUC.zip|CLJ.zip|GLT.zip|IAS.zip",
-          "checked_at": "2026-06-21T07:16:20.303Z"
+          "fingerprint": "rules:v6:sha256:7d2ceb2bfb2accf5d9491b18d9c12922af96b701b7fbcff42dc0608c9737cfbf",
+          "checked_at": "2026-06-27T13:35:58.078Z"
         }
       }
     },
