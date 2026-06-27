@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-27T13:35:58.078Z",
+  "generated_at": "2026-06-27T14:05:08.487Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -1055,10 +1055,11 @@
     },
     "bucharest-medium": {
       "has_complete_version": false,
-      "latest_semver_version": "1.1.2",
+      "latest_semver_version": "1.1.3",
       "latest_semver_complete": false,
       "complete_versions": [],
       "incomplete_versions": [
+        "1.1.3",
         "1.1.2"
       ],
       "last_updated": 1782518400,
@@ -1109,6 +1110,44 @@
           },
           "fingerprint": "rules:v6:sha256:7d2ceb2bfb2accf5d9491b18d9c12922af96b701b7fbcff42dc0608c9737cfbf",
           "checked_at": "2026-06-27T13:35:58.078Z"
+        },
+        "1.1.3": {
+          "is_complete": false,
+          "errors": [
+            "config.json version '1.1.2' does not match release tag '1.1.3' (expected '1.1.3')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "BUC.pmtiles",
+            "config_version_matches_tag": null
+          },
+          "release_size": 36.47,
+          "source": {
+            "update_type": "custom",
+            "repo": "metatablestudios/subwaybuilder-romania",
+            "tag": "v1.1.3",
+            "asset_name": "BUC.zip",
+            "download_url": "https://github.com/metatablestudios/subwaybuilder-romania/releases/download/v1.1.3/BUC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:7d2ceb2bfb2accf5d9491b18d9c12922af96b701b7fbcff42dc0608c9737cfbf",
+          "checked_at": "2026-06-27T14:05:08.487Z"
         }
       }
     },
