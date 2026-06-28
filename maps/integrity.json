@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-06-28T02:22:06.005Z",
+  "generated_at": "2026-06-28T03:10:13.206Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -6399,8 +6399,8 @@
     },
     "jelegend-tokyo": {
       "has_complete_version": true,
-      "latest_semver_version": "v0.5.0",
-      "latest_semver_complete": true,
+      "latest_semver_version": "v0.6.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "v0.5.0",
         "v0.4.0",
@@ -6408,9 +6408,10 @@
         "v0.1.0"
       ],
       "incomplete_versions": [
+        "v0.6.0",
         "v0.2.0"
       ],
-      "last_updated": 1776586675,
+      "last_updated": 1782615197,
       "versions": {
         "v0.1.0": {
           "is_complete": true,
@@ -6632,6 +6633,58 @@
           },
           "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.5.0:TYO.zip",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "v0.6.0": {
+          "is_complete": false,
+          "errors": [
+            "no game_version found (declare a \"subway-builder\" dependency range in the release manifest.json)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true,
+            "game_version_valid": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TYO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 214.15,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 2.44,
+            "TYO.pmtiles": 172.67,
+            "buildings_index.json": 185.64,
+            "config.json": 0,
+            "demand_data.json": 53.75,
+            "manifest.json": 0,
+            "ocean_depth_index.json": 3.59,
+            "roads.geojson": 22.81,
+            "runways_taxiways.geojson": 1.11,
+            "thumbnail.svg": 0.15,
+            "water.geojson": 9.85
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "jelegend/subwaybuilder",
+            "tag": "v0.6.0",
+            "asset_name": "TYO.zip",
+            "download_url": "https://github.com/jelegend/subwaybuilder/releases/download/v0.6.0/TYO.zip"
+          },
+          "fingerprint": "rules:v6:github:jelegend/subwaybuilder:v0.6.0:TYO.zip",
+          "checked_at": "2026-06-28T03:10:13.206Z"
         }
       }
     },
@@ -24541,9 +24594,10 @@
     },
     "yukina-wakkanai": {
       "has_complete_version": true,
-      "latest_semver_version": "0.2.0",
+      "latest_semver_version": "0.2.1",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.2.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
@@ -24693,6 +24747,56 @@
           },
           "fingerprint": "rules:v6:sha256:971da3464eee7d91ff5612defe93098fe6ff4db50bd1eefb44507c41fdbc5e9b",
           "checked_at": "2026-06-28T02:22:06.005Z"
+        },
+        "0.2.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "WKJ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 43.8,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 4,
+            ".railyard_map/special_demand_points.json": 0.02,
+            ".railyard_map/special_demand_types.json": 0.06,
+            "WKJ.pmtiles": 22.85,
+            "buildings_index.bin.gz": 4.77,
+            "buildings_index.json": 12.03,
+            "config.json": 0.01,
+            "demand_data.json": 8.06,
+            "ocean_depth_index.json": 47.02,
+            "roads.geojson": 2.85,
+            "runways_taxiways.geojson": 0.09
+          },
+          "game_version": ">1.3.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-jp-maps",
+            "tag": "0.4.1",
+            "asset_name": "WKJ.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.1/WKJ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:c84ae687825b0fdb664dd8ab8fea20647c17e66b5edce9dbf4f67d555b87ecb8",
+          "checked_at": "2026-06-28T03:10:13.206Z"
         }
       }
     },
