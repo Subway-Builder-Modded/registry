@@ -1154,7 +1154,8 @@ export declare const MapManifestSchema: z.ZodObject<{
     data_source: z.ZodString;
     source_quality: z.ZodEnum<["low-quality", "medium-quality", "high-quality"]>;
     level_of_detail: z.ZodEnum<["low-detail", "medium-detail", "high-detail"]>;
-    location: z.ZodEnum<["caribbean", "central-america", "central-asia", "east-africa", "east-asia", "europe", "middle-east", "north-africa", "north-america", "oceania", "south-america", "south-asia", "southeast-asia", "southern-africa", "west-africa"]>;
+    location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
+    sub_location: z.ZodOptional<z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
     file_sizes: z.ZodRecord<z.ZodString, z.ZodNumber>;
     included_cities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
@@ -1192,7 +1193,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
     level_of_detail: "low-detail" | "medium-detail" | "high-detail";
-    location: "caribbean" | "central-america" | "central-asia" | "east-africa" | "east-asia" | "europe" | "middle-east" | "north-africa" | "north-america" | "oceania" | "south-america" | "south-asia" | "southeast-asia" | "southern-africa" | "west-africa";
+    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
@@ -1274,6 +1275,7 @@ export declare const MapManifestSchema: z.ZodObject<{
             };
         };
     } | undefined;
+    sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
     included_cities?: string[] | undefined;
 }, {
     schema_version: 1;
@@ -1309,7 +1311,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
     level_of_detail: "low-detail" | "medium-detail" | "high-detail";
-    location: "caribbean" | "central-america" | "central-asia" | "east-africa" | "east-asia" | "europe" | "middle-east" | "north-africa" | "north-america" | "oceania" | "south-america" | "south-asia" | "southeast-asia" | "southern-africa" | "west-africa";
+    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
@@ -1391,6 +1393,7 @@ export declare const MapManifestSchema: z.ZodObject<{
             };
         };
     } | undefined;
+    sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
     included_cities?: string[] | undefined;
 }>;
 export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
@@ -1867,7 +1870,8 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     data_source: z.ZodString;
     source_quality: z.ZodEnum<["low-quality", "medium-quality", "high-quality"]>;
     level_of_detail: z.ZodEnum<["low-detail", "medium-detail", "high-detail"]>;
-    location: z.ZodEnum<["caribbean", "central-america", "central-asia", "east-africa", "east-asia", "europe", "middle-east", "north-africa", "north-america", "oceania", "south-america", "south-asia", "southeast-asia", "southern-africa", "west-africa"]>;
+    location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
+    sub_location: z.ZodOptional<z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
     file_sizes: z.ZodRecord<z.ZodString, z.ZodNumber>;
     included_cities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
@@ -1905,7 +1909,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
     level_of_detail: "low-detail" | "medium-detail" | "high-detail";
-    location: "caribbean" | "central-america" | "central-asia" | "east-africa" | "east-asia" | "europe" | "middle-east" | "north-africa" | "north-america" | "oceania" | "south-america" | "south-asia" | "southeast-asia" | "southern-africa" | "west-africa";
+    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
@@ -1987,6 +1991,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
             };
         };
     } | undefined;
+    sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
     included_cities?: string[] | undefined;
 }, {
     schema_version: 1;
@@ -2022,7 +2027,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
     level_of_detail: "low-detail" | "medium-detail" | "high-detail";
-    location: "caribbean" | "central-america" | "central-asia" | "east-africa" | "east-asia" | "europe" | "middle-east" | "north-africa" | "north-america" | "oceania" | "south-america" | "south-asia" | "southeast-asia" | "southern-africa" | "west-africa";
+    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
@@ -2104,6 +2109,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
             };
         };
     } | undefined;
+    sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
     included_cities?: string[] | undefined;
 }>, z.ZodObject<{
     schema_version: z.ZodLiteral<1>;

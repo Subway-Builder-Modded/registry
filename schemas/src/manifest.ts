@@ -137,6 +137,10 @@ export const MapManifestSchema = BaseManifestSchema.extend({
   source_quality: SourceQualitySchema,
   level_of_detail: LevelOfDetailSchema,
   location: LocationTagSchema,
+  // Populated during the europe→sub-region migration. New app reads
+  // sub_location ?? location; old apps (≤0.2.3) read location and still see
+  // "europe". Removed once location is updated to the sub-region directly.
+  sub_location: LocationTagSchema.optional(),
   special_demand: z.array(SpecialDemandTagSchema).refine(
     (a) => new Set(a).size === a.length,
     { message: "special_demand must be unique" },
