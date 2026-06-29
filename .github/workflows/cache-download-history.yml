@@ -3,8 +3,8 @@ name: Cache Download History
 on:
   schedule:
     # Fallback: fires if the Cloudflare Worker (workers/scheduler) misses the 04:00 UTC slot.
-    # Staggered to 04:43 to avoid GitHub's :00 queue congestion.
-    - cron: "43 4 * * *"
+    # Staggered to 04:20 to avoid GitHub's :00 queue congestion.
+    - cron: "20 4 * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,36 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  should-run:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CUTOFF_EPOCH=$(( $(date -u +%s) - 720 * 60 ))
+          RECENT=$(gh api \
+            "repos/${{ github.repository }}/actions/workflows/cache-download-history.yml/runs?per_page=10&exclude_pull_requests=true" \
+            --jq '[.workflow_runs[] | select(
+              .event == "workflow_dispatch" and
+              (.status == "in_progress" or .status == "queued" or .conclusion == "success")
+            ) | .created_at] | first // ""')
+          if [ -n "${RECENT}" ] && \
+             [ "$(date -u -d "${RECENT}" +%s)" -ge "${CUTOFF_EPOCH}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping: Worker dispatch found at ${RECENT}."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   cache-history:
+    needs: [should-run]
+    if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

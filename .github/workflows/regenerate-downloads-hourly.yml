@@ -3,8 +3,8 @@ name: Regenerate Download Counts (Hourly)
 on:
   schedule:
     # Fallback: fires if the Cloudflare Worker (workers/scheduler) misses an hour.
-    # Staggered to :23 to avoid GitHub's :00 queue congestion.
-    - cron: "23 * * * *"
+    # Staggered to :20 to avoid GitHub's :00 queue congestion.
+    - cron: "20 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -12,11 +12,40 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: regenerate-registry-analytics
+  group: regenerate-downloads-hourly
   cancel-in-progress: false
 
 jobs:
+  should-run:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CUTOFF_EPOCH=$(( $(date -u +%s) - 30 * 60 ))
+          RECENT=$(gh api \
+            "repos/${{ github.repository }}/actions/workflows/regenerate-downloads-hourly.yml/runs?per_page=10&exclude_pull_requests=true" \
+            --jq '[.workflow_runs[] | select(
+              .event == "workflow_dispatch" and
+              (.status == "in_progress" or .status == "queued" or .conclusion == "success")
+            ) | .created_at] | first // ""')
+          if [ -n "${RECENT}" ] && \
+             [ "$(date -u -d "${RECENT}" +%s)" -ge "${CUTOFF_EPOCH}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping: Worker dispatch found at ${RECENT}."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   generate-maps:
+    needs: [should-run]
+    if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
     runs-on: ubuntu-latest
     outputs:
       warnings_json: ${{ steps.generate_map_downloads.outputs.warnings_json }}
@@ -56,6 +85,8 @@ jobs:
           if-no-files-found: error
 
   generate-mods:
+    needs: [should-run]
+    if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
     runs-on: ubuntu-latest
     outputs:
       warnings_json: ${{ steps.generate_mod_downloads.outputs.warnings_json }}

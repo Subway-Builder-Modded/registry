@@ -3,8 +3,8 @@ name: Cache Website Analytics
 on:
   schedule:
     # Fallback: fires if the Cloudflare Worker (workers/scheduler) misses an hour.
-    # Staggered to :47 to spread load from the fallback downloads run (:23).
-    - cron: "47 * * * *"
+    # Staggered to :40 to spread load from the fallback downloads run (:20).
+    - cron: "40 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -16,7 +16,36 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  should-run:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CUTOFF_EPOCH=$(( $(date -u +%s) - 30 * 60 ))
+          RECENT=$(gh api \
+            "repos/${{ github.repository }}/actions/workflows/cache-website-analytics.yml/runs?per_page=10&exclude_pull_requests=true" \
+            --jq '[.workflow_runs[] | select(
+              .event == "workflow_dispatch" and
+              (.status == "in_progress" or .status == "queued" or .conclusion == "success")
+            ) | .created_at] | first // ""')
+          if [ -n "${RECENT}" ] && \
+             [ "$(date -u -d "${RECENT}" +%s)" -ge "${CUTOFF_EPOCH}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping: Worker dispatch found at ${RECENT}."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
   cache-analytics:
+    needs: [should-run]
+    if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
