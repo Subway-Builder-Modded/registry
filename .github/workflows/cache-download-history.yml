@@ -2,7 +2,8 @@ name: Cache Download History
 
 on:
   schedule:
-    # Off-peak minute and off-midnight hour; lands near the historical ~05:00Z window.
+    # Fallback: fires if the Cloudflare Worker (workers/scheduler) misses the 04:00 UTC slot.
+    # Staggered to 04:43 to avoid GitHub's :00 queue congestion.
     - cron: "43 4 * * *"
   workflow_dispatch:
 

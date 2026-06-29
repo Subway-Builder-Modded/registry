@@ -2,7 +2,8 @@ name: Regenerate Download Counts (Hourly)
 
 on:
   schedule:
-    # Off-peak minute: GitHub throttles/drops :00 (and :30) schedules under load.
+    # Fallback: fires if the Cloudflare Worker (workers/scheduler) misses an hour.
+    # Staggered to :23 to avoid GitHub's :00 queue congestion.
     - cron: "23 * * * *"
   workflow_dispatch:
 

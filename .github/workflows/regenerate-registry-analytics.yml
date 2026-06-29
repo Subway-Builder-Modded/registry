@@ -2,7 +2,8 @@ name: Regenerate Registry Analytics (Full)
 
 on:
   schedule:
-    # Off-peak minute: GitHub throttles/drops :00 schedules under load.
+    # Fallback: fires if the Cloudflare Worker (workers/scheduler) misses a 4-hour slot.
+    # Staggered to :13 to avoid GitHub's :00 queue congestion.
     - cron: "13 */4 * * *"
   workflow_dispatch:
     inputs:

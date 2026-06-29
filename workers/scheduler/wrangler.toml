@@ -1,0 +1,9 @@
+name = "railyard-scheduler"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+
+# Fires every hour on the hour (UTC). The handler fans out to the appropriate
+# workflows based on the current hour. GH native `schedule` triggers remain
+# active as a fallback — they fire ~13-47 min later and are idempotent.
+[triggers]
+crons = ["0 * * * *"]
