@@ -127,6 +127,7 @@ jobs:
 
   commit:
     needs: [generate-maps, generate-mods]
+    if: "!cancelled() && needs.generate-maps.result == 'success' && needs.generate-mods.result == 'success'"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
