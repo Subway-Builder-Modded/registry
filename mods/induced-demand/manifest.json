@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "id": "induced-demand",
+  "name": "Induced Demand",
+  "author": "martig7",
+  "github_id": 143552868,
+  "description": "A Subway Builder mod that models long-run, transit-induced demand: over time it grows residential and commercial demand around well-served stations by adding commuter pops.\n\nEach in-game day the engine runs one pass over every demand point:\n\n1. **Score**: how transit-attractive the point is, in `[0, 1]`:\n   `score = access × (FLOOR + (1 − FLOOR) × transitFraction)`.\n   - **access** is a walk-time Gaussian decay within the station catchment, boosted by how\n     many distinct lines are reachable (connectivity).\n   - **transitFraction** is the point's current transit mode share.\n   - The `MODE_SHARE_FLOOR` (0.5) makes *access* the dominant term: a well-served point still\n     scores half its access even at zero current ridership, so demand can grow near new transit\n     before riders have shown up. Mode share modulates within `[FLOOR, 1]`.\n2. **Cap & growth**: each point has a soft ceiling `cap = baseline × (1 + K_MAX × score)`\n   and grows **logistically** toward it. High-score points can gain the most; unserved\n   points (score 0) don't grow.\n3. **Net-equal, gravity-paired**: added residents always equal added jobs. New demand is\n   created as 200-person pops that are gravity-matched into home-job pairs.\n4. **Decay** *(limited, see Status at full readme)*: designed to slowly shrink induced demand when a\n   point loses service.\n\nThe mod adds an **Induced Demand** toolbar panel that renders demand points as circles on\nthe map:\n\n- **Show**: On / Off.\n- **View**:\n  - **Realized**: the demand the mod has actually added so far (from its induced pops).\n  - **Targeting**: the model's per-point transit score.\n- **Metric**: Residential / Commercial / Both.\n- A legend showing the value scale.\n- **Clear induced demand**: a two-click reset that wipes the mod's added demand. Because\n  pops can't be safely deleted mid-simulation, it queues the clear and applies it on the\n  next reload.",
+  "tags": [
+    "cosmetic",
+    "gameplay",
+    "ui"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/martig7/Induced-Demand",
+  "update": {
+    "type": "github",
+    "repo": "martig7/Induced-Demand"
+  }
+}
