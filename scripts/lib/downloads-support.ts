@@ -392,12 +392,20 @@ export async function fetchZipBuffer(
   }
 }
 
+export type CustomVersionFetchResult =
+  | { transientError: true; versions: [] }
+  | { transientError: false; versions: CustomVersionCandidate[] };
+
+function isTransientCustomFetchStatus(status: number): boolean {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
+}
+
 export async function fetchCustomVersions(
   listingId: string,
   updateUrl: string,
   fetchImpl: typeof fetch,
   warnings: string[],
-): Promise<CustomVersionCandidate[]> {
+): Promise<CustomVersionFetchResult> {
   let response: Response;
   try {
     response = await fetchWithTimeout(
@@ -416,11 +424,12 @@ export async function fetchCustomVersions(
     );
   } catch (error) {
     warnListing(warnings, listingId, `custom update JSON fetch failed (${(error as Error).message})`);
-    return [];
+    return { transientError: true, versions: [] };
   }
   if (!response.ok) {
-    warnListing(warnings, listingId, `custom update JSON returned HTTP ${response.status}`);
-    return [];
+    const transientError = isTransientCustomFetchStatus(response.status);
+    warnListing(warnings, listingId, `custom update JSON returned HTTP ${response.status}${transientError ? " (transient; previous counts preserved)" : ""}`);
+    return { transientError, versions: [] };
   }
 
   let body: unknown;
@@ -428,18 +437,18 @@ export async function fetchCustomVersions(
     body = await response.json();
   } catch {
     warnListing(warnings, listingId, "custom update JSON is not valid JSON");
-    return [];
+    return { transientError: false, versions: [] };
   }
 
   if (typeof body !== "object" || body === null || Array.isArray(body)) {
     warnListing(warnings, listingId, "custom update JSON must be an object");
-    return [];
+    return { transientError: false, versions: [] };
   }
 
   const versions = (body as { versions?: unknown }).versions;
   if (!Array.isArray(versions)) {
     warnListing(warnings, listingId, "custom update JSON missing versions array");
-    return [];
+    return { transientError: false, versions: [] };
   }
 
   const candidates: CustomVersionCandidate[] = [];
@@ -508,7 +517,7 @@ export async function fetchCustomVersions(
     });
   }
 
-  return candidates;
+  return { transientError: false, versions: candidates };
 }
 
 export function aggregateZipDownloadCountsByTag(releases: Array<{

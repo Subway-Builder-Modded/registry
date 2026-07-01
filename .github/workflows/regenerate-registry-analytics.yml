@@ -57,8 +57,32 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-  generate-maps:
+  await-bot-pr:
     needs: [should-run]
+    if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    steps:
+      - name: Wait for open bot PR to merge
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for i in $(seq 1 9); do
+            OPEN=$(gh pr list --repo "${{ github.repository }}" \
+              --head bot/regenerate-registry-analytics --state open \
+              --json number --jq 'length')
+            if [ "${OPEN}" = "0" ]; then
+              echo "No open bot PR; proceeding."
+              exit 0
+            fi
+            echo "Waiting for open bot PR to merge... (${i}/9)"
+            sleep 10
+          done
+          echo "Bot PR still open after 90s; proceeding anyway."
+
+  generate-maps:
+    needs: [should-run, await-bot-pr]
     if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
     runs-on: ubuntu-latest
     outputs:
@@ -115,7 +139,7 @@ jobs:
           if-no-files-found: error
 
   generate-mods:
-    needs: [should-run]
+    needs: [should-run, await-bot-pr]
     if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
     runs-on: ubuntu-latest
     outputs:
@@ -176,7 +200,7 @@ jobs:
           if-no-files-found: error
 
   generate-map-demand-stats:
-    needs: [should-run]
+    needs: [should-run, await-bot-pr]
     if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
     runs-on: ubuntu-latest
     outputs:

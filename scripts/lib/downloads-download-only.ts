@@ -70,8 +70,13 @@ export async function generateDownloadsDataDownloadOnly(
       continue;
     }
 
-    const customVersions = await fetchCustomVersions(id, manifest.update.url, fetchImpl, warnings);
-    for (const version of customVersions) {
+    const customFetch = await fetchCustomVersions(id, manifest.update.url, fetchImpl, warnings);
+    if (customFetch.transientError) {
+      downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
+      warnListing(warnings, id, "preserved previous custom-update downloads (transient fetch error)");
+      continue;
+    }
+    for (const version of customFetch.versions) {
       if (version.parsed) {
         repoSet.add(version.parsed.repo);
       }
@@ -83,7 +88,7 @@ export async function generateDownloadsDataDownloadOnly(
       update: {
         type: "custom",
         url: manifest.update.url,
-        versions: customVersions,
+        versions: customFetch.versions,
       },
     });
   }
