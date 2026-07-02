@@ -1,4 +1,5 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import { resolve } from "node:path";
 import {
   parseGalleryImages,
@@ -22,6 +23,7 @@ import {
   resolveManifestType,
 } from "./lib/manifests.js";
 import { resolveAndExtractDemandStatsForMapSource } from "./lib/map-demand-stats.js";
+import type { DemandStats } from "./lib/map-demand-stats.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
 import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import { ensureAuthorAliasPrefill } from "./lib/author-aliases.js";
@@ -77,14 +79,25 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
     getRequiredIssueValue("source_quality", data.source_quality),
   );
   const update = buildUpdate(data);
-  const demandStats = await resolveAndExtractDemandStatsForMapSource(
-    String(data["map-id"]),
-    update,
-    {
-      token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
-      requireResidentTotalsMatch: true,
-    },
-  );
+  const mapId = String(data["map-id"]);
+  let demandStats: DemandStats;
+  try {
+    const cached = JSON.parse(
+      readFileSync(resolve(os.tmpdir(), `railyard-publish-demand-stats-${mapId}.json`), "utf-8"),
+    ) as { mapId: string; stats: DemandStats };
+    if (cached.mapId !== mapId) throw new Error("mapId mismatch");
+    demandStats = cached.stats;
+    console.log(`[create-listing] Reusing demand stats from validate-publish step (mapId=${mapId}).`);
+  } catch {
+    demandStats = await resolveAndExtractDemandStatsForMapSource(
+      mapId,
+      update,
+      {
+        token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
+        requireResidentTotalsMatch: true,
+      },
+    );
+  }
 
   const includedCities = parseCommaSeparated(data["included-cities"]);
 

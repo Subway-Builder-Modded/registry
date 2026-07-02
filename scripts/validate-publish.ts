@@ -1,4 +1,5 @@
-import { existsSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
+import os from "node:os";
 import { resolve } from "node:path";
 import { z } from "zod";
 import { validateCustomUpdateUrl } from "./lib/custom-url.js";
@@ -197,7 +198,7 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
   );
   if (!hasUpdateFieldErrors) {
     try {
-      await resolveAndExtractDemandStatsForMapSource(
+      const demandStats = await resolveAndExtractDemandStatsForMapSource(
         id,
         parsed.data["update-type"] === "GitHub Releases"
           ? { type: "github", repo: parsed.data["github-repo"] as string }
@@ -206,6 +207,10 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
           token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
           requireResidentTotalsMatch: true,
         },
+      );
+      writeFileSync(
+        resolve(os.tmpdir(), `railyard-publish-demand-stats-${id}.json`),
+        JSON.stringify({ mapId: id, stats: demandStats }),
       );
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
@@ -234,8 +239,6 @@ async function main() {
       ...result.errors.map((e) => `- ${e}`),
     ].join("\n");
 
-    // Write error for the workflow to pick up
-    const { writeFileSync } = await import("node:fs");
     writeFileSync(resolve(REPO_ROOT, "scripts", "validation-error.md"), errorMessage);
     console.error(errorMessage);
     process.exit(1);

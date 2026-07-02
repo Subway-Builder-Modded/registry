@@ -126,6 +126,7 @@ async function main() {
     applyModTagUpdates(manifest as ModManifest, data);
   }
 
+  const originalUpdateJson = JSON.stringify(manifest.update);
   applyUpdateTypeChanges(manifest as ModManifest, data);
 
   if (manifestType === "map") {
@@ -134,21 +135,25 @@ async function main() {
     if (!mapManifest.file_sizes || typeof mapManifest.file_sizes !== "object" || Array.isArray(mapManifest.file_sizes)) {
       mapManifest.file_sizes = {};
     }
-    const demandStatsResult = await resolveDemandStatsForMapUpdate(
-      mapManifest.id,
-      mapManifest.update,
-      {
-        repoRoot: REPO_ROOT,
-        token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
-        sourceUrl: mapManifest.source,
-      },
-    );
-    const demandStats = demandStatsResult.stats;
-    mapManifest.population = demandStats.residents_total;
-    mapManifest.residents_total = demandStats.residents_total;
-    mapManifest.points_count = demandStats.points_count;
-    mapManifest.population_count = demandStats.population_count;
-    mapManifest.initial_view_state = demandStats.initial_view_state;
+    if (JSON.stringify(mapManifest.update) !== originalUpdateJson) {
+      const demandStatsResult = await resolveDemandStatsForMapUpdate(
+        mapManifest.id,
+        mapManifest.update,
+        {
+          repoRoot: REPO_ROOT,
+          token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
+          sourceUrl: mapManifest.source,
+        },
+      );
+      const demandStats = demandStatsResult.stats;
+      mapManifest.population = demandStats.residents_total;
+      mapManifest.residents_total = demandStats.residents_total;
+      mapManifest.points_count = demandStats.points_count;
+      mapManifest.population_count = demandStats.population_count;
+      mapManifest.initial_view_state = demandStats.initial_view_state;
+    } else {
+      console.log(`[update-listing] Map source unchanged; demand stats will be refreshed by the next analytics run.`);
+    }
   }
 
   // Gallery images — resolve URLs via GitHub API (same as create-listing)
