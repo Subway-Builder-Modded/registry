@@ -336,9 +336,25 @@ export async function extractDemandStatsFromZipBuffer(
     }
   }
 
+  let parsedGridData: DemandData;
+  try {
+    parsedGridData = parseDemandGridData(payload);
+  } catch (error) {
+    throw new Error(`listing=${listingId}: failed to parse demand grid data (${(error as Error).message})`);
+  }
+
+  const phantomPoints = parsedGridData.points.filter((p) => p.residents === 0 && p.jobs === 0);
+  if (phantomPoints.length > 0) {
+    const pct = ((phantomPoints.length / parsedGridData.points.length) * 100).toFixed(1);
+    const examples = phantomPoints.slice(0, 3).map((p) => p.id).join(", ");
+    throw new Error(
+      `listing=${listingId}: ${phantomPoints.length} of ${parsedGridData.points.length} demand points (${pct}%) have neither residents nor jobs (e.g. ${examples})`,
+    );
+  }
+
   let gridData: FeatureCollection<Polygon, GeoJsonProperties>;
   try {
-    gridData = await generateGrid(parseDemandGridData(payload), listingId);
+    gridData = await generateGrid(parsedGridData, listingId);
   } catch (error) {
     throw new Error(`listing=${listingId}: failed to generate grid data (${(error as Error).message})`);
   }
