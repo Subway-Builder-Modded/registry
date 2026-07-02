@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-01T18:18:33.767Z",
+  "generated_at": "2026-07-01T23:57:16.427Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -2093,6 +2093,63 @@
           },
           "fingerprint": "rules:v6:sha256:e0292f7710b2ad6c656358175745f0060c0a0eb8d16d3ba6dfc78395ed29fa3f",
           "checked_at": "2026-06-27T17:21:31.289Z"
+        }
+      }
+    },
+    "chongqing": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1782864000,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CKG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 215.63,
+          "file_sizes": {
+            "CKG.pmtiles": 152.66,
+            "buildings_index.bin.gz": 51.75,
+            "config.json": 0,
+            "demand_data.json": 37.68,
+            "roads.geojson": 46.98,
+            "runways_taxiways.geojson": 1.51
+          },
+          "game_version": ">=1.3.7",
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.6.0",
+            "asset_name": "CKG.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.6.0/CKG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:0231fcc183112d74c9408aaa87b02229a4ba6504ff71447e73e1123ebb671b33",
+          "checked_at": "2026-07-01T23:57:16.427Z"
         }
       }
     },
