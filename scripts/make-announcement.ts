@@ -157,15 +157,22 @@ export async function makeAnnouncement(filename: string) {
         ? `[${authorPresentation.author_alias}](${authorPresentation.attribution_link})`
         : authorPresentation?.author_alias ?? modAuthor;
 
-    if (!modId || !announcementAuthor || !modDescription || !modType || !webhookUrl) {
-        throw new Error('Missing required environment variables. Please set MOD_ID, MOD_AUTHOR, MOD_DESCRIPTION, MOD_TYPE, and DISCORD_WEBHOOK_URL.');
+    if (!modId || !announcementAuthor || !modType || !webhookUrl) {
+        const missing = [
+            !modId && 'manifest.id',
+            !announcementAuthor && 'manifest.author',
+            !modType && 'listing type',
+            !webhookUrl && 'DISCORD_ANNOUNCEMENT_WEBHOOK_URL',
+        ].filter(Boolean).join(', ');
+        throw new Error(`Cannot send announcement for ${filename}: missing required fields: ${missing}`);
     }
+    const effectiveDescription = modDescription || modName || modId;
 
     const announcement = BASE_ANNOUNCEMENT
         .replace('$TYPE', modType)
         .replace('$NAME', modName || modId)
         .replace('$AUTHOR', announcementAuthor)
-        .replace('$DESCRIPTION', modDescription)
+        .replace('$DESCRIPTION', effectiveDescription)
         .replace('$TYPE_LOWER', modType.toLowerCase() + 's')
         .replace('$NAME_LOWER', modId.toLowerCase());
     const announcementWithMention = `<@&${CONTENT_ANNOUNCEMENTS_ROLE_ID}>\n${announcement}`;
