@@ -11,79 +11,10 @@
 
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { COUNTRY_TO_EUROPE_SUB_REGION } from "./lib/map-constants.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");
 const DRY_RUN = process.argv.includes("--dry-run");
-
-// CIA World Factbook sub-regions (with user-specified adjustments):
-//   Central  : DE AT CH SI + Visegrád (PL CZ SK HU)
-//   Western  : FR Benelux + British Isles (GB IE)
-//   Southern : Iberia + Italy + Balkans
-//   Northern : Scandinavia + Baltic states
-//   Eastern  : Romania, Ukraine, Belarus, Moldova, Russia + Caucasus
-
-const COUNTRY_TO_EUROPE_SUB_REGION: Record<string, string> = {
-  // Northern Europe — Scandinavia
-  IS: "north-europe",
-  NO: "north-europe",
-  SE: "north-europe",
-  DK: "north-europe",
-  FI: "north-europe",
-  // Northern Europe — Baltic states
-  EE: "north-europe",
-  LV: "north-europe",
-  LT: "north-europe",
-
-  // Western Europe — Atlantic seaboard + British Isles
-  IE: "west-europe",
-  GB: "west-europe",
-  FR: "west-europe",
-  NL: "west-europe",
-  BE: "west-europe",
-  LU: "west-europe",
-  MC: "west-europe",
-
-  // Central Europe — CIA Factbook definition + Visegrád
-  DE: "central-europe",
-  AT: "central-europe",
-  CH: "central-europe",
-  LI: "central-europe",
-  SI: "central-europe",
-  PL: "central-europe",
-  CZ: "central-europe",
-  SK: "central-europe",
-  HU: "central-europe",
-
-  // Southern Europe — Iberia, Italian peninsula, Balkans
-  ES: "south-europe",
-  PT: "south-europe",
-  AD: "south-europe",
-  IT: "south-europe",
-  SM: "south-europe",
-  VA: "south-europe",
-  MT: "south-europe",
-  GR: "south-europe",
-  CY: "south-europe",
-  HR: "south-europe",
-  BA: "south-europe",
-  RS: "south-europe",
-  ME: "south-europe",
-  MK: "south-europe",
-  AL: "south-europe",
-  XK: "south-europe",
-  BG: "south-europe",
-  GI: "south-europe",
-
-  // Eastern Europe
-  RO: "east-europe",
-  MD: "east-europe",
-  UA: "east-europe",
-  BY: "east-europe",
-  RU: "east-europe",
-  AM: "east-europe",
-  AZ: "east-europe",
-  GE: "east-europe",
-};
 
 interface MapManifest {
   location: string;

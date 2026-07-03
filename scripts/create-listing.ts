@@ -12,6 +12,7 @@ import {
   getRequiredIssueValue,
   normalizeSourceQualityForDataSource,
 } from "./lib/map-field-utils.js";
+import { COUNTRY_TO_EUROPE_SUB_REGION } from "./lib/map-constants.js";
 import {
   ensureCollaboratorAuthorAliasPrefills,
   resolvePublishCollaborators,
@@ -100,12 +101,17 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
   }
 
   const includedCities = parseCommaSeparated(data["included-cities"]);
+  const country = String(data.country);
+  const subLocation = location === "europe" ? COUNTRY_TO_EUROPE_SUB_REGION[country] : undefined;
+  if (location === "europe" && !subLocation) {
+    console.warn(`[create-listing] No sub_location mapping for country="${country}"; leaving sub_location unset.`);
+  }
 
   return {
     tags: combineMapTags(location, specialDemand),
     mapFields: {
       city_code: String(data["city-code"]),
-      country: String(data.country),
+      country,
       population: demandStats.residents_total,
       residents_total: demandStats.residents_total,
       points_count: demandStats.points_count,
@@ -115,6 +121,7 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
       source_quality: sourceQuality as SourceQuality,
       level_of_detail: levelOfDetail as LevelOfDetail,
       location: location as LocationTag,
+      ...(subLocation ? { sub_location: subLocation as LocationTag } : {}),
       special_demand: specialDemand as SpecialDemandTag[],
       file_sizes: {},
       ...(includedCities.length > 0 ? { included_cities: includedCities } : {}),
