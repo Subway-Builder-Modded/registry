@@ -48,9 +48,99 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 52.48,
+    ".railyard_map/special_demand_points.json": 1.37,
+    ".railyard_map/special_demand_types.json": 0.06,
+    "RIX.pmtiles": 156.3,
+    "buildings_index.bin.gz": 49.88,
+    "buildings_index.json": 126.82,
+    "config.json": 0.01,
+    "demand_data.json": 93.28,
+    "ocean_depth_index.json": 101.15,
+    "roads.geojson": 14.41,
+    "runways_taxiways.geojson": 0.7
+  },
   "included_cities": [
     "Jūrmala",
     "Jelgava"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.06584578512627577,
+      "p25": 0.07471141653670245,
+      "p50": 0.09277597321088309,
+      "p75": 0.12084046775382043,
+      "p90": 0.19392056850747336,
+      "mean": 0.13976341578097193
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.06824614808518044,
+      "p25": 0.08650411222300783,
+      "p50": 0.11689610811859669,
+      "p75": 0.1777851004675277,
+      "p90": 0.25098366615702905,
+      "mean": 0.1590675774483131
+    },
+    "commuteDistanceKm": {
+      "p10": 2950,
+      "p25": 5975,
+      "p50": 11752,
+      "p75": 28653,
+      "p90": 54016,
+      "mean": 20791.94733285784
+    },
+    "residentCellDensity": {
+      "p10": 13,
+      "p25": 18,
+      "p50": 33,
+      "p75": 103,
+      "p90": 348,
+      "mean": 191.83529411764707
+    },
+    "workerCellDensity": {
+      "p10": 12,
+      "p25": 19,
+      "p50": 46,
+      "p75": 169,
+      "p90": 699,
+      "mean": 308.8854307622914
+    },
+    "detail": {
+      "radiusKm": 0.10414005087029399,
+      "expectedPointSpacingKm": 0.4973328479254873,
+      "normalizedRadius": 0.20939708950392258,
+      "activityPerPoint": 39.82272225129368,
+      "playableAreaKm2": 8340,
+      "playableAreaPerPointKm2": 0.48491191348334206,
+      "playableCatchmentRadiusKm": 0.3928768967374472,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.3556065717552404,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 24.120615797766952,
+            "latitude": 56.91189247574499,
+            "massShare": 1,
+            "assignedMass": 1369822,
+            "assignedPointCount": 17199,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1783123200
 }
