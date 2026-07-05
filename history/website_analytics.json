@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "updated_at": "2026-07-05T18:01:03.218Z",
+  "updated_at": "2026-07-05T18:42:17.283Z",
   "valid_paths": [
     "/",
     "/community",
@@ -47,6 +47,7 @@
     "/railyard/docs/v0.2/github-token",
     "/railyard/docs/v0.2/importing-local-assets",
     "/railyard/docs/v0.2/installing-railyard",
+    "/railyard/docs/v0.2/installing-railyard/linux",
     "/railyard/docs/v0.2/installing-railyard/macos",
     "/railyard/docs/v0.2/installing-railyard/windows",
     "/railyard/docs/v0.2/players",
@@ -836,6 +837,7 @@
     "/registry/maps/richmond",
     "/registry/maps/riviera-romagnola",
     "/registry/maps/rochester",
+    "/registry/maps/rochester/gallery",
     "/registry/maps/rome",
     "/registry/maps/rotterdam-the-hague",
     "/registry/maps/sacramento",
@@ -906,6 +908,7 @@
     "/registry/maps/yukina-kochi",
     "/registry/maps/yukina-kumamoto",
     "/registry/maps/yukina-kyoto",
+    "/registry/maps/yukina-lv-daugavpils",
     "/registry/maps/yukina-lv-riga",
     "/registry/maps/yukina-matsuyama",
     "/registry/maps/yukina-morioka",
@@ -40059,17 +40062,57 @@
       }
     },
     "2026-07-05T18:00:00.000Z": {
-      "captured_at": "2026-07-05T18:01:03.218Z",
+      "captured_at": "2026-07-05T18:42:17.283Z",
       "window_start": "2026-07-05T18:00:00.000Z",
       "window_end": "2026-07-05T19:00:00.000Z",
       "totals": {
-        "visits": 0
+        "visits": 20
       },
-      "pages": {},
-      "countries": {},
-      "browsers": {},
-      "operating_systems": {},
-      "devices": {}
+      "pages": {
+        "/": 6,
+        "/railyard": 3,
+        "/railyard/docs/v0.2/game-version-incompatibility": 1,
+        "/railyard/docs/v0.2/installing-railyard/linux": 1,
+        "/railyard/updates/v0.2.0": 1,
+        "/registry/maps": 1,
+        "/registry/maps/barcelona": 1,
+        "/registry/maps/glasgow-edinburgh": 1,
+        "/registry/maps/jelegend-tokyo": 1,
+        "/registry/maps/milan": 1,
+        "/registry/maps/rochester/gallery": 1,
+        "/registry/maps/yukina-lv-daugavpils": 1,
+        "/registry/maps/yukina-pl-opole": 1
+      },
+      "countries": {
+        "BE": 1,
+        "BR": 1,
+        "CA": 1,
+        "DE": 4,
+        "ES": 2,
+        "IE": 1,
+        "NL": 2,
+        "US": 8
+      },
+      "browsers": {
+        "Chrome": 3,
+        "ChromeMobile": 1,
+        "Firefox": 1,
+        "GoogleBot": 2,
+        "MobileSafari": 4,
+        "Safari": 1,
+        "Unknown": 8
+      },
+      "operating_systems": {
+        "Android": 3,
+        "MacOSX": 3,
+        "Unknown": 8,
+        "Windows": 2,
+        "iOS": 4
+      },
+      "devices": {
+        "desktop": 12,
+        "mobile": 8
+      }
     }
   },
   "daily_snapshots": {
@@ -51209,37 +51252,46 @@
       }
     },
     "2026-07-05": {
-      "captured_at": "2026-07-05T18:01:03.218Z",
+      "captured_at": "2026-07-05T18:42:17.283Z",
       "window_start": "2026-07-05T00:00:00.000Z",
       "window_end": "2026-07-05T19:00:00.000Z",
       "totals": {
-        "visits": 131
+        "visits": 151
       },
       "pages": {
-        "/": 46,
+        "/": 52,
         "/credits": 1,
         "/depot": 4,
-        "/railyard": 40,
+        "/railyard": 43,
         "/railyard/docs": 1,
         "/railyard/docs/v0.1/install-guide-macos": 1,
         "/railyard/docs/v0.1/install-guide-windows": 1,
+        "/railyard/docs/v0.2/game-version-incompatibility": 1,
         "/railyard/docs/v0.2/github-token": 3,
+        "/railyard/docs/v0.2/installing-railyard/linux": 1,
         "/railyard/docs/v0.2/installing-railyard/macos": 1,
+        "/railyard/updates/v0.2.0": 1,
         "/registry": 2,
+        "/registry/maps": 1,
+        "/registry/maps/barcelona": 1,
         "/registry/maps/florence": 1,
+        "/registry/maps/glasgow-edinburgh": 1,
         "/registry/maps/greater-los-angeles/description": 2,
-        "/registry/maps/jelegend-tokyo": 2,
+        "/registry/maps/jelegend-tokyo": 3,
         "/registry/maps/mfn-hong-kong": 1,
-        "/registry/maps/milan": 1,
+        "/registry/maps/milan": 2,
         "/registry/maps/montreal": 1,
         "/registry/maps/providence": 1,
         "/registry/maps/rhode-island": 1,
+        "/registry/maps/rochester/gallery": 1,
         "/registry/maps/rotterdam-the-hague": 1,
         "/registry/maps/sydney": 1,
         "/registry/maps/yukina-ee-ida-viru": 1,
         "/registry/maps/yukina-kochi": 1,
+        "/registry/maps/yukina-lv-daugavpils": 1,
         "/registry/maps/yukina-pl-kielce": 1,
         "/registry/maps/yukina-pl-legnica": 1,
+        "/registry/maps/yukina-pl-opole": 1,
         "/registry/maps/yukina-pl-radom": 1,
         "/registry/maps/yukina-tw-tainan": 1,
         "/registry/mods/mode-manager": 1,
@@ -51253,51 +51305,52 @@
       "countries": {
         "AT": 8,
         "AU": 4,
-        "BE": 19,
-        "BR": 2,
-        "CA": 1,
+        "BE": 20,
+        "BR": 3,
+        "CA": 2,
         "CH": 3,
         "CN": 1,
-        "DE": 15,
-        "ES": 1,
+        "DE": 19,
+        "ES": 3,
         "FR": 2,
         "GB": 6,
         "HU": 3,
+        "IE": 1,
         "IL": 3,
         "IN": 1,
         "JP": 2,
         "KR": 1,
-        "NL": 3,
+        "NL": 5,
         "RO": 1,
         "SE": 3,
         "SG": 2,
         "TR": 1,
         "TW": 2,
-        "US": 47
+        "US": 55
       },
       "browsers": {
-        "Chrome": 37,
-        "ChromeMobile": 7,
+        "Chrome": 40,
+        "ChromeMobile": 8,
         "Edge": 2,
-        "Firefox": 5,
-        "GoogleBot": 6,
-        "MobileSafari": 7,
+        "Firefox": 6,
+        "GoogleBot": 8,
+        "MobileSafari": 11,
         "Opera": 1,
-        "Safari": 27,
-        "Unknown": 39
+        "Safari": 28,
+        "Unknown": 47
       },
       "operating_systems": {
-        "Android": 15,
+        "Android": 18,
         "ChromeOS": 2,
         "Linux": 3,
-        "MacOSX": 37,
-        "Unknown": 39,
-        "Windows": 26,
-        "iOS": 9
+        "MacOSX": 40,
+        "Unknown": 47,
+        "Windows": 28,
+        "iOS": 13
       },
       "devices": {
-        "desktop": 107,
-        "mobile": 20,
+        "desktop": 119,
+        "mobile": 28,
         "tablet": 4
       }
     }
