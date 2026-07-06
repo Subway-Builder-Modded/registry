@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-06T18:23:43.848Z",
+  "generated_at": "2026-07-06T22:30:31.695Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -9238,9 +9238,10 @@
     },
     "opo-pt-metropolitan": {
       "has_complete_version": true,
-      "latest_semver_version": "v0.2.1",
+      "latest_semver_version": "v0.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "v0.3.0",
         "v0.2.1",
         "v0.2.0",
         "v0.1.1"
@@ -9248,7 +9249,7 @@
       "incomplete_versions": [
         "v0.1.0"
       ],
-      "last_updated": 1780173364,
+      "last_updated": 1783366570,
       "versions": {
         "v0.1.0": {
           "is_complete": false,
@@ -9426,6 +9427,52 @@
           },
           "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.2.1:OPO_porto_amp_v0.2.1.zip",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "v0.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "OPO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 86.87,
+          "file_sizes": {
+            "OPO.pmtiles": 41.94,
+            "buildings_index.bin": 116.22,
+            "config.json": 0,
+            "demand_data.json": 14.1,
+            "ocean_depth_index.json": 0,
+            "roads.geojson": 26.1,
+            "runways_taxiways.geojson": 0.31
+          },
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "github",
+            "repo": "bquelhas/subwaybuilder-map-opo",
+            "tag": "v0.3.0",
+            "asset_name": "OPO_porto_amp_v0.3.0.zip",
+            "download_url": "https://github.com/bquelhas/subwaybuilder-map-opo/releases/download/v0.3.0/OPO_porto_amp_v0.3.0.zip"
+          },
+          "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.3.0:OPO_porto_amp_v0.3.0.zip",
+          "checked_at": "2026-07-06T22:30:31.695Z"
         }
       }
     },
@@ -16959,13 +17006,14 @@
     },
     "yukina-ee-ida-viru": {
       "has_complete_version": true,
-      "latest_semver_version": "0.1.0",
+      "latest_semver_version": "0.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.2.0",
         "0.1.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1781222400,
+      "last_updated": 1783382400,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -17015,18 +17063,69 @@
           },
           "fingerprint": "rules:v6:sha256:6c4a7cd23666dee41a3754e36ff8bb02226667d071faaa751d3e7d0e0adfb03c",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "IDV.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 52.9,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 18.01,
+            ".railyard_map/special_demand_points.json": 0.01,
+            ".railyard_map/special_demand_types.json": 0.06,
+            "IDV.pmtiles": 18.75,
+            "buildings_index.bin.gz": 5.39,
+            "buildings_index.json": 12.61,
+            "config.json": 0.01,
+            "demand_data.json": 9.03,
+            "ocean_depth_index.json": 42.78,
+            "roads.geojson": 1.81,
+            "runways_taxiways.geojson": 0.01
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.4.1",
+            "asset_name": "IDV.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.4.1/IDV.zip"
+          },
+          "fingerprint": "rules:v6:sha256:e00c1263c249b33d295d32df62e7359d66baef8085c0ede8f8d11941d91b56ed",
+          "checked_at": "2026-07-06T22:30:31.695Z"
         }
       }
     },
     "yukina-ee-parnu": {
       "has_complete_version": true,
-      "latest_semver_version": "0.1.0",
+      "latest_semver_version": "0.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.2.0",
         "0.1.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1781222400,
+      "last_updated": 1783382400,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -17076,18 +17175,69 @@
           },
           "fingerprint": "rules:v6:sha256:0f957b07183ca1c904f7faca521618ffd276ed0fb6731bb0caab01639d35ba8f",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "EPU.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 87.94,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 34.71,
+            ".railyard_map/special_demand_points.json": 0.01,
+            ".railyard_map/special_demand_types.json": 0.06,
+            "EPU.pmtiles": 28.79,
+            "buildings_index.bin.gz": 6.65,
+            "buildings_index.json": 15.5,
+            "config.json": 0.01,
+            "demand_data.json": 13.27,
+            "ocean_depth_index.json": 81.38,
+            "roads.geojson": 2.79,
+            "runways_taxiways.geojson": 0.11
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.4.1",
+            "asset_name": "EPU.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.4.1/EPU.zip"
+          },
+          "fingerprint": "rules:v6:sha256:b7c9f84c6fe6a0013fc1319c94321fff7d19695fbd52c177c2563dfb821ff5fd",
+          "checked_at": "2026-07-06T22:30:31.695Z"
         }
       }
     },
     "yukina-ee-tallinn": {
       "has_complete_version": true,
-      "latest_semver_version": "0.1.0",
+      "latest_semver_version": "0.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.2.0",
         "0.1.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1781222400,
+      "last_updated": 1783382400,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -17137,18 +17287,69 @@
           },
           "fingerprint": "rules:v6:sha256:a1b0404a2fb86244a4370a091eb9c65eb76243892bff615d9772d74eebf4482b",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TLL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 278.85,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 95.39,
+            ".railyard_map/special_demand_points.json": 0.04,
+            ".railyard_map/special_demand_types.json": 0.06,
+            "TLL.pmtiles": 97.96,
+            "buildings_index.bin.gz": 28.7,
+            "buildings_index.json": 66.89,
+            "config.json": 0.01,
+            "demand_data.json": 65.02,
+            "ocean_depth_index.json": 169.28,
+            "roads.geojson": 12.59,
+            "runways_taxiways.geojson": 0.45
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.4.1",
+            "asset_name": "TLL.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.4.1/TLL.zip"
+          },
+          "fingerprint": "rules:v6:sha256:a8491011f721fa25adea1395675c8d0f03e279b466cb1be88524252ed49e9693",
+          "checked_at": "2026-07-06T22:30:31.695Z"
         }
       }
     },
     "yukina-ee-tartu": {
       "has_complete_version": true,
-      "latest_semver_version": "0.1.0",
+      "latest_semver_version": "0.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.2.0",
         "0.1.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1781222400,
+      "last_updated": 1783382400,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -17198,6 +17399,56 @@
           },
           "fingerprint": "rules:v6:sha256:52c70c0329871cc745a701ff9fe713ed9a21003a1b60abee23a75419307966f2",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TAY.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 125.61,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 47.17,
+            ".railyard_map/special_demand_points.json": 0.02,
+            ".railyard_map/special_demand_types.json": 0.06,
+            "TAY.pmtiles": 39.85,
+            "buildings_index.bin.gz": 12.11,
+            "buildings_index.json": 28.18,
+            "config.json": 0.01,
+            "demand_data.json": 28.75,
+            "ocean_depth_index.json": 43.31,
+            "roads.geojson": 5.37,
+            "runways_taxiways.geojson": 0.03
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.4.1",
+            "asset_name": "TAY.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.4.1/TAY.zip"
+          },
+          "fingerprint": "rules:v6:sha256:4e0c74b0fd3254bca028ecb2543d0ec71dee7acdf9e9efd607a258d2c92b95d3",
+          "checked_at": "2026-07-06T22:30:31.695Z"
         }
       }
     },
