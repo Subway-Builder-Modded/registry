@@ -584,7 +584,10 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json mods/*/manifest.json maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
+          # downloads.json and download-version-buckets.json are owned by the hourly workflow. This
+          # run commits only the attribution ledger; the next hourly run reconciles it into
+          # downloads.json. Excluding them here stops this PR from racing the hourly workflow.
+          git add maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json mods/*/manifest.json maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -604,6 +607,21 @@ jobs:
           delete-branch: true
           title: "chore: regenerate registry analytics"
           body: "Automated update from regenerate-registry-analytics workflow."
+          # Commit only analytics-owned files. reconcile-attributed-downloads still writes
+          # downloads.json / download-version-buckets.json into the working tree (needed for the
+          # ledger merge + Discord stats), but they are deliberately omitted here so this PR never
+          # touches files the hourly workflow owns — the source of the recurring merge conflicts.
+          add-paths: |
+            maps/integrity.json
+            mods/integrity.json
+            maps/integrity-cache.json
+            mods/integrity-cache.json
+            maps/*/manifest.json
+            mods/*/manifest.json
+            maps/basemap-completeness.json
+            maps/demand-stats-cache.json
+            history/registry-download-attribution.json
+            history/content-announcements.json
 
       - name: Finalize bot PR automation
         id: bot_pr
