@@ -85,6 +85,8 @@ jobs:
           git checkout -B "publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}"
           git add -A
           git commit -m "feat(mod): add ${{ fromJson(steps.parser.outputs.jsonString).mod-id }}"
+          gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/publish" 2>/dev/null || true
+          gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/publish/mod" 2>/dev/null || true
           git push --force origin "publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}"
 
       - name: Create or update pull request
@@ -246,6 +248,8 @@ jobs:
           git checkout -B "publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
           git add -A
           git commit -m "feat(map): add ${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+          gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/publish" 2>/dev/null || true
+          gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/publish/map" 2>/dev/null || true
           git push --force origin "publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
 
       - name: Create or update pull request
