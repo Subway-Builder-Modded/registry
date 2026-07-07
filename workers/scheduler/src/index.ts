@@ -33,19 +33,24 @@ export default {
 		env: Env,
 		_ctx: ExecutionContext,
 	): Promise<void> {
-		const hour = new Date(event.scheduledTime).getUTCHours();
+		const scheduledTime = new Date(event.scheduledTime);
+		const hour = scheduledTime.getUTCHours();
+		const topOfHour = scheduledTime.getUTCMinutes() === 0;
 
-		const workflows: string[] = [
-			"regenerate-downloads-hourly.yml",
-			"cache-website-analytics.yml",
-		];
+		// Download regeneration runs every fire (:00 and :30). Everything else stays
+		// hourly / 4-hourly / daily, so it only dispatches at the top of the hour.
+		const workflows: string[] = ["regenerate-downloads-hourly.yml"];
 
-		if (hour % 4 === 0) {
-			workflows.push("regenerate-registry-analytics.yml");
-		}
+		if (topOfHour) {
+			workflows.push("cache-website-analytics.yml");
 
-		if (hour === 4) {
-			workflows.push("cache-download-history.yml");
+			if (hour % 4 === 0) {
+				workflows.push("regenerate-registry-analytics.yml");
+			}
+
+			if (hour === 4) {
+				workflows.push("cache-download-history.yml");
+			}
 		}
 
 		const results = await Promise.allSettled(
