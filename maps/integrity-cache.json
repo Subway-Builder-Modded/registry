@@ -9544,24 +9544,54 @@
           "checked_at": "2026-07-07T03:43:59.556Z"
         }
       },
-      "v0.4.0a": {
-        "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.4.0a:OPO_porto_amp_v0.4.0-alpha1.zip",
-        "last_checked_at": "2026-07-07T16:01:09.833Z",
+      "v0.4.0": {
+        "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.4.0:OPO_porto_amp_v0.4.0-alpha1.zip",
+        "last_checked_at": "2026-07-07T20:00:59.311Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'v0.4.0a'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "OPO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 86.87,
+          "file_sizes": {
+            "OPO.pmtiles": 41.94,
+            "buildings_index.bin": 116.22,
+            "config.json": 0,
+            "demand_data.json": 14.1,
+            "ocean_depth_index.json": 0,
+            "roads.geojson": 26.1,
+            "runways_taxiways.geojson": 0.31
+          },
+          "game_version": ">=1.4.0",
           "source": {
             "update_type": "github",
             "repo": "bquelhas/subwaybuilder-map-opo",
-            "tag": "v0.4.0a"
+            "tag": "v0.4.0",
+            "asset_name": "OPO_porto_amp_v0.4.0-alpha1.zip",
+            "download_url": "https://github.com/bquelhas/subwaybuilder-map-opo/releases/download/v0.4.0/OPO_porto_amp_v0.4.0-alpha1.zip"
           },
-          "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.4.0a:OPO_porto_amp_v0.4.0-alpha1.zip",
-          "checked_at": "2026-07-07T16:01:09.833Z",
-          "release_size": 86.87
+          "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.4.0:OPO_porto_amp_v0.4.0-alpha1.zip",
+          "checked_at": "2026-07-07T20:00:59.311Z"
         }
       }
     },
