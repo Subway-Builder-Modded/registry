@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-07T00:01:12.521Z",
+  "generated_at": "2026-07-07T01:41:26.793Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -688,13 +688,14 @@
     },
     "beijing": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.0",
+      "latest_semver_version": "1.1.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.1.0",
         "1.0.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1779926400,
+      "last_updated": 1783296000,
       "versions": {
         "1.0.0": {
           "is_complete": true,
@@ -739,6 +740,53 @@
           },
           "fingerprint": "rules:v6:sha256:580959a3b7f38a874b07e82b75fa6b42fe60d73b201a68c435a71124a36b0cfe",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "1.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PEK.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 293.57,
+          "file_sizes": {
+            "PEK.pmtiles": 133.44,
+            "PEK_foundations.pmtiles": 79.11,
+            "buildings_index.bin.gz": 67.88,
+            "config.json": 0,
+            "demand_data.json": 43.81,
+            "ocean_depth_index.json.gz": 3.67,
+            "roads.geojson": 42.47,
+            "runways_taxiways.geojson": 3.36
+          },
+          "game_version": ">=1.3.7",
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.7.0",
+            "asset_name": "PEK.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.7.0/PEK.zip"
+          },
+          "fingerprint": "rules:v6:sha256:790a245e5242a9f930bbf997fb907750d4116b829138011acd2a8f8eb3a2050a",
+          "checked_at": "2026-07-07T01:41:26.793Z"
         }
       }
     },
@@ -2098,13 +2146,15 @@
     },
     "chongqing": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.0",
-      "latest_semver_complete": true,
+      "latest_semver_version": "1.1.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.0.0"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1782864000,
+      "incomplete_versions": [
+        "1.1.0"
+      ],
+      "last_updated": 1783296000,
       "versions": {
         "1.0.0": {
           "is_complete": true,
@@ -2150,6 +2200,20 @@
           },
           "fingerprint": "rules:v6:sha256:0231fcc183112d74c9408aaa87b02229a4ba6504ff71447e73e1123ebb671b33",
           "checked_at": "2026-07-02T00:47:32.354Z"
+        },
+        "1.1.0": {
+          "is_complete": false,
+          "errors": [
+            "non-GitHub release download URL"
+          ],
+          "required_checks": {},
+          "matched_files": {},
+          "source": {
+            "update_type": "custom",
+            "download_url": "https://github.com/kronifer/sb-chinese-maps/releases/v1.7.0/download/CKG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:7e9e2afefca043abdce2007e4673897cfad30f0a3bd3c9a99f36d06c1fd0ce39",
+          "checked_at": "2026-07-07T01:41:26.793Z"
         }
       }
     },
@@ -4948,15 +5012,16 @@
     },
     "guangzhou": {
       "has_complete_version": true,
-      "latest_semver_version": "1.2.0",
+      "latest_semver_version": "1.3.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.3.0",
         "1.2.0",
         "1.1.0",
         "1.0.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1780185600,
+      "last_updated": 1783296000,
       "versions": {
         "1.0.0": {
           "is_complete": true,
@@ -5089,6 +5154,53 @@
           },
           "fingerprint": "rules:v6:sha256:28032e8bef8427ad3085dbe69ba1855ff4c69eafb61e39ffce623d77676ad8a7",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "1.3.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CAN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 697.09,
+          "file_sizes": {
+            "CAN.pmtiles": 310.9,
+            "CAN_foundations.pmtiles": 160.91,
+            "buildings_index.bin.gz": 207.5,
+            "config.json": 0,
+            "demand_data.json": 45.08,
+            "ocean_depth_index.json.gz": 8.74,
+            "roads.geojson": 61.79,
+            "runways_taxiways.geojson": 2.61
+          },
+          "game_version": ">=1.3.7",
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.7.0",
+            "asset_name": "CAN.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.7.0/CAN.zip"
+          },
+          "fingerprint": "rules:v6:sha256:e79d7963c0b8a0dde2ce8dc8b68a6fc084ee5e1d2825561b101f8deafc56deef",
+          "checked_at": "2026-07-07T01:41:26.793Z"
         }
       }
     },
@@ -11949,14 +12061,15 @@
     },
     "shanghai": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.0",
+      "latest_semver_version": "1.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.2.0",
         "1.1.0",
         "1.0.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1780185600,
+      "last_updated": 1783296000,
       "versions": {
         "1.0.0": {
           "is_complete": true,
@@ -12045,19 +12158,67 @@
           },
           "fingerprint": "rules:v6:sha256:02a08f7c46d8df6657a2343f3c34ead196ad8896958e23b4cd551f75406b4777",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "1.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SHA.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 335.32,
+          "file_sizes": {
+            "SHA.pmtiles": 162.36,
+            "SHA_foundations.pmtiles": 77.04,
+            "buildings_index.bin.gz": 78.14,
+            "config.json": 0,
+            "demand_data.json": 48.63,
+            "ocean_depth_index.json.gz": 8.9,
+            "roads.geojson": 42,
+            "runways_taxiways.geojson": 2.04
+          },
+          "game_version": ">=1.3.7",
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.7.0",
+            "asset_name": "SHA.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.7.0/SHA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:c82d1d428043f702d9514274e30e8fcd2e61f5472c22be115afc7551ac13c96d",
+          "checked_at": "2026-07-07T01:41:26.793Z"
         }
       }
     },
     "shenzhen": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.0",
+      "latest_semver_version": "1.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.2.0",
         "1.1.0",
         "1.0.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1780185600,
+      "last_updated": 1783296000,
       "versions": {
         "1.0.0": {
           "is_complete": true,
@@ -12146,6 +12307,53 @@
           },
           "fingerprint": "rules:v6:sha256:398ca15864a66c828b679e2ac1d226d908fde634fccb43b55a35ecd0ec87d1fa",
           "checked_at": "2026-06-21T07:16:20.303Z"
+        },
+        "1.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SZX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 348.73,
+          "file_sizes": {
+            "SZX.pmtiles": 159.57,
+            "SZX_foundations.pmtiles": 86.82,
+            "buildings_index.bin.gz": 88.41,
+            "config.json": 0,
+            "demand_data.json": 50.26,
+            "ocean_depth_index.json.gz": 5.99,
+            "roads.geojson": 36.97,
+            "runways_taxiways.geojson": 1.12
+          },
+          "game_version": ">=1.3.7",
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.7.0",
+            "asset_name": "SZX.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.7.0/SZX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:563bbbfca0261f9baa3c60fea4cb4905b42ae7ec0dd53eab7ecb225b4500fb25",
+          "checked_at": "2026-07-07T01:41:26.793Z"
         }
       }
     },
