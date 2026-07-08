@@ -46,9 +46,107 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 19.57,
+    ".railyard_map/special_demand_points.json": 0.01,
+    ".railyard_map/special_demand_types.json": 0.06,
+    "PLW.pmtiles": 61.37,
+    "buildings_index.bin.gz": 30.26,
+    "buildings_index.json": 71.49,
+    "config.json": 0,
+    "demand_data.json": 40.33,
+    "ocean_depth_index.json": 19.93,
+    "roads.geojson": 6.94,
+    "runways_taxiways.geojson": 0.03
+  },
   "included_cities": [
     "Płock",
     "Włocławek"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.09062252061590266,
+      "p25": 0.1039828967636381,
+      "p50": 0.14513305253615585,
+      "p75": 0.32778784288940044,
+      "p90": 0.6228303033956357,
+      "mean": 0.25743184220882115
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.08299638973252346,
+      "p25": 0.10395791119914106,
+      "p50": 0.1452048864760031,
+      "p75": 0.2097990754158033,
+      "p90": 0.33947158171480335,
+      "mean": 0.18775655062851307
+    },
+    "commuteDistanceKm": {
+      "p10": 2144,
+      "p25": 4792,
+      "p50": 9738,
+      "p75": 22106,
+      "p90": 44798,
+      "mean": 17263.252136752137
+    },
+    "residentCellDensity": {
+      "p10": 12,
+      "p25": 15,
+      "p50": 21,
+      "p75": 34,
+      "p90": 68,
+      "mean": 54.48785578747628
+    },
+    "workerCellDensity": {
+      "p10": 12,
+      "p25": 17,
+      "p50": 34,
+      "p75": 91,
+      "p90": 282,
+      "mean": 127.52619893428064
+    },
+    "detail": {
+      "radiusKm": 0.14516896506288218,
+      "expectedPointSpacingKm": 0.6908833795220742,
+      "normalizedRadius": 0.21012079515258325,
+      "activityPerPoint": 23.81947093457169,
+      "playableAreaKm2": 7256,
+      "playableAreaPerPointKm2": 0.6017082676838875,
+      "playableCatchmentRadiusKm": 0.43764105177908535,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9903887806546101,
+        "continuousScore": 0.9981074603044713,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9809605536047399,
+        "largestCenterShare": 0.5490184132377567,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 19.75083337477204,
+            "latitude": 52.584209852173146,
+            "massShare": 0.5490184132377567,
+            "assignedMass": 315399,
+            "assignedPointCount": 6523,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 19.006224100772688,
+            "latitude": 52.655272445159575,
+            "massShare": 0.4509815867622433,
+            "assignedMass": 259079,
+            "assignedPointCount": 5536,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1783555200
 }

@@ -48,10 +48,116 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 26.51,
+    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/special_demand_types.json": 0.06,
+    "OSZ.pmtiles": 52.01,
+    "buildings_index.bin.gz": 22.2,
+    "buildings_index.json": 52.19,
+    "config.json": 0.01,
+    "demand_data.json": 45.75,
+    "ocean_depth_index.json": 80.2,
+    "roads.geojson": 8.41,
+    "runways_taxiways.geojson": 0.28
+  },
   "included_cities": [
     "Koszalin",
     "Słupsk",
     "Sławno"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.0847459418324714,
+      "p25": 0.0974852378328724,
+      "p50": 0.12432105879459342,
+      "p75": 0.17298148648829412,
+      "p90": 0.2765586190908018,
+      "mean": 0.18086864498073693
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.07362204030673535,
+      "p25": 0.0974852378328724,
+      "p50": 0.1338122156812786,
+      "p75": 0.17947017368126125,
+      "p90": 0.24030747886272166,
+      "mean": 0.1569099173392724
+    },
+    "commuteDistanceKm": {
+      "p10": 1843,
+      "p25": 3741,
+      "p50": 9599,
+      "p75": 22138,
+      "p90": 44391,
+      "mean": 17873.509406062596
+    },
+    "residentCellDensity": {
+      "p10": 12,
+      "p25": 18,
+      "p50": 32,
+      "p75": 72,
+      "p90": 164,
+      "mean": 103.98475269616958
+    },
+    "workerCellDensity": {
+      "p10": 13,
+      "p25": 21,
+      "p50": 50,
+      "p75": 132,
+      "p90": 424,
+      "mean": 185.3320079522863
+    },
+    "detail": {
+      "radiusKm": 0.12897936398178994,
+      "expectedPointSpacingKm": 0.5867481150950611,
+      "normalizedRadius": 0.21982067034146935,
+      "activityPerPoint": 31.43722603124649,
+      "playableAreaKm2": 7492,
+      "playableAreaPerPointKm2": 0.8420816005395076,
+      "playableCatchmentRadiusKm": 0.5177285953327235,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9184664035027335,
+        "continuousScore": 0.9967314380151405,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.579386658027849,
+        "largestCenterShare": 0.4734981068799451,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 17.07750700009552,
+            "latitude": 54.38782133052445,
+            "massShare": 0.4734981068799451,
+            "assignedMass": 264872,
+            "assignedPointCount": 4412,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 16.211980438391976,
+            "latitude": 54.17437951131058,
+            "massShare": 0.3748002302491625,
+            "assignedMass": 209661,
+            "assignedPointCount": 3218,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 15.617677235948236,
+            "latitude": 54.14377825103422,
+            "massShare": 0.15170166287089243,
+            "assignedMass": 84861,
+            "assignedPointCount": 1267,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1783555200
 }
