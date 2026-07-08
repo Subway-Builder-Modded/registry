@@ -46,8 +46,98 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 11.63,
+    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/special_demand_types.json": 0.06,
+    "OZH.pmtiles": 52.15,
+    "buildings_index.bin.gz": 27.17,
+    "buildings_index.json": 70.69,
+    "config.json": 0.01,
+    "demand_data.json": 60.43,
+    "ocean_depth_index.json": 7.86,
+    "roads.geojson": 3.22,
+    "runways_taxiways.geojson": 0.27
+  },
   "included_cities": [
     "Vasylivka"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.08108635114552269,
+      "p25": 0.09229191659942437,
+      "p50": 0.1122124537236867,
+      "p75": 0.14770735731735957,
+      "p90": 0.18616175170788535,
+      "mean": 0.131422802561953
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.08404543104476128,
+      "p25": 0.1000800488908546,
+      "p50": 0.132699747705733,
+      "p75": 0.19209332865015455,
+      "p90": 0.25950145505058353,
+      "mean": 0.16025742853365363
+    },
+    "commuteDistanceKm": {
+      "p10": 4758,
+      "p25": 8522,
+      "p50": 14558,
+      "p75": 28506,
+      "p90": 47238,
+      "mean": 22543.777641636036
+    },
+    "residentCellDensity": {
+      "p10": 13,
+      "p25": 22,
+      "p50": 56,
+      "p75": 188,
+      "p90": 785,
+      "mean": 292.68849332485695
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 20,
+      "p50": 64,
+      "p75": 393,
+      "p90": 1772,
+      "mean": 515.7368421052631
+    },
+    "detail": {
+      "radiusKm": 0.12202689989741797,
+      "expectedPointSpacingKm": 0.4180681935560642,
+      "normalizedRadius": 0.2918827640521134,
+      "activityPerPoint": 46.91006314931758,
+      "playableAreaKm2": 3424,
+      "playableAreaPerPointKm2": 0.34874719902220414,
+      "playableCatchmentRadiusKm": 0.33318115377024793,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.384362130274601,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 35.16093071091242,
+            "latitude": 47.828484042469185,
+            "massShare": 1,
+            "assignedMass": 921126,
+            "assignedPointCount": 9818,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1783468800
 }
