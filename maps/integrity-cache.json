@@ -26637,6 +26637,57 @@
           "fingerprint": "rules:v6:github:kronifer/sb-zurich-map:v1.1.0:ZRH.zip",
           "checked_at": "2026-07-07T03:43:59.556Z"
         }
+      },
+      "v1.2.0": {
+        "fingerprint": "rules:v6:github:kronifer/sb-zurich-map:v1.2.0:ZRH.zip",
+        "last_checked_at": "2026-07-08T01:37:40.360Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ZRH.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 242.82,
+          "file_sizes": {
+            "ZRH.pmtiles": 123.05,
+            "ZRH_foundations.pmtiles": 49.9,
+            "buildings_index.bin.gz": 44.88,
+            "config.json": 0,
+            "demand_data.json": 15.45,
+            "ocean_depth_index.json.gz": 14.53,
+            "roads.geojson": 43.31,
+            "runways_taxiways.geojson": 1.32
+          },
+          "game_version": ">=v1.3.7",
+          "source": {
+            "update_type": "github",
+            "repo": "kronifer/sb-zurich-map",
+            "tag": "v1.2.0",
+            "asset_name": "ZRH.zip",
+            "download_url": "https://github.com/Kronifer/sb-zurich-map/releases/download/v1.2.0/ZRH.zip"
+          },
+          "fingerprint": "rules:v6:github:kronifer/sb-zurich-map:v1.2.0:ZRH.zip",
+          "checked_at": "2026-07-08T01:37:40.360Z"
+        }
       }
     }
   }
