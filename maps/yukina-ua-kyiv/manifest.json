@@ -46,11 +46,101 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 36,
+    ".railyard_map/special_demand_points.json": 0.11,
+    ".railyard_map/special_demand_types.json": 0.06,
+    "KBP.pmtiles": 143.46,
+    "buildings_index.bin.gz": 78.38,
+    "buildings_index.json": 199.4,
+    "config.json": 0.01,
+    "demand_data.json": 82.78,
+    "ocean_depth_index.json": 39.25,
+    "roads.geojson": 15.21,
+    "runways_taxiways.geojson": 1.32
+  },
   "included_cities": [
     "Brovary",
     "Irpin",
     "Bucha",
     "Boryspil"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.11441385242432797,
+      "p25": 0.11984541247224204,
+      "p50": 0.13254033688497072,
+      "p75": 0.16402263513601742,
+      "p90": 0.20127810220982428,
+      "mean": 0.1551808074585624
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.11378752385235795,
+      "p25": 0.12255091829187262,
+      "p50": 0.14282167101924098,
+      "p75": 0.18597075518610803,
+      "p90": 0.25355807365051936,
+      "mean": 0.17021436095251596
+    },
+    "commuteDistanceKm": {
+      "p10": 5825,
+      "p25": 10089,
+      "p50": 16952,
+      "p75": 30885,
+      "p90": 51175,
+      "mean": 23258.925123303216
+    },
+    "residentCellDensity": {
+      "p10": 19,
+      "p25": 31,
+      "p50": 67,
+      "p75": 222,
+      "p90": 1245,
+      "mean": 498.51760644418874
+    },
+    "workerCellDensity": {
+      "p10": 19,
+      "p25": 32,
+      "p50": 78,
+      "p75": 418,
+      "p90": 1817,
+      "mean": 662.6390333435302
+    },
+    "detail": {
+      "radiusKm": 0.13758500060458864,
+      "expectedPointSpacingKm": 0.4674342464380719,
+      "normalizedRadius": 0.29434086537948306,
+      "activityPerPoint": 95.11596557477826,
+      "playableAreaKm2": 8320,
+      "playableAreaPerPointKm2": 0.3653288838148766,
+      "playableCatchmentRadiusKm": 0.34100996382329457,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.6890621682413937,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 30.50451742275013,
+            "latitude": 50.43554296215493,
+            "massShare": 1,
+            "assignedMass": 4332342,
+            "assignedPointCount": 22774,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1783468800
 }

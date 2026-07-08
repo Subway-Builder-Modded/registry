@@ -48,9 +48,99 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 12.6,
+    ".railyard_map/special_demand_points.json": 0.05,
+    ".railyard_map/special_demand_types.json": 0.06,
+    "ODS.pmtiles": 80.99,
+    "buildings_index.bin.gz": 43.99,
+    "buildings_index.json": 113.23,
+    "config.json": 0.01,
+    "demand_data.json": 81.94,
+    "ocean_depth_index.json": 78.16,
+    "roads.geojson": 6.24,
+    "runways_taxiways.geojson": 0.52
+  },
   "included_cities": [
     "Bilhorod-Dnistrovs'kyi",
     "Chornomorsk"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.11014028173573398,
+      "p25": 0.11522914484571935,
+      "p50": 0.1272566395193534,
+      "p75": 0.1568408214930239,
+      "p90": 0.19235189220349827,
+      "mean": 0.14657286122884253
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.11161859041205391,
+      "p25": 0.11896329473512096,
+      "p50": 0.1333816347498248,
+      "p75": 0.1697239804701193,
+      "p90": 0.2511427104696057,
+      "mean": 0.16148254953446536
+    },
+    "commuteDistanceKm": {
+      "p10": 3893,
+      "p25": 7623,
+      "p50": 15599,
+      "p75": 37495,
+      "p90": 76720,
+      "mean": 27768.628591033852
+    },
+    "residentCellDensity": {
+      "p10": 21,
+      "p25": 35,
+      "p50": 89,
+      "p75": 257,
+      "p90": 887,
+      "mean": 452.4157894736842
+    },
+    "workerCellDensity": {
+      "p10": 17,
+      "p25": 29,
+      "p50": 72,
+      "p75": 283,
+      "p90": 1373,
+      "mean": 561.449379490529
+    },
+    "detail": {
+      "radiusKm": 0.13028314784292142,
+      "expectedPointSpacingKm": 0.4191184251738196,
+      "normalizedRadius": 0.31085044230372244,
+      "activityPerPoint": 70.07670361917182,
+      "playableAreaKm2": 4156,
+      "playableAreaPerPointKm2": 0.3387675252689925,
+      "playableCatchmentRadiusKm": 0.3283794335995137,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.639322116183891,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 30.68166103236919,
+            "latitude": 46.467765984837186,
+            "massShare": 1,
+            "assignedMass": 1719402,
+            "assignedPointCount": 12268,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1783468800
 }
