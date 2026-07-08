@@ -17,7 +17,7 @@ import {
   withCheckResult,
 } from "../downloads-support.js";
 
-const INTEGRITY_RULES_VERSION = "v6";
+const INTEGRITY_RULES_VERSION = "v7";
 
 function applyVersionTagCheck(
   check: ZipCompletenessResult,

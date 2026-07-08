@@ -4,6 +4,7 @@ import type { ManifestType } from "./manifests.js";
 import type { CompiledSecurityRule, SecurityIssue } from "./mod-security.js";
 import { scanZipForSecurityIssues } from "./mod-security.js";
 import { isObject, toFiniteNumber, bytesToMebibytesRounded, getDemandPointRef } from "./json-utils.js";
+import { parseDemandDataPayload, parseDemandGridData } from "./map-demand-stats/extraction.js";
 
 
 export interface IntegritySource {
@@ -254,44 +255,26 @@ async function parseConfigCode(zip: JSZip): Promise<{
   };
 }
 
-async function parseDemandPointCoordinates(zip: JSZip): Promise<DemandPointCoordinate[]> {
-  const demandDataEntry = findTopLevelEntry(zip, ["demand_data.json", "demand_data.json.gz"]);
-  if (!demandDataEntry) {
-    return [];
-  }
-
-  let rawText: string;
+async function readDemandDataEntry(zip: JSZip): Promise<unknown | null> {
+  const entry = findTopLevelEntry(zip, ["demand_data.json", "demand_data.json.gz"]);
+  if (!entry) return null;
   try {
-    if (demandDataEntry.name.toLowerCase().endsWith(".gz")) {
-      const compressed = await demandDataEntry.async("nodebuffer");
-      rawText = gunzipSync(compressed).toString("utf-8");
-    } else {
-      rawText = await demandDataEntry.async("string");
-    }
+    const rawText = entry.name.toLowerCase().endsWith(".gz")
+      ? gunzipSync(await entry.async("nodebuffer")).toString("utf-8")
+      : await entry.async("string");
+    return JSON.parse(rawText);
   } catch {
-    return [];
+    return null;
   }
+}
 
-  let payload: unknown;
-  try {
-    payload = JSON.parse(rawText);
-  } catch {
-    return [];
-  }
-
-  if (!isObject(payload) && !Array.isArray(payload)) {
-    return [];
-  }
-
+function extractDemandPointCoordinates(payload: unknown): DemandPointCoordinate[] {
+  if (!isObject(payload) && !Array.isArray(payload)) return [];
   const pointsRaw = isObject(payload) ? payload.points : null;
-  if (!Array.isArray(pointsRaw) && !isObject(pointsRaw)) {
-    return [];
-  }
-
+  if (!Array.isArray(pointsRaw) && !isObject(pointsRaw)) return [];
   const pointEntries = Array.isArray(pointsRaw)
     ? pointsRaw.map((pointValue, index) => [String(index), pointValue] as const)
     : Object.entries(pointsRaw);
-
   const coordinates: DemandPointCoordinate[] = [];
   for (const [pointKey, pointValue] of pointEntries) {
     if (!isObject(pointValue)) continue;
@@ -300,12 +283,8 @@ async function parseDemandPointCoordinates(zip: JSZip): Promise<DemandPointCoord
     const longitude = toFiniteNumber(locationRaw[0]);
     const latitude = toFiniteNumber(locationRaw[1]);
     if (longitude === null || latitude === null) continue;
-    coordinates.push({
-      id: getDemandPointRef(pointValue, pointKey),
-      location: [longitude, latitude],
-    });
+    coordinates.push({ id: getDemandPointRef(pointValue, pointKey), location: [longitude, latitude] });
   }
-
   return coordinates;
 }
 
@@ -426,7 +405,10 @@ async function inspectMapZip(
   if (!demandData) {
     errors.push("missing top-level demand_data.json or demand_data.json.gz");
   } else {
-    const demandPoints = await parseDemandPointCoordinates(zip);
+    const demandPayload = await readDemandDataEntry(zip);
+
+    // Existing: geographic isolation check
+    const demandPoints = extractDemandPointCoordinates(demandPayload);
     if (demandPoints.length >= 2) {
       const isolatedPoints = findIsolatedDemandPoints(demandPoints);
       requiredChecks.demand_point_spacing = isolatedPoints.length === 0;
@@ -442,6 +424,45 @@ async function inspectMapZip(
         errors.push(
           `demand_data contains ${isolatedPoints.length} isolated point(s) with nearest-neighbor distance >${ISOLATED_MAP_POINT_DISTANCE_KM}km: ${examples}${remainder}`,
         );
+      }
+    }
+
+    if (demandPayload !== null) {
+      // Phantom points: demand points with neither residents nor jobs
+      try {
+        const gridData = parseDemandGridData(demandPayload);
+        const phantoms = gridData.points.filter((p) => p.residents === 0 && p.jobs === 0);
+        requiredChecks.demand_phantom_points = phantoms.length === 0;
+        matchedFiles.demand_phantom_points = demandData;
+        if (phantoms.length > 0) {
+          const pct = ((phantoms.length / gridData.points.length) * 100).toFixed(1);
+          const examples = phantoms.slice(0, 3).map((p) => p.id).join(", ");
+          errors.push(
+            `demand_data contains ${phantoms.length} of ${gridData.points.length} points (${pct}%) with neither residents nor jobs (e.g. ${examples})`,
+          );
+        }
+      } catch (error) {
+        requiredChecks.demand_phantom_points = false;
+        matchedFiles.demand_phantom_points = demandData;
+        errors.push(`demand_data phantom-points check failed: ${(error as Error).message}`);
+      }
+
+      // Resident totals: sum by points must equal sum by population entries
+      try {
+        const parsed = parseDemandDataPayload(demandPayload);
+        const totalsMatch = parsed.residentsTotalByPoint === parsed.residentsTotalByPop;
+        requiredChecks.demand_residents_match = totalsMatch;
+        matchedFiles.demand_residents_match = demandData;
+        if (!totalsMatch) {
+          const delta = parsed.residentsTotalByPoint - parsed.residentsTotalByPop;
+          errors.push(
+            `demand_data resident totals mismatch (points=${parsed.residentsTotalByPoint}, pops=${parsed.residentsTotalByPop}, delta=${delta})`,
+          );
+        }
+      } catch (error) {
+        requiredChecks.demand_residents_match = false;
+        matchedFiles.demand_residents_match = demandData;
+        errors.push(`demand_data residents-match check failed: ${(error as Error).message}`);
       }
     }
   }

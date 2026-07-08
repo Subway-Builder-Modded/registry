@@ -38,7 +38,7 @@ function findConfigEntry(zip: JSZip): JSZip.JSZipObject | null {
   return byBasename ?? null;
 }
 
-function parseDemandDataPayload(payload: unknown): ParsedDemandDataPayloadResult {
+export function parseDemandDataPayload(payload: unknown): ParsedDemandDataPayloadResult {
   if (!isObject(payload)) {
     throw new Error("demand data payload must be an object");
   }
