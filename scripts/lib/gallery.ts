@@ -165,14 +165,6 @@ export async function downloadGalleryImages(
 
       const buffer = Buffer.from(await response.arrayBuffer());
 
-      // Skip very small images (badges, icons)
-      if (buffer.length < MIN_SCREENSHOT_SIZE) {
-        console.warn(
-          `Skipping image ${i + 1}: too small (${buffer.length} bytes, likely a badge/icon)`
-        );
-        continue;
-      }
-
       // Transcode all gallery screenshots to WebP to keep the registry (and the
       // Railyard app's clone) small. The app has rendered image/webp since its
       // first release, so WebP gallery paths are safe for every shipped version.
