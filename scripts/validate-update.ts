@@ -116,11 +116,14 @@ async function main() {
       existingManifest = manifest;
       const ownerId = String(manifest.github_id);
       const authorId = String(issueAuthorId);
+      const collaboratorIds = Array.isArray(manifest.collaborators)
+        ? manifest.collaborators.map((id) => String(id))
+        : [];
 
-      if (ownerId !== authorId) {
+      if (ownerId !== authorId && !collaboratorIds.includes(authorId)) {
         errors.push(
-          `**Ownership check failed**: Your GitHub account does not match the original publisher of \`${id}\`. `
-          + `Only the original publisher can update this listing.`,
+          `**Ownership check failed**: Your GitHub account does not match the original publisher or any listed collaborator of \`${id}\`. `
+          + `Only the original publisher or a listed collaborator can update this listing.`,
         );
       }
 
