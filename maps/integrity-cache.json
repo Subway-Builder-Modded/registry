@@ -13329,6 +13329,64 @@
           "fingerprint": "rules:v6:sha256:55795d59059dd844741331c55fc71f1d918d9112688e581e96c4b5035af5f5f9",
           "checked_at": "2026-07-09T05:12:53.661Z"
         }
+      },
+      "1.3.2": {
+        "fingerprint": "rules:v6:sha256:4b8907e558314d100bafcdded98bcfeef42b7b2db5ae2d28d3222058285aee6e",
+        "last_checked_at": "2026-07-09T05:21:55.097Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TPA.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 242.67,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.1,
+            ".railyard_map/special_demand_types.json": 0.03,
+            "TPA.pmtiles": 98.38,
+            "TPA_foundations.pmtiles": 51.83,
+            "buildings_index.bin": 154.77,
+            "buildings_index.json": 203.7,
+            "config.json": 0,
+            "demand_data.json": 10.01,
+            "ocean_depth_index.json.gz": 4.94,
+            "roads.geojson": 29.97,
+            "runways_taxiways.geojson": 2.19
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.3.2",
+            "asset_name": "TPA.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.3.2/TPA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:4b8907e558314d100bafcdded98bcfeef42b7b2db5ae2d28d3222058285aee6e",
+          "checked_at": "2026-07-09T05:21:55.097Z"
+        }
       }
     },
     "tel-aviv": {
