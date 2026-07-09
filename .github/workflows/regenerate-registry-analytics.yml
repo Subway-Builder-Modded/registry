@@ -24,6 +24,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: write
 
 concurrency:
   group: regenerate-registry-analytics
@@ -653,6 +654,7 @@ jobs:
 
       - name: Trigger hourly download refresh
         if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh workflow run regenerate-downloads-hourly.yml --ref main
