@@ -52,6 +52,7 @@ jobs:
       warning_count: ${{ steps.generate_map_downloads.outputs.warning_count }}
       adjusted_delta_total: ${{ steps.generate_map_downloads.outputs.adjusted_delta_total }}
       clamped_versions: ${{ steps.generate_map_downloads.outputs.clamped_versions }}
+      token_auth_status: ${{ steps.generate_map_downloads.outputs.token_auth_status }}
     steps:
       - uses: actions/checkout@v4
 
@@ -93,6 +94,7 @@ jobs:
       warning_count: ${{ steps.generate_mod_downloads.outputs.warning_count }}
       adjusted_delta_total: ${{ steps.generate_mod_downloads.outputs.adjusted_delta_total }}
       clamped_versions: ${{ steps.generate_mod_downloads.outputs.clamped_versions }}
+      token_auth_status: ${{ steps.generate_mod_downloads.outputs.token_auth_status }}
     steps:
       - uses: actions/checkout@v4
 
@@ -406,6 +408,8 @@ jobs:
           CLAMPED_VERSIONS_MODS: ${{ needs.generate-mods.outputs.clamped_versions }}
           MAP_WARNINGS_JSON: ${{ needs.generate-maps.outputs.warnings_json }}
           MOD_WARNINGS_JSON: ${{ needs.generate-mods.outputs.warnings_json }}
+          MAP_AUTH_STATUS: ${{ needs.generate-maps.outputs.token_auth_status }}
+          MOD_AUTH_STATUS: ${{ needs.generate-mods.outputs.token_auth_status }}
           COMMITTED: ${{ steps.commit_changes.outputs.committed }}
           COMMIT_SHA: ${{ steps.commit_changes.outputs.commit_sha }}
           PULL_REQUEST_URL: ${{ steps.commit_changes.outputs.pull_request_url }}
@@ -430,6 +434,26 @@ jobs:
             --arg maps "${MAP_WARNINGS_JSON_SAFE}" \
             --arg mods "${MOD_WARNINGS_JSON_SAFE}" \
             '($maps | fromjson) + ($mods | fromjson)')"
+
+          # Escalate to error (red) if GitHub token auth failed for either listing type
+          AUTH_ERRORS=()
+          if [ "${MAP_AUTH_STATUS}" = "missing" ]; then
+            AUTH_ERRORS+=("Maps: no GitHub token configured (GH_DOWNLOADS_TOKEN / GITHUB_TOKEN both empty)")
+          elif [ "${MAP_AUTH_STATUS}" = "invalid" ]; then
+            AUTH_ERRORS+=("Maps: GitHub token appears invalid or expired — GraphQL returned HTTP 401")
+          fi
+          if [ "${MOD_AUTH_STATUS}" = "missing" ]; then
+            AUTH_ERRORS+=("Mods: no GitHub token configured (GH_DOWNLOADS_TOKEN / GITHUB_TOKEN both empty)")
+          elif [ "${MOD_AUTH_STATUS}" = "invalid" ]; then
+            AUTH_ERRORS+=("Mods: GitHub token appears invalid or expired — GraphQL returned HTTP 401")
+          fi
+          if [ "${#AUTH_ERRORS[@]}" -gt 0 ]; then
+            AUTH_ERRORS+=("Download counts for GitHub-hosted listings may be stale. Check/rotate GH_DOWNLOADS_TOKEN, or verify GITHUB_TOKEN permissions.")
+            export DISCORD_STATUS="error"
+            export DISCORD_ERRORS_JSON="$(jq -cn '$ARGS.positional' --args "${AUTH_ERRORS[@]}")"
+          else
+            export DISCORD_ERRORS_JSON='[]'
+          fi
 
           export DISCORD_LINES_JSON="$(jq -nc \
             --arg updated_records_total "${UPDATED_RECORDS_TOTAL}" \

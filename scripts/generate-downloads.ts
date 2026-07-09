@@ -382,6 +382,8 @@ async function run(): Promise<void> {
       `[downloads] Suppressed ${suppressedWarnings} older-version warnings from GitHub/Discord output`,
     );
   }
+  const hasAuthFailure401 = warnings.some((w) => /GraphQL returned HTTP 401/.test(w));
+  const tokenAuthStatus = !token ? "missing" : hasAuthFailure401 ? "invalid" : "ok";
   appendGitHubOutput([
     `warning_count=${warningsForGitHub.length}`,
     `warnings_json=${toWarningsOutputJson(listingType, warningsForGitHub)}`,
@@ -398,6 +400,7 @@ async function run(): Promise<void> {
     `registry_fetches_added=${stats.registry_fetches_added}`,
     `adjusted_delta_total=${stats.adjusted_delta_total}`,
     `clamped_versions=${stats.clamped_versions}`,
+    `token_auth_status=${tokenAuthStatus}`,
   ]);
 }
 
