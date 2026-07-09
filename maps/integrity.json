@@ -379,12 +379,63 @@
       }
     },
     "baltimore-dc-corridor": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "1.1.1",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.1.1"
+      ],
       "incomplete_versions": [],
-      "versions": {}
+      "last_updated": 1773792000,
+      "versions": {
+        "1.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DCA.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 229.44,
+          "file_sizes": {
+            "DCA.pmtiles": 143.65,
+            "buildings_index.json": 362.01,
+            "city_config.json": 0,
+            "config.json": 0,
+            "demand_data.json": 23.83,
+            "ocean_depth_index.json": 6.87,
+            "roads.geojson": 61.18,
+            "runways_taxiways.geojson": 1.93
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.0",
+            "asset_name": "DCA.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/DCA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:a6117386faecfdef85d2f43f5c1b9a01c28d046d409259c02072c9986a901ff4",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        }
+      }
     },
     "bangkok": {
       "has_complete_version": true,
@@ -645,12 +696,109 @@
       }
     },
     "beijing": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "1.1.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.1.0",
+        "1.0.0"
+      ],
       "incomplete_versions": [],
-      "versions": {}
+      "last_updated": 1783296000,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PEK.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 217.21,
+          "file_sizes": {
+            "PEK.pmtiles": 155.33,
+            "buildings_index.json": 276.37,
+            "config.json": 0,
+            "demand_data.json": 43.81,
+            "roads.geojson": 42.47,
+            "runways_taxiways.geojson": 3.36
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.4.0",
+            "asset_name": "PEK.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.4.0/PEK.zip"
+          },
+          "fingerprint": "rules:v6:sha256:580959a3b7f38a874b07e82b75fa6b42fe60d73b201a68c435a71124a36b0cfe",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "1.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PEK.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 293.57,
+          "file_sizes": {
+            "PEK.pmtiles": 133.44,
+            "PEK_foundations.pmtiles": 79.11,
+            "buildings_index.bin.gz": 67.88,
+            "config.json": 0,
+            "demand_data.json": 43.81,
+            "ocean_depth_index.json.gz": 3.67,
+            "roads.geojson": 42.47,
+            "runways_taxiways.geojson": 3.36
+          },
+          "game_version": ">=1.3.7",
+          "source": {
+            "update_type": "custom",
+            "repo": "kronifer/sb-chinese-maps",
+            "tag": "v1.7.0",
+            "asset_name": "PEK.zip",
+            "download_url": "https://github.com/Kronifer/sb-chinese-maps/releases/download/v1.7.0/PEK.zip"
+          },
+          "fingerprint": "rules:v6:sha256:790a245e5242a9f930bbf997fb907750d4116b829138011acd2a8f8eb3a2050a",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        }
+      }
     },
     "bergen-stavanger-no": {
       "has_complete_version": true,
@@ -2186,12 +2334,199 @@
       }
     },
     "ciudad-de-mexico": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "1.2.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.2.0",
+        "1.1.1",
+        "1.1.0",
+        "1.0.0"
+      ],
       "incomplete_versions": [],
-      "versions": {}
+      "last_updated": 1777766400,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CDMX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 470.17,
+          "file_sizes": {
+            "CDMX.pmtiles": 354.21,
+            "buildings_index.json": 443.75,
+            "config.json": 0,
+            "demand_data.json": 15.29,
+            "roads.geojson": 57.37,
+            "runways_taxiways.geojson": 1.06
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.2",
+            "asset_name": "CDMX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.2/CDMX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:8f5b521246d7cef21317e2a5cb49d48812908dab1972373555b7c9fc95fa51e3",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "1.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CDMX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 157.25,
+          "file_sizes": {
+            "CDMX.pmtiles": 90.83,
+            "buildings_index.json": 266.28,
+            "config.json": 0,
+            "demand_data.json": 15.29,
+            "roads.geojson": 57.37,
+            "runways_taxiways.geojson": 1.06
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.4",
+            "asset_name": "CDMX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.4/CDMX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:59d787d4a287f5ec1f8677bf144ca39deb8aa27ac01d75c9072e167670bcaf1b",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "1.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CDMX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 157.25,
+          "file_sizes": {
+            "CDMX.pmtiles": 90.83,
+            "buildings_index.json": 266.28,
+            "config.json": 0,
+            "demand_data.json": 15.29,
+            "roads.geojson": 57.37,
+            "runways_taxiways.geojson": 1.06
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.5",
+            "asset_name": "CDMX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.5/CDMX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:08a6d8fbacb53d614081548a2b536efcb47fed70e1afba9db887102bd27dad1f",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "1.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CDMX.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 166.67,
+          "file_sizes": {
+            "CDMX.pmtiles": 93.79,
+            "buildings_index.json": 275.05,
+            "config.json": 0,
+            "demand_data.json": 16.74,
+            "roads.geojson": 74.99,
+            "runways_taxiways.geojson": 1.31
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.1",
+            "asset_name": "CDMX.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.1/CDMX.zip"
+          },
+          "fingerprint": "rules:v6:sha256:965aac7dde584db1f931952e2e8a665c60d898453e3689926d4de383b7b49ea5",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        }
+      }
     },
     "ciudad-juarez-el-paso": {
       "has_complete_version": false,
@@ -2816,12 +3151,156 @@
       }
     },
     "daejeon-3": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "0.2.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.0",
+        "0.1.1",
+        "0.1.0"
+      ],
       "incomplete_versions": [],
-      "versions": {}
+      "last_updated": 1776902400,
+      "versions": {
+        "0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DAJ3.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 30.51,
+          "file_sizes": {
+            "DAJ3.pmtiles": 24.97,
+            "buildings_index.json": 54.43,
+            "config.json": 0,
+            "demand_data.json": 1.74,
+            "ocean_depth_index.json": 0.01,
+            "roads.geojson": 13.56,
+            "runways_taxiways.geojson": 0.18
+          },
+          "game_version": ">=1.3.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "kimth9/sb_korean_map_pack",
+            "tag": "v0.1.0",
+            "asset_name": "DAJ3.zip",
+            "download_url": "https://github.com/kimth9/sb_korean_map_pack/releases/download/v0.1.0/DAJ3.zip"
+          },
+          "fingerprint": "rules:v6:sha256:de184bba198314d06a19e6a0ee756aead3eb691a0c38f22c49502cc227db3ff6",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "0.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DAJ3.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 46.03,
+          "file_sizes": {
+            "DAJ3.pmtiles": 36.9,
+            "buildings_index.json": 54.45,
+            "config.json": 0,
+            "demand_data.json": 502.42,
+            "ocean_depth_index.json": 0.01,
+            "roads.geojson": 13.56,
+            "runways_taxiways.geojson": 0.18
+          },
+          "game_version": ">=1.3.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "kimth9/sb_korean_map_pack",
+            "tag": "v0.1.1",
+            "asset_name": "DAJ3.zip",
+            "download_url": "https://github.com/kimth9/sb_korean_map_pack/releases/download/v0.1.1/DAJ3.zip"
+          },
+          "fingerprint": "rules:v6:sha256:c4eb5bdcabaa163b3b0854ac2b3353530803c3aed9f20a12500f18e1b5c991ca",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DAJ3.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 39.22,
+          "file_sizes": {
+            "DAJ3.pmtiles": 36.92,
+            "buildings_index.json": 54.45,
+            "config.json": 0,
+            "demand_data.json": 27.75,
+            "ocean_depth_index.json": 0.01,
+            "roads.geojson": 13.56,
+            "runways_taxiways.geojson": 0.18
+          },
+          "game_version": ">=1.3.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "kimth9/sb_korean_map_pack",
+            "tag": "v0.2.0",
+            "asset_name": "DAJ3.zip",
+            "download_url": "https://github.com/kimth9/sb_korean_map_pack/releases/download/v0.2.0/DAJ3.zip"
+          },
+          "fingerprint": "rules:v6:sha256:27f105ce3ac0393ebc66e5e7e4aa726bf6124abd748f66200bce5aca1e09a28a",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        }
+      }
     },
     "daejeon-4": {
       "has_complete_version": true,
@@ -10295,12 +10774,62 @@
       }
     },
     "puerto-rico": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.1",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.1"
+      ],
       "incomplete_versions": [],
-      "versions": {}
+      "last_updated": 1773792000,
+      "versions": {
+        "1.0.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PR.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 154.04,
+          "file_sizes": {
+            "PR.pmtiles": 65.13,
+            "buildings_index.json": 340.9,
+            "config.json": 0,
+            "demand_data.json": 5.44,
+            "ocean_depth_index.json": 3.56,
+            "roads.geojson": 40.22,
+            "runways_taxiways.geojson": 0.52
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.1.0",
+            "asset_name": "PR.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.1.0/PR.zip"
+          },
+          "fingerprint": "rules:v6:sha256:b144d52d0d34c60c90ae72c4a1943f809c0b2784fcf74a1c82463243e4dc278a",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        }
+      }
     },
     "pulau-pinang": {
       "has_complete_version": true,
@@ -10420,12 +10949,107 @@
       }
     },
     "quebec-city": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "1.1.3",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.1.3",
+        "1.0.1"
+      ],
       "incomplete_versions": [],
-      "versions": {}
+      "last_updated": 1772150400,
+      "versions": {
+        "1.0.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "QC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 27.63,
+          "file_sizes": {
+            "QC.pmtiles": 19,
+            "buildings_index.json": 30.55,
+            "config.json": 0,
+            "demand_data.json": 1.02,
+            "roads.geojson": 6.63,
+            "runways_taxiways.geojson": 0.34
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v1.0.1",
+            "asset_name": "QC.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.0.1/QC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:99653d4ae692af49a0761a37a535c39da02745739847975bf14faeeabd8f8673",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "1.1.3": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YQB.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 27.63,
+          "file_sizes": {
+            "YQB.pmtiles": 19,
+            "buildings_index.json": 30.55,
+            "config.json": 0,
+            "demand_data.json": 1.02,
+            "roads.geojson": 6.63,
+            "runways_taxiways.geojson": 0.34
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v1.1.3",
+            "asset_name": "YQB.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v1.1.3/YQB.zip"
+          },
+          "fingerprint": "rules:v6:sha256:5da6b99b25f7c33abc130963f89441b5b6c60d2a75a4e7552b0fe9759efac2fc",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        }
+      }
     },
     "rhode-island": {
       "has_complete_version": true,
@@ -11761,12 +12385,156 @@
       }
     },
     "seoul-4": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "0.2.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.0",
+        "0.1.1",
+        "0.1.0"
+      ],
       "incomplete_versions": [],
-      "versions": {}
+      "last_updated": 1776902400,
+      "versions": {
+        "0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SEL4.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 138.74,
+          "file_sizes": {
+            "SEL4.pmtiles": 91.26,
+            "buildings_index.json": 296.93,
+            "config.json": 0,
+            "demand_data.json": 7.54,
+            "ocean_depth_index.json": 0.01,
+            "roads.geojson": 55.48,
+            "runways_taxiways.geojson": 2.25
+          },
+          "game_version": ">=1.3.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "kimth9/sb_korean_map_pack",
+            "tag": "v0.1.0",
+            "asset_name": "SEL4.zip",
+            "download_url": "https://github.com/kimth9/sb_korean_map_pack/releases/download/v0.1.0/SEL4.zip"
+          },
+          "fingerprint": "rules:v6:sha256:32ce76f8602500ef6c5936bfd77163074f7ac4167675c2f6297edf51334e84f3",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "0.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SEL4.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 218.76,
+          "file_sizes": {
+            "SEL4.pmtiles": 234.09,
+            "buildings_index.json": 296.91,
+            "config.json": 0,
+            "demand_data.json": 464.88,
+            "ocean_depth_index.json": 0.01,
+            "roads.geojson": 55.48,
+            "runways_taxiways.geojson": 2.25
+          },
+          "game_version": ">=1.3.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "kimth9/sb_korean_map_pack",
+            "tag": "v0.1.1",
+            "asset_name": "SEL4.zip",
+            "download_url": "https://github.com/kimth9/sb_korean_map_pack/releases/download/v0.1.1/SEL4.zip"
+          },
+          "fingerprint": "rules:v6:sha256:afc8da06bb6aae1e1f6b6c9ce1d078a3d552a69f98bbd694da2518ae67091c39",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SEL4.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 226.68,
+          "file_sizes": {
+            "SEL4.pmtiles": 241.8,
+            "buildings_index.json": 305.31,
+            "config.json": 0,
+            "demand_data.json": 110.7,
+            "ocean_depth_index.json": 0.01,
+            "roads.geojson": 57.37,
+            "runways_taxiways.geojson": 2.25
+          },
+          "game_version": ">=1.3.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "kimth9/sb_korean_map_pack",
+            "tag": "v0.2.0",
+            "asset_name": "SEL4.zip",
+            "download_url": "https://github.com/kimth9/sb_korean_map_pack/releases/download/v0.2.0/SEL4.zip"
+          },
+          "fingerprint": "rules:v6:sha256:3936e32fbe8cf7a8168bc527962f7b5710365af5bb78c5f68f4b5ad5595f6835",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        }
+      }
     },
     "shanghai": {
       "has_complete_version": true,
@@ -12221,12 +12989,194 @@
       }
     },
     "spokane": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
-      "incomplete_versions": [],
-      "versions": {}
+      "has_complete_version": true,
+      "latest_semver_version": "2.2.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "2.2.0",
+        "2.1.0",
+        "1.0.0"
+      ],
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1775779200,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "GEG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 24.46,
+          "file_sizes": {
+            "GEG.pmtiles": 15.59,
+            "buildings_index.json": 35.17,
+            "config.json": 0,
+            "demand_data.json": 0.28,
+            "roads.geojson": 5.04,
+            "runways_taxiways.geojson": 0.6
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.0.0-geg",
+            "asset_name": "GEG.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.0-geg/GEG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:3adf76e1a57b794688ce1805f8345caef993057207c60692038fa28ee9f6948e",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "config.json version '1.0.0' does not match release tag '2.0.0' (expected '2.0.0')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "GEG.pmtiles",
+            "config_version_matches_tag": null
+          },
+          "release_size": 24.43,
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v2.0.0-geg",
+            "asset_name": "GEG.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.0.0-geg/GEG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:a2928a130704da97cad2357c489488458dc0980a1a5401899f2f125ff44eba23",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "2.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "GEG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 24.79,
+          "file_sizes": {
+            "GEG.pmtiles": 15.59,
+            "buildings_index.json": 35.17,
+            "config.json": 0,
+            "demand_data.json": 2.66,
+            "roads.geojson": 5.04,
+            "runways_taxiways.geojson": 0.6
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v2.1.0-geg",
+            "asset_name": "GEG.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.1.0-geg/GEG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:d89c66ec7376fb8b9da9a61ff227961c087ce218f7df78e50ddf525d9b1b6685",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        },
+        "2.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "GEG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 24.91,
+          "file_sizes": {
+            "GEG.pmtiles": 15.7,
+            "buildings_index.json": 35.17,
+            "config.json": 0,
+            "demand_data.json": 2.66,
+            "roads.geojson": 5.04,
+            "runways_taxiways.geojson": 0.6
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v2.2.0-geg",
+            "asset_name": "GEG.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.2.0-geg/GEG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:62a84fb8e7fc8321c2e4ec85ccdea6fca032d1421093558bf224c16ee8f7bca5",
+          "checked_at": "2026-07-07T03:43:59.556Z"
+        }
+      }
     },
     "sydney": {
       "has_complete_version": true,
