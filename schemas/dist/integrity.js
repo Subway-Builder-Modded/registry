@@ -24,6 +24,11 @@ export const IntegrityVersionEntrySchema = z.object({
     source: IntegritySourceSchema,
     fingerprint: z.string(),
     checked_at: z.string(),
+    // Immutable publish date of this version (github release publishedAt, else the
+    // custom update.json declared date). Rules-bump-proof, unlike checked_at.
+    // Optional: only present once the version has been (re)checked or backfilled
+    // since this field was introduced.
+    released_at: z.string().optional(),
 });
 export const ListingIntegrityEntrySchema = z.object({
     has_complete_version: z.boolean(),

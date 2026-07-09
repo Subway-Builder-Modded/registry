@@ -32,6 +32,9 @@ export interface IntegrityVersionEntry {
   source: IntegritySource;
   fingerprint: string;
   checked_at: string;
+  // Immutable publish date (github release publishedAt, else custom update.json
+  // date). Rules-bump-proof; backfilled onto reused cache entries at no cost.
+  released_at?: string;
 }
 
 // GAME_DEPENDENCY_KEY is the manifest dependency key declaring the required

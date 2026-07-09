@@ -43,6 +43,10 @@
                   "type": "string"
                 }
               },
+              "last_updated": {
+                "type": "integer",
+                "minimum": 0
+              },
               "versions": {
                 "type": "object",
                 "additionalProperties": {
@@ -174,6 +178,9 @@
                       "type": "string"
                     },
                     "checked_at": {
+                      "type": "string"
+                    },
+                    "released_at": {
                       "type": "string"
                     }
                   },

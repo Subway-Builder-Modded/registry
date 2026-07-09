@@ -36,6 +36,7 @@ import {
   resolveExpectedCustomReleaseManifestAssetName,
   versionedFingerprint,
   withReleaseSizeIfMissing,
+  withReleasedAtIfMissing,
   withBuildingsIndexPresenceIfMissing,
 } from "./downloads-full/integrity-completeness.js";
 import {
@@ -909,6 +910,17 @@ export async function generateDownloadsDataFull(
       GAME_VERSION_REQUIRED_SINCE_EPOCH,
     )) {
       warnListing(warnings, id, `game_version required [${listingType}]: ${violation.reason}`, violation.version);
+    }
+
+    // Stamp released_at (immutable publish date) onto every version — fresh, reused,
+    // and legacy cache entries alike. The output entry and its cache entry share a
+    // reference, so re-point both to the stamped copy.
+    for (const version of Object.keys(versionEntries)) {
+      const stamped = withReleasedAtIfMissing(versionEntries[version], publishEpochByVersion.get(version));
+      if (stamped === versionEntries[version]) continue;
+      versionEntries[version] = stamped;
+      const cacheEntry = nextListingCacheEntries[version];
+      if (cacheEntry) nextListingCacheEntries[version] = { ...cacheEntry, result: stamped };
     }
 
     for (const result of Object.values(versionEntries)) {

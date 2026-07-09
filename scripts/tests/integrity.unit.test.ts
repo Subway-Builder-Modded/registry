@@ -4,7 +4,10 @@ import JSZip from "jszip";
 import { inspectZipCompleteness, parseManifestGameDependency } from "../lib/integrity.js";
 import type { IntegrityVersionEntry } from "../lib/integrity.js";
 import type { CompiledSecurityRule } from "../lib/mod-security.js";
-import { withBuildingsIndexPresenceIfMissing } from "../lib/downloads-full/integrity-completeness.js";
+import {
+  withBuildingsIndexPresenceIfMissing,
+  withReleasedAtIfMissing,
+} from "../lib/downloads-full/integrity-completeness.js";
 
 function makeCachedEntry(matchedFiles: Record<string, string | null>): IntegrityVersionEntry {
   return {
@@ -98,7 +101,10 @@ test("map integrity requires exact top-level files including city pmtiles", asyn
 test("map integrity accepts a binary-only buildings index", async () => {
   const zipBuffer = await makeZip({
     "config.json": "{\"code\":\"ABC\"}",
-    "demand_data.json": "{}",
+    "demand_data.json": makeDemandData([
+      { id: "city-a", location: [0, 0] },
+      { id: "city-b", location: [0.02, 0.02] },
+    ]),
     "buildings_index.bin.gz": "stub",
     "roads.geojson": "{}",
     "runways_taxiways.geojson": "{}",
@@ -116,7 +122,10 @@ test("map integrity accepts a binary-only buildings index", async () => {
 test("map integrity records both buildings index forms when present", async () => {
   const zipBuffer = await makeZip({
     "config.json": "{\"code\":\"ABC\"}",
-    "demand_data.json": "{}",
+    "demand_data.json": makeDemandData([
+      { id: "city-a", location: [0, 0] },
+      { id: "city-b", location: [0.02, 0.02] },
+    ]),
     "buildings_index.json": "{}",
     "buildings_index.bin.gz": "stub",
     "roads.geojson": "{}",
@@ -169,7 +178,10 @@ test("map integrity rejects nested paths and missing top-level city pmtiles", as
 test("map integrity uses config code for pmtiles and warns on registry mismatch", async () => {
   const zipBuffer = await makeZip({
     "config.json": "{\"code\":\"CFG\"}",
-    "demand_data.json": "{}",
+    "demand_data.json": makeDemandData([
+      { id: "city-a", location: [0, 0] },
+      { id: "city-b", location: [0.02, 0.02] },
+    ]),
     "buildings_index.json": "{}",
     "roads.geojson": "{}",
     "runways_taxiways.geojson": "{}",
@@ -333,4 +345,18 @@ test("withBuildingsIndexPresenceIfMissing ignores non-map (mod) entries", async 
   const mod = makeCachedEntry({ release_manifest_asset: "manifest.json", zip_manifest_json: "manifest.json" });
   const patched = withBuildingsIndexPresenceIfMissing(mod);
   assert.equal(patched, mod); // no buildings_index key → untouched
+});
+
+test("withReleasedAtIfMissing stamps the publish date from epoch seconds", async () => {
+  const entry = makeCachedEntry({});
+  const epoch = Math.floor(Date.parse("2025-03-14T09:30:00Z") / 1000);
+  const patched = withReleasedAtIfMissing(entry, epoch);
+  assert.equal(patched.released_at, "2025-03-14T09:30:00.000Z");
+});
+
+test("withReleasedAtIfMissing is a no-op when already set or no date is known", async () => {
+  const known = { ...makeCachedEntry({}), released_at: "2020-01-01T00:00:00.000Z" };
+  assert.equal(withReleasedAtIfMissing(known, 1_700_000_000), known); // keep existing (immutable)
+  const dateless = makeCachedEntry({});
+  assert.equal(withReleasedAtIfMissing(dateless, undefined), dateless); // no epoch → untouched
 });
