@@ -258,9 +258,10 @@ export async function generateDownloadsDataFull(
   const repoSet = new Set<string>();
 
   // Pace unauthenticated raw.githubusercontent.com custom-update fetches to
-  // avoid GitHub secondary rate limits (429s). 500ms between each fetch.
+  // avoid GitHub secondary rate limits (429s). 200ms between each fetch.
   const CUSTOM_UPDATE_INTER_FETCH_DELAY_MS = 200;
   let customFetchCount = 0;
+  const transientErrorListings = new Set<string>();
 
   for (const id of ids) {
     downloadsByListing[id] = {};
@@ -291,6 +292,7 @@ export async function generateDownloadsDataFull(
     const customFetch = await fetchCustomVersions(id, manifest.update.url, fetchImpl, warnings);
     if (customFetch.transientError) {
       downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
+      transientErrorListings.add(id);
       warnListing(warnings, id, "preserved previous custom-update downloads (transient fetch error)");
       continue;
     }
@@ -334,7 +336,18 @@ export async function generateDownloadsDataFull(
     versionBucketInputs[id] = {};
     const context = listingContexts.get(id);
     if (!context) {
-      integrityListings[id] = createListingIntegrityEntry({});
+      if (transientErrorListings.has(id)) {
+        const listingCacheEntries = cache.entries[id] ?? {};
+        const preservedListing = previousIntegrity?.listings[id];
+        integrityListings[id] = preservedListing ?? createListingIntegrityEntry({});
+        nextCache.entries[id] = sortObjectByKeys(listingCacheEntries);
+        const preservedCounts = countIntegrityVersions(preservedListing);
+        completeVersions += preservedCounts.complete;
+        incompleteVersions += preservedCounts.incomplete;
+        warnListing(warnings, id, "preserved previous integrity state (transient custom-update fetch error)");
+      } else {
+        integrityListings[id] = createListingIntegrityEntry({});
+      }
       continue;
     }
 
