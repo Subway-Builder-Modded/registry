@@ -2,7 +2,6 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import sharp from "sharp";
 
-const MIN_SCREENSHOT_SIZE = 5 * 1024; // 5KB — badges/icons are typically smaller
 // Matches scripts/convert-galleries-to-webp.ts; visually lossless for screenshots.
 const GALLERY_WEBP_QUALITY = 82;
 
@@ -132,8 +131,7 @@ export async function resolveGalleryUrls(
 /**
  * Download gallery images to disk.
  *
- * Skips SVG images (likely badges) and images smaller than MIN_SCREENSHOT_SIZE
- * (likely icons/badges rather than actual screenshots).
+ * Skips SVG images (likely badges)
  */
 export async function downloadGalleryImages(
   urls: string[],
