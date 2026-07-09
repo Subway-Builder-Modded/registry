@@ -651,6 +651,12 @@ jobs:
           echo "commit_sha=${HEAD_SHA:0:7}" >> "$GITHUB_OUTPUT"
           echo "pull_request_url=${{ steps.bot_pr.outputs.pr_url }}" >> "$GITHUB_OUTPUT"
 
+      - name: Trigger hourly download refresh
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh workflow run regenerate-downloads-hourly.yml --ref main
+
       - name: Send new content announcements
         if: ${{ steps.commit_changes.outputs.committed == 'true' }}
         env:
