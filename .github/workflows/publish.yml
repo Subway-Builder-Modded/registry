@@ -241,6 +241,21 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
+      - name: Resolve GeoNames cache key
+        id: geonames-key
+        run: echo "week=$(date +%Y-%U)" >> $GITHUB_OUTPUT
+
+      - name: Cache GeoNames data
+        uses: actions/cache@v4
+        with:
+          path: tmp/geonames
+          key: geonames-${{ steps.geonames-key.outputs.week }}
+          restore-keys: |
+            geonames-
+
+      - name: Generate search aliases
+        run: pnpm --dir scripts run generate-search-aliases -- --map-id "${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
