@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-09T01:24:14.604Z",
+  "generated_at": "2026-07-09T03:16:35.896Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -1833,14 +1833,16 @@
       }
     },
     "cape-town": {
-      "has_complete_version": false,
-      "latest_semver_version": "v1.0.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.1",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.1"
+      ],
       "incomplete_versions": [
         "v1.0.0"
       ],
-      "last_updated": 1783520224,
+      "last_updated": 1783563855,
       "versions": {
         "v1.0.0": {
           "is_complete": false,
@@ -1884,6 +1886,62 @@
           },
           "fingerprint": "rules:v6:github:worstboyinaustral1a/subway-builder-za:v1.0.0:CPT_v3.zip",
           "checked_at": "2026-07-09T00:49:01.651Z"
+        },
+        "v1.0.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CPT.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 406.8,
+          "file_sizes": {
+            "CPT.pmtiles": 104.6,
+            "CPT_foundations.pmtiles": 74.46,
+            "buildings_foundations.geojson": 1233.16,
+            "buildings_index.bin": 238.87,
+            "buildings_index.json": 317.04,
+            "config.json": 0,
+            "demand_data.json": 10.07,
+            "ocean_depth_index.json.gz": 4.44,
+            "ocean_foundations.geojson": 79.63,
+            "places.geojson": 1.89,
+            "roads.geojson": 30.29,
+            "runways_taxiways.geojson": 0.78,
+            "water.geojson": 10.67
+          },
+          "game_version": ">=1.3.0",
+          "source": {
+            "update_type": "github",
+            "repo": "worstboyinaustral1a/subway-builder-za",
+            "tag": "v1.0.1",
+            "asset_name": "CPT_v1.0.1.zip",
+            "download_url": "https://github.com/worstboyinaustral1a/subway-builder-za/releases/download/v1.0.1/CPT_v1.0.1.zip"
+          },
+          "fingerprint": "rules:v6:github:worstboyinaustral1a/subway-builder-za:v1.0.1:CPT_v1.0.1.zip",
+          "checked_at": "2026-07-09T03:16:35.896Z"
         }
       }
     },
@@ -9626,9 +9684,10 @@
     },
     "opo-pt-metropolitan": {
       "has_complete_version": true,
-      "latest_semver_version": "v0.4.2",
+      "latest_semver_version": "v0.4.3",
       "latest_semver_complete": true,
       "complete_versions": [
+        "v0.4.3",
         "v0.4.2",
         "v0.3.0",
         "v0.2.1",
@@ -9639,7 +9698,7 @@
         "v0.4.0",
         "v0.1.0"
       ],
-      "last_updated": 1783556263,
+      "last_updated": 1783560953,
       "versions": {
         "v0.1.0": {
           "is_complete": false,
@@ -9961,6 +10020,56 @@
           },
           "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.4.2:OPO_porto_amp_v0.4.2.zip",
           "checked_at": "2026-07-09T00:49:01.651Z"
+        },
+        "v0.4.3": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "OPO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 84.74,
+          "file_sizes": {
+            "OPO.pmtiles": 41.94,
+            "buildings_index.bin.gz": 37.7,
+            "config.json": 0,
+            "demand_data.json.gz": 1.89,
+            "ocean_depth_index.json.gz": 0,
+            "roads.geojson.gz": 5.2,
+            "runways_taxiways.geojson.gz": 0.11
+          },
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "github",
+            "repo": "bquelhas/subwaybuilder-map-opo",
+            "tag": "v0.4.3",
+            "asset_name": "OPO_porto_amp_v0.4.3.zip",
+            "download_url": "https://github.com/bquelhas/subwaybuilder-map-opo/releases/download/v0.4.3/OPO_porto_amp_v0.4.3.zip"
+          },
+          "fingerprint": "rules:v6:github:bquelhas/subwaybuilder-map-opo:v0.4.3:OPO_porto_amp_v0.4.3.zip",
+          "checked_at": "2026-07-09T03:16:35.896Z"
         }
       }
     },
@@ -13384,14 +13493,15 @@
     },
     "tampa-bay": {
       "has_complete_version": false,
-      "latest_semver_version": "1.2.0",
+      "latest_semver_version": "1.3.0",
       "latest_semver_complete": false,
       "complete_versions": [],
       "incomplete_versions": [
+        "1.3.0",
         "1.2.0",
         "1.1.0"
       ],
-      "last_updated": 1780617600,
+      "last_updated": 1783468800,
       "versions": {
         "1.1.0": {
           "is_complete": false,
@@ -13478,6 +13588,50 @@
           },
           "fingerprint": "rules:v6:sha256:4208a9af3b14594c10b5fbaa2de47f6ab541cc1b8c69aae59d0c7889c7095543",
           "checked_at": "2026-07-09T00:49:01.651Z"
+        },
+        "1.3.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 108 of 3374 points (3.2%) with neither residents nor jobs (e.g. merged_SO_77192, merged_SO_106970, merged_SO_26404)",
+            "config.json version '1.2.0' does not match release tag '1.3.0' (expected '1.3.0')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": null,
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TPA.pmtiles",
+            "config_version_matches_tag": null
+          },
+          "release_size": 147.79,
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.2.3",
+            "asset_name": "TPA.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.2.3/TPA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:55795d59059dd844741331c55fc71f1d918d9112688e581e96c4b5035af5f5f9",
+          "checked_at": "2026-07-09T03:16:35.896Z"
         }
       }
     },
