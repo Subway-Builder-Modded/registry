@@ -13282,6 +13282,53 @@
           "fingerprint": "rules:v6:sha256:55795d59059dd844741331c55fc71f1d918d9112688e581e96c4b5035af5f5f9",
           "checked_at": "2026-07-09T03:16:35.896Z"
         }
+      },
+      "1.3.1": {
+        "fingerprint": "rules:v6:sha256:55795d59059dd844741331c55fc71f1d918d9112688e581e96c4b5035af5f5f9",
+        "last_checked_at": "2026-07-09T05:12:53.661Z",
+        "result": {
+          "is_complete": false,
+          "errors": [
+            "config.json version '1.3.0' does not match release tag '1.3.1' (expected '1.3.1')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TPA.pmtiles",
+            "config_version_matches_tag": null
+          },
+          "release_size": 242.67,
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.3.1",
+            "asset_name": "TPA.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.3.1/TPA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:55795d59059dd844741331c55fc71f1d918d9112688e581e96c4b5035af5f5f9",
+          "checked_at": "2026-07-09T05:12:53.661Z"
+        }
       }
     },
     "tel-aviv": {
