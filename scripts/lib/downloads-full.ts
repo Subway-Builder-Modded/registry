@@ -257,6 +257,11 @@ export async function generateDownloadsDataFull(
   const listingContexts = new Map<string, ListingContext>();
   const repoSet = new Set<string>();
 
+  // Pace unauthenticated raw.githubusercontent.com custom-update fetches to
+  // avoid GitHub secondary rate limits (429s). 500ms between each fetch.
+  const CUSTOM_UPDATE_INTER_FETCH_DELAY_MS = 500;
+  let customFetchCount = 0;
+
   for (const id of ids) {
     downloadsByListing[id] = {};
     let manifest;
@@ -279,6 +284,10 @@ export async function generateDownloadsDataFull(
       continue;
     }
 
+    if (customFetchCount > 0) {
+      await new Promise<void>((resolve) => setTimeout(resolve, CUSTOM_UPDATE_INTER_FETCH_DELAY_MS));
+    }
+    customFetchCount += 1;
     const customFetch = await fetchCustomVersions(id, manifest.update.url, fetchImpl, warnings);
     if (customFetch.transientError) {
       downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
