@@ -259,7 +259,7 @@ export async function generateDownloadsDataFull(
 
   // Pace unauthenticated raw.githubusercontent.com custom-update fetches to
   // avoid GitHub secondary rate limits (429s). 500ms between each fetch.
-  const CUSTOM_UPDATE_INTER_FETCH_DELAY_MS = 500;
+  const CUSTOM_UPDATE_INTER_FETCH_DELAY_MS = 200;
   let customFetchCount = 0;
 
   for (const id of ids) {
