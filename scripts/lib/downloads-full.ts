@@ -84,6 +84,27 @@ function countIntegrityVersions(entry: ListingIntegrityEntry | undefined): {
   return { complete, incomplete };
 }
 
+// Checks added after the v6 baseline that must not retroactively fail versions
+// that were already passing before these checks existed. If a fresh inspection
+// (triggered by an empty cache) fails ONLY due to these keys, we preserve the
+// previous passing result instead of marking the version incomplete.
+const GRANDFATHERED_CHECK_KEYS: ReadonlySet<string> = new Set([
+  "demand_phantom_points",
+  "demand_residents_match",
+]);
+
+function isGrandfatheredDowngrade(
+  previousEntry: IntegrityVersionEntry | undefined,
+  newResult: IntegrityVersionEntry,
+): boolean {
+  if (!previousEntry?.is_complete) return false;
+  if (newResult.is_complete) return false;
+  const failingKeys = Object.entries(newResult.required_checks)
+    .filter(([, pass]) => pass === false)
+    .map(([key]) => key);
+  return failingKeys.length > 0 && failingKeys.every((key) => GRANDFATHERED_CHECK_KEYS.has(key));
+}
+
 function getAdjustedGithubZipTotal(params: {
   listingId: string;
   version: string;
@@ -551,12 +572,25 @@ export async function generateDownloadsDataFull(
                   attemptedReleaseSizeMiB,
                 )
             );
-          versionEntries[tag] = result;
-          nextListingCacheEntries[tag] = {
-            fingerprint,
-            last_checked_at: nowIso,
-            result,
-          };
+          const previousVersionEntry = previousIntegrity?.listings[id]?.versions?.[tag];
+          if (isGrandfatheredDowngrade(previousVersionEntry, result)) {
+            versionEntries[tag] = previousVersionEntry!;
+            nextListingCacheEntries[tag] = {
+              fingerprint,
+              last_checked_at: nowIso,
+              result: previousVersionEntry!,
+            };
+            const failingKeys = Object.entries(result.required_checks)
+              .filter(([, v]) => !v).map(([k]) => k).join(", ");
+            warnListing(warnings, id, `preserved previous is_complete=true (grandfathered checks: ${failingKeys})`, tag);
+          } else {
+            versionEntries[tag] = result;
+            nextListingCacheEntries[tag] = {
+              fingerprint,
+              last_checked_at: nowIso,
+              result,
+            };
+          }
         }
 
         if (isSupportedReleaseTag(tag)) {
@@ -831,12 +865,24 @@ export async function generateDownloadsDataFull(
                     releaseSizeMiB,
                     candidate.gameMeta,
                   );
-                  versionEntries[versionKey] = result;
-                  nextListingCacheEntries[versionKey] = {
-                    fingerprint,
-                    last_checked_at: nowIso,
-                    result,
-                  };
+                  if (isGrandfatheredDowngrade(previousVersionEntry, result)) {
+                    versionEntries[versionKey] = previousVersionEntry!;
+                    nextListingCacheEntries[versionKey] = {
+                      fingerprint,
+                      last_checked_at: nowIso,
+                      result: previousVersionEntry!,
+                    };
+                    const failingKeys = Object.entries(result.required_checks)
+                      .filter(([, v]) => !v).map(([k]) => k).join(", ");
+                    warnListing(warnings, id, `preserved previous is_complete=true (grandfathered checks: ${failingKeys})`, versionKey);
+                  } else {
+                    versionEntries[versionKey] = result;
+                    nextListingCacheEntries[versionKey] = {
+                      fingerprint,
+                      last_checked_at: nowIso,
+                      result,
+                    };
+                  }
                 }
               }
             }
