@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-11T04:01:21.320Z",
+  "generated_at": "2026-07-11T06:28:50.294Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -13799,9 +13799,10 @@
     },
     "tampa-bay": {
       "has_complete_version": true,
-      "latest_semver_version": "1.3.2",
+      "latest_semver_version": "1.3.3",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.3.3",
         "1.3.2",
         "1.2.0",
         "1.1.0"
@@ -13810,7 +13811,7 @@
         "1.3.1",
         "1.3.0"
       ],
-      "last_updated": 1783555200,
+      "last_updated": 1783728000,
       "versions": {
         "1.1.0": {
           "is_complete": true,
@@ -14049,6 +14050,61 @@
           "fingerprint": "rules:v6:sha256:4b8907e558314d100bafcdded98bcfeef42b7b2db5ae2d28d3222058285aee6e",
           "checked_at": "2026-07-09T05:21:55.097Z",
           "released_at": "2026-07-09T00:00:00.000Z"
+        },
+        "1.3.3": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TPA.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 239.69,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.1,
+            ".railyard_map/special_demand_types.json": 0.03,
+            "TPA.pmtiles": 95.26,
+            "TPA_foundations.pmtiles": 51.83,
+            "buildings_index.bin": 154.77,
+            "buildings_index.json": 203.7,
+            "config.json": 0,
+            "demand_data.json": 10,
+            "ocean_depth_index.json.gz": 5.04,
+            "roads.geojson": 29.97,
+            "runways_taxiways.geojson": 2.19
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.3.3",
+            "asset_name": "TPA.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.3.3/TPA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:a69290315c81b8bc6fc95635c7cb55786f1fb4a42dba59dc284d140b6a0f000c",
+          "checked_at": "2026-07-11T06:28:50.294Z",
+          "released_at": "2026-07-11T00:00:00.000Z"
         }
       }
     },
