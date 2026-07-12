@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "hide-and-seek",
+  "name": "Hide+Seek: The Mod [beta]",
+  "author": "nzh0172",
+  "github_id": 69677589,
+  "description": "<p>Play hide and seek using your own rail network inspired by Jet Lag The Game&#x27;s infamous Hide and Seek game as the seeker.</p>\n<h3>Phases</h3>\n<ol>\n<li>Setup phase: Decide your playing area, number of rounds played, hiding time, game mode and starting station</li>\n<li>Seeking phase: Use questions and question log to pinpoint the hider&#x27;s location.</li>\n<li>Reveal phase: See the hiding station and the path it took.</li>\n</ol>\n<h3>Game mode</h3>\n<p>Instant (quick-play)</p>\n<ul>\n<li>Hider path is schedule-valid on a synthetic timetable (not live trains).</li>\n<li>No hide timer; seeking starts immediately after the hiding station is chosen.</li>\n<li>Long travel budget for path search (up to 24 hours of journey time).</li>\n<li>Trains do not need to be running.</li>\n</ul>\n<p>Live</p>\n<ul>\n<li>Hider must travel on real running trains and real departures.</li>\n<li>Requires trains to run on your routes.</li>\n<li>Simulation runs for X hours which can be set on Setup Phase then seeking begins.</li>\n<li>Hiding destinations must be reachable within that time window.</li>\n</ul>\n<h3>How the hider pick a station</h3>\n<p>Among valid candidates, the bot prefers a <strong>distance band</strong> from the play-area center (as a fraction of radius):</p>\n<table><thead><tr><th>Zone</th><th>Distance from center</th><th>Weight</th></tr></thead><tbody><tr><td><strong>Near</strong></td><td>12%–42% of radius</td><td>40%</td></tr><tr><td><strong>Far</strong></td><td>42%–72% of radius</td><td>40%</td></tr><tr><td><strong>Boundary</strong></td><td>≥ 88% of radius (outer ring)</td><td>20%</td></tr></tbody></table>\n<p>It rolls a zone with those weights, picks a <strong>uniform random</strong> candidate in that zone, then falls back through near → far → boundary if the preferred zone is empty. If still empty, it prefers non-boundary candidates, then any remaining candidate.</p>",
+  "tags": [
+    "gameplay",
+    "ui"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/nzh0172/sb-hideandseek",
+  "update": {
+    "type": "github",
+    "repo": "nzh0172/sb-hideandseek"
+  }
+}
