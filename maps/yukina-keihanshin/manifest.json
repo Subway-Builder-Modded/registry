@@ -51,7 +51,18 @@
     "schools",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 49.25,
+    ".railyard_map/special_demand_points.json": 1.41,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "KHS.pmtiles": 491.85,
+    "buildings_index.bin.gz": 292.82,
+    "config.json": 0.02,
+    "demand_data.json": 95.01,
+    "ocean_depth_index.json": 60.02,
+    "roads.geojson": 110.85,
+    "runways_taxiways.geojson": 2.12
+  },
   "included_cities": [
     "Akashi",
     "Nishinomiya",
@@ -62,5 +73,91 @@
     "Higashiōsaka",
     "Kōbe",
     "Kyōto"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.13869447277157512,
+      "p25": 0.15390116186460526,
+      "p50": 0.16543078938129152,
+      "p75": 0.21162976900767075,
+      "p90": 0.2723897757659901,
+      "mean": 0.1891492767250568
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1194053892663356,
+      "p25": 0.14755105939405,
+      "p50": 0.16409455314873075,
+      "p75": 0.2001559868443143,
+      "p90": 0.26682565330395996,
+      "mean": 0.1914580043899154
+    },
+    "commuteDistanceKm": {
+      "p10": 963,
+      "p25": 3498,
+      "p50": 9267,
+      "p75": 23490,
+      "p90": 42846,
+      "mean": 16493.137093668593
+    },
+    "residentCellDensity": {
+      "p10": 48,
+      "p25": 165,
+      "p50": 1311,
+      "p75": 3738,
+      "p90": 6281,
+      "mean": 2344.756569847856
+    },
+    "workerCellDensity": {
+      "p10": 47,
+      "p25": 174,
+      "p50": 892,
+      "p75": 2678,
+      "p90": 5298,
+      "mean": 2229.123602892834
+    },
+    "detail": {
+      "radiusKm": 0.16476131663884222,
+      "expectedPointSpacingKm": 0.3647319429582732,
+      "normalizedRadius": 0.45173262122997426,
+      "activityPerPoint": 276.0350891476024,
+      "playableAreaKm2": 5932,
+      "playableAreaPerPointKm2": 0.1609813020706125,
+      "playableCatchmentRadiusKm": 0.22636682605853511,
+      "localityScore": 0.7298383523728308,
+      "deaggregationScore": 1,
+      "score": 0.8543057721757654
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.5326170266125576,
+        "continuousScore": 0.909827495942785,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.3629707010863124,
+        "largestCenterShare": 0.84182706643398,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 135.45610307840758,
+            "latitude": 34.67914303404004,
+            "massShare": 0.84182706643398,
+            "assignedMass": 17125485,
+            "assignedPointCount": 28169,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 135.73679833292036,
+            "latitude": 34.95324327109322,
+            "massShare": 0.15817293356602002,
+            "assignedMass": 3217749,
+            "assignedPointCount": 8680,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1783900800
 }
