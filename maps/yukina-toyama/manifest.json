@@ -24,10 +24,10 @@
   },
   "city_code": "TOY",
   "country": "JP",
-  "population": 673188,
-  "residents_total": 673188,
-  "points_count": 7405,
-  "population_count": 16717,
+  "population": 705450,
+  "residents_total": 705450,
+  "points_count": 10856,
+  "population_count": 18502,
   "data_source": "統計局・令和２年国勢調査・令和3年経済センサス",
   "source_quality": "high-quality",
   "level_of_detail": "high-detail",
@@ -40,115 +40,119 @@
     "universities"
   ],
   "initial_view_state": {
-    "latitude": 36.715394,
-    "longitude": 137.162196,
+    "latitude": 36.715297,
+    "longitude": 137.160646,
     "zoom": 12,
     "bearing": 0
   },
   "file_sizes": {
-    "TOY.pmtiles": 30.08,
-    "buildings_index.json": 47.72,
-    "config.json": 0,
-    "demand_data.json": 93.87,
-    "roads.geojson": 27.87,
-    "runways_taxiways.geojson": 0.03,
-    "water.geojson": 6.1
+    ".railyard_map/landuse_provenance.parquet": 11.93,
+    ".railyard_map/special_demand_points.json": 0.15,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "TOY.pmtiles": 101.49,
+    "buildings_index.bin.gz": 51.26,
+    "buildings_index.json": 129.31,
+    "config.json": 0.01,
+    "demand_data.json": 59.77,
+    "ocean_depth_index.json": 23.27,
+    "roads.geojson": 27.89,
+    "runways_taxiways.geojson": 0.03
   },
   "is_test": false,
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.12026209618706298,
-      "p25": 0.1470203989418081,
-      "p50": 0.20467936916155924,
-      "p75": 0.2505318493477068,
-      "p90": 0.334476005231767,
-      "mean": 0.22144459059996016
+      "p10": 0.12981731664910445,
+      "p25": 0.1526386390454282,
+      "p50": 0.16842560716118174,
+      "p75": 0.2176508547705928,
+      "p90": 0.2690166512090306,
+      "mean": 0.19207764740788144
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.11992341050661129,
-      "p25": 0.12613355178836422,
-      "p50": 0.18311838238406403,
-      "p75": 0.2412868748331318,
-      "p90": 0.30610658279099356,
-      "mean": 0.20809038164768107
+      "p10": 0.121815698506908,
+      "p25": 0.13545478545531983,
+      "p50": 0.1600283386754788,
+      "p75": 0.20865320433874388,
+      "p90": 0.2745180963576159,
+      "mean": 0.18612075011214943
     },
     "commuteDistanceKm": {
-      "p10": 1898,
-      "p25": 3602,
-      "p50": 7376,
-      "p75": 14129,
-      "p90": 25633,
-      "mean": 11215.980977448107
+      "p10": 2152,
+      "p25": 4648,
+      "p50": 8419,
+      "p75": 15438,
+      "p90": 27910,
+      "mean": 12291.651497135445
     },
     "residentCellDensity": {
-      "p10": 50,
-      "p25": 89,
-      "p50": 197,
-      "p75": 502,
-      "p90": 1150,
-      "mean": 434.70090439276487
+      "p10": 24,
+      "p25": 60,
+      "p50": 155,
+      "p75": 431,
+      "p90": 1086,
+      "mean": 389.6613259668508
     },
     "workerCellDensity": {
-      "p10": 46,
-      "p25": 80,
-      "p50": 201,
-      "p75": 541,
-      "p90": 1187,
-      "mean": 503.9752808988764
+      "p10": 15,
+      "p25": 40,
+      "p50": 137,
+      "p75": 445,
+      "p90": 1094,
+      "mean": 417.35266272189347
     },
     "detail": {
-      "radiusKm": 0.19359895399576776,
-      "expectedPointSpacingKm": 0.47574526629960506,
-      "normalizedRadius": 0.40693826656773713,
-      "activityPerPoint": 90.9099257258609,
-      "playableAreaKm2": 1847,
-      "playableAreaPerPointKm2": 0.24942606347062796,
-      "playableCatchmentRadiusKm": 0.28177079670293464,
-      "localityScore": 0.8404081872158627,
+      "radiusKm": 0.16417329290847746,
+      "expectedPointSpacingKm": 0.423386007241013,
+      "normalizedRadius": 0.3877626801563652,
+      "activityPerPoint": 64.98249815770082,
+      "playableAreaKm2": 2364,
+      "playableAreaPerPointKm2": 0.21775976418570375,
+      "playableCatchmentRadiusKm": 0.2632775830817361,
+      "localityScore": 0.891514543348753,
       "deaggregationScore": 1,
-      "score": 0.9167377963277519
+      "score": 0.944200478367149
     },
     "polycentrism": {
       "activity": {
-        "score": 0.8919581694272682,
-        "continuousScore": 0.5168741183822607,
+        "score": 0.8893080460312135,
+        "continuousScore": 0.8733277018480808,
         "detectedCenterCount": 3,
-        "effectiveCenterCount": 2.466935537292077,
-        "largestCenterShare": 0.48654536325662373,
+        "effectiveCenterCount": 2.4562301668652204,
+        "largestCenterShare": 0.486891345949394,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 137.22706163719224,
-            "latitude": 36.68436289067209,
-            "massShare": 0.48654536325662373,
-            "assignedMass": 655073,
-            "assignedPointCount": 3131,
+            "longitude": 137.22676518406388,
+            "latitude": 36.68405360509977,
+            "massShare": 0.486891345949394,
+            "assignedMass": 686955,
+            "assignedPointCount": 4356,
             "prominenceRatio": 1
           },
           {
-            "longitude": 136.9944338235097,
-            "latitude": 36.70926185152338,
-            "massShare": 0.3924052419235043,
-            "assignedMass": 528325,
-            "assignedPointCount": 3208,
+            "longitude": 136.9944379254191,
+            "latitude": 36.7094707599451,
+            "massShare": 0.39516266213055495,
+            "assignedMass": 557535,
+            "assignedPointCount": 4828,
             "prominenceRatio": 1
           },
           {
-            "longitude": 137.44705859981107,
-            "latitude": 36.8563953105231,
-            "massShare": 0.12104939481987201,
-            "assignedMass": 162978,
-            "assignedPointCount": 1066,
+            "longitude": 137.45002696090037,
+            "latitude": 36.85879014135741,
+            "massShare": 0.11794599192005104,
+            "assignedMass": 166410,
+            "assignedPointCount": 1672,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1774224000,
+  "last_updated": 1783900800,
   "search_aliases": [
     "射水町",
     "Takaoka",

@@ -24,7 +24,7 @@
   },
   "city_code": "GAJ",
   "country": "JP",
-  "population": 323354,
+  "population": 494552,
   "level_of_detail": "high-detail",
   "source_quality": "high-quality",
   "data_source": "統計局・令和２年国勢調査・令和3年経済センサス",
@@ -35,82 +35,86 @@
     "schools",
     "universities"
   ],
-  "residents_total": 323354,
-  "points_count": 4254,
-  "population_count": 11161,
+  "residents_total": 494552,
+  "points_count": 9431,
+  "population_count": 17498,
   "initial_view_state": {
-    "latitude": 38.311902,
-    "longitude": 140.325852,
+    "latitude": 38.233138,
+    "longitude": 140.265484,
     "zoom": 12,
     "bearing": 0
   },
   "file_sizes": {
-    "GAJ.pmtiles": 13.72,
-    "buildings_index.json": 23.4,
-    "config.json": 0,
-    "demand_data.json": 38.53,
-    "roads.geojson": 7.51,
-    "runways_taxiways.geojson": 0.02,
-    "water.geojson": 2.36
+    ".railyard_map/landuse_provenance.parquet": 5.47,
+    ".railyard_map/special_demand_points.json": 0.12,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "GAJ.pmtiles": 65.57,
+    "buildings_index.bin.gz": 33.32,
+    "buildings_index.json": 94.49,
+    "config.json": 0.01,
+    "demand_data.json": 50.79,
+    "ocean_depth_index.json": 21.99,
+    "roads.geojson": 14.13,
+    "runways_taxiways.geojson": 0.03
   },
   "is_test": false,
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.10978247018467285,
-      "p25": 0.1359987179814571,
-      "p50": 0.17453081974339632,
-      "p75": 0.2149622920526113,
-      "p90": 0.23704488050839292,
-      "mean": 0.18064636125264516
+      "p10": 0.10485872958769434,
+      "p25": 0.11869809279594935,
+      "p50": 0.14998847616357025,
+      "p75": 0.18740648199042484,
+      "p90": 0.22304096221119898,
+      "mean": 0.16430737778175555
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.10936579463075938,
-      "p25": 0.11786383127706603,
-      "p50": 0.1474087624792295,
-      "p75": 0.21258260004487559,
-      "p90": 0.2726742172486097,
-      "mean": 0.17736545080091234
+      "p10": 0.09006191291420651,
+      "p25": 0.10603597131296359,
+      "p50": 0.13650789621049583,
+      "p75": 0.18529470873482318,
+      "p90": 0.23642749067698576,
+      "mean": 0.16533520304016713
     },
     "commuteDistanceKm": {
-      "p10": 1622,
-      "p25": 3019,
-      "p50": 5890,
-      "p75": 11361,
-      "p90": 18743,
-      "mean": 8373.869187348804
+      "p10": 1880,
+      "p25": 3936,
+      "p50": 7580,
+      "p75": 14776,
+      "p90": 26898,
+      "mean": 11795.867470568064
     },
     "residentCellDensity": {
-      "p10": 40,
-      "p25": 72,
-      "p50": 165,
-      "p75": 419,
-      "p90": 1286,
-      "mean": 433.8241610738255
+      "p10": 17,
+      "p25": 36,
+      "p50": 98,
+      "p75": 257,
+      "p90": 846,
+      "mean": 304.3212307692308
     },
     "workerCellDensity": {
-      "p10": 34,
-      "p25": 62,
-      "p50": 180,
-      "p75": 601,
-      "p90": 1570,
-      "mean": 556.4974182444062
+      "p10": 10,
+      "p25": 22,
+      "p50": 76,
+      "p75": 330,
+      "p90": 1082,
+      "mean": 358.7242380261248
     },
     "detail": {
-      "radiusKm": 0.16039754409859125,
-      "expectedPointSpacingKm": 0.4425106810777442,
-      "normalizedRadius": 0.36247157629718585,
-      "activityPerPoint": 76.01175364362952,
-      "playableAreaKm2": 1017,
-      "playableAreaPerPointKm2": 0.2390691114245416,
-      "playableCatchmentRadiusKm": 0.2758587711993327,
-      "localityScore": 0.9629281844866721,
+      "radiusKm": 0.14308952210734047,
+      "expectedPointSpacingKm": 0.43456334109470274,
+      "normalizedRadius": 0.329271957793047,
+      "activityPerPoint": 52.438977839041456,
+      "playableAreaKm2": 2784,
+      "playableAreaPerPointKm2": 0.29519669176121305,
+      "playableCatchmentRadiusKm": 0.3065355205458957,
+      "localityScore": 1,
       "deaggregationScore": 1,
-      "score": 0.9812890422738206
+      "score": 1
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.32882428902641037,
+        "continuousScore": 0.890114680776727,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -120,18 +124,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 140.3280335030852,
-            "latitude": 38.30875619871198,
+            "longitude": 140.26861021756804,
+            "latitude": 38.23135471373343,
             "massShare": 1,
-            "assignedMass": 646708,
-            "assignedPointCount": 4254,
+            "assignedMass": 989104,
+            "assignedPointCount": 9431,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1774224000,
+  "last_updated": 1783900800,
   "search_aliases": [
     "仙台",
     "Tendō",
