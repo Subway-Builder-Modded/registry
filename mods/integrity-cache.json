@@ -4,7 +4,7 @@
     "advanced-analytics": {
       "target-1.1.0": {
         "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-07-13T00:01:08.841Z",
+        "last_checked_at": "2026-07-13T01:59:19.279Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -18,7 +18,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-07-13T00:01:08.841Z",
+          "checked_at": "2026-07-13T01:59:19.279Z",
           "released_at": "2026-03-02T23:15:42.000Z"
         }
       },
@@ -2438,23 +2438,35 @@
       }
     },
     "hide-and-seek": {
-      "v1.0.0b": {
-        "fingerprint": "rules:v6:github:nzh0172/sb-hideandseek:v1.0.0b:sb-hideandseek-v.1.0.0b.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-07-13T00:01:08.841Z",
+      "v1.0.0": {
+        "fingerprint": "rules:v6:github:nzh0172/sb-hideandseek:v1.0.0:sb-hideandseek-v.1.0.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-07-13T01:59:19.279Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag 'v1.0.0b'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.11,
+          "game_version": ">=1.3.0",
           "source": {
             "update_type": "github",
             "repo": "nzh0172/sb-hideandseek",
-            "tag": "v1.0.0b"
+            "tag": "v1.0.0",
+            "asset_name": "sb-hideandseek-v.1.0.0.zip",
+            "download_url": "https://github.com/nzh0172/sb-hideandseek/releases/download/v1.0.0/sb-hideandseek-v.1.0.0.zip"
           },
-          "fingerprint": "rules:v6:github:nzh0172/sb-hideandseek:v1.0.0b:sb-hideandseek-v.1.0.0b.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-07-13T00:01:08.841Z",
+          "fingerprint": "rules:v6:github:nzh0172/sb-hideandseek:v1.0.0:sb-hideandseek-v.1.0.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-07-13T01:59:19.279Z",
           "released_at": "2026-07-12T11:16:55.000Z"
         }
       }
@@ -5165,7 +5177,7 @@
       },
       "v1.0": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-07-13T00:01:08.841Z",
+        "last_checked_at": "2026-07-13T01:59:19.279Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -5179,13 +5191,13 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-07-13T00:01:08.841Z",
+          "checked_at": "2026-07-13T01:59:19.279Z",
           "released_at": "2026-03-01T14:52:46.000Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-07-13T00:01:08.841Z",
+        "last_checked_at": "2026-07-13T01:59:19.279Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -5199,7 +5211,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-07-13T00:01:08.841Z",
+          "checked_at": "2026-07-13T01:59:19.279Z",
           "released_at": "2026-03-08T08:01:18.000Z"
         }
       }
