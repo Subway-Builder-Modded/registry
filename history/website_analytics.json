@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "updated_at": "2026-07-14T12:00:45.634Z",
+  "updated_at": "2026-07-14T12:51:36.484Z",
   "valid_paths": [
     "/",
     "/community",
@@ -830,7 +830,9 @@
     "/registry/maps/mfn-rdu",
     "/registry/maps/milan",
     "/registry/maps/monterrey",
+    "/registry/maps/monterrey/versions/1.0.0",
     "/registry/maps/monterrey/versions/1.1.0",
+    "/registry/maps/monterrey/versions/1.2.0",
     "/registry/maps/montreal",
     "/registry/maps/naples",
     "/registry/maps/naples/details",
@@ -926,6 +928,7 @@
     "/registry/maps/yukina-hakodate",
     "/registry/maps/yukina-hiroshima-kure",
     "/registry/maps/yukina-kagoshima-kirishima",
+    "/registry/maps/yukina-kagoshima-kirishima/versions/0.4.0",
     "/registry/maps/yukina-kitakyushu-shimonoseki",
     "/registry/maps/yukina-kobe-akashi",
     "/registry/maps/yukina-kochi",
@@ -939,6 +942,7 @@
     "/registry/maps/yukina-nagoya",
     "/registry/maps/yukina-nakadoori",
     "/registry/maps/yukina-nakaumi",
+    "/registry/maps/yukina-nakaumi/versions/0.2.0",
     "/registry/maps/yukina-niigata",
     "/registry/maps/yukina-northern-kyushu",
     "/registry/maps/yukina-northern-kyushu/details",
@@ -995,11 +999,13 @@
     "/registry/mods/advanced-analytics",
     "/registry/mods/any-money",
     "/registry/mods/chinese-trains",
+    "/registry/mods/chinese-trains/versions/v1.0.3",
     "/registry/mods/chinese-trains/versions/v1.2.1",
     "/registry/mods/cinematic-camera",
     "/registry/mods/citymapper",
     "/registry/mods/copy-paste",
     "/registry/mods/danield1909-dantrains",
+    "/registry/mods/danield1909-dantrains/versions/v1.0.0",
     "/registry/mods/danield1909-dantrains/versions/v1.0.2",
     "/registry/mods/distance-circles",
     "/registry/mods/distance-circles/analytics",
@@ -1014,6 +1020,8 @@
     "/registry/mods/lrt-trains",
     "/registry/mods/lrt-trains/versions/v1.0.0",
     "/registry/mods/mode-manager",
+    "/registry/mods/mode-manager/versions",
+    "/registry/mods/mode-manager/versions/v1.1.2",
     "/registry/mods/network-status",
     "/registry/mods/orbital-surveyor",
     "/registry/mods/orbital-surveyor/analytics",
@@ -44834,17 +44842,71 @@
       "devices": {}
     },
     "2026-07-14T12:00:00.000Z": {
-      "captured_at": "2026-07-14T12:00:45.634Z",
+      "captured_at": "2026-07-14T12:51:36.484Z",
       "window_start": "2026-07-14T12:00:00.000Z",
       "window_end": "2026-07-14T13:00:00.000Z",
       "totals": {
-        "visits": 0
+        "visits": 54
       },
-      "pages": {},
-      "countries": {},
-      "browsers": {},
-      "operating_systems": {},
-      "devices": {}
+      "pages": {
+        "/": 26,
+        "/credits": 1,
+        "/license": 1,
+        "/railyard": 8,
+        "/railyard/docs/v0.2/github-token": 1,
+        "/registry": 1,
+        "/registry/maps/monterrey/versions/1.0.0": 1,
+        "/registry/maps/monterrey/versions/1.2.0": 1,
+        "/registry/maps/singapore-val": 1,
+        "/registry/maps/toronto/versions": 1,
+        "/registry/maps/yukina-kagoshima-kirishima/versions/0.4.0": 1,
+        "/registry/maps/yukina-nakaumi/versions/0.2.0": 1,
+        "/registry/maps/yukina-tw-chiayi": 1,
+        "/registry/maps/yukina-tw-hsinchu": 1,
+        "/registry/mods/chinese-trains/versions/v1.0.3": 1,
+        "/registry/mods/danield1909-dantrains/versions/v1.0.0": 1,
+        "/registry/mods/induced-demand": 1,
+        "/registry/mods/mode-manager/versions": 1,
+        "/registry/mods/mode-manager/versions/v1.1.2": 1,
+        "/registry/trending": 1,
+        "/template-mod": 1,
+        "/template-mod/updates": 1
+      },
+      "countries": {
+        "CH": 1,
+        "DE": 3,
+        "DK": 1,
+        "ES": 1,
+        "GB": 2,
+        "HU": 2,
+        "IE": 1,
+        "KR": 1,
+        "RU": 1,
+        "TR": 2,
+        "US": 39
+      },
+      "browsers": {
+        "BingBot": 2,
+        "Chrome": 7,
+        "ChromeMobile": 2,
+        "Edge": 3,
+        "Firefox": 3,
+        "GoogleBot": 18,
+        "MobileSafari": 1,
+        "Safari": 2,
+        "Unknown": 16
+      },
+      "operating_systems": {
+        "Android": 20,
+        "MacOSX": 3,
+        "Unknown": 18,
+        "Windows": 12,
+        "iOS": 1
+      },
+      "devices": {
+        "desktop": 33,
+        "mobile": 21
+      }
     }
   },
   "daily_snapshots": {
@@ -56945,32 +57007,49 @@
       }
     },
     "2026-07-14": {
-      "captured_at": "2026-07-14T12:00:45.634Z",
+      "captured_at": "2026-07-14T12:51:36.484Z",
       "window_start": "2026-07-14T00:00:00.000Z",
       "window_end": "2026-07-14T13:00:00.000Z",
       "totals": {
-        "visits": 72
+        "visits": 126
       },
       "pages": {
-        "/": 50,
+        "/": 76,
         "/contribute": 1,
-        "/credits": 1,
+        "/credits": 2,
+        "/license": 1,
+        "/railyard": 8,
         "/railyard/analytics": 1,
-        "/railyard/docs/v0.2/github-token": 3,
-        "/registry": 1,
+        "/railyard/docs/v0.2/github-token": 4,
+        "/registry": 2,
         "/registry/maps": 1,
         "/registry/maps/arequipa/versions": 1,
         "/registry/maps/bucharest-medium": 1,
         "/registry/maps/greater-los-angeles": 1,
+        "/registry/maps/monterrey/versions/1.0.0": 1,
+        "/registry/maps/monterrey/versions/1.2.0": 1,
+        "/registry/maps/singapore-val": 1,
         "/registry/maps/sydney": 1,
+        "/registry/maps/toronto/versions": 1,
         "/registry/maps/yukina-cz-ostrava": 1,
+        "/registry/maps/yukina-kagoshima-kirishima/versions/0.4.0": 1,
+        "/registry/maps/yukina-nakaumi/versions/0.2.0": 1,
         "/registry/maps/yukina-okayama": 1,
         "/registry/maps/yukina-pl-lodz": 1,
         "/registry/maps/yukina-pl-rzeszow": 1,
+        "/registry/maps/yukina-tw-chiayi": 1,
+        "/registry/maps/yukina-tw-hsinchu": 1,
         "/registry/maps/yukina-tw-kaohsiung": 1,
+        "/registry/mods/chinese-trains/versions/v1.0.3": 1,
+        "/registry/mods/danield1909-dantrains/versions/v1.0.0": 1,
+        "/registry/mods/induced-demand": 1,
+        "/registry/mods/mode-manager/versions": 1,
+        "/registry/mods/mode-manager/versions/v1.1.2": 1,
         "/registry/mods/subwaybuilder-regions/versions/v0.4.9": 1,
-        "/registry/trending": 1,
+        "/registry/trending": 2,
         "/registry/world-map": 1,
+        "/template-mod": 1,
+        "/template-mod/updates": 1,
         "/website": 1,
         "/website/updates": 1
       },
@@ -56978,34 +57057,46 @@
         "AU": 3,
         "BE": 22,
         "BR": 1,
+        "CH": 1,
         "CN": 1,
+        "DE": 3,
+        "DK": 1,
+        "ES": 1,
         "FI": 7,
+        "GB": 2,
         "HK": 1,
+        "HU": 2,
+        "IE": 1,
+        "KR": 1,
+        "RU": 1,
         "SE": 1,
         "SG": 1,
-        "US": 35
+        "TR": 2,
+        "US": 74
       },
       "browsers": {
-        "BingBot": 1,
-        "Chrome": 6,
-        "ChromeMobile": 2,
-        "Firefox": 2,
-        "GoogleBot": 6,
-        "MobileSafari": 3,
+        "BingBot": 3,
+        "Chrome": 13,
+        "ChromeMobile": 4,
+        "Edge": 3,
+        "Firefox": 5,
+        "GoogleBot": 24,
+        "MobileSafari": 4,
         "Opera": 1,
-        "Unknown": 51
+        "Safari": 2,
+        "Unknown": 67
       },
       "operating_systems": {
-        "Android": 6,
+        "Android": 26,
         "Linux": 1,
-        "MacOSX": 1,
-        "Unknown": 52,
-        "Windows": 7,
-        "iOS": 5
+        "MacOSX": 4,
+        "Unknown": 70,
+        "Windows": 19,
+        "iOS": 6
       },
       "devices": {
-        "desktop": 61,
-        "mobile": 11
+        "desktop": 94,
+        "mobile": 32
       }
     }
   }
