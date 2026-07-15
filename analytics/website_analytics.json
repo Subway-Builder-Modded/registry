@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-07-15T20:01:01.368Z",
+  "generated_at": "2026-07-15T20:40:08.925Z",
   "valid_paths": [
     "/",
     "/community",
@@ -752,6 +752,7 @@
     "/registry/maps/bologna",
     "/registry/maps/bordeaux-arcachon-libourne",
     "/registry/maps/bucharest-medium",
+    "/registry/maps/bucharest-medium/versions",
     "/registry/maps/bucharest-medium/versions/1.1.3",
     "/registry/maps/buffalo-ny",
     "/registry/maps/busan-3",
@@ -809,6 +810,7 @@
     "/registry/maps/gwangju-3",
     "/registry/maps/gwangju-4",
     "/registry/maps/helsinki",
+    "/registry/maps/helsinki/versions/1.0.0",
     "/registry/maps/huancayo-jauja",
     "/registry/maps/incheon-3",
     "/registry/maps/incheon-3/versions/0.1.1",
@@ -1137,8 +1139,8 @@
     "latest_hour": "2026-07-15T20:00:00.000Z",
     "total_days": 90,
     "total_hours": 1170,
-    "latest_day_visits": 221,
-    "latest_hour_visits": 0
+    "latest_day_visits": 245,
+    "latest_hour_visits": 24
   },
   "time_series": {
     "by_day": [
@@ -1500,7 +1502,7 @@
       },
       {
         "date": "2026-07-15",
-        "visits": 221
+        "visits": 245
       }
     ],
     "by_hour": [
@@ -6182,7 +6184,7 @@
       },
       {
         "hour": "2026-07-15T20:00:00.000Z",
-        "visits": 0
+        "visits": 24
       }
     ]
   },
@@ -18472,24 +18474,27 @@
       }
     },
     "2026-07-15": {
-      "captured_at": "2026-07-15T20:00:58.972Z",
+      "captured_at": "2026-07-15T20:40:06.233Z",
       "window_start": "2026-07-15T00:00:00.000Z",
       "window_end": "2026-07-15T21:00:00.000Z",
       "totals": {
-        "visits": 221
+        "visits": 245
       },
       "pages": {
-        "/": 79,
+        "/": 85,
         "/community": 2,
         "/credits": 2,
         "/depot": 2,
         "/depot/updates/v1.0.0": 2,
-        "/railyard": 34,
+        "/railyard": 36,
+        "/railyard/docs": 1,
         "/railyard/docs/v0.2/github-token": 3,
         "/railyard/docs/v0.2/installing-railyard/macos": 1,
         "/railyard/docs/v0.2/installing-railyard/windows": 1,
         "/railyard/updates": 1,
         "/railyard/updates/v0.2.3": 1,
+        "/railyard/updates/v0.2.4": 1,
+        "/railyard/updates/v0.2.7": 5,
         "/registry/authors/BarKuperman": 1,
         "/registry/authors/Mpfk": 1,
         "/registry/authors/martig7": 1,
@@ -18502,6 +18507,7 @@
         "/registry/maps/berlin-val": 1,
         "/registry/maps/bologna": 1,
         "/registry/maps/bordeaux-arcachon-libourne": 6,
+        "/registry/maps/bucharest-medium/versions": 1,
         "/registry/maps/bucharest-medium/versions/1.1.3": 1,
         "/registry/maps/busan-4": 1,
         "/registry/maps/ciudad-juarez-el-paso": 1,
@@ -18509,15 +18515,19 @@
         "/registry/maps/greater-los-angeles": 4,
         "/registry/maps/greater-newyork": 1,
         "/registry/maps/guangzhou/versions/1.3.0": 1,
+        "/registry/maps/helsinki/versions/1.0.0": 1,
         "/registry/maps/jelegend-tokyo": 1,
         "/registry/maps/madrid/versions/1.0.0": 1,
         "/registry/maps/montreal": 2,
+        "/registry/maps/opo-pt-metropolitan": 1,
         "/registry/maps/sejong-4/versions": 1,
         "/registry/maps/toronto": 2,
         "/registry/maps/ulsan-3/versions": 1,
         "/registry/maps/vancouver": 1,
         "/registry/maps/yukina-bydgoszcz-torun": 1,
         "/registry/maps/yukina-cz-hradec-pardubice": 1,
+        "/registry/maps/yukina-cz-liberec-jablonec": 1,
+        "/registry/maps/yukina-cz-plzen": 1,
         "/registry/maps/yukina-cz-ustecko-chomutov": 1,
         "/registry/maps/yukina-cz-zlin": 1,
         "/registry/maps/yukina-fukuoka": 1,
@@ -18525,10 +18535,11 @@
         "/registry/maps/yukina-kitakyushu-shimonoseki": 1,
         "/registry/maps/yukina-kobe-akashi": 1,
         "/registry/maps/yukina-kyoto": 1,
-        "/registry/maps/yukina-nagoya": 1,
+        "/registry/maps/yukina-nagoya": 2,
         "/registry/maps/yukina-nakadoori": 1,
         "/registry/maps/yukina-nakaumi": 1,
         "/registry/maps/yukina-okinawa": 2,
+        "/registry/maps/yukina-osaka": 1,
         "/registry/maps/yukina-pl-czestochowa": 1,
         "/registry/maps/yukina-pl-gdansk": 1,
         "/registry/maps/yukina-pl-szczecin": 1,
@@ -18547,6 +18558,8 @@
         "/registry/mods/improved-schematics": 1,
         "/registry/mods/improved-schematics/versions/v1.0.0": 1,
         "/registry/mods/japanese-trains/versions/v1.0.0": 1,
+        "/registry/mods/lrt-trains": 1,
+        "/registry/mods/network-status": 1,
         "/registry/mods/orbital-surveyor": 1,
         "/registry/mods/scrollable-dropdowns/versions/v1.2.0": 1,
         "/registry/mods/station-dots": 1,
@@ -18564,14 +18577,17 @@
       "countries": {
         "BE": 19,
         "BG": 1,
-        "CA": 9,
+        "BR": 1,
+        "CA": 10,
         "CH": 5,
+        "CN": 4,
         "CZ": 1,
         "DE": 16,
         "ES": 1,
-        "FR": 20,
-        "GB": 7,
+        "FR": 22,
+        "GB": 9,
         "ID": 1,
+        "IE": 1,
         "IL": 2,
         "IN": 1,
         "IT": 3,
@@ -18584,36 +18600,38 @@
         "PE": 1,
         "PL": 1,
         "PT": 1,
+        "RU": 1,
+        "ST": 1,
         "TR": 1,
         "TW": 1,
-        "US": 108,
+        "US": 119,
         "VN": 1
       },
       "browsers": {
         "AppleBot": 1,
         "BingBot": 5,
-        "Chrome": 75,
-        "ChromeMobile": 12,
+        "Chrome": 84,
+        "ChromeMobile": 14,
         "Curl": 12,
         "Edge": 1,
         "Firefox": 6,
-        "GoogleBot": 34,
-        "MobileSafari": 7,
+        "GoogleBot": 38,
+        "MobileSafari": 9,
         "Opera": 2,
         "Safari": 6,
-        "Unknown": 59
+        "Unknown": 66
       },
       "operating_systems": {
-        "Android": 43,
+        "Android": 49,
         "Linux": 5,
         "MacOSX": 28,
-        "Unknown": 76,
-        "Windows": 59,
-        "iOS": 10
+        "Unknown": 83,
+        "Windows": 68,
+        "iOS": 12
       },
       "devices": {
-        "desktop": 167,
-        "mobile": 53
+        "desktop": 183,
+        "mobile": 61
       }
     }
   }
