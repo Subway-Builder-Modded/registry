@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-15T00:00:47.036Z",
+  "generated_at": "2026-07-15T02:05:46.569Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -1191,6 +1191,68 @@
           "fingerprint": "rules:v6:sha256:01780884c4c890ebfbaee6bd1395baa93bc35553c65ee1c0c002c9f740d010b1",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-03-09T00:00:00.000Z"
+        }
+      }
+    },
+    "bordeaux-arcachon-libourne": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.4.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.4.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1784034777,
+      "versions": {
+        "v1.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "BOD.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 167.79,
+          "file_sizes": {
+            "BOD.pmtiles": 51.47,
+            "buildings_index.bin.gz": 108.49,
+            "config.json": 0,
+            "demand_data.json.gz": 0.85,
+            "roads.geojson.gz": 6.91,
+            "runways_taxiways.geojson.gz": 0.06
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "cvwh7gzvv9-collab/subway-builder-bordeaux",
+            "tag": "v1.4.0",
+            "asset_name": "bordeaux-arcachon-libourne_v1.4.0.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-bordeaux/releases/download/v1.4.0/bordeaux-arcachon-libourne_v1.4.0.zip"
+          },
+          "fingerprint": "rules:v6:github:cvwh7gzvv9-collab/subway-builder-bordeaux:v1.4.0:bordeaux-arcachon-libourne_v1.4.0.zip",
+          "checked_at": "2026-07-15T02:05:46.569Z",
+          "released_at": "2026-07-14T13:12:57.000Z"
         }
       }
     },

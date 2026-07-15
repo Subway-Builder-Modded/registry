@@ -45,7 +45,14 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "BOD.pmtiles": 51.47,
+    "buildings_index.bin.gz": 108.49,
+    "config.json": 0,
+    "demand_data.json.gz": 0.85,
+    "roads.geojson.gz": 6.91,
+    "runways_taxiways.geojson.gz": 0.06
+  },
   "included_cities": [
     "Arcachon",
     "Libourne",
@@ -53,5 +60,83 @@
     "Mérignac",
     "Pessac",
     "Talence"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.26786746369111153,
+      "p25": 0.2818944771580236,
+      "p50": 0.2993609221287208,
+      "p75": 0.3115807080363635,
+      "p90": 0.32442751220027394,
+      "mean": 0.29719798330718533
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1798423901429088,
+      "p25": 0.2679172866698391,
+      "p50": 0.29930721345648187,
+      "p75": 0.31144203499462575,
+      "p90": 0.3282366918085705,
+      "mean": 0.2949551454268895
+    },
+    "commuteDistanceKm": {
+      "p10": 3495,
+      "p25": 4128,
+      "p50": 7369,
+      "p75": 12645,
+      "p90": 19717,
+      "mean": 9739.121190744921
+    },
+    "residentCellDensity": {
+      "p10": 5,
+      "p25": 17,
+      "p50": 63,
+      "p75": 258,
+      "p90": 706,
+      "mean": 285.67287866772404
+    },
+    "workerCellDensity": {
+      "p10": 4,
+      "p25": 10,
+      "p50": 46,
+      "p75": 211,
+      "p90": 690,
+      "mean": 403.9380877742947
+    },
+    "detail": {
+      "radiusKm": 0.29933406658800177,
+      "expectedPointSpacingKm": 0.5795115722088645,
+      "normalizedRadius": 0.5165281953681459,
+      "activityPerPoint": 113.60611589097579,
+      "playableAreaKm2": 3168,
+      "playableAreaPerPointKm2": 0.4168969601263324,
+      "playableCatchmentRadiusKm": 0.364283438997961,
+      "localityScore": 0.5879168425345641,
+      "deaggregationScore": 1,
+      "score": 0.7667573557094605
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.725346343018865,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -0.6113689082231556,
+            "latitude": 44.81525436491372,
+            "massShare": 1,
+            "assignedMass": 1754168,
+            "assignedPointCount": 7599,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784034777
 }
