@@ -44,5 +44,95 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {}
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 29.93,
+    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "PNV.pmtiles": 42.06,
+    "buildings_index.bin.gz": 17.26,
+    "buildings_index.json": 42.09,
+    "config.json": 0.01,
+    "demand_data.json": 22.58,
+    "ocean_depth_index.json": 14.96,
+    "roads.geojson": 3.71,
+    "runways_taxiways.geojson": 0.19
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.093167012494172,
+      "p25": 0.1146336356810458,
+      "p50": 0.1430638832204407,
+      "p75": 0.19319324359076329,
+      "p90": 0.3128994135516213,
+      "mean": 0.20462042965655378
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.08992223143545636,
+      "p25": 0.1150321629360211,
+      "p50": 0.15350204115852628,
+      "p75": 0.20161639052653088,
+      "p90": 0.2750587176343119,
+      "mean": 0.18097284977875086
+    },
+    "commuteDistanceKm": {
+      "p10": 1970,
+      "p25": 3976,
+      "p50": 9788,
+      "p75": 33750,
+      "p90": 55776,
+      "mean": 20934.582130209754
+    },
+    "residentCellDensity": {
+      "p10": 1,
+      "p25": 2,
+      "p50": 6,
+      "p75": 16,
+      "p90": 50,
+      "mean": 34.60974539069359
+    },
+    "workerCellDensity": {
+      "p10": 1,
+      "p25": 4,
+      "p50": 11,
+      "p75": 38,
+      "p90": 149,
+      "mean": 89.51645856980704
+    },
+    "detail": {
+      "radiusKm": 0.14819108640671572,
+      "expectedPointSpacingKm": 0.7016464154456233,
+      "normalizedRadius": 0.21120479367460024,
+      "activityPerPoint": 14.979297245963913,
+      "playableAreaKm2": 5832,
+      "playableAreaPerPointKm2": 1.1076923076923078,
+      "playableCatchmentRadiusKm": 0.5937923983920633,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.4692132324599138,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 24.464981663817237,
+            "latitude": 55.731308853841924,
+            "massShare": 1,
+            "assignedMass": 157732,
+            "assignedPointCount": 5265,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784073600
 }
