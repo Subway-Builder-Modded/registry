@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-15T06:48:22.689Z",
+  "generated_at": "2026-07-15T07:05:11.492Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -30546,16 +30546,15 @@
     "yukina-tw-hsinchu": {
       "has_complete_version": true,
       "latest_semver_version": "0.3.0",
-      "latest_semver_complete": false,
+      "latest_semver_complete": true,
       "complete_versions": [
+        "0.3.0",
         "0.2.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
-      "incomplete_versions": [
-        "0.3.0"
-      ],
+      "incomplete_versions": [],
       "last_updated": 1784073600,
       "versions": {
         "0.1.0": {
@@ -30761,10 +30760,8 @@
           "released_at": "2026-06-03T00:00:00.000Z"
         },
         "0.3.0": {
-          "is_complete": false,
-          "errors": [
-            "config.json version '0.2.1' does not match release tag '0.3.0' (expected '0.3.0')"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -30775,7 +30772,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -30789,9 +30786,22 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "HSZ.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 153.13,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 6.96,
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "HSZ.pmtiles": 72.69,
+            "buildings_index.bin.gz": 37.54,
+            "buildings_index.json": 108.9,
+            "config.json": 0.01,
+            "demand_data.json": 46.4,
+            "ocean_depth_index.json": 16.7,
+            "roads.geojson": 6.4,
+            "runways_taxiways.geojson": 0.29
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30801,7 +30811,7 @@
             "download_url": "https://github.com/ahkimn/subwaybuilder-tw-maps/releases/download/0.2.0/HSZ.zip"
           },
           "fingerprint": "rules:v6:sha256:cd9151dc278d36b166e5af11fed31f9b235186b3ca13333398aa9fc111228ba4",
-          "checked_at": "2026-07-15T05:47:40.716Z",
+          "checked_at": "2026-07-15T07:05:11.492Z",
           "released_at": "2026-07-15T00:00:00.000Z"
         }
       }
