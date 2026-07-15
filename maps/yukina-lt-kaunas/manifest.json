@@ -46,11 +46,101 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 74.82,
+    ".railyard_map/special_demand_points.json": 0.17,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "KUN.pmtiles": 109.65,
+    "buildings_index.bin.gz": 50.38,
+    "buildings_index.json": 123.46,
+    "config.json": 0.01,
+    "demand_data.json": 65.52,
+    "ocean_depth_index.json": 45.89,
+    "roads.geojson": 11.1,
+    "runways_taxiways.geojson": 0.34
+  },
   "included_cities": [
     "Alytus",
     "Marijampolė",
     "Kėdainiai",
     "Jonava"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.09189004131732591,
+      "p25": 0.11441177107686944,
+      "p50": 0.14129695973771986,
+      "p75": 0.17846339088648014,
+      "p90": 0.2715940808292328,
+      "mean": 0.18810018432496134
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.090072779729084,
+      "p25": 0.114304457059122,
+      "p50": 0.1581381907423876,
+      "p75": 0.2120311666231677,
+      "p90": 0.2824506056930872,
+      "mean": 0.17955173062180918
+    },
+    "commuteDistanceKm": {
+      "p10": 2714,
+      "p25": 5320,
+      "p50": 11120,
+      "p75": 38031,
+      "p90": 67765,
+      "mean": 24470.79097504672
+    },
+    "residentCellDensity": {
+      "p10": 2,
+      "p25": 5,
+      "p50": 14,
+      "p75": 39,
+      "p90": 129,
+      "mean": 87.95990566037736
+    },
+    "workerCellDensity": {
+      "p10": 2,
+      "p25": 7,
+      "p50": 25,
+      "p75": 102,
+      "p90": 422,
+      "mean": 201.88342351205117
+    },
+    "detail": {
+      "radiusKm": 0.14948058593116031,
+      "expectedPointSpacingKm": 0.6529918468738055,
+      "normalizedRadius": 0.2289164660275587,
+      "activityPerPoint": 32.51822215179845,
+      "playableAreaKm2": 11056,
+      "playableAreaPerPointKm2": 0.8759309142766598,
+      "playableCatchmentRadiusKm": 0.5280316937725115,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.6306054527065506,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 23.885704801327496,
+            "latitude": 54.8592639203117,
+            "massShare": 1,
+            "assignedMass": 820890,
+            "assignedPointCount": 12622,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784073600
 }
