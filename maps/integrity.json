@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-16T05:30:06.678Z",
+  "generated_at": "2026-07-16T08:01:05.256Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -122,13 +122,13 @@
     "amsterdam": {
       "has_complete_version": true,
       "latest_semver_version": "1.2.1",
-      "latest_semver_complete": false,
+      "latest_semver_complete": true,
       "complete_versions": [
+        "1.2.1",
         "1.2.0",
         "1.0.0"
       ],
       "incomplete_versions": [
-        "1.2.1",
         "1.1.0"
       ],
       "last_updated": 1784073600,
@@ -267,17 +267,14 @@
           "released_at": "2026-03-16T00:00:00.000Z"
         },
         "1.2.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data contains 8 of 530 points (1.5%) with neither residents nor jobs (e.g. AIR_Terminal_5, AIR_Terminal_9, AIR_Terminal_10)",
-            "demand_data resident totals mismatch (points=1126652, pops=720820, delta=405832)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
-            "demand_residents_match": false,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -298,7 +295,16 @@
             "city_pmtiles": "AMS.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 215.56,
+          "release_size": 215.63,
+          "file_sizes": {
+            "AMS.pmtiles": 96.59,
+            "buildings_index.bin": 111.45,
+            "buildings_index.json": 158.74,
+            "config.json": 0,
+            "demand_data.json": 1.33,
+            "roads.geojson": 21.38,
+            "runways_taxiways.geojson": 1.19
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -307,8 +313,8 @@
             "asset_name": "AMS.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.2.1-ams/AMS.zip"
           },
-          "fingerprint": "rules:v6:sha256:0e11876ecde0012359643a30c34219db8cfabd53943c56b751f5f90766cf4375",
-          "checked_at": "2026-07-16T02:26:57.621Z",
+          "fingerprint": "rules:v6:sha256:fce9babb2cc133dc0bb9bd84bda3171971626bcf611dccd733236d0b7a9de992",
+          "checked_at": "2026-07-16T08:01:05.256Z",
           "released_at": "2026-07-15T00:00:00.000Z"
         }
       }
@@ -1731,16 +1737,15 @@
     "cairo": {
       "has_complete_version": true,
       "latest_semver_version": "2.2.1",
-      "latest_semver_complete": false,
+      "latest_semver_complete": true,
       "complete_versions": [
+        "2.2.1",
         "2.2.0",
         "2.1.0",
         "2.0.1",
         "2.0.0"
       ],
-      "incomplete_versions": [
-        "2.2.1"
-      ],
+      "incomplete_versions": [],
       "last_updated": 1784073600,
       "versions": {
         "2.0.0": {
@@ -1928,17 +1933,14 @@
           "released_at": "2026-04-10T00:00:00.000Z"
         },
         "2.2.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data contains 3049 of 5210 points (58.5%) with neither residents nor jobs (e.g. 30724801, 30874900, 30874901)",
-            "demand_data resident totals mismatch (points=2697426, pops=1422928, delta=1274498)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
-            "demand_residents_match": false,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -1959,7 +1961,16 @@
             "city_pmtiles": "CAI.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 367.73,
+          "release_size": 367.77,
+          "file_sizes": {
+            "CAI.pmtiles": 106.26,
+            "buildings_index.bin": 221.77,
+            "buildings_index.json": 335.48,
+            "config.json": 0,
+            "demand_data.json": 1.81,
+            "roads.geojson": 67.5,
+            "runways_taxiways.geojson": 1.47
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -1968,8 +1979,8 @@
             "asset_name": "CAI.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.2.1-cai/CAI.zip"
           },
-          "fingerprint": "rules:v6:sha256:bee5af099b500c48c6ade7a3ae117fc6978d5f175d3714fdb38b4a8e5103efdf",
-          "checked_at": "2026-07-16T02:26:57.621Z",
+          "fingerprint": "rules:v6:sha256:375a5fbc9cc2548ac861364724c7950917ab88c53ca51687f3db2841f1095419",
+          "checked_at": "2026-07-16T08:01:05.256Z",
           "released_at": "2026-07-15T00:00:00.000Z"
         }
       }
@@ -13623,14 +13634,13 @@
     "rotterdam-the-hague": {
       "has_complete_version": true,
       "latest_semver_version": "1.1.1",
-      "latest_semver_complete": false,
+      "latest_semver_complete": true,
       "complete_versions": [
+        "1.1.1",
         "1.1.0",
         "1.0.0"
       ],
-      "incomplete_versions": [
-        "1.1.1"
-      ],
+      "incomplete_versions": [],
       "last_updated": 1784073600,
       "versions": {
         "1.0.0": {
@@ -13726,17 +13736,14 @@
           "released_at": "2026-04-10T00:00:00.000Z"
         },
         "1.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data contains 1 of 854 points (0.1%) with neither residents nor jobs (e.g. 4230951092)",
-            "demand_data resident totals mismatch (points=2386688, pops=613773, delta=1772915)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
-            "demand_residents_match": false,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -13757,7 +13764,16 @@
             "city_pmtiles": "RTM.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 282.83,
+          "release_size": 282.89,
+          "file_sizes": {
+            "RTM.pmtiles": 87.07,
+            "buildings_index.bin": 183.89,
+            "buildings_index.json": 262.53,
+            "config.json": 0,
+            "demand_data.json": 1.28,
+            "roads.geojson": 21.27,
+            "runways_taxiways.geojson": 0.1
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -13766,8 +13782,8 @@
             "asset_name": "RTM.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.1.1-rtm/RTM.zip"
           },
-          "fingerprint": "rules:v6:sha256:12e9270552aa6ffe97a896ea61e99de31b7c7b2ac8f4ad992628fc066284fce8",
-          "checked_at": "2026-07-16T02:26:57.621Z",
+          "fingerprint": "rules:v6:sha256:26c6edd9008ba8baf099b195a4240eab280f2845e5f21ff15b9aab2e447155e8",
+          "checked_at": "2026-07-16T08:01:05.256Z",
           "released_at": "2026-07-15T00:00:00.000Z"
         }
       }
@@ -15685,14 +15701,14 @@
     "spokane": {
       "has_complete_version": true,
       "latest_semver_version": "2.2.1",
-      "latest_semver_complete": false,
+      "latest_semver_complete": true,
       "complete_versions": [
+        "2.2.1",
         "2.2.0",
         "2.1.0",
         "1.0.0"
       ],
       "incomplete_versions": [
-        "2.2.1",
         "2.0.0"
       ],
       "last_updated": 1784073600,
@@ -15876,15 +15892,13 @@
           "released_at": "2026-04-10T00:00:00.000Z"
         },
         "2.2.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data contains 7 of 526 points (1.3%) with neither residents nor jobs (e.g. merged_530630112023018, merged_530630104032035, merged_530630133002016)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -15906,7 +15920,16 @@
             "city_pmtiles": "GEG.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 40.07,
+          "release_size": 40.03,
+          "file_sizes": {
+            "GEG.pmtiles": 15.6,
+            "buildings_index.bin": 22.4,
+            "buildings_index.json": 35.17,
+            "config.json": 0,
+            "demand_data.json": 2.48,
+            "roads.geojson": 5.04,
+            "runways_taxiways.geojson": 0.6
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -15915,8 +15938,8 @@
             "asset_name": "GEG.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.2.1-geg/GEG.zip"
           },
-          "fingerprint": "rules:v6:sha256:55970e743b352c5bcce0e5c68c13227551ba0ffcb3b0bb33096187bb95351f6d",
-          "checked_at": "2026-07-16T02:26:57.621Z",
+          "fingerprint": "rules:v6:sha256:141bdabdd025488dcd6ec5d8b45ab564caf9f68b6f4fcabe42d206e36c91572a",
+          "checked_at": "2026-07-16T08:01:05.256Z",
           "released_at": "2026-07-15T00:00:00.000Z"
         }
       }
