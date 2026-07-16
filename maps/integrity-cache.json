@@ -10864,6 +10864,54 @@
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-04-10T00:00:00.000Z"
         }
+      },
+      "1.1.1": {
+        "fingerprint": "rules:v6:sha256:b9b72cbf1b4e137eba6b36605babbf2000859d5aa59d2e6a6827cd8e806023d4",
+        "last_checked_at": "2026-07-16T00:01:06.263Z",
+        "result": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 5 of 640 points (0.8%) with neither residents nor jobs (e.g. merged_400272023011005, merged_400272023011009, merged_400272023016008)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "OKC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 126.52,
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.1.1-okc",
+            "asset_name": "OKC.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.1.1-okc/OKC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:b9b72cbf1b4e137eba6b36605babbf2000859d5aa59d2e6a6827cd8e806023d4",
+          "checked_at": "2026-07-16T00:01:06.263Z",
+          "released_at": "2026-07-15T00:00:00.000Z"
+        }
       }
     },
     "opo-pt-metropolitan": {

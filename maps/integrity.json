@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-15T20:01:05.647Z",
+  "generated_at": "2026-07-16T00:01:06.263Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -10967,14 +10967,16 @@
     },
     "oklahoma-city": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.0",
-      "latest_semver_complete": true,
+      "latest_semver_version": "1.1.1",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.0",
         "1.0.0"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1775779200,
+      "incomplete_versions": [
+        "1.1.1"
+      ],
+      "last_updated": 1784073600,
       "versions": {
         "1.0.0": {
           "is_complete": true,
@@ -11067,6 +11069,50 @@
           "fingerprint": "rules:v6:sha256:1526b5211b50ec139f72647e6dc450f970c4a858f1b26be5369f374a285b7a86",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-04-10T00:00:00.000Z"
+        },
+        "1.1.1": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 5 of 640 points (0.8%) with neither residents nor jobs (e.g. merged_400272023011005, merged_400272023011009, merged_400272023016008)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "OKC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 126.52,
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.1.1-okc",
+            "asset_name": "OKC.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.1.1-okc/OKC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:b9b72cbf1b4e137eba6b36605babbf2000859d5aa59d2e6a6827cd8e806023d4",
+          "checked_at": "2026-07-16T00:01:06.263Z",
+          "released_at": "2026-07-15T00:00:00.000Z"
         }
       }
     },
