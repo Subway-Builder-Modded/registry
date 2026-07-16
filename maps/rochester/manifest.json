@@ -20,7 +20,7 @@
   },
   "city_code": "ROC",
   "country": "US",
-  "population": 270140,
+  "population": 359848,
   "level_of_detail": "high-detail",
   "source_quality": "high-quality",
   "data_source": "LODES",
@@ -29,9 +29,9 @@
     "airports",
     "universities"
   ],
-  "residents_total": 270140,
-  "points_count": 832,
-  "population_count": 24806,
+  "residents_total": 359848,
+  "points_count": 5062,
+  "population_count": 26202,
   "initial_view_state": {
     "latitude": 43.154,
     "longitude": -77.608,
@@ -39,73 +39,76 @@
     "bearing": 0
   },
   "file_sizes": {
-    "ROC.pmtiles": 13.61,
-    "buildings_index.json": 11.8,
-    "city_config.json": 0,
+    ".railyard_map/special_demand_points.json": 0.03,
+    ".railyard_map/special_demand_types.json": 0.03,
+    "ROC.pmtiles": 22.41,
+    "ROC_foundations.pmtiles": 12.61,
+    "buildings_index.bin.gz": 11.34,
+    "buildings_index.json.gz": 8.15,
     "config.json": 0,
-    "demand_data.json": 7.28,
-    "ocean_depth_index.json": 0.93,
-    "roads.geojson": 6.47,
-    "runways_taxiways.geojson": 0.21
+    "demand_data.json": 4.55,
+    "ocean_depth_index.json.gz": 1.26,
+    "roads.geojson": 6.56,
+    "runways_taxiways.geojson": 0.13
   },
   "is_test": false,
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.37380219837201023,
-      "p25": 0.5117090950344979,
-      "p50": 0.653663110346359,
-      "p75": 0.8617547783868558,
-      "p90": 1.0882427194258377,
-      "mean": 0.7010094051879521
+      "p10": 0.26063434312052985,
+      "p25": 0.2769143225786342,
+      "p50": 0.3007184131948311,
+      "p75": 0.33560950251103217,
+      "p90": 0.3705383750213992,
+      "mean": 0.3109125877287326
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.24621043855692434,
-      "p25": 0.35733962085014087,
-      "p50": 0.49813239052327696,
-      "p75": 0.6925765390248623,
-      "p90": 1.0882427194258377,
-      "mean": 0.5672442946359436
+      "p10": 0.24282233917355897,
+      "p25": 0.26722648228395735,
+      "p50": 0.3036869107113065,
+      "p75": 0.35198443410453767,
+      "p90": 0.3949804062798626,
+      "mean": 0.3130412524531669
     },
     "commuteDistanceKm": {
-      "p10": 4466,
-      "p25": 8699,
-      "p50": 14667,
-      "p75": 21353,
-      "p90": 27973,
-      "mean": 15651.831169878255
+      "p10": 4347,
+      "p25": 8559,
+      "p50": 14528,
+      "p75": 21232,
+      "p90": 27888,
+      "mean": 15582.556064422562
     },
     "residentCellDensity": {
-      "p10": 39,
-      "p25": 127,
-      "p50": 308,
-      "p75": 608,
-      "p90": 926,
-      "mean": 443.57236842105266
+      "p10": 6,
+      "p25": 26,
+      "p50": 121,
+      "p75": 359,
+      "p90": 754,
+      "mean": 285.71088165210483
     },
     "workerCellDensity": {
-      "p10": 17,
-      "p25": 60,
-      "p50": 163,
-      "p75": 423,
-      "p90": 893,
-      "mean": 446.60199004975124
+      "p10": 3,
+      "p25": 9,
+      "p50": 46,
+      "p75": 268,
+      "p90": 798,
+      "mean": 352.7154072620216
     },
     "detail": {
-      "radiusKm": 0.5706231398687862,
-      "expectedPointSpacingKm": 0.8569568250501305,
-      "normalizedRadius": 0.6658715155636992,
-      "activityPerPoint": 324.6875,
-      "playableAreaKm2": 943,
-      "playableAreaPerPointKm2": 1.1334134615384615,
-      "playableCatchmentRadiusKm": 0.6006469095412744,
-      "localityScore": 0.3190156467440832,
-      "deaggregationScore": 0.9978904704515983,
-      "score": 0.5642186400774739
+      "radiusKm": 0.302199017035371,
+      "expectedPointSpacingKm": 0.502069994065698,
+      "normalizedRadius": 0.6019061497545439,
+      "activityPerPoint": 71.08810746740419,
+      "playableAreaKm2": 1068,
+      "playableAreaPerPointKm2": 0.21098380086922164,
+      "playableCatchmentRadiusKm": 0.2591490490843165,
+      "localityScore": 0.425949793851542,
+      "deaggregationScore": 1,
+      "score": 0.6526482926136726
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.33157077103570654,
+        "continuousScore": 0.7441583246170611,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -115,18 +118,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": -77.6090346326784,
-            "latitude": 43.14833661558566,
+            "longitude": -77.60864889383069,
+            "latitude": 43.14993133280347,
             "massShare": 1,
-            "assignedMass": 540280,
-            "assignedPointCount": 830,
+            "assignedMass": 719696,
+            "assignedPointCount": 5062,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1772928000,
+  "last_updated": 1784160000,
   "search_aliases": [
     "Рочестър",
     "ロチェスター",
