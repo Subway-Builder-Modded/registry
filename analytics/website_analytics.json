@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-07-16T19:01:07.174Z",
+  "generated_at": "2026-07-16T19:44:59.109Z",
   "valid_paths": [
     "/",
     "/community",
@@ -839,6 +839,7 @@
     "/registry/maps/kristiansand-no",
     "/registry/maps/lima",
     "/registry/maps/lima/versions",
+    "/registry/maps/lima/versions/1.0.0",
     "/registry/maps/los-angeles-county",
     "/registry/maps/louisville",
     "/registry/maps/madrid",
@@ -969,6 +970,7 @@
     "/registry/maps/yukina-kochi",
     "/registry/maps/yukina-kumamoto",
     "/registry/maps/yukina-kyoto",
+    "/registry/maps/yukina-lt-siauliai",
     "/registry/maps/yukina-lv-daugavpils",
     "/registry/maps/yukina-lv-riga",
     "/registry/maps/yukina-matsuyama",
@@ -1012,6 +1014,7 @@
     "/registry/maps/yukina-toyama",
     "/registry/maps/yukina-tsugaru",
     "/registry/maps/yukina-tw-chiayi",
+    "/registry/maps/yukina-tw-chiayi/versions/0.1.0",
     "/registry/maps/yukina-tw-hsinchu",
     "/registry/maps/yukina-tw-kaohsiung",
     "/registry/maps/yukina-tw-kaohsiung/versions/0.2.0",
@@ -1152,8 +1155,8 @@
     "latest_hour": "2026-07-16T19:00:00.000Z",
     "total_days": 91,
     "total_hours": 1193,
-    "latest_day_visits": 189,
-    "latest_hour_visits": 0
+    "latest_day_visits": 241,
+    "latest_hour_visits": 52
   },
   "time_series": {
     "by_day": [
@@ -1519,7 +1522,7 @@
       },
       {
         "date": "2026-07-16",
-        "visits": 189
+        "visits": 241
       }
     ],
     "by_hour": [
@@ -6293,7 +6296,7 @@
       },
       {
         "hour": "2026-07-16T19:00:00.000Z",
-        "visits": 0
+        "visits": 52
       }
     ]
   },
@@ -18767,35 +18770,42 @@
       }
     },
     "2026-07-16": {
-      "captured_at": "2026-07-16T19:01:04.503Z",
+      "captured_at": "2026-07-16T19:44:56.535Z",
       "window_start": "2026-07-16T00:00:00.000Z",
       "window_end": "2026-07-16T20:00:00.000Z",
       "totals": {
-        "visits": 189
+        "visits": 241
       },
       "pages": {
-        "/": 101,
-        "/credits": 1,
+        "/": 133,
+        "/credits": 3,
         "/depot/updates/v1.2.3": 2,
-        "/railyard": 30,
+        "/railyard": 31,
         "/railyard/analytics": 1,
         "/railyard/docs": 1,
+        "/railyard/docs/latest/github-token": 2,
         "/railyard/docs/latest/installing-railyard": 1,
-        "/railyard/updates": 1,
+        "/railyard/updates": 2,
         "/railyard/updates/v0.1.0": 1,
+        "/railyard/updates/v0.1.4": 1,
+        "/railyard/updates/v0.2.2": 1,
         "/railyard/updates/v0.2.5": 2,
+        "/railyard/updates/v0.2.7": 1,
         "/registry": 2,
         "/registry/authors/NerdieSanders": 1,
         "/registry/authors/Valdotorium": 1,
         "/registry/authors/ahkimn/subwaybuilder-jp-maps": 1,
         "/registry/authors/devenperez/subway-builder-canadian-maps": 1,
         "/registry/authors/seanyushoumori": 1,
-        "/registry/maps": 4,
+        "/registry/maps": 5,
+        "/registry/maps/arequipa": 1,
         "/registry/maps/bangkok": 1,
         "/registry/maps/bilbao": 1,
         "/registry/maps/ciudad-de-mexico": 1,
         "/registry/maps/greater-los-angeles": 1,
         "/registry/maps/greater-newyork": 1,
+        "/registry/maps/iquitos": 1,
+        "/registry/maps/lima/versions/1.0.0": 1,
         "/registry/maps/mfn-msy": 1,
         "/registry/maps/mfn-rdu": 1,
         "/registry/maps/san-juan": 1,
@@ -18803,15 +18813,20 @@
         "/registry/maps/south-florida": 1,
         "/registry/maps/valencia/versions/1.0.2": 1,
         "/registry/maps/yukina-asahikawa": 1,
+        "/registry/maps/yukina-bydgoszcz-torun": 1,
         "/registry/maps/yukina-cz-liberec-jablonec": 1,
         "/registry/maps/yukina-cz-ustecko-chomutov": 1,
         "/registry/maps/yukina-keihanshin": 3,
         "/registry/maps/yukina-kitakyushu-shimonoseki": 1,
+        "/registry/maps/yukina-lt-siauliai": 1,
         "/registry/maps/yukina-nagoya": 1,
         "/registry/maps/yukina-nakadoori": 1,
+        "/registry/maps/yukina-pl-gdansk": 1,
         "/registry/maps/yukina-pl-legnica": 1,
         "/registry/maps/yukina-pl-szczecin": 1,
+        "/registry/maps/yukina-tw-chiayi/versions/0.1.0": 1,
         "/registry/maps/yukina-tw-taichung/versions/0.1.1": 1,
+        "/registry/maps/yukina-yamagata": 1,
         "/registry/mods": 1,
         "/registry/mods/advanced-analytics": 1,
         "/registry/mods/japanese-trains/versions/v1.0.3": 1,
@@ -18819,7 +18834,9 @@
         "/registry/mods/lrt-trains/versions": 1,
         "/registry/mods/lrt-trains/versions/v1.1.1": 2,
         "/registry/mods/map-markers": 3,
+        "/registry/mods/mode-manager/versions": 1,
         "/registry/mods/orbital-surveyor": 1,
+        "/registry/mods/subwaybuilder-regions": 1,
         "/template-mod": 2,
         "/website": 1
       },
@@ -18828,53 +18845,55 @@
         "AU": 2,
         "AZ": 1,
         "BE": 18,
-        "BR": 2,
+        "BR": 5,
         "CA": 4,
         "CL": 1,
         "CN": 7,
+        "CZ": 2,
         "DE": 3,
         "EG": 2,
         "FI": 1,
         "FR": 5,
-        "GB": 3,
+        "GB": 5,
         "HK": 1,
         "IE": 1,
-        "IL": 10,
-        "IT": 1,
+        "IL": 18,
+        "IT": 7,
         "NL": 3,
         "NZ": 5,
+        "PL": 2,
         "PR": 1,
         "RU": 1,
         "SA": 1,
         "SG": 7,
         "TR": 10,
-        "US": 92
+        "US": 121
       },
       "browsers": {
         "AppleBot": 1,
-        "BingBot": 3,
-        "Chrome": 64,
+        "BingBot": 5,
+        "Chrome": 95,
         "ChromeDerivative": 5,
         "ChromeMobile": 9,
         "Edge": 5,
-        "Firefox": 30,
-        "GoogleBot": 11,
-        "MobileSafari": 6,
+        "Firefox": 31,
+        "GoogleBot": 15,
+        "MobileSafari": 10,
         "Opera": 2,
-        "Safari": 7,
-        "Unknown": 46
+        "Safari": 11,
+        "Unknown": 52
       },
       "operating_systems": {
-        "Android": 21,
-        "Linux": 3,
-        "MacOSX": 38,
-        "Unknown": 49,
-        "Windows": 72,
-        "iOS": 6
+        "Android": 25,
+        "Linux": 6,
+        "MacOSX": 57,
+        "Unknown": 57,
+        "Windows": 86,
+        "iOS": 10
       },
       "devices": {
-        "desktop": 159,
-        "mobile": 30
+        "desktop": 203,
+        "mobile": 38
       }
     }
   }
