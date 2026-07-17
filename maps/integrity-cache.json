@@ -11257,6 +11257,61 @@
           "checked_at": "2026-07-16T02:26:57.621Z",
           "released_at": "2026-07-15T00:00:00.000Z"
         }
+      },
+      "1.2.0": {
+        "fingerprint": "rules:v6:sha256:37ac68ac05ccec9ddc75f614d8e4db978b7d6cb4c93787b951285bc1fa8be55f",
+        "last_checked_at": "2026-07-17T20:01:21.440Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "OKC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 100.9,
+          "file_sizes": {
+            "OKC.pmtiles": 55.45,
+            "buildings_index.bin": 62.98,
+            "buildings_index.json": 82.25,
+            "config.json": 0,
+            "demand_data.json": 10.67,
+            "roads.geojson": 19.36,
+            "runways_taxiways.geojson": 0.64
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.2.0-okc",
+            "asset_name": "OKC.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.2.0-okc/OKC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:37ac68ac05ccec9ddc75f614d8e4db978b7d6cb4c93787b951285bc1fa8be55f",
+          "checked_at": "2026-07-17T20:01:21.440Z",
+          "released_at": "2026-07-17T00:00:00.000Z"
+        }
       }
     },
     "opo-pt-metropolitan": {
@@ -15691,8 +15746,8 @@
         }
       },
       "2.2.1": {
-        "fingerprint": "rules:v6:sha256:141bdabdd025488dcd6ec5d8b45ab564caf9f68b6f4fcabe42d206e36c91572a",
-        "last_checked_at": "2026-07-16T08:01:05.256Z",
+        "fingerprint": "rules:v6:sha256:500f089c6fed0ad33ff00bc04a4e7c8f0d2cd0771f4ba4f18377a6ca96a62248",
+        "last_checked_at": "2026-07-17T20:01:21.440Z",
         "result": {
           "is_complete": true,
           "errors": [],
@@ -15740,8 +15795,8 @@
             "asset_name": "GEG.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v2.2.1-geg/GEG.zip"
           },
-          "fingerprint": "rules:v6:sha256:141bdabdd025488dcd6ec5d8b45ab564caf9f68b6f4fcabe42d206e36c91572a",
-          "checked_at": "2026-07-16T08:01:05.256Z",
+          "fingerprint": "rules:v6:sha256:500f089c6fed0ad33ff00bc04a4e7c8f0d2cd0771f4ba4f18377a6ca96a62248",
+          "checked_at": "2026-07-17T20:01:21.440Z",
           "released_at": "2026-07-15T00:00:00.000Z"
         }
       }
@@ -17040,18 +17095,16 @@
         }
       },
       "1.0.2": {
-        "fingerprint": "rules:v6:sha256:d385edef3a67d9599eda19ec2e574b1735f3f4aed166b3881f06a5a5b91da290",
-        "last_checked_at": "2026-07-16T02:26:57.621Z",
+        "fingerprint": "rules:v6:sha256:141bdabdd025488dcd6ec5d8b45ab564caf9f68b6f4fcabe42d206e36c91572a",
+        "last_checked_at": "2026-07-17T20:01:21.440Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "demand_data contains 9 of 334 points (2.7%) with neither residents nor jobs (e.g. merged_530719200003036, merged_530719200002043, merged_530210206082061)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -17073,7 +17126,16 @@
             "city_pmtiles": "PSC.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 16.47,
+          "release_size": 16.45,
+          "file_sizes": {
+            "PSC.pmtiles": 7.34,
+            "buildings_index.bin": 7.84,
+            "buildings_index.json": 12.39,
+            "config.json": 0,
+            "demand_data.json": 0.95,
+            "roads.geojson": 3.09,
+            "runways_taxiways.geojson": 0.43
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -17082,8 +17144,8 @@
             "asset_name": "PSC.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.2-psc/PSC.zip"
           },
-          "fingerprint": "rules:v6:sha256:d385edef3a67d9599eda19ec2e574b1735f3f4aed166b3881f06a5a5b91da290",
-          "checked_at": "2026-07-16T02:26:57.621Z",
+          "fingerprint": "rules:v6:sha256:141bdabdd025488dcd6ec5d8b45ab564caf9f68b6f4fcabe42d206e36c91572a",
+          "checked_at": "2026-07-17T20:01:21.440Z",
           "released_at": "2026-07-15T00:00:00.000Z"
         }
       }
