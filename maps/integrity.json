@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-17T03:41:49.298Z",
+  "generated_at": "2026-07-17T04:01:08.021Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -439,13 +439,14 @@
     },
     "baltimore-dc-corridor": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.1",
+      "latest_semver_version": "1.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "1.2.0",
         "1.1.1"
       ],
       "incomplete_versions": [],
-      "last_updated": 1773792000,
+      "last_updated": 1784160000,
       "versions": {
         "1.1.1": {
           "is_complete": true,
@@ -494,6 +495,61 @@
           "fingerprint": "rules:v6:sha256:a6117386faecfdef85d2f43f5c1b9a01c28d046d409259c02072c9986a901ff4",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-03-18T00:00:00.000Z"
+        },
+        "1.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json.gz",
+            "buildings_index_json": "buildings_index.json.gz",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DCA.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 330.23,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.08,
+            ".railyard_map/special_demand_types.json": 0.03,
+            "DCA.pmtiles": 143.63,
+            "DCA_foundations.pmtiles": 68.29,
+            "buildings_index.bin.gz": 50.78,
+            "buildings_index.json.gz": 35.68,
+            "config.json": 0,
+            "demand_data.json": 18.05,
+            "ocean_depth_index.json.gz": 16.36,
+            "roads.geojson": 71.3,
+            "runways_taxiways.geojson": 1.97
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "rslurry/subwaybuilder-maps",
+            "tag": "1.3.7",
+            "asset_name": "DCA.zip",
+            "download_url": "https://github.com/rslurry/subwaybuilder-maps/releases/download/1.3.7/DCA.zip"
+          },
+          "fingerprint": "rules:v6:sha256:53fc5483b33aae44b9a1a2a8254be76a99c249d8ebf928f144a26845392608a2",
+          "checked_at": "2026-07-17T04:01:08.021Z",
+          "released_at": "2026-07-16T00:00:00.000Z"
         }
       }
     },
