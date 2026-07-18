@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-18T12:01:17.893Z",
+  "generated_at": "2026-07-18T16:01:26.605Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -10049,16 +10049,18 @@
     },
     "mfn-hong-kong": {
       "has_complete_version": true,
-      "latest_semver_version": "0.5.2",
-      "latest_semver_complete": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "0.5.2",
         "0.5.0",
         "0.4.0",
         "0.3.0"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1781951284,
+      "incomplete_versions": [
+        "1.0.0"
+      ],
+      "last_updated": 1784385710,
       "versions": {
         "0.3.0": {
           "is_complete": true,
@@ -10243,6 +10245,49 @@
           "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:0.5.2:HKG.zip",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-06-20T10:28:04.000Z"
+        },
+        "1.0.0": {
+          "is_complete": false,
+          "errors": [
+            "asset 'HKG.zip': demand_data contains 3 of 1968 points (0.2%) with neither residents nor jobs (e.g. 328/24, 269, 287)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "HKG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 80.88,
+          "source": {
+            "update_type": "github",
+            "repo": "crumpetime/sb-maps-hkg",
+            "tag": "1.0.0",
+            "asset_name": "HKG.zip",
+            "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/1.0.0/HKG.zip"
+          },
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:1.0.0:HKG.zip",
+          "checked_at": "2026-07-18T16:01:26.605Z",
+          "released_at": "2026-07-18T14:41:50.000Z"
         },
         "railyard": {
           "is_complete": false,
@@ -11352,15 +11397,17 @@
       }
     },
     "nice-cote-d-azur": {
-      "has_complete_version": false,
-      "latest_semver_version": "v1.0.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.2",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.2"
+      ],
       "incomplete_versions": [
         "v1.0.1",
         "v1.0.0"
       ],
-      "last_updated": 1784366114,
+      "last_updated": 1784381653,
       "versions": {
         "v1.0.0": {
           "is_complete": false,
@@ -11449,6 +11496,58 @@
           "fingerprint": "rules:v6:github:pierreggt/subway-builder-nice:v1.0.1:nice_v1.0.1.zip",
           "checked_at": "2026-07-18T12:01:17.893Z",
           "released_at": "2026-07-18T09:15:14.000Z"
+        },
+        "v1.0.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "NCE.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 51.87,
+          "file_sizes": {
+            "NCE.pmtiles": 28.3,
+            "buildings_index.bin.gz": 14.36,
+            "config.json": 0,
+            "demand_data.json.gz": 0.29,
+            "ocean_depth_index.json.gz": 3.75,
+            "ocean_depth_index_contours.json.gz": 2.95,
+            "roads.geojson.gz": 2.84,
+            "runways_taxiways.geojson.gz": 0.09
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-nice",
+            "tag": "v1.0.2",
+            "asset_name": "nice_v1.0.2.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-nice/releases/download/v1.0.2/nice_v1.0.2.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-nice:v1.0.2:nice_v1.0.2.zip",
+          "checked_at": "2026-07-18T16:01:26.605Z",
+          "released_at": "2026-07-18T13:34:13.000Z"
         }
       }
     },
