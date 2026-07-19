@@ -67,7 +67,7 @@ _Some countries will refuse to provide data points that contain only a handful o
 Granularity scores the grain at which a count's **magnitude** is measured — not the finer grain it may ultimately be placed at (that finer placement is credited in the [Dasymetric](#3-dasymetric) section). Some sources blur the two: a total measured at a coarse unit is redistributed to finer units that carry their own partial signal. To resolve which grain to score:
 
 1. **Find where the magnitude is actually measured.** A total published per municipality and then spread across buildings by a model is _measured_ at the municipality — score that grain; the finer placement earns its credit only in the dasymetric (R × I).
-2. **Determine whether the finer units carry independent magnitude information of their own.** If they do — establishment employee-size bands, per-building dwelling counts — the finer grain is partly measured, not pure interpolation, and the effective grain sits **between** the coarse anchor and the fine unit; for example:
+2. **Determine whether the finer units carry independent magnitude information of their own.** If they do (e.g. establishment employee-size bands, per-building dwelling counts), the finer grain is partly measured, not pure interpolation, and the effective grain sits **between** the coarse anchor and the fine unit; for example:
    - Exact per-unit counts (e.g. block-level headcounts) => score the **fine** grain.
    - A partial per-unit signal (e.g. size _bands_ constrained to a coarse total) => score a **middle** grain.
    - No independent finer signal (a coarse total spread by geometry alone) => score the **coarse** grain.
