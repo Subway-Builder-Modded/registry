@@ -10,7 +10,7 @@ A Subway Builder map is a closed-system model of how residents within a city nor
 
 Countries around the world publish these statistics in disparate formats and with varying methodologies; this rubric is **NOT** intended to be an exhaustive reference of what can be used to model a Subway Builder map (or macro commute flows in general), but rather to provide a reasonable framework for comparing the relative quality of different data sources and the maps they produce.
 
-We score data quality along **three pillars**, weighted by how much each shapes modeled demand:
+This rubric thus scores data quality along **three pillars**, weighted by how much each shapes modeled demand:
 
 | Pillar        | Weight | Captures                                        |
 | :------------ | :----: | :---------------------------------------------- |
@@ -33,9 +33,9 @@ Within the Workplace and Resident pillars, quality further splits into a **count
 
 The Railyard `registry` currently records data quality as a single author-declared `source_quality` tag — `high` / `medium` / `low`. That tag is a useful first cut to distinguish map quality, but is limited in several ways this rubric is built to address:
 
-- **Single-axis.** It grades only whether the _source_ is official — not what was measured, at what grain, how it was placed, or whether commute flows were observed. Two `high` maps can differ enormously: a government total at provincial (ADM1) grain and a government block-level (ADM5) census are both "official," yet are wholly different levels of data quality.
-- **Self-reported.** Authors grade their own work, so the tag is not comparable across authors and biases upward. This rubric applies the same named tiers to every pipeline, so a map's score is auditable and comparable across authors.
-- **Coarse.** Three buckets encompass the full range of scores; this rubric resolves a continuous [0, 1] score for internal use, which can then be mapped to a coarse grade, or directly to the existing three-level system.
+- **Single-axis.** It grades only whether the _source_ is official; it does not ask what was measured, at what grain, how it was placed, or whether any commute flow data was observed. Two `high` maps can differ enormously in actual data quality: a government total at provincial (ADM1) grain and a government block-level (ADM5) census are both "official," yet are wholly different levels of data quality.
+- **Self-reported.** Authors grade their own work, so the tag is not comparable across authors and biases the value upwards. This rubric applies objectively the same named tiers to every pipeline, so a map's score is auditable and comparable.
+- **Coarse.** The three buckets encompass the full range of scores; this rubric resolves a continuous [0, 1] score for internal use, which can then be mapped to a coarse tier system as needed.
 - **Opaque.** A tag says _how good_, never _why_. This rubric is especially userful for map reviewers; the author would now be required to report more granular detail on their source data.
 
 The metric should then be used as a refinement over the existing tag. A `high` / `medium` / `low` split is useful for the end-user (the person using the simulation), and they likely do not need to or want to know the exact methodology or source data the map draws from.
@@ -44,7 +44,7 @@ The continuous rubric score resolves into **six named tiers** — very high, hig
 
 ## **2. Granularity**
 
-The quality of the metric being measured by the census/official statistics is secondary to the granularity at which the metric is measured. The finer the measurement granularity, the higher fidelity and detail to which a map can be modeled. Within this document, we will use the following definitions
+The quality of the metric being measured by the census/official statistics is secondary to the granularity at which the metric is measured. The finer the measurement granularity, the higher fidelity and detail to which a map can be modeled. Within this document, the following definitions are used:
 
 | Metric Granularity | Description                                                                                                                                            | Examples                                                           |
 | :----------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------- |
@@ -315,7 +315,7 @@ A map with a well-cited special-demand layer is materially better than one that 
 
 ### **Data Vintage & Temporal Coherence**
 
-Some census / official data is of COVID-vintage, wherein O/D is lower than normal, and WFH rates are higher (which can in particular skew physical workplace-based census data). We do not attempt to penalize COVID-vintage data, as even though it may be less representative of the pre-COVID world, it is still a real-world measurement.
+Some census / official data is of COVID-vintage, wherein O/D is lower than normal, and WFH rates are higher (which can in particular skew physical workplace-based census data). This rubric does not attempt to penalize COVID-vintage data, as even though it may be less representative of the pre-COVID world, it is still a real-world measurement.
 
 Separately, a single map can be assembled from layers of **different vintages**. For example, a reasonable methodology may include a residence census, a workplace / economic census usually published a year or more later, a current building-footprint snapshot, and a special-demand layer whose figures may span many years. This modest, systematic lag between the residence and workplace censuses is normal and accepted (the two are rarely published concurrently).
 
@@ -325,7 +325,7 @@ The looser risk is the special-demand layer, which is left primarily to the disc
 
 Some census data attempts to capture the full breadth of employment within a country by estimating informal employment (or garnering such data via survey). Herein lies a potential source of bias in the data, as informal employment is often more prevalent in certain sectors (e.g. construction, agriculture) and may be more spatially diffuse than formal employment, and certain countries will exhibit much higher rates of informal employment than others.
 
-We do not attempt to score informal employment, as modeling it explicitly is a design choice, but it is worth noting that a map that does not model informal employment may be less realistic than one that does.
+This rubric does not attempt to score informal employment, as modeling it explicitly is a design choice, but it is worth noting that a map that does not model informal employment may be less realistic than one that does.
 
 ### **Point-Placement Detail — distinct from input quality**
 
