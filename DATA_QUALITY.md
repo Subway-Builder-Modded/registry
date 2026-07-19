@@ -204,10 +204,13 @@ Every pipeline resolves to a single **weighted score** in [0, 1] and a named qua
 | **Low**       |   D   | 0.30 – 0.45    |
 | **Very low**  |   E   | 0.15 – 0.30    |
 | **Absent**    |   F   | < 0.15         |
+| **Unknown**   |   U   | N/A            |
 
 _Tiers apply to the **weighted** (player-facing) score, and refine the current three-level tag system: **very high** and **high** map to `high`, **medium** to `medium`, and **low** / **very low** / **absent** to `low`._
 
 _The **absent** tier (grade F) is reserved for pipelines with no usable census anchor — the granularity multiplier floors the score at ~0 by construction, categorically apart from a map that is weakly grounded in census data._
+
+_The **unknown** tier (grade U) is reserved for pipelines that have not been scored yet, to enable backwards compatibility for pipelines/maps that have yet to be scored._
 
 _Tiers are heterogeneous — a given tier can arise from different strength/weakness profiles across the three pillars. The **grade** letter alias (A–F) is kept for brevity._
 
@@ -265,10 +268,13 @@ _Mesh tiers are graded by **cell size in meters** — a uniform grid gives consi
 | CN            | Kronifer | 0.25      | 0.10     | 0.00 | 0.16          | **0.40**           | Low       |
 | UA            | Yukina-  | 0.04      | 0.12     | 0.10 | 0.08          | **0.17**           | Very low  |
 | OSM (patcher) | —        | 0.00      | 0.00     | 0.00 | 0.00          | **0.00**           | Absent    |
+| _Unscored_    | —        | —         | —        | —    | —             | N/A                | Unknown   |
 
 The raw (weakest-link product) column is retained as the sterner internal view.
 
 _OSM (patcher): the `Subway-Builder-Modded/map-manager` pipeline (an early community OSM patcher), scored as the true floor of the scale. It uses **no census or official statistics at all** — resident and job counts are derived entirely from OSM building footprints × `building:levels`, multiplied by hardcoded square-feet-per-person / square-feet-per-job constants (the source comments call it "all vibes"). Neighborhoods are Voronoi cells around OSM place-nodes, and the O/D "matrix" is a synthetic jobs-share × population product with no distance decay. Because no count magnitude is ever **measured**, the granularity multiplier is **None (G = 0)**, which zeroes every pillar regardless of how the OSM footprints are placed — so it scores **0.00**. It is the concrete illustration of what "no census bounding" costs: with no real magnitude to place, spatial detail is worthless._
+
+_Initially, all pipelines are **unscored** (grade U) until a reviewer has worked with teh submitter to define the three pillars and the O/D metric. The unscored tier is a placeholder and is not at all a judgment of the map's data quality._
 
 ### **Worked examples — one per tier**
 
