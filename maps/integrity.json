@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-19T08:01:25.737Z",
+  "generated_at": "2026-07-19T16:01:22.205Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -10362,18 +10362,17 @@
     },
     "mfn-hong-kong": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.2",
-      "latest_semver_complete": false,
+      "latest_semver_version": "1.0.5",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "1.0.5",
         "0.5.2",
         "0.5.0",
         "0.4.0",
         "0.3.0"
       ],
-      "incomplete_versions": [
-        "1.0.2"
-      ],
-      "last_updated": 1784436210,
+      "incomplete_versions": [],
+      "last_updated": 1784461073,
       "versions": {
         "0.3.0": {
           "is_complete": true,
@@ -10559,11 +10558,9 @@
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-06-20T10:28:04.000Z"
         },
-        "1.0.2": {
-          "is_complete": false,
-          "errors": [
-            "no game_version found (declare a \"subway-builder\" dependency range in the release manifest.json)"
-          ],
+        "1.0.5": {
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -10574,8 +10571,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": true,
-            "game_version_valid": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -10602,16 +10598,17 @@
             "roads.geojson": 32.95,
             "runways_taxiways.geojson": 2.08
           },
+          "game_version": ">=1.4.0",
           "source": {
             "update_type": "github",
             "repo": "crumpetime/sb-maps-hkg",
-            "tag": "1.0.2",
+            "tag": "1.0.5",
             "asset_name": "HKG.zip",
-            "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/1.0.2/HKG.zip"
+            "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/1.0.5/HKG.zip"
           },
-          "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:1.0.2:HKG.zip",
-          "checked_at": "2026-07-19T05:10:19.971Z",
-          "released_at": "2026-07-19T04:43:30.000Z"
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:1.0.5:HKG.zip",
+          "checked_at": "2026-07-19T12:01:20.534Z",
+          "released_at": "2026-07-19T11:37:53.000Z"
         },
         "railyard": {
           "is_complete": false,
