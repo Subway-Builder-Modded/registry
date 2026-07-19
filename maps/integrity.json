@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-19T00:01:23.325Z",
+  "generated_at": "2026-07-19T04:09:07.603Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -10362,7 +10362,7 @@
     },
     "mfn-hong-kong": {
       "has_complete_version": true,
-      "latest_semver_version": "1.0.0",
+      "latest_semver_version": "1.0.1",
       "latest_semver_complete": false,
       "complete_versions": [
         "0.5.2",
@@ -10371,9 +10371,9 @@
         "0.3.0"
       ],
       "incomplete_versions": [
-        "1.0.0"
+        "1.0.1"
       ],
-      "last_updated": 1784385710,
+      "last_updated": 1784426648,
       "versions": {
         "0.3.0": {
           "is_complete": true,
@@ -10559,22 +10559,23 @@
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-06-20T10:28:04.000Z"
         },
-        "1.0.0": {
+        "1.0.1": {
           "is_complete": false,
           "errors": [
-            "asset 'HKG.zip': demand_data contains 3 of 1968 points (0.2%) with neither residents nor jobs (e.g. 328/24, 269, 287)"
+            "no game_version found (declare a \"subway-builder\" dependency range in the release manifest.json)"
           ],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": true
+            "config_version_matches_tag": true,
+            "game_version_valid": false
           },
           "matched_files": {
             "config_json": "config.json",
@@ -10590,17 +10591,27 @@
             "city_pmtiles": "HKG.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 80.88,
+          "release_size": 74.11,
+          "file_sizes": {
+            "HKG.pmtiles": 33.58,
+            "HKG_foundations.pmtiles": 8.66,
+            "buildings_index.bin": 25.96,
+            "config.json": 0,
+            "demand_data.json": 33.4,
+            "ocean_depth_index.json": 67.84,
+            "roads.geojson": 32.95,
+            "runways_taxiways.geojson": 2.08
+          },
           "source": {
             "update_type": "github",
             "repo": "crumpetime/sb-maps-hkg",
-            "tag": "1.0.0",
+            "tag": "1.0.1",
             "asset_name": "HKG.zip",
-            "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/1.0.0/HKG.zip"
+            "download_url": "https://github.com/crumpetime/sb-maps-hkg/releases/download/1.0.1/HKG.zip"
           },
-          "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:1.0.0:HKG.zip",
-          "checked_at": "2026-07-18T16:01:26.605Z",
-          "released_at": "2026-07-18T14:41:50.000Z"
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-hkg:1.0.1:HKG.zip",
+          "checked_at": "2026-07-19T04:09:07.603Z",
+          "released_at": "2026-07-19T02:04:08.000Z"
         },
         "railyard": {
           "is_complete": false,
@@ -13130,6 +13141,70 @@
           "fingerprint": "rules:v6:sha256:13c551531285ad8dc8001811f36ee41893b092d05d4e5f3613c71d40afcecf17",
           "checked_at": "2026-07-18T22:48:21.603Z",
           "released_at": "2026-07-18T00:00:00.000Z"
+        }
+      }
+    },
+    "paris-ile-de-france": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1784385339,
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "PAR.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 221.17,
+          "file_sizes": {
+            "PAR.pmtiles": 124.39,
+            "buildings_index.bin.gz": 78.91,
+            "config.json": 0,
+            "demand_data.json.gz": 3.93,
+            "ocean_depth_index.json.gz": 3.24,
+            "ocean_depth_index_contours.json.gz": 2.83,
+            "roads.geojson.gz": 11.41,
+            "runways_taxiways.geojson.gz": 0.74
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-paris",
+            "tag": "v1.0.0",
+            "asset_name": "paris_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-paris/releases/download/v1.0.0/paris_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-paris:v1.0.0:paris_v1.0.0.zip",
+          "checked_at": "2026-07-19T04:09:07.603Z",
+          "released_at": "2026-07-18T14:35:39.000Z"
         }
       }
     },
