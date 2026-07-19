@@ -1,12 +1,12 @@
 # **Data Quality Scoring Guidelines**
 
-This document describes the criterion that will be used to judge the data quality of a specific map or set of maps for Railyard.
+This document describes the criterion that will be used to judge the data quality of a specific map or set of maps for [Registry](https://github.com/Subway-Builder-Modded/registry).
 
 The intent for this system is to both measure the objective quality of the raw data bounding the demand modeled within a map (for internal review) and then distill that quality into a single, usable metric for non-technical users (players)
 
 ## **1. Criterion**
 
-A Subway Builder map is a closed-system model of how residents within a city normally commute; the provenance of the underlying census / official statistics bounds how realistic that model can be, and the quality of that data is what this rubric is intended to measure.
+A Subway Builder map is a closed-system model of how residents within a city normally commute. The provenance of the underlying census / official data bounds how realistic that model can be, and the quality of that data is what this rubric is intended to measure.
 
 Countries around the world publish these statistics in disparate formats and with varying methodologies; this rubric is **NOT** intended to be an exhaustive reference of what can be used to model a Subway Builder map (or macro commute flows in general), but rather to provide a reasonable framework for comparing the relative quality of different data sources and the maps they produce.
 
@@ -20,8 +20,8 @@ This rubric thus scores data quality along **three pillars**, weighted by how mu
 
 **Why these weights?**
 
-- **Workplace — 0.50.** _Workplace data is scored the highest; it is more concentrated than resident demand, and the nodes they would produce within a modeled map are the most load bearing. A concentrated set of destination points is more sensitive to misplacement than a more diffuse set of origin points, and primate destination nodes provide a model with clear structure._
-  _In addition, workplace data is often more difficult to obtain than resident data, and is more likely to be suppressed or estimated. A map that can accurately model workplace demand is therefore more likely to be a high-quality map overall._
+- **Workplace — 0.50.** _Workplace data is scored the highest. Workplaces are more concentrated than resident demand, and the nodes they produce within a modeled map are therefore the most load bearing. A concentrated set of destination points is more sensitive to misplacement than origin points, which are more diffuse. And during simulation, primate destination nodes provide a user with clear structure to work around._
+  - _In addition, workplace data is often more difficult to obtain than resident data, and is more likely to be suppressed or estimated. A map that can accurately model workplace demand is therefore more likely to be a high-quality map overall._
 
 - **Resident — 0.35.** _Resident data is scored the second highest; it represents the origin side of every commute and is generally more uniformly distributed than workplace data. While less load-bearing than workplace nodes, residential density provides a solid foundation for modeling commute flows._
 
@@ -31,7 +31,7 @@ Within the Workplace and Resident pillars, quality further splits into a **count
 
 ### **Relationship to the self-reported quality tag**
 
-The Railyard `registry` currently records data quality as a single author-declared `source_quality` tag — `high` / `medium` / `low`. That tag is a useful first cut to distinguish map quality, but is limited in several ways this rubric is built to address:
+[Registry](https://github.com/Subway-Builder-Modded/registry) currently records data quality as a single author-declared `source_quality` tag — `high` / `medium` / `low`. That tag is a useful first cut to distinguish map quality, but is limited in several ways this rubric is built to address:
 
 - **Single-axis.** It grades only whether the _source_ is official; it does not ask what was measured, at what grain, how it was placed, or whether any commute flow data was observed. Two `high` maps can differ enormously in actual data quality: a government total at provincial (ADM1) grain and a government block-level (ADM5) census are both "official," yet are wholly different levels of data quality.
 - **Self-reported.** Authors grade their own work, so the tag is not comparable across authors and biases the value upwards. This rubric applies objectively the same named tiers to every pipeline, so a map's score is auditable and comparable.
@@ -321,7 +321,7 @@ A map with a well-cited special-demand layer is materially better than one that 
 
 ### **Data Vintage & Temporal Coherence**
 
-Some census / official data is of COVID-vintage, wherein O/D is lower than normal, and WFH rates are higher (which can in particular skew physical workplace-based census data). This rubric does not attempt to penalize COVID-vintage data, as even though it may be less representative of the pre-COVID world, it is still a real-world measurement.
+Some census / official data is of COVID-vintage, wherein O/D is lower than normal, and WFH (work from home) rates are higher. This rubric does not attempt to penalize COVID-vintage data, as even though it may be less representative of the pre-COVID world, it is still a real-world measurement.
 
 Separately, a single map can be assembled from layers of **different vintages**. For example, a reasonable methodology may include a residence census, a workplace / economic census usually published a year or more later, a current building-footprint snapshot, and a special-demand layer whose figures may span many years. This modest, systematic lag between the residence and workplace censuses is normal and accepted (the two are rarely published concurrently).
 
