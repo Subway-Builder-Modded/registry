@@ -10450,26 +10450,25 @@
           "released_at": "2026-04-08T06:02:47.000Z"
         }
       },
-      "2.0.0": {
-        "fingerprint": "rules:v6:github:crumpetime/sb-maps-orf:2.0.0:ORF.zip",
-        "last_checked_at": "2026-07-20T11:16:07.068Z",
+      "2.0.2": {
+        "fingerprint": "rules:v6:github:crumpetime/sb-maps-orf:2.0.2:ORF.zip",
+        "last_checked_at": "2026-07-20T14:35:26.661Z",
         "result": {
           "is_complete": false,
           "errors": [
-            "asset 'ORF.zip': demand_data contains 1 isolated point(s) with nearest-neighbor distance >100km: UNI_NSU=11283.6km",
-            "asset 'ORF.zip': demand_data contains 62 of 2332 points (2.7%) with neither residents nor jobs (e.g. merged_511818601002007, merged_510932803002008, merged_511319303022058)"
+            "asset 'ORF.zip': config.json version '2.0.0' does not match release tag '2.0.2' (expected '2.0.2')"
           ],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
-            "demand_point_spacing": false,
-            "demand_phantom_points": false,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": true
+            "config_version_matches_tag": false
           },
           "matched_files": {
             "config_json": "config.json",
@@ -10477,26 +10476,26 @@
             "demand_point_spacing": "demand_data.json",
             "demand_phantom_points": "demand_data.json",
             "demand_residents_match": "demand_data.json",
-            "buildings_index": "buildings_index.json",
-            "buildings_index_json": "buildings_index.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
             "buildings_index_bin": "buildings_index.bin",
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "ORF.pmtiles",
-            "config_version_matches_tag": "config.json"
+            "config_version_matches_tag": null
           },
-          "release_size": 206.37,
-          "game_version": ">=1.0.0",
+          "release_size": 178.62,
+          "game_version": ">=1.4.0",
           "source": {
             "update_type": "github",
             "repo": "crumpetime/sb-maps-orf",
-            "tag": "2.0.0",
+            "tag": "2.0.2",
             "asset_name": "ORF.zip",
-            "download_url": "https://github.com/crumpetime/sb-maps-orf/releases/download/2.0.0/ORF.zip"
+            "download_url": "https://github.com/crumpetime/sb-maps-orf/releases/download/2.0.2/ORF.zip"
           },
-          "fingerprint": "rules:v6:github:crumpetime/sb-maps-orf:2.0.0:ORF.zip",
-          "checked_at": "2026-07-20T11:16:07.068Z",
-          "released_at": "2026-07-20T09:01:34.000Z"
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-orf:2.0.2:ORF.zip",
+          "checked_at": "2026-07-20T14:35:26.661Z",
+          "released_at": "2026-07-20T12:51:22.000Z"
         }
       }
     },
