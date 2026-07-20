@@ -46,7 +46,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "LYS.pmtiles": 18.92,
+    "buildings_index.bin.gz": 11.15,
+    "config.json": 0,
+    "demand_data.json.gz": 0.38,
+    "ocean_depth_index.json.gz": 1.19,
+    "ocean_depth_index_contours.json.gz": 1.04,
+    "roads.geojson.gz": 1.97,
+    "runways_taxiways.geojson.gz": 0.08
+  },
   "included_cities": [
     "Villeurbanne",
     "Vénissieux",
@@ -58,5 +67,83 @@
     "Écully",
     "Caluire-et-Cuire",
     "Meyzieu"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.19896621211927756,
+      "p25": 0.19902212401175248,
+      "p50": 0.19910007032295868,
+      "p75": 0.19924491313060394,
+      "p90": 0.19963697984661358,
+      "mean": 0.2105152469660832
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1989856089085415,
+      "p25": 0.19905138834405778,
+      "p50": 0.19914071875437508,
+      "p75": 0.19969459990440613,
+      "p90": 0.43606147854270066,
+      "mean": 0.2884905011509071
+    },
+    "commuteDistanceKm": {
+      "p10": 1832,
+      "p25": 4195,
+      "p50": 7289,
+      "p75": 14379,
+      "p90": 23191,
+      "mean": 10241.750924214417
+    },
+    "residentCellDensity": {
+      "p10": 60,
+      "p25": 173,
+      "p50": 460,
+      "p75": 1256,
+      "p90": 2975,
+      "mean": 1184.1663947797715
+    },
+    "workerCellDensity": {
+      "p10": 54,
+      "p25": 120,
+      "p50": 381,
+      "p75": 1057,
+      "p90": 2656,
+      "mean": 1178.453957996769
+    },
+    "detail": {
+      "radiusKm": 0.1991203935014207,
+      "expectedPointSpacingKm": 0.3525716250817342,
+      "normalizedRadius": 0.5647657932065862,
+      "activityPerPoint": 140.92445974373686,
+      "playableAreaKm2": 700,
+      "playableAreaPerPointKm2": 0.13386880856760375,
+      "playableCatchmentRadiusKm": 0.20642617377337016,
+      "localityScore": 0.49338547914850245,
+      "deaggregationScore": 1,
+      "score": 0.7024140368390301
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.5993766747723607,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 4.873632799147518,
+            "latitude": 45.752182214687686,
+            "massShare": 1,
+            "assignedMass": 1473788,
+            "assignedPointCount": 5229,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784467901
 }
