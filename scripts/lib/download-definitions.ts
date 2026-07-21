@@ -17,6 +17,7 @@ export interface GraphqlReleaseAssetNode {
   downloadCount: number;
   downloadUrl: string;
   size?: number | null;
+  updatedAt?: string | null;
 }
 
 export interface GraphqlReleaseNode {
@@ -64,6 +65,9 @@ export interface RepoReleaseTagData {
     downloadCount: number;
     downloadUrl: string | null;
     sizeBytes: number | null;
+    // ISO 8601 timestamp of last asset update from GitHub API; populated by full
+    // release-index path only. Used to detect asset replacement (clobber).
+    assetUpdatedAt?: string | null;
   }>;
 }
 
@@ -180,6 +184,7 @@ export const REPO_RELEASES_QUERY = `
               downloadCount
               downloadUrl
               size
+              updatedAt
             }
             pageInfo {
               hasNextPage

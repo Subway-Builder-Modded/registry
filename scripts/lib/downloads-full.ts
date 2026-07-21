@@ -425,13 +425,14 @@ export async function generateDownloadsDataFull(
         versionsChecked += 1;
 
         const zipAssets = Array.from(releaseData.assets.entries())
-          .filter(([assetName]) => assetName.toLowerCase().endsWith(".zip"));
-        const zipAssetNames = zipAssets.map(([assetName]) => assetName).sort();
+          .filter(([assetName]) => assetName.toLowerCase().endsWith(".zip"))
+          .sort(([a], [b]) => a.localeCompare(b));
+        const zipAssetNames = zipAssets.map(([name]) => name);
         const securityFingerprintPart = getSecurityFingerprintPart(
           listingType,
           modSecurityRules,
         );
-        const fingerprintBase = zipAssetNames.length > 0
+        const fingerprintBase = zipAssets.length > 0
           ? `github:${repo}:${tag}:${zipAssetNames.join("|")}${securityFingerprintPart}`
           : `github:${repo}:${tag}:no-zip${securityFingerprintPart}`;
         const fingerprint = versionedFingerprint(fingerprintBase);
@@ -441,7 +442,13 @@ export async function generateDownloadsDataFull(
           repo,
           tag,
         };
-        const shouldReuseCached = (
+        const currentZipSizes: Record<string, number> = Object.fromEntries(
+          zipAssets.flatMap(([name, a]) => a.sizeBytes != null ? [[name, a.sizeBytes]] : []),
+        );
+        const currentZipUpdatedAt: Record<string, string> = Object.fromEntries(
+          zipAssets.flatMap(([name, a]) => a.assetUpdatedAt != null ? [[name, a.assetUpdatedAt]] : []),
+        );
+        let shouldReuseCached = (
           !forceIntegrityRecheck
           && shouldUseCachedIntegrity(
             cached,
@@ -452,6 +459,24 @@ export async function generateDownloadsDataFull(
           && !isLegacyMapCacheMissingFileSizes(listingType, cached)
           && !isLegacyModCacheMissingSecurityCheck(listingType, cached)
         );
+        if (shouldReuseCached && cached != null) {
+          // Prefer updatedAt timestamps (catches same-size replacements, e.g. config.json version bump).
+          // Fall back to byte-size check for entries written before updatedAt was recorded.
+          const storedUpdatedAt = cached.asset_updated_at;
+          const storedSizes = cached.asset_sizes;
+          const updatedAtMismatch = storedUpdatedAt != null && (
+            Object.keys(currentZipUpdatedAt).some((name) => currentZipUpdatedAt[name] !== storedUpdatedAt[name])
+            || Object.keys(storedUpdatedAt).some((name) => !(name in currentZipUpdatedAt))
+          );
+          const sizeMismatch = storedSizes != null && storedUpdatedAt == null && (
+            Object.keys(currentZipSizes).some((name) => currentZipSizes[name] !== storedSizes[name])
+            || Object.keys(storedSizes).some((name) => !(name in currentZipSizes))
+          );
+          if (updatedAtMismatch || sizeMismatch) {
+            warnListing(warnings, id, "zip asset replaced since last inspection; forcing re-check", tag);
+            shouldReuseCached = false;
+          }
+        }
 
         if (shouldReuseCached) {
           cacheHits += 1;
@@ -573,12 +598,16 @@ export async function generateDownloadsDataFull(
                 )
             );
           const previousVersionEntry = previousIntegrity?.listings[id]?.versions?.[tag];
+          const zipSizesEntry = Object.keys(currentZipSizes).length > 0 ? currentZipSizes : undefined;
+          const zipUpdatedAtEntry = Object.keys(currentZipUpdatedAt).length > 0 ? currentZipUpdatedAt : undefined;
           if (isGrandfatheredDowngrade(previousVersionEntry, result)) {
             versionEntries[tag] = previousVersionEntry!;
             nextListingCacheEntries[tag] = {
               fingerprint,
               last_checked_at: nowIso,
               result: previousVersionEntry!,
+              asset_sizes: zipSizesEntry,
+              asset_updated_at: zipUpdatedAtEntry,
             };
             const failingKeys = Object.entries(result.required_checks)
               .filter(([, v]) => !v).map(([k]) => k).join(", ");
@@ -589,6 +618,8 @@ export async function generateDownloadsDataFull(
               fingerprint,
               last_checked_at: nowIso,
               result,
+              asset_sizes: zipSizesEntry,
+              asset_updated_at: zipUpdatedAtEntry,
             };
           }
         }

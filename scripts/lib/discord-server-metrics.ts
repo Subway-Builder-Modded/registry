@@ -481,8 +481,12 @@ export function updateDiscordServerMessageDays(params: {
         || createdDelta.public_total_messages > 0
         || createdDelta.private_total_messages > 0
       ) {
-        const entry = nextMessageDays[dateKey] ?? emptyMessageDayMetrics();
-        nextMessageDays[dateKey] = {
+        // Messages newly found on historical dates are attributed to the capture date
+        // rather than their original creation date, since we can't tell when they
+        // actually appeared between the two captures.
+        const attributionDate = dateKey < params.captureDate ? params.captureDate : dateKey;
+        const entry = nextMessageDays[attributionDate] ?? emptyMessageDayMetrics();
+        nextMessageDays[attributionDate] = {
           messages_created: entry.messages_created + createdDelta.total_messages,
           messages_deleted: entry.messages_deleted,
           public_messages_created: entry.public_messages_created + createdDelta.public_total_messages,
