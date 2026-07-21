@@ -46,7 +46,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "RNS.pmtiles": 13.05,
+    "buildings_index.bin.gz": 6.6,
+    "config.json": 0,
+    "demand_data.json.gz": 0.16,
+    "ocean_depth_index.json.gz": 1.03,
+    "ocean_depth_index_contours.json.gz": 0.94,
+    "roads.geojson.gz": 1.45,
+    "runways_taxiways.geojson.gz": 0.03
+  },
   "included_cities": [
     "Cesson-Sévigné",
     "Saint-Grégoire",
@@ -58,5 +67,83 @@
     "Vezin-le-Coquet",
     "Pacé",
     "Chartres-de-Bretagne"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.19915334360607304,
+      "p25": 0.19915518053814893,
+      "p50": 0.19916163205977963,
+      "p75": 0.1994329523970237,
+      "p90": 0.2735427242794694,
+      "mean": 0.22578710474739153
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1991537808732462,
+      "p25": 0.19915621448989065,
+      "p50": 0.19926850613996014,
+      "p75": 0.2735427242794694,
+      "p90": 0.49322390194677684,
+      "mean": 0.2679421768181047
+    },
+    "commuteDistanceKm": {
+      "p10": 2912,
+      "p25": 5233,
+      "p50": 9389,
+      "p75": 16348,
+      "p90": 23037,
+      "mean": 11453.11067761807
+    },
+    "residentCellDensity": {
+      "p10": 52,
+      "p25": 60,
+      "p50": 192,
+      "p75": 552,
+      "p90": 1171,
+      "mean": 532.4896030245746
+    },
+    "workerCellDensity": {
+      "p10": 19,
+      "p25": 60,
+      "p50": 120,
+      "p75": 375,
+      "p90": 1320,
+      "mean": 575.4118811881189
+    },
+    "detail": {
+      "radiusKm": 0.19921506193294894,
+      "expectedPointSpacingKm": 0.45888906767453275,
+      "normalizedRadius": 0.4341246631620396,
+      "activityPerPoint": 99.74556411114831,
+      "playableAreaKm2": 668,
+      "playableAreaPerPointKm2": 0.22363575493806495,
+      "playableCatchmentRadiusKm": 0.2668060563423581,
+      "localityScore": 0.7719350594419818,
+      "deaggregationScore": 1,
+      "score": 0.8785983493280544
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.3740085252538779,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -1.6798004021111608,
+            "latitude": 48.106184028814624,
+            "massShare": 1,
+            "assignedMass": 595880,
+            "assignedPointCount": 2987,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784576735
 }

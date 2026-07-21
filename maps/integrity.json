@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-21T14:26:54.686Z",
+  "generated_at": "2026-07-21T15:37:26.856Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -9448,6 +9448,70 @@
         }
       }
     },
+    "lille": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1784576729,
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "LIL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 47.84,
+          "file_sizes": {
+            "LIL.pmtiles": 27.05,
+            "buildings_index.bin.gz": 17.31,
+            "config.json": 0,
+            "demand_data.json.gz": 0.37,
+            "ocean_depth_index.json.gz": 0.6,
+            "ocean_depth_index_contours.json.gz": 0.52,
+            "roads.geojson.gz": 2.93,
+            "runways_taxiways.geojson.gz": 0.05
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-lille",
+            "tag": "v1.0.0",
+            "asset_name": "lille_flat_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-lille/releases/download/v1.0.0/lille_flat_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-lille:v1.0.0:lille_flat_v1.0.0.zip|lille_v1.0.0.zip",
+          "checked_at": "2026-07-21T15:37:26.856Z",
+          "released_at": "2026-07-20T19:45:29.000Z"
+        }
+      }
+    },
     "lima": {
       "has_complete_version": true,
       "latest_semver_version": "1.1.0",
@@ -11217,6 +11281,72 @@
         }
       }
     },
+    "mfn-rsw": {
+      "has_complete_version": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "2.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1784631863,
+      "versions": {
+        "2.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "RSW.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 112.45,
+          "file_sizes": {
+            "RSW.pmtiles": 40.88,
+            "buildings_foundations.geojson": 343.11,
+            "buildings_index.bin": 67.76,
+            "buildings_index.json": 89.16,
+            "config.json": 0,
+            "demand_data.json": 4.42,
+            "ocean_depth_index.json": 17.72,
+            "ocean_foundations.geojson": 38.87,
+            "roads.geojson": 14.41,
+            "runways_taxiways.geojson": 0.71
+          },
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "github",
+            "repo": "crumpetime/sb-maps-rsw",
+            "tag": "2.0.0",
+            "asset_name": "RSW.zip",
+            "download_url": "https://github.com/crumpetime/sb-maps-rsw/releases/download/2.0.0/RSW.zip"
+          },
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-rsw:2.0.0:RSW.zip",
+          "checked_at": "2026-07-21T15:37:26.856Z",
+          "released_at": "2026-07-21T11:04:23.000Z"
+        }
+      }
+    },
     "milan": {
       "has_complete_version": true,
       "latest_semver_version": "1.1.0",
@@ -11935,6 +12065,70 @@
           "fingerprint": "rules:v6:sha256:97a0f08ea48b9c1109b59a736212217593117c21486627bf997fc4575b9aac05",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        }
+      }
+    },
+    "nantes": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1784576709,
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "NTE.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 42.22,
+          "file_sizes": {
+            "NTE.pmtiles": 24.69,
+            "buildings_index.bin.gz": 12.65,
+            "config.json": 0,
+            "demand_data.json.gz": 0.24,
+            "ocean_depth_index.json.gz": 1.55,
+            "ocean_depth_index_contours.json.gz": 1.35,
+            "roads.geojson.gz": 2.33,
+            "runways_taxiways.geojson.gz": 0.02
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-nantes",
+            "tag": "v1.0.0",
+            "asset_name": "nantes_flat_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-nantes/releases/download/v1.0.0/nantes_flat_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-nantes:v1.0.0:nantes_flat_v1.0.0.zip|nantes_v1.0.0.zip",
+          "checked_at": "2026-07-21T15:37:26.856Z",
+          "released_at": "2026-07-20T19:45:09.000Z"
         }
       }
     },
@@ -14488,6 +14682,70 @@
           "fingerprint": "rules:v6:sha256:5da6b99b25f7c33abc130963f89441b5b6c60d2a75a4e7552b0fe9759efac2fc",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        }
+      }
+    },
+    "rennes": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1784576735,
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "RNS.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 22.94,
+          "file_sizes": {
+            "RNS.pmtiles": 13.05,
+            "buildings_index.bin.gz": 6.6,
+            "config.json": 0,
+            "demand_data.json.gz": 0.16,
+            "ocean_depth_index.json.gz": 1.03,
+            "ocean_depth_index_contours.json.gz": 0.94,
+            "roads.geojson.gz": 1.45,
+            "runways_taxiways.geojson.gz": 0.03
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-rennes",
+            "tag": "v1.0.0",
+            "asset_name": "rennes_flat_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-rennes/releases/download/v1.0.0/rennes_flat_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-rennes:v1.0.0:rennes_flat_v1.0.0.zip|rennes_v1.0.0.zip",
+          "checked_at": "2026-07-21T15:37:26.856Z",
+          "released_at": "2026-07-20T19:45:35.000Z"
         }
       }
     },
@@ -17365,6 +17623,70 @@
           "fingerprint": "rules:v6:sha256:500f089c6fed0ad33ff00bc04a4e7c8f0d2cd0771f4ba4f18377a6ca96a62248",
           "checked_at": "2026-07-17T20:01:21.440Z",
           "released_at": "2026-07-15T00:00:00.000Z"
+        }
+      }
+    },
+    "strasbourg": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1784576716,
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "STR.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 20.88,
+          "file_sizes": {
+            "STR.pmtiles": 12.45,
+            "buildings_index.bin.gz": 6.28,
+            "config.json": 0,
+            "demand_data.json.gz": 0.16,
+            "ocean_depth_index.json.gz": 0.65,
+            "ocean_depth_index_contours.json.gz": 0.55,
+            "roads.geojson.gz": 1.03,
+            "runways_taxiways.geojson.gz": 0.09
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-strasbourg",
+            "tag": "v1.0.0",
+            "asset_name": "strasbourg_flat_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-strasbourg/releases/download/v1.0.0/strasbourg_flat_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-strasbourg:v1.0.0:strasbourg_flat_v1.0.0.zip|strasbourg_v1.0.0.zip",
+          "checked_at": "2026-07-21T15:37:26.856Z",
+          "released_at": "2026-07-20T19:45:16.000Z"
         }
       }
     },
