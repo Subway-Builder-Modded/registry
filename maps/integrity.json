@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-21T04:01:22.345Z",
+  "generated_at": "2026-07-21T06:43:45.267Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -10510,16 +10510,16 @@
     },
     "mfn-hamptonroads": {
       "has_complete_version": true,
-      "latest_semver_version": "2.0.2",
-      "latest_semver_complete": false,
+      "latest_semver_version": "2.0.3",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "2.0.3",
         "1.4.1"
       ],
       "incomplete_versions": [
-        "2.0.2",
         "1.0.0"
       ],
-      "last_updated": 1784551882,
+      "last_updated": 1784612091,
       "versions": {
         "1.0.0": {
           "is_complete": false,
@@ -10607,11 +10607,9 @@
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-04-08T06:02:47.000Z"
         },
-        "2.0.2": {
-          "is_complete": false,
-          "errors": [
-            "asset 'ORF.zip': config.json version '2.0.0' does not match release tag '2.0.2' (expected '2.0.2')"
-          ],
+        "2.0.3": {
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -10622,7 +10620,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -10636,20 +10634,30 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "ORF.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 178.62,
+          "file_sizes": {
+            "ORF.pmtiles": 76.98,
+            "buildings_foundations.geojson": 601.46,
+            "buildings_index.bin": 118.27,
+            "config.json": 0,
+            "demand_data.json": 9.92,
+            "ocean_foundations.geojson": 102.48,
+            "roads.geojson": 23.59,
+            "runways_taxiways.geojson": 1.36
+          },
           "game_version": ">=1.4.0",
           "source": {
             "update_type": "github",
             "repo": "crumpetime/sb-maps-orf",
-            "tag": "2.0.2",
+            "tag": "2.0.3",
             "asset_name": "ORF.zip",
-            "download_url": "https://github.com/crumpetime/sb-maps-orf/releases/download/2.0.2/ORF.zip"
+            "download_url": "https://github.com/crumpetime/sb-maps-orf/releases/download/2.0.3/ORF.zip"
           },
-          "fingerprint": "rules:v6:github:crumpetime/sb-maps-orf:2.0.2:ORF.zip",
-          "checked_at": "2026-07-20T14:35:26.661Z",
-          "released_at": "2026-07-20T12:51:22.000Z"
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-orf:2.0.3:ORF.zip",
+          "checked_at": "2026-07-21T06:43:45.267Z",
+          "released_at": "2026-07-21T05:34:51.000Z"
         }
       }
     },
