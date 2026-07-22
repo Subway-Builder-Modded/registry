@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-22T04:01:24.729Z",
+  "generated_at": "2026-07-22T06:44:45.943Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -19380,19 +19380,19 @@
         "1.1.0": {
           "is_complete": false,
           "errors": [
-            "demand_data contains 9 of 334 points (2.7%) with neither residents nor jobs (e.g. merged_530719200003036, merged_530719200002043, merged_530210206082061)"
+            "config.json version '1.0.2' does not match release tag '1.1.0' (expected '1.1.0')"
           ],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": true
+            "config_version_matches_tag": false
           },
           "matched_files": {
             "config_json": "config.json",
@@ -19406,7 +19406,7 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "PSC.pmtiles",
-            "config_version_matches_tag": "config.json"
+            "config_version_matches_tag": null
           },
           "release_size": 15.76,
           "game_version": ">=1.0.0",
@@ -19417,8 +19417,8 @@
             "asset_name": "PSC.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.1.0-psc/PSC.zip"
           },
-          "fingerprint": "rules:v6:sha256:0d1ed4c74486ab43d57597cd402a474bbc03a658dc1fc04f141cad90404bc9ce",
-          "checked_at": "2026-07-21T20:01:27.763Z",
+          "fingerprint": "rules:v6:sha256:4b062a4375d1ad8d524e46b15f084d712e6b6ba521a4b237d1c0c092c89aa8ce",
+          "checked_at": "2026-07-22T06:44:45.943Z",
           "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
