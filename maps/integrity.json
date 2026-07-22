@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-22T00:01:21.007Z",
+  "generated_at": "2026-07-22T03:50:50.866Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -2204,14 +2204,16 @@
     },
     "calgary": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.3",
-      "latest_semver_complete": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.3",
         "1.0.1"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1772150400,
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1784592000,
       "versions": {
         "1.0.1": {
           "is_complete": true,
@@ -2304,6 +2306,50 @@
           "fingerprint": "rules:v6:sha256:147f4a279196a0b4d325335fa17644ca4a5612c581e7ccacb6ba1f33d0209cde",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 59 of 3571 points (1.7%) with neither residents nor jobs (e.g. 36, 352, 361)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YYC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 74.94,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v2.0.0",
+            "asset_name": "YYC.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v2.0.0/YYC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:cad8c2429a1a035fad430d82baf421aa613cabeabcdf9bece31be22c17688cde",
+          "checked_at": "2026-07-22T03:50:50.866Z",
+          "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
     },
@@ -4714,14 +4760,16 @@
     },
     "edmonton": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.3",
-      "latest_semver_complete": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.3",
         "1.0.1"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1772150400,
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1784592000,
       "versions": {
         "1.0.1": {
           "is_complete": true,
@@ -4814,6 +4862,50 @@
           "fingerprint": "rules:v6:sha256:eb0f18d3e3241f40a99bb2d26e5bcb5ea2d4ac43c86a0dd91f237b53658085f2",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 114 of 3488 points (3.3%) with neither residents nor jobs (e.g. 72, 73, 104)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YEG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 66.82,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v2.0.0",
+            "asset_name": "YEG.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v2.0.0/YEG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:9211ae52465bb6800ef742298467a2a6093ebc37086014d9c07075da32793fc5",
+          "checked_at": "2026-07-22T03:50:50.866Z",
+          "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
     },
@@ -11965,14 +12057,16 @@
     },
     "montreal": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.3",
-      "latest_semver_complete": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.3",
         "1.0.1"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1772150400,
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1784592000,
       "versions": {
         "1.0.1": {
           "is_complete": true,
@@ -12065,6 +12159,50 @@
           "fingerprint": "rules:v6:sha256:97a0f08ea48b9c1109b59a736212217593117c21486627bf997fc4575b9aac05",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 68 of 8282 points (0.8%) with neither residents nor jobs (e.g. 109, 496, 513)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YUL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 162.92,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v2.0.0",
+            "asset_name": "YUL.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v2.0.0/YUL.zip"
+          },
+          "fingerprint": "rules:v6:sha256:303ae1993ce15251e6aff191fdbe8945d5b9d2f47cacb17acab3cdbab9e6ed7f",
+          "checked_at": "2026-07-22T03:50:50.866Z",
+          "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
     },
@@ -13423,14 +13561,16 @@
     },
     "ottawa": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.3",
-      "latest_semver_complete": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.3",
         "1.0.1"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1772150400,
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1784592000,
       "versions": {
         "1.0.1": {
           "is_complete": true,
@@ -13523,6 +13663,51 @@
           "fingerprint": "rules:v6:sha256:1ad349318afe26e27eefcec044e4376cc6e72411730805781f08f5c8ea7180c5",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 25 of 3373 points (0.7%) with neither residents nor jobs (e.g. 368, 432, 499)",
+            "demand_data resident totals mismatch (points=739120, pops=738872, delta=248)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": false,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YOW.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 97.71,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v2.0.0",
+            "asset_name": "YOW.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v2.0.0/YOW.zip"
+          },
+          "fingerprint": "rules:v6:sha256:97d9684e4a88df689316a43f1df30622098e19e85c98cabde5c71fc5da2064e6",
+          "checked_at": "2026-07-22T03:50:50.866Z",
+          "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
     },
@@ -14582,14 +14767,16 @@
     },
     "quebec-city": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.3",
-      "latest_semver_complete": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.3",
         "1.0.1"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1772150400,
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1784592000,
       "versions": {
         "1.0.1": {
           "is_complete": true,
@@ -14682,6 +14869,50 @@
           "fingerprint": "rules:v6:sha256:5da6b99b25f7c33abc130963f89441b5b6c60d2a75a4e7552b0fe9759efac2fc",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 29 of 2176 points (1.3%) with neither residents nor jobs (e.g. 74, 244, 251)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YQB.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 43.99,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v2.0.0",
+            "asset_name": "YQB.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v2.0.0/YQB.zip"
+          },
+          "fingerprint": "rules:v6:sha256:bdc93afc26d22324958a81fb40b8b32f5f864d4f69efa59e06d6c9ab12572d0d",
+          "checked_at": "2026-07-22T03:50:50.866Z",
+          "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
     },
@@ -18775,14 +19006,16 @@
     },
     "toronto": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.3",
-      "latest_semver_complete": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.3",
         "1.0.1"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1772150400,
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1784592000,
       "versions": {
         "1.0.1": {
           "is_complete": true,
@@ -18875,6 +19108,51 @@
           "fingerprint": "rules:v6:sha256:3d5c457b599b4ee0565fdadb94ffe2ee4116eb6373159c15cc77d2add77a11a2",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 255 of 11458 points (2.2%) with neither residents nor jobs (e.g. 11, 326, 353)",
+            "demand_data resident totals mismatch (points=4039647, pops=4039209, delta=438)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": false,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YYZ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 226.52,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v2.0.0",
+            "asset_name": "YYZ.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v2.0.0/YYZ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:0256129e60fa9801bc31083dcb2b17f312ee45aa79bc800613605b0702e15970",
+          "checked_at": "2026-07-22T03:50:50.866Z",
+          "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
     },
@@ -20058,14 +20336,16 @@
     },
     "vancouver": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.3",
-      "latest_semver_complete": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.3",
         "1.0.1"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1772150400,
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1784592000,
       "versions": {
         "1.0.1": {
           "is_complete": true,
@@ -20158,6 +20438,50 @@
           "fingerprint": "rules:v6:sha256:47b36073c8dee7bca75d90358e17579db4664a33bd7928b4c3b5bd1abdfd0a1c",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 142 of 5740 points (2.5%) with neither residents nor jobs (e.g. 3, 8, 17)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YVR.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 111.33,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v2.0.0",
+            "asset_name": "YVR.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v2.0.0/YVR.zip"
+          },
+          "fingerprint": "rules:v6:sha256:b1ce087f70bafbf2ad603f1f47de1f8b215fd8cccfa16c0f541df06057ccc9dd",
+          "checked_at": "2026-07-22T03:50:50.866Z",
+          "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
     },
@@ -20485,14 +20809,16 @@
     },
     "winnipeg": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.3",
-      "latest_semver_complete": true,
+      "latest_semver_version": "2.0.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.3",
         "1.0.1"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1772150400,
+      "incomplete_versions": [
+        "2.0.0"
+      ],
+      "last_updated": 1784592000,
       "versions": {
         "1.0.1": {
           "is_complete": true,
@@ -20585,6 +20911,50 @@
           "fingerprint": "rules:v6:sha256:aac872d7cd8a65ab69687e446b2be911e388e8fe89faf7a9601631eff19a0b29",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-02-27T00:00:00.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 18 of 2137 points (0.8%) with neither residents nor jobs (e.g. 176, 181, 570)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "YWG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 41.8,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "devenperez/subway-builder-canadian-maps",
+            "tag": "v2.0.0",
+            "asset_name": "YWG.zip",
+            "download_url": "https://github.com/devenperez/subway-builder-canadian-maps/releases/download/v2.0.0/YWG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:045f235a1ba1550969f114d9b3d1075d7d2cded6bc5ecf28638a057739a0974d",
+          "checked_at": "2026-07-22T03:50:50.866Z",
+          "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
     },
