@@ -19123,13 +19123,11 @@
         }
       },
       "1.1.0": {
-        "fingerprint": "rules:v6:sha256:4b062a4375d1ad8d524e46b15f084d712e6b6ba521a4b237d1c0c092c89aa8ce",
-        "last_checked_at": "2026-07-22T06:44:45.943Z",
+        "fingerprint": "rules:v6:sha256:1461c14b214390f976d79ae72821e5babddc66ef73a77feb9a99849e5737c43e",
+        "last_checked_at": "2026-07-22T07:23:59.108Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "config.json version '1.0.2' does not match release tag '1.1.0' (expected '1.1.0')"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -19140,7 +19138,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -19154,9 +19152,18 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "PSC.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 15.76,
+          "file_sizes": {
+            "PSC.pmtiles": 7.34,
+            "buildings_index.bin": 7.84,
+            "buildings_index.json": 12.39,
+            "config.json": 0,
+            "demand_data.json": 1.06,
+            "roads.geojson": 3.09,
+            "runways_taxiways.geojson": 0.43
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -19165,8 +19172,8 @@
             "asset_name": "PSC.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.1.0-psc/PSC.zip"
           },
-          "fingerprint": "rules:v6:sha256:4b062a4375d1ad8d524e46b15f084d712e6b6ba521a4b237d1c0c092c89aa8ce",
-          "checked_at": "2026-07-22T06:44:45.943Z",
+          "fingerprint": "rules:v6:sha256:1461c14b214390f976d79ae72821e5babddc66ef73a77feb9a99849e5737c43e",
+          "checked_at": "2026-07-22T07:23:59.108Z",
           "released_at": "2026-07-21T00:00:00.000Z"
         }
       }
