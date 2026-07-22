@@ -125,11 +125,25 @@ export interface DownloadVersionBucketInput {
 
 export type VersionBucketInputsByListing = Record<string, Record<string, DownloadVersionBucketInput[]>>;
 
+export interface IntegrityAlert {
+  listingId: string;
+  listingName: string;
+  listingType: "map" | "mod";
+  authorId: string;
+  version: string;
+  isRegression: boolean;
+  failingChecks: string[];
+  errors: string[];
+  sourceRepo?: string;
+  sourceTag?: string;
+}
+
 export interface GenerateDownloadsResult {
   downloads: DownloadsByListing;
   versionBucketInputs: VersionBucketInputsByListing;
   integrity: IntegrityOutput;
   integrityCache: IntegrityCache;
+  integrityAlerts: IntegrityAlert[];
   stats: {
     listings: number;
     versions_checked: number;

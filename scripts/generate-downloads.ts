@@ -31,6 +31,9 @@ import {
 } from "./lib/script-runtime.js";
 import { compareStableSemverAsc, isStableSemverTag } from "./lib/semver.js";
 import { filterListingMessages, isTestListing } from "./lib/test-listings.js";
+import { loadAuthorAliasIndex } from "./lib/author-aliases.js";
+import { buildIntegrityAlertEmbed } from "./lib/downloads-full/integrity-alerts.js";
+import { sendDiscordPayload } from "./lib/discord-webhook.js";
 
 export function listZeroValidSemverListings(integrity: IntegrityOutput): string[] {
   return Object.entries(integrity.listings)
@@ -261,6 +264,7 @@ async function run(): Promise<void> {
     versionBucketInputs,
     integrity,
     integrityCache,
+    integrityAlerts,
     stats,
     warnings,
     rateLimit,
@@ -305,6 +309,33 @@ async function run(): Promise<void> {
     writeJsonFile(integrityCachePath, integrityCache);
     writeJsonFile(pendingAnnouncementsPath, pendingAnnouncements);
     writeDownloadAttributionDeltaFile(attributionDeltaPath, attributionDelta);
+    const discordIntegrityWebhookUrl = process.env.DISCORD_INTEGRITY_WEBHOOK_URL?.trim() || undefined;
+    if (discordIntegrityWebhookUrl && integrityAlerts.length > 0) {
+      const authorIndex = loadAuthorAliasIndex(repoRoot);
+      const alertsByAuthorId = new Map<string, typeof integrityAlerts>();
+      for (const alert of integrityAlerts) {
+        if (!alertsByAuthorId.has(alert.authorId)) {
+          alertsByAuthorId.set(alert.authorId, []);
+        }
+        alertsByAuthorId.get(alert.authorId)!.push(alert);
+      }
+      for (const [authorId, authorAlerts] of alertsByAuthorId) {
+        const authorEntry = authorIndex.authors.find((a) => a.author_id === authorId);
+        const discordId = authorEntry?.discord_id;
+        const authorAlias = authorEntry?.author_alias ?? authorEntry?.author_id ?? authorId;
+        const content = discordId ? `<@${discordId}>` : undefined;
+        const noDiscordIdNote = discordId ? undefined : `No Discord ID on file for ${authorAlias}`;
+        const embeds = authorAlerts.slice(0, 10).map((alert) =>
+          buildIntegrityAlertEmbed(alert, authorAlias, noDiscordIdNote),
+        );
+        try {
+          await sendDiscordPayload(discordIntegrityWebhookUrl, content, embeds);
+          console.log(`[downloads][integrity-alert] Sent Discord alert for author=${authorId} (${authorAlerts.length} version(s))`);
+        } catch (error) {
+          console.warn(`[downloads][integrity-alert] Failed to send Discord alert for author=${authorId}: ${(error as Error).message}`);
+        }
+      }
+    }
     console.log(
       pendingAnnouncements.listings.length > 0
         ? `[downloads] Pending announcements: ${pendingAnnouncements.listings.map((entry) => entry.listing_id).join(", ")}`

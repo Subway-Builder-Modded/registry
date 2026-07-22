@@ -277,6 +277,7 @@ export async function generateDownloadsDataFull(
 
   const downloadsByListing: D.DownloadsByListing = {};
   const listingContexts = new Map<string, ListingContext>();
+  const listingMeta = new Map<string, { listingName: string; authorId: string }>();
   const repoSet = new Set<string>();
 
   // Pace unauthenticated raw.githubusercontent.com custom-update fetches to
@@ -294,6 +295,8 @@ export async function generateDownloadsDataFull(
       warnListing(warnings, id, `failed to read manifest (${(error as Error).message})`);
       continue;
     }
+
+    listingMeta.set(id, { listingName: manifest.name, authorId: manifest.author });
 
     if (manifest.update.type === "github") {
       const repo = manifest.update.repo.toLowerCase();
@@ -345,6 +348,7 @@ export async function generateDownloadsDataFull(
 
   const integrityListings: Record<string, ListingIntegrityEntry> = {};
   const versionBucketInputs: D.VersionBucketInputsByListing = {};
+  const integrityAlerts: D.IntegrityAlert[] = [];
   let versionsChecked = 0;
   let completeVersions = 0;
   let incompleteVersions = 0;
@@ -1000,6 +1004,29 @@ export async function generateDownloadsDataFull(
       if (cacheEntry) nextListingCacheEntries[version] = { ...cacheEntry, result: stamped };
     }
 
+    for (const [version, entry] of Object.entries(versionEntries)) {
+      if (!entry.is_complete && Object.values(entry.required_checks).some((v) => v === false)) {
+        const prevEntry = previousIntegrity?.listings[id]?.versions?.[version];
+        if (prevEntry === undefined || prevEntry.is_complete === true) {
+          const meta = listingMeta.get(id);
+          integrityAlerts.push({
+            listingId: id,
+            listingName: meta?.listingName ?? id,
+            listingType,
+            authorId: meta?.authorId ?? "",
+            version,
+            isRegression: prevEntry?.is_complete === true,
+            failingChecks: Object.entries(entry.required_checks)
+              .filter(([, v]) => v === false)
+              .map(([k]) => k),
+            errors: entry.errors,
+            sourceRepo: entry.source.repo,
+            sourceTag: entry.source.tag,
+          });
+        }
+      }
+    }
+
     for (const result of Object.values(versionEntries)) {
       if (result.is_complete) {
         completeVersions += 1;
@@ -1029,6 +1056,7 @@ export async function generateDownloadsDataFull(
       schema_version: 1,
       entries: sortObjectByKeys(nextCache.entries),
     },
+    integrityAlerts,
     stats: {
       listings: ids.length,
       versions_checked: versionsChecked,
