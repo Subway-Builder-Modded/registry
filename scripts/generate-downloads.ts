@@ -309,7 +309,11 @@ async function run(): Promise<void> {
     writeJsonFile(integrityCachePath, integrityCache);
     writeJsonFile(pendingAnnouncementsPath, pendingAnnouncements);
     writeDownloadAttributionDeltaFile(attributionDeltaPath, attributionDelta);
-    const discordIntegrityWebhookUrl = process.env.DISCORD_INTEGRITY_WEBHOOK_URL?.trim() || undefined;
+    const discordIntegrityWebhookUrl = (
+      process.env.DISCORD_INTEGRITY_WEBHOOK_URL?.trim()
+      || process.env.DISCORD_WEBHOOK_URL?.trim()
+      || undefined
+    );
     if (discordIntegrityWebhookUrl && integrityAlerts.length > 0) {
       const authorIndex = loadAuthorAliasIndex(repoRoot);
       const alertsByAuthorId = new Map<string, typeof integrityAlerts>();
