@@ -119,6 +119,7 @@ jobs:
         id: generate_map_analytics
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_INTEGRITY_WEBHOOK_URL: ${{ secrets.DISCORD_INTEGRITY_WEBHOOK_URL }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_integrity_recheck }}" = "true" ]; then
             pnpm --dir scripts run generate-registry-analytics:maps -- --strict-fingerprint-cache --force-integrity
@@ -180,6 +181,7 @@ jobs:
         id: generate_mod_analytics
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DISCORD_INTEGRITY_WEBHOOK_URL: ${{ secrets.DISCORD_INTEGRITY_WEBHOOK_URL }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_integrity_recheck }}" = "true" ]; then
             pnpm --dir scripts run generate-registry-analytics:mods -- --strict-fingerprint-cache --force-integrity
