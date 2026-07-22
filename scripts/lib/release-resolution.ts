@@ -193,6 +193,7 @@ function aggregateReleaseDataByTag(releases: Array<{
     downloadCount: number;
     downloadUrl: string | null;
     sizeBytes: number | null;
+    updatedAt: string | null;
   }>;
 }>): Map<string, D.RepoReleaseTagData> {
   const byTag = new Map<string, D.RepoReleaseTagData>();
@@ -203,6 +204,7 @@ function aggregateReleaseDataByTag(releases: Array<{
       downloadCount: number;
       downloadUrl: string | null;
       sizeBytes: number | null;
+      assetUpdatedAt?: string | null;
     }>();
     let zipTotal = 0;
 
@@ -213,6 +215,7 @@ function aggregateReleaseDataByTag(releases: Array<{
         downloadCount: asset.downloadCount,
         downloadUrl: asset.downloadUrl,
         sizeBytes: Number.isFinite(asset.sizeBytes) ? asset.sizeBytes : null,
+        assetUpdatedAt: typeof asset.updatedAt === "string" && asset.updatedAt.trim() !== "" ? asset.updatedAt : null,
       });
       if (asset.name.toLowerCase().endsWith(".zip")) {
         zipTotal += asset.downloadCount;
@@ -272,6 +275,7 @@ async function fetchGraphqlReleaseIndexForRepo(
         downloadCount: asset.downloadCount,
         downloadUrl: asset.downloadUrl,
         sizeBytes: typeof asset.size === "number" && Number.isFinite(asset.size) ? asset.size : null,
+        updatedAt: typeof asset.updatedAt === "string" && asset.updatedAt.trim() !== "" ? asset.updatedAt : null,
       }));
       if (release.releaseAssets.pageInfo.hasNextPage) {
         warn(

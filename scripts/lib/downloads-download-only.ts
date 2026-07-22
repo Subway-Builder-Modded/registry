@@ -302,6 +302,7 @@ export async function generateDownloadsDataDownloadOnly(
     versionBucketInputs,
     integrity,
     integrityCache: loadIntegrityCache(repoRoot, dir),
+    integrityAlerts: [],
     stats: {
       listings: ids.length,
       versions_checked: versionsChecked,
