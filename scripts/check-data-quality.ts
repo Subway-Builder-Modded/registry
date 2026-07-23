@@ -40,7 +40,17 @@ function runReport(paths: string[]): void {
     try {
       const raw = readJsonFile<unknown>(absolute);
       const id = path.replace(/\\/g, "/").split("/").at(-2) ?? "";
-      const errors = checkMapDataQuality({ id, answersFile: raw });
+      // Read the manifest too: without it, confirmed answers files would trip
+      // the "manifest not stamped" consistency rule even when the same PR
+      // stamps the manifest (the check job remains the authoritative gate).
+      const manifest = readJsonIfExists(resolve(MAPS_DIR, id, "manifest.json")) as
+        | Record<string, unknown>
+        | undefined;
+      const errors = checkMapDataQuality({
+        id,
+        manifestDataQuality: manifest?.data_quality,
+        answersFile: raw,
+      });
       if (errors.length > 0) {
         return { path, error: errors.join("; ") };
       }
