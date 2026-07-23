@@ -117,6 +117,8 @@ export const DataQualityAnswersFileSchema = z
     sources: z.array(z.string().min(1)).optional(),
     /** Audit note for ambiguous grain calls (docs/data-quality.md §2). */
     ambiguity_bounds: z.string().min(1).optional(),
+    /** Map id whose reviewed answers these were inherited from (same-methodology flow). */
+    derived_from: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/).optional(),
     provenance: DataQualityProvenanceSchema,
   })
   .strict()

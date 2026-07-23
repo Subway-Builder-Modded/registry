@@ -9,6 +9,7 @@
     "test:build": "tsc -p tsconfig.test.json",
     "test:run": "node --test .test-dist/tests/*.test.js",
     "test:security-rules": "pnpm run test:build && node --test --test-isolation=none .test-dist/tests/security-rules-fixtures.test.js",
+    "validate-data-quality": "tsx validate-data-quality.ts",
     "validate-publish": "tsx validate-publish.ts",
     "validate-update": "tsx validate-update.ts",
     "validate-author-update": "tsx validate-author-update.ts",

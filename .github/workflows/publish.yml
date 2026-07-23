@@ -318,11 +318,55 @@ jobs:
               });
             } catch {}
 
+            // Phase-two invite: prefilled data-quality form link, with the
+            // same-(author, country) scored maps a "Yes" answer inherits from.
+            const fs = require('fs');
+            const path = require('path');
+            const mapId = '${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
+            const author = '${{ github.event.issue.user.login }}';
+            let country = '';
+            try {
+              country = JSON.parse(fs.readFileSync(path.join('maps', mapId, 'manifest.json'), 'utf-8')).country ?? '';
+            } catch {}
+
+            const sample = [];
+            try {
+              for (const entry of fs.readdirSync('maps', { withFileTypes: true })) {
+                if (!entry.isDirectory() || entry.name === mapId) continue;
+                try {
+                  const manifest = JSON.parse(fs.readFileSync(path.join('maps', entry.name, 'manifest.json'), 'utf-8'));
+                  if (manifest.author !== author || manifest.country !== country) continue;
+                  const dq = JSON.parse(fs.readFileSync(path.join('maps', entry.name, 'data-quality.json'), 'utf-8'));
+                  if (dq.provenance?.method !== 'reviewed' && dq.provenance?.method !== 'backfill') continue;
+                  sample.push({ id: entry.name, lastUpdated: manifest.last_updated ?? 0 });
+                } catch {}
+              }
+            } catch {}
+            sample.sort((a, b) => b.lastUpdated - a.lastUpdated);
+            const sampleIds = sample.slice(0, 5).map((s) => s.id);
+
+            const params = new URLSearchParams({
+              template: 'data-quality.yml',
+              title: `[Data Quality]: ${mapId}`,
+              'map-id': mapId,
+            });
+            if (sampleIds.length > 0) {
+              params.set('same-methodology', 'Yes — same methodology as my other maps in this country');
+              params.set('same-methodology-sample', sampleIds.join(', '));
+            }
+            const inviteUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/issues/new?${params.toString()}`;
+
+            const sampleNote = sampleIds.length > 0
+              ? `\n\nIf this map was generated with the same methodology as your other scored ${country} maps (${sampleIds.map((id) => `[\`${id}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/main/maps/${id})`).join(', ')}), answering **Yes** to the first question inherits their answers automatically.`
+              : '';
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'A pull request has been created for your map submission. A maintainer will review it shortly.'
+              body: 'A pull request has been created for your map submission. A maintainer will review it shortly.\n\n' +
+                `**Next step — data quality:** once the PR merges, [answer the data-quality questions](${inviteUrl}) so your map can receive its data-quality tier. Until then it is listed as \`unknown-quality\`. The [guide](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/main/docs/data-quality-questions.md) explains every question in plain language.` +
+                sampleNote
             });
 
       - name: Handle failure

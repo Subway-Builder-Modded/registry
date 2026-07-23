@@ -98,11 +98,17 @@
       "value": "## Data Attestation
 
 
-        Provide details about your map's data source, data source quality, and level of
-        detail. Be honest and transparent in your descriptions and please include the
-        methodology you used to generate the map's data. See the [Data
+        Provide details about your map's data source and level of detail. Be honest and
+        transparent in your descriptions and please include the methodology you used to
+        generate the map's data. See the [Data
         Quality](https://subwaybuildermodded.com/wiki/railyard/latest/developers/data-quali\
-        ty) guide for more information."
+        ty) guide for more information.
+
+
+        After your map is published, you will be invited to answer the [data-quality
+        questions](https://github.com/Subway-Builder-Modded/registry/blob/main/docs/data-qu\
+        ality-questions.md) so the map can receive its data-quality tier; until then it is
+        listed as `unknown-quality`."
   - "type": "input"
     "id": "data_source"
     "attributes":
@@ -113,21 +119,6 @@
       "value": "OSM"
     "validations":
       "required": false
-  - "type": "dropdown"
-    "id": "source_quality"
-    "attributes":
-      "label": "Source Quality"
-      "description": "Approximate quality of the data source used for your map. Official gov't
-        sources are considered high-quality while raw open-source data is considered
-        low-quality. If your data source includes OSM, we will not consider that
-        high-quality data."
-      "options":
-        - ""
-        - "low-quality"
-        - "medium-quality"
-        - "high-quality"
-    "validations":
-      "required": true
   - "type": "dropdown"
     "id": "level_of_detail"
     "attributes":
