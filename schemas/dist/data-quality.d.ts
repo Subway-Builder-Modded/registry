@@ -79,37 +79,37 @@ export declare const DATA_QUALITY_PROVENANCE_METHODS: readonly ["self-reported",
  */
 export declare const DataQualityAnswersSchema: z.ZodObject<{
     workplace_count: z.ZodEnum<["physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none", ...("physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none")[]]>;
-    workplace_granularity: z.ZodEnum<["none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>;
-    workplace_resolution: z.ZodEnum<["exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon", ...("exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon")[]]>;
+    workplace_granularity: z.ZodEnum<["none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>;
+    workplace_resolution: z.ZodEnum<["exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon", ...("exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon")[]]>;
     workplace_intensity: z.ZodEnum<["measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform", ...("measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform")[]]>;
     resident_count: z.ZodEnum<["none" | "employed_residents" | "working_age" | "total_population", ...("none" | "employed_residents" | "working_age" | "total_population")[]]>;
-    resident_granularity: z.ZodEnum<["none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>;
-    resident_resolution: z.ZodEnum<["exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon", ...("exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon")[]]>;
+    resident_granularity: z.ZodEnum<["none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>;
+    resident_resolution: z.ZodEnum<["exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon", ...("exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon")[]]>;
     resident_intensity: z.ZodEnum<["measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform", ...("measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform")[]]>;
     od_metric: z.ZodEnum<["none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic", ...("none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic")[]]>;
-    od_granularity: z.ZodNullable<z.ZodEnum<["none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>>;
+    od_granularity: z.ZodNullable<z.ZodEnum<["none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>>;
 }, "strict", z.ZodTypeAny, {
     workplace_count: "physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none";
-    workplace_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-    workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+    workplace_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+    workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
     workplace_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
     resident_count: "none" | "employed_residents" | "working_age" | "total_population";
-    resident_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-    resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+    resident_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+    resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
     resident_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
     od_metric: "none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic";
-    od_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
+    od_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
 }, {
     workplace_count: "physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none";
-    workplace_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-    workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+    workplace_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+    workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
     workplace_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
     resident_count: "none" | "employed_residents" | "working_age" | "total_population";
-    resident_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-    resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+    resident_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+    resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
     resident_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
     od_metric: "none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic";
-    od_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
+    od_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
 }>;
 export declare const DataQualityProvenanceSchema: z.ZodObject<{
     method: z.ZodEnum<["self-reported", "reviewed", "backfill"]>;
@@ -136,37 +136,37 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     id: z.ZodString;
     answers: z.ZodObject<{
         workplace_count: z.ZodEnum<["physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none", ...("physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none")[]]>;
-        workplace_granularity: z.ZodEnum<["none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>;
-        workplace_resolution: z.ZodEnum<["exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon", ...("exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon")[]]>;
+        workplace_granularity: z.ZodEnum<["none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>;
+        workplace_resolution: z.ZodEnum<["exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon", ...("exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon")[]]>;
         workplace_intensity: z.ZodEnum<["measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform", ...("measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform")[]]>;
         resident_count: z.ZodEnum<["none" | "employed_residents" | "working_age" | "total_population", ...("none" | "employed_residents" | "working_age" | "total_population")[]]>;
-        resident_granularity: z.ZodEnum<["none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>;
-        resident_resolution: z.ZodEnum<["exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon", ...("exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon")[]]>;
+        resident_granularity: z.ZodEnum<["none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>;
+        resident_resolution: z.ZodEnum<["exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon", ...("exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon")[]]>;
         resident_intensity: z.ZodEnum<["measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform", ...("measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform")[]]>;
         od_metric: z.ZodEnum<["none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic", ...("none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic")[]]>;
-        od_granularity: z.ZodNullable<z.ZodEnum<["none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>>;
+        od_granularity: z.ZodNullable<z.ZodEnum<["none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1", ...("none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1")[]]>>;
     }, "strict", z.ZodTypeAny, {
         workplace_count: "physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none";
-        workplace_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        workplace_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         workplace_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         resident_count: "none" | "employed_residents" | "working_age" | "total_population";
-        resident_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        resident_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         resident_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         od_metric: "none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic";
-        od_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
+        od_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
     }, {
         workplace_count: "physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none";
-        workplace_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        workplace_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         workplace_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         resident_count: "none" | "employed_residents" | "working_age" | "total_population";
-        resident_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        resident_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         resident_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         od_metric: "none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic";
-        od_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
+        od_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
     }>;
     /** Methodology narrative (persisted from the submission form). */
     notes: z.ZodString;
@@ -204,15 +204,15 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     id: string;
     answers: {
         workplace_count: "physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none";
-        workplace_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        workplace_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         workplace_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         resident_count: "none" | "employed_residents" | "working_age" | "total_population";
-        resident_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        resident_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         resident_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         od_metric: "none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic";
-        od_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
+        od_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
     };
     notes: string;
     sources?: string[] | undefined;
@@ -228,15 +228,15 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     id: string;
     answers: {
         workplace_count: "physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none";
-        workplace_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        workplace_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         workplace_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         resident_count: "none" | "employed_residents" | "working_age" | "total_population";
-        resident_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        resident_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         resident_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         od_metric: "none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic";
-        od_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
+        od_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
     };
     notes: string;
     sources?: string[] | undefined;
@@ -252,15 +252,15 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     id: string;
     answers: {
         workplace_count: "physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none";
-        workplace_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        workplace_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         workplace_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         resident_count: "none" | "employed_residents" | "working_age" | "total_population";
-        resident_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        resident_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         resident_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         od_metric: "none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic";
-        od_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
+        od_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
     };
     notes: string;
     sources?: string[] | undefined;
@@ -276,15 +276,15 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     id: string;
     answers: {
         workplace_count: "physical_measured" | "physical_inferred" | "registered_self_declared" | "size_bands" | "estimated_proxy" | "none";
-        workplace_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        workplace_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        workplace_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         workplace_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         resident_count: "none" | "employed_residents" | "working_age" | "total_population";
-        resident_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
-        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
+        resident_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1";
+        resident_resolution: "exact_footprints" | "mesh_125_or_adm5" | "mesh_250" | "mesh_500" | "ml_hybrid_footprints" | "osm_footprints" | "mesh_1km" | "admin_polygon";
         resident_intensity: "measured_per_unit" | "fine_types_calibrated" | "fine_types_generic" | "coarse_sector" | "binary_split" | "size_only" | "uniform";
         od_metric: "none" | "full_matrix" | "structured_marginals" | "marginal_od" | "synthetic_measured_marginals" | "prior_informed_synthetic";
-        od_granularity: "none" | "mesh_250" | "mesh_1km" | "mesh_125" | "mesh_500" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
+        od_granularity: "none" | "mesh_250" | "mesh_500" | "mesh_1km" | "mesh_125" | "mesh_coarse" | "adm5" | "adm4" | "adm3" | "adm2" | "adm1" | null;
     };
     notes: string;
     sources?: string[] | undefined;
