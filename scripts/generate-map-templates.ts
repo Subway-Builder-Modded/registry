@@ -287,7 +287,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   spacer(),
   // ===== Data Validation ===== //
   markdown(
-    "## Data Attestation\n\nProvide details about your map's data source and level of detail. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/wiki/railyard/latest/developers/data-quality) guide for more information.\n\nAfter your map is published, you will be invited to answer the [data-quality questions](https://github.com/Subway-Builder-Modded/registry/blob/main/docs/data-quality-questions.md) so the map can receive its data-quality tier; until then it is listed as `unknown-quality`.",
+    "## Data Attestation\n\nProvide details about your map's data source and level of detail. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/registry/docs/data-quality/) guide for more information.\n\nAfter your map is published, you will be invited to answer the [data-quality questions](https://github.com/Subway-Builder-Modded/registry/blob/main/docs/data-quality-questions.md) so the map can receive its data-quality tier; until then it is listed as `unknown-quality`.",
   ),
   input(
     "data_source",
