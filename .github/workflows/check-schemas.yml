@@ -1,0 +1,64 @@
+name: Check Schemas
+
+# Guard the committed schema build outputs (schemas/dist + schemas/json-schemas)
+# against drifting from schemas/src. Registry workflows run tsx scripts that
+# import @subway-builder-modded/registry-schemas via the workspace link, which
+# resolves to the COMMITTED dist — stale dist means production validation runs
+# old schema code. Rebuilds with the lockfile-pinned toolchain and fails if the
+# outputs differ, then runs the scripts test suite (including the data-quality
+# scoring worked-example tests that pin the rubric-weight transcription).
+
+on:
+  pull_request:
+    paths:
+      - "schemas/**"
+      - "scripts/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/check-schemas.yml"
+  push:
+    branches: [main]
+    paths:
+      - "schemas/**"
+      - "scripts/**"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/check-schemas.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10.19.0"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Rebuild schemas (dist + JSON schemas)
+        run: pnpm --filter @subway-builder-modded/registry-schemas prepublishOnly
+
+      - name: Verify committed build outputs match src
+        run: |
+          set -euo pipefail
+          status="$(git status --porcelain -- schemas/dist schemas/json-schemas)"
+          if [ -n "$status" ]; then
+            echo "::error::schemas/dist or schemas/json-schemas is stale relative to schemas/src."
+            echo "Rebuild and commit the outputs:"
+            echo "  pnpm --dir schemas build && pnpm --dir schemas emit-json-schemas"
+            echo ""
+            echo "$status"
+            git diff -- schemas/dist schemas/json-schemas | head -200
+            exit 1
+          fi
+
+      - name: Run scripts tests
+        run: pnpm --dir scripts test

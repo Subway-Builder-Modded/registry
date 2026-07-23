@@ -40,7 +40,7 @@ Within the Workplace and Resident pillars, quality further splits into a **count
 
 The metric should then be used as a refinement over the existing tag. A `high` / `medium` / `low` split is useful for the end-user (the person using the simulation), and they likely do not need to or want to know the exact methodology or source data the map draws from.
 
-The continuous rubric score resolves into **six named tiers** — very high, high, medium, low, very low, absent (aliased **A**–**F**) — which are themselves a refinement of the registry's three: **very high** and **high** collapse to `high`, **medium** to `medium`, and **low**, **very low** and **absent** to `low`. After review, the rubric can therefore programmatically populate `source_quality` objectively instead of by self-report.
+The continuous rubric score resolves into **six named tiers** — very high, high, medium, low, very low, absent (aliased **A**–**F**) — which are themselves a refinement of the registry's three: **very high** and **high** collapse to `high`, **medium** to `medium`, and **low**, **very low** and **absent** to `low`. After review, the rubric-assigned tier therefore **supersedes** `source_quality` rather than rewriting it: existing self-reported tags are frozen for legacy compatibility, and new registry listings initialize the legacy tag from the reviewed tier (via the collapse above) at creation only.
 
 ## **2. Granularity**
 
