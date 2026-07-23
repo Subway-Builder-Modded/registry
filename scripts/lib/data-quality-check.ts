@@ -207,6 +207,10 @@ export interface ReportEntry {
   file?: DataQualityAnswersFile;
 }
 
+/** Detailed sections beyond this count collapse to one summary line each,
+ * keeping the comment under GitHub's body-size limit on bulk PRs. */
+const REPORT_DETAIL_LIMIT = 20;
+
 /** Builds the markdown body for the provisional-score PR comment. */
 export function buildProvisionalReport(entries: ReportEntry[]): string {
   const lines: string[] = [
@@ -218,6 +222,23 @@ export function buildProvisionalReport(entries: ReportEntry[]): string {
     "reviewer confirms (provenance `reviewed`).",
     "",
   ];
+  if (entries.length > REPORT_DETAIL_LIMIT) {
+    lines.push(
+      `${entries.length} files changed — showing one summary line each (detail suppressed above ${REPORT_DETAIL_LIMIT} files).`,
+      "",
+    );
+    for (const entry of entries) {
+      if (entry.error !== undefined || entry.file === undefined) {
+        lines.push(`- ❌ \`${entry.path}\` — ${entry.error ?? "unreadable file"}`);
+        continue;
+      }
+      const scores = computeProvisionalScores(entry.file.answers);
+      lines.push(
+        `- \`${entry.path}\` — **${scores.tier}** (raw ${roundScore(scores.raw_score)}, weighted ${roundScore(scores.weighted_score)}; ${entry.file.provenance.method})${scores.assumedOdGranularity ? " ⚠️ O/D grain assumed" : ""}`,
+      );
+    }
+    return lines.join("\n");
+  }
   for (const entry of entries) {
     lines.push(`### \`${entry.path}\``, "");
     if (entry.error !== undefined || entry.file === undefined) {
