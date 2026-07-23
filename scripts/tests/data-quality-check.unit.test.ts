@@ -221,6 +221,18 @@ test("provisional report includes marker, scores, and assumption flag", () => {
   assert.match(report, /❌ Invalid: bad json/);
 });
 
+test("bulk reports collapse to summary lines above the detail limit", () => {
+  const entries = Array.from({ length: 25 }, (_, i) => ({
+    path: `maps/map-${i}/data-quality.json`,
+    file: makeAnswersFile({ id: ID }) as never,
+  }));
+  const report = buildProvisionalReport(entries);
+  assert.match(report, /25 files changed — showing one summary line each/);
+  assert.match(report, /- `maps\/map-24\/data-quality\.json` — \*\*high\*\*/);
+  // No per-file detail tables in bulk mode.
+  assert.ok(!report.includes("| Raw |"));
+});
+
 test("report round-trips the recomputed composite scores", () => {
   const file = makeAnswersFile() as never;
   const report = buildProvisionalReport([{ path: `maps/${ID}/data-quality.json`, file }]);

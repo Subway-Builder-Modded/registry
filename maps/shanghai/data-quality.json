@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "shanghai",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "binary_split",
+    "resident_count": "total_population",
+    "resident_granularity": "adm4",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "binary_split",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "5th Economic Census 从业人员 physical count at 街道 grain; commercial/residential volume split over OSM + Overture + 3D-GloBFP; total population same footprints/grain; no O/D. docs/data-quality.md §7/§8 (CN / Kronifer).",
+  "provenance": {
+    "method": "backfill",
+    "submitted_by": "ahkimn",
+    "reviewed_by": "ahkimn",
+    "date": "2026-07-23"
+  }
+}
