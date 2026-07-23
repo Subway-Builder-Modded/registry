@@ -26,6 +26,7 @@ import {
 import { resolveAndExtractDemandStatsForMapSource } from "./lib/map-demand-stats.js";
 import type { DemandStats } from "./lib/map-demand-stats.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
+import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
 import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import { ensureAuthorAliasPrefill } from "./lib/author-aliases.js";
 
@@ -120,6 +121,9 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
       data_source: dataSource,
       source_quality: sourceQuality as SourceQuality,
       level_of_detail: levelOfDetail as LevelOfDetail,
+      // Every new map starts Unscored; a scored block is written only after a
+      // reviewer confirms the map's data-quality answers (plan D3/D5).
+      data_quality: { tier: "unknown", rubric_version: RUBRIC_VERSION },
       location: location as LocationTag,
       ...(subLocation ? { sub_location: subLocation as LocationTag } : {}),
       special_demand: specialDemand as SpecialDemandTag[],

@@ -47,7 +47,9 @@ jobs:
         run: pnpm install
 
       - name: Check data-quality consistency
-        run: pnpm --dir scripts check-data-quality
+        # --require-presence: post-backfill, every map manifest must carry a
+        # data_quality block (plan D5).
+        run: pnpm --dir scripts check-data-quality --require-presence
 
   report:
     if: github.event_name == 'pull_request'

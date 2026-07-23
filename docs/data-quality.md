@@ -263,11 +263,11 @@ _Mesh tiers are graded by **cell size in meters** — a uniform grid gives consi
 | TW            | Yukina-  | 0.60      | 0.57     | 0.53 | 0.57          | **0.65**           | High      |
 | EE            | Yukina-  | 0.42      | 0.85     | 0.53 | 0.58          | **0.65**           | High      |
 | NO            | slurry   | 0.81      | 0.32     | 0.00 | 0.52          | **0.65**           | High      |
-| MX            | slurry   | 0.62      | 0.60     | 0.00 | 0.52          | **0.64**           | High      |
+| MX            | slurry   | 0.63      | 0.60     | 0.00 | 0.52          | **0.65**           | High      |
 | LT            | Yukina-  | 0.60      | 0.60     | 0.25 | 0.54          | **0.59**           | Medium    |
 | HU            | Yukina-  | 0.42      | 0.49     | 0.53 | 0.46          | **0.57**           | Medium    |
-| PE            | kai      | 0.35      | 0.34     | 0.00 | 0.30          | **0.50**           | Medium    |
-| PR            | slurry   | 0.21      | 0.50     | 0.00 | 0.28          | **0.41**           | Low       |
+| PE            | kai      | 0.34      | 0.34     | 0.00 | 0.29          | **0.50**           | Medium    |
+| PR            | slurry   | 0.21      | 0.49     | 0.00 | 0.27          | **0.40**           | Low       |
 | CN            | Kronifer | 0.25      | 0.10     | 0.00 | 0.16          | **0.40**           | Low       |
 | UA            | Yukina-  | 0.04      | 0.12     | 0.10 | 0.08          | **0.17**           | Very low  |
 | OSM (patcher) | —        | 0.00      | 0.00     | 0.00 | 0.00          | **0.00**           | Absent    |

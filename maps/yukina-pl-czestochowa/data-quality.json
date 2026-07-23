@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "yukina-pl-czestochowa",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "exact_footprints",
+    "workplace_intensity": "fine_types_calibrated",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm3",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm3"
+  },
+  "notes": "Physical workplace count at gmina grain on BDOT10k with Tikhonov fit; NSP pracujący employed residents on 125m/250m mesh; full gmina O/D. docs/data-quality.md §7 (PL / Yukina-).",
+  "provenance": {
+    "method": "backfill",
+    "submitted_by": "ahkimn",
+    "reviewed_by": "ahkimn",
+    "date": "2026-07-23"
+  }
+}
