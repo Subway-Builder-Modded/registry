@@ -131,6 +131,11 @@ export declare const SPATIAL_RESOLUTION_LADDER: readonly [{
     readonly formLabel: null;
     readonly description: "Fine, complete published census mesh ≤250 m";
 }, {
+    readonly value: "mesh_500";
+    readonly weight: 0.75;
+    readonly formLabel: null;
+    readonly description: "Medium published census mesh ≤500 m, unrefined — a building-footprint refinement within the cell lifts toward the ≤250 m tier";
+}, {
     readonly value: "ml_hybrid_footprints";
     readonly weight: 0.7;
     readonly formLabel: null;

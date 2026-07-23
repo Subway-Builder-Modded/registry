@@ -500,6 +500,71 @@
                   "high-detail"
                 ]
               },
+              "data_quality": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tier": {
+                        "type": "string",
+                        "enum": [
+                          "very-high",
+                          "high",
+                          "medium",
+                          "low",
+                          "very-low",
+                          "absent"
+                        ]
+                      },
+                      "raw_score": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "weighted_score": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "rubric_version": {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      "provenance": {
+                        "type": "string",
+                        "enum": [
+                          "reviewed",
+                          "backfill"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "tier",
+                      "rubric_version",
+                      "provenance"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "tier": {
+                        "type": "string",
+                        "const": "unknown"
+                      },
+                      "rubric_version": {
+                        "type": "integer",
+                        "minimum": 1
+                      }
+                    },
+                    "required": [
+                      "tier",
+                      "rubric_version"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              },
               "location": {
                 "type": "string",
                 "enum": [
@@ -1360,6 +1425,71 @@
               "low-detail",
               "medium-detail",
               "high-detail"
+            ]
+          },
+          "data_quality": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "very-high",
+                      "high",
+                      "medium",
+                      "low",
+                      "very-low",
+                      "absent"
+                    ]
+                  },
+                  "raw_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "weighted_score": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "rubric_version": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "provenance": {
+                    "type": "string",
+                    "enum": [
+                      "reviewed",
+                      "backfill"
+                    ]
+                  }
+                },
+                "required": [
+                  "tier",
+                  "rubric_version",
+                  "provenance"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "tier": {
+                    "type": "string",
+                    "const": "unknown"
+                  },
+                  "rubric_version": {
+                    "type": "integer",
+                    "minimum": 1
+                  }
+                },
+                "required": [
+                  "tier",
+                  "rubric_version"
+                ],
+                "additionalProperties": false
+              }
             ]
           },
           "location": {
@@ -2829,6 +2959,241 @@
         "required": [
           "schema_version",
           "rules"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "$schema": "http://json-schema.org/draft-07/schema#"
+  },
+  "data-quality-answers": {
+    "$ref": "#/definitions/data-quality-answers",
+    "definitions": {
+      "data-quality-answers": {
+        "type": "object",
+        "properties": {
+          "schema_version": {
+            "type": "number",
+            "const": 1
+          },
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
+          "answers": {
+            "type": "object",
+            "properties": {
+              "workplace_count": {
+                "type": "string",
+                "enum": [
+                  "physical_measured",
+                  "physical_inferred",
+                  "registered_self_declared",
+                  "size_bands",
+                  "estimated_proxy",
+                  "none"
+                ]
+              },
+              "workplace_granularity": {
+                "type": "string",
+                "enum": [
+                  "mesh_125",
+                  "mesh_250",
+                  "mesh_500",
+                  "mesh_1km",
+                  "mesh_coarse",
+                  "adm5",
+                  "adm4",
+                  "adm3",
+                  "adm2",
+                  "adm1",
+                  "none"
+                ]
+              },
+              "workplace_resolution": {
+                "type": "string",
+                "enum": [
+                  "exact_footprints",
+                  "mesh_125_or_adm5",
+                  "mesh_250",
+                  "mesh_500",
+                  "ml_hybrid_footprints",
+                  "osm_footprints",
+                  "mesh_1km",
+                  "admin_polygon"
+                ]
+              },
+              "workplace_intensity": {
+                "type": "string",
+                "enum": [
+                  "measured_per_unit",
+                  "fine_types_calibrated",
+                  "fine_types_generic",
+                  "coarse_sector",
+                  "binary_split",
+                  "size_only",
+                  "uniform"
+                ]
+              },
+              "resident_count": {
+                "type": "string",
+                "enum": [
+                  "employed_residents",
+                  "working_age",
+                  "total_population",
+                  "none"
+                ]
+              },
+              "resident_granularity": {
+                "type": "string",
+                "enum": [
+                  "mesh_125",
+                  "mesh_250",
+                  "mesh_500",
+                  "mesh_1km",
+                  "mesh_coarse",
+                  "adm5",
+                  "adm4",
+                  "adm3",
+                  "adm2",
+                  "adm1",
+                  "none"
+                ]
+              },
+              "resident_resolution": {
+                "type": "string",
+                "enum": [
+                  "exact_footprints",
+                  "mesh_125_or_adm5",
+                  "mesh_250",
+                  "mesh_500",
+                  "ml_hybrid_footprints",
+                  "osm_footprints",
+                  "mesh_1km",
+                  "admin_polygon"
+                ]
+              },
+              "resident_intensity": {
+                "type": "string",
+                "enum": [
+                  "measured_per_unit",
+                  "fine_types_calibrated",
+                  "fine_types_generic",
+                  "coarse_sector",
+                  "binary_split",
+                  "size_only",
+                  "uniform"
+                ]
+              },
+              "od_metric": {
+                "type": "string",
+                "enum": [
+                  "full_matrix",
+                  "structured_marginals",
+                  "marginal_od",
+                  "synthetic_measured_marginals",
+                  "prior_informed_synthetic",
+                  "none"
+                ]
+              },
+              "od_granularity": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "enum": [
+                      "mesh_125",
+                      "mesh_250",
+                      "mesh_500",
+                      "mesh_1km",
+                      "mesh_coarse",
+                      "adm5",
+                      "adm4",
+                      "adm3",
+                      "adm2",
+                      "adm1",
+                      "none"
+                    ]
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "workplace_count",
+              "workplace_granularity",
+              "workplace_resolution",
+              "workplace_intensity",
+              "resident_count",
+              "resident_granularity",
+              "resident_resolution",
+              "resident_intensity",
+              "od_metric",
+              "od_granularity"
+            ],
+            "additionalProperties": false
+          },
+          "notes": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "ambiguity_bounds": {
+            "type": "string",
+            "minLength": 1
+          },
+          "provenance": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "self-reported",
+                  "reviewed",
+                  "backfill"
+                ]
+              },
+              "submitted_by": {
+                "type": "string",
+                "minLength": 1
+              },
+              "reviewed_by": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "date": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              }
+            },
+            "required": [
+              "method",
+              "submitted_by",
+              "reviewed_by",
+              "date"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "schema_version",
+          "id",
+          "answers",
+          "notes",
+          "provenance"
         ],
         "additionalProperties": false
       }

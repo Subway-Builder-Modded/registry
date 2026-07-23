@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   GRANULARITY_LADDER,
+  SPATIAL_RESOLUTION_LADDER,
   WORKPLACE_COUNT_LADDER,
   collapseTier,
   ladderWeight,
@@ -192,6 +193,15 @@ test("collapseTier maps tiers onto the frozen legacy vocabulary", () => {
   assert.equal(collapseTier("very-low"), "low-quality");
   assert.equal(collapseTier("absent"), "low-quality");
   assert.equal(collapseTier("unknown"), null);
+});
+
+test("R ladder carries the mesh_500 rung between mesh_250 and ML footprints", () => {
+  const weights = SPATIAL_RESOLUTION_LADDER.map((r) => r.weight);
+  assert.equal(ladderWeight(SPATIAL_RESOLUTION_LADDER, "mesh_500"), 0.75);
+  // The ladder stays strictly descending so rungs keep a total order.
+  for (let i = 1; i < weights.length; i += 1) {
+    assert.ok(weights[i] < weights[i - 1], `R ladder not descending at index ${i}`);
+  }
 });
 
 test("ladderWeight throws on unknown values", () => {

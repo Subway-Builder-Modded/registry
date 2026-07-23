@@ -210,6 +210,13 @@ export const SPATIAL_RESOLUTION_LADDER = [
     description: "Fine, complete published census mesh ≤250 m",
   },
   {
+    value: "mesh_500",
+    weight: 0.75,
+    formLabel: null,
+    description:
+      "Medium published census mesh ≤500 m, unrefined — a building-footprint refinement within the cell lifts toward the ≤250 m tier",
+  },
+  {
     value: "ml_hybrid_footprints",
     weight: 0.7,
     formLabel: null,
