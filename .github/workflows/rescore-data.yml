@@ -1,0 +1,149 @@
+name: Rescore Data
+
+# Maintainer comment command for the data-quality review flow. Commenting
+# `rescore_data` on a pull request that touches maps/<id>/data-quality.json
+# confirms those answers (flipping self-reported provenance to reviewed,
+# attributed to the commenter), stamps the recomputed scored block into each
+# map's manifest, and pushes the result to the PR branch. Optional arguments
+# select specific maps: `rescore_data map-id-a map-id-b`.
+#
+# The commit is pushed with GITHUB_TOKEN, which does NOT retrigger the PR's CI
+# — the CLI runs the same consistency verification itself and the result is
+# posted in the confirmation comment.
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+
+jobs:
+  rescore:
+    if: >
+      github.event.issue.pull_request != null &&
+      startsWith(github.event.comment.body, 'rescore_data') &&
+      contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Acknowledge command
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: "eyes",
+            });
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check out PR branch
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cross="$(gh pr view "${{ github.event.issue.number }}" --json isCrossRepository -q .isCrossRepository)"
+          echo "cross=${cross}" >> "$GITHUB_OUTPUT"
+          if [ "$cross" = "true" ]; then
+            echo "Fork PR — cannot push; will comment instructions."
+            exit 0
+          fi
+          gh pr checkout "${{ github.event.issue.number }}"
+
+      - name: Explain fork limitation
+        if: steps.pr.outputs.cross == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: "`rescore_data` cannot push to a fork branch. Run locally instead:\n\n```\npnpm --dir scripts apply-data-quality --reviewer <your-login> <map-id>\n```",
+            });
+
+      - name: Resolve target maps
+        if: steps.pr.outputs.cross != 'true'
+        id: targets
+        run: |
+          set -euo pipefail
+          args="$(echo "${{ github.event.comment.body }}" | head -1 | sed 's/^rescore_data//' | xargs || true)"
+          if [ -n "$args" ]; then
+            ids="$args"
+          else
+            ids="$(git diff --name-only origin/main...HEAD -- 'maps/*/data-quality.json' | sed 's|maps/||; s|/data-quality.json||' | tr '\n' ' ' | xargs || true)"
+          fi
+          echo "ids=${ids}" >> "$GITHUB_OUTPUT"
+
+      - uses: pnpm/action-setup@v4
+        if: steps.pr.outputs.cross != 'true' && steps.targets.outputs.ids != ''
+        with:
+          version: "10.19.0"
+
+      - uses: actions/setup-node@v4
+        if: steps.pr.outputs.cross != 'true' && steps.targets.outputs.ids != ''
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        if: steps.pr.outputs.cross != 'true' && steps.targets.outputs.ids != ''
+        run: pnpm install
+
+      - name: Apply reviewed answers
+        if: steps.pr.outputs.cross != 'true' && steps.targets.outputs.ids != ''
+        id: apply
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          pnpm --silent --dir scripts apply-data-quality \
+            --reviewer "${{ github.event.comment.user.login }}" \
+            ${{ steps.targets.outputs.ids }} 2>&1 | tee apply-output.txt
+
+      - name: Commit and push
+        if: steps.pr.outputs.cross != 'true' && steps.targets.outputs.ids != '' && steps.apply.outcome == 'success'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add maps/
+          if git diff --cached --quiet; then
+            echo "No changes to commit (already applied)."
+          else
+            git commit -m "chore(data-quality): confirm reviewed answers via rescore_data (by ${{ github.event.comment.user.login }})"
+            git push
+          fi
+
+      - name: Report result
+        if: steps.pr.outputs.cross != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const ids = "${{ steps.targets.outputs.ids }}".trim();
+            let body;
+            if (!ids) {
+              body = "`rescore_data`: no `maps/<id>/data-quality.json` changes found in this PR and no map ids were given.";
+            } else {
+              const output = fs.existsSync("apply-output.txt")
+                ? fs.readFileSync("apply-output.txt", "utf8").trim()
+                : "(no output)";
+              const ok = "${{ steps.apply.outcome }}" === "success";
+              body = ok
+                ? `✅ \`rescore_data\` applied and self-verified (CI does not retrigger on this push):\n\n\`\`\`\n${output}\n\`\`\``
+                : `❌ \`rescore_data\` failed — nothing was pushed:\n\n\`\`\`\n${output}\n\`\`\``;
+            }
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body,
+            });

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "san-juan",
+  "answers": {
+    "workplace_count": "registered_self_declared",
+    "workplace_granularity": "adm2",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_calibrated",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm4",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Municipio-grain (ADM2) registry workplaces on Overture footprints with calibrated 8-class job density; employed residents ~ADM4 (ADM2 employed × ADM5 working-age blocks + Overture); no O/D. docs/data-quality.md §7 (PR / slurry).",
+  "provenance": {
+    "method": "backfill",
+    "submitted_by": "ahkimn",
+    "reviewed_by": "ahkimn",
+    "date": "2026-07-23"
+  }
+}

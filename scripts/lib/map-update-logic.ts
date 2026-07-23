@@ -1,4 +1,5 @@
 import type { MapManifest } from "./manifests.js";
+import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
 import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import {
   DEFAULT_LEVEL_OF_DETAIL,
@@ -142,6 +143,13 @@ export function applyMapManifestUpdates(
       : [] as SpecialDemandTag[];
     manifest.special_demand = specialDemand;
     manifest.tags = combineMapTags(manifest.location, specialDemand);
+  }
+
+  // Self-heal the D5 presence invariant: any update to a map that predates the
+  // data-quality migration stamps the Unscored marker. An existing block
+  // (scored or unknown) is never touched here — scoring is reviewer-gated.
+  if (manifest.data_quality === undefined) {
+    manifest.data_quality = { tier: "unknown", rubric_version: RUBRIC_VERSION };
   }
 }
 

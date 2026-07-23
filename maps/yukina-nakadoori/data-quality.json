@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "yukina-nakadoori",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "mesh_500",
+    "workplace_resolution": "mesh_250",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm4",
+    "resident_resolution": "mesh_250",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm3"
+  },
+  "notes": "経済センサス physical worker mesh (500m, refined to 100m floor area — R credited at the ≤250m tier); 国勢調査 employed residents on 250m mesh (町丁目 grain); full municipal O/D. docs/data-quality.md §7/§8 (JP / Yukina-).",
+  "provenance": {
+    "method": "backfill",
+    "submitted_by": "ahkimn",
+    "reviewed_by": "ahkimn",
+    "date": "2026-07-23"
+  }
+}
