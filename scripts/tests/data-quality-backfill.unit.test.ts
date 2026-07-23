@@ -8,39 +8,28 @@ import {
 import { applyMapManifestUpdates } from "../lib/map-update-logic.js";
 import type { MapManifest } from "../lib/manifests.js";
 
-test("confirmed pipeline encodings reproduce the doc §8 table exactly", () => {
-  for (const encoding of PIPELINE_ENCODINGS.filter((p) => p.confirmed)) {
+test("all pipeline encodings are confirmed and reproduce the doc §8 table exactly", () => {
+  for (const encoding of PIPELINE_ENCODINGS) {
     const recomputed = recomputeEncoding(encoding);
     const label = `${encoding.country}/${encoding.docAuthor}`;
+    assert.equal(encoding.confirmed, true, `${label} confirmed`);
     assert.equal(recomputed.raw, encoding.expectedDoc.raw, `${label} raw`);
     assert.equal(recomputed.weighted, encoding.expectedDoc.weighted, `${label} weighted`);
     assert.equal(recomputed.tier, encoding.expectedDoc.tier, `${label} tier`);
   }
 });
 
-test("unconfirmed encodings land on the doc tier within a rounding wobble", () => {
-  const unconfirmed = PIPELINE_ENCODINGS.filter((p) => !p.confirmed);
-  assert.deepEqual(
-    unconfirmed.map((p) => p.country).sort(),
-    ["MX", "PE", "PR"],
-  );
-  for (const encoding of unconfirmed) {
-    const recomputed = recomputeEncoding(encoding);
-    const label = `${encoding.country}/${encoding.docAuthor}`;
-    assert.equal(recomputed.tier, encoding.expectedDoc.tier, `${label} tier`);
-    assert.ok(Math.abs(recomputed.rawDelta) <= 0.015, `${label} raw delta ${recomputed.rawDelta}`);
-    assert.ok(
-      Math.abs(recomputed.weightedDelta) <= 0.015,
-      `${label} weighted delta ${recomputed.weightedDelta}`,
-    );
-  }
-});
-
-test("pipeline matching is exact on (country, registry author)", () => {
+test("pipeline matching is exact on (country, registry author) plus shared data sources", () => {
   assert.equal(findPipelineEncoding("US", "rslurry")?.docAuthor, "slurry");
-  // Same country, different author (shared-pipeline candidates stay unmatched).
+  // The US LODES generator is shared: any US map with data_source LODES matches.
+  assert.equal(findPipelineEncoding("US", "kaicardenas0618", "LODES")?.docAuthor, "slurry");
+  assert.equal(findPipelineEncoding("US", "crumpetime", "LODES")?.docAuthor, "slurry");
+  // Without the shared data source, other authors stay unmatched.
+  assert.equal(findPipelineEncoding("US", "kaicardenas0618", "OSM"), undefined);
   assert.equal(findPipelineEncoding("US", "kaicardenas0618"), undefined);
-  assert.equal(findPipelineEncoding("NO", "Valdotorium"), undefined);
+  // Shared sources never leak across countries or into author-only pipelines.
+  assert.equal(findPipelineEncoding("NO", "Valdotorium", "LODES"), undefined);
+  assert.equal(findPipelineEncoding("JP", "jelegend", "LODES"), undefined);
   // Doc pipelines with no registry maps are not encoded.
   assert.equal(findPipelineEncoding("SK", "ahkimn"), undefined);
 });

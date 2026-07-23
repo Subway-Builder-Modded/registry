@@ -69,6 +69,7 @@ function main(): void {
     const encoding = findPipelineEncoding(
       String(manifest.country ?? ""),
       String(manifest.author ?? ""),
+      typeof manifest.data_source === "string" ? manifest.data_source : undefined,
     );
     if (encoding && (encoding.confirmed || includeUnconfirmed)) {
       const group = matched.get(encoding) ?? [];
@@ -125,9 +126,11 @@ function main(): void {
         id: entry.id,
         answers: encoding.answers,
         notes: encoding.notes,
+        // The maintainer applying docs/data-quality.md is the submitter; the
+        // pipeline author is credited in the notes.
         provenance: {
           method: "backfill",
-          submitted_by: encoding.registryAuthor,
+          submitted_by: reviewer,
           reviewed_by: reviewer,
           date,
         },
