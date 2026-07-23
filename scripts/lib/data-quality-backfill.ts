@@ -1,0 +1,359 @@
+import type { DataQualityAnswers } from "@subway-builder-modded/registry-schemas";
+import { computeScores, roundScore } from "./data-quality.js";
+
+/**
+ * Canonical rubric-answer encodings for the pipelines already scored in
+ * docs/data-quality.md §7/§8, keyed by (country, registry author). A map is
+ * backfilled ONLY on an exact (country, author) match — the doc's pipeline
+ * authors are pseudonyms, so the mapping to registry logins is explicit here
+ * and never inferred (Yukina- = ahkimn, slurry = rslurry, kai =
+ * kaicardenas0618). Maps by other authors in the same country (e.g. the
+ * shared-pipeline US maps by other logins) stay Unscored until reviewed
+ * individually.
+ *
+ * `expectedDoc` carries the §8 table's raw/weighted composites. For
+ * `confirmed` pipelines the recomputation reproduces them exactly (unit
+ * tested). The `confirmed: false` encodings (MX, PE, PR) are best-guess rung
+ * assignments whose recomputation lands within ±0.01 of the hand-computed doc
+ * values — they are excluded from backfill by default until confirmed and the
+ * doc table is reconciled. SK and HU are scored in the doc but have no
+ * registry maps, so they are deliberately not encoded yet.
+ */
+export interface PipelineEncoding {
+  country: string;
+  registryAuthor: string;
+  docAuthor: string;
+  confirmed: boolean;
+  answers: DataQualityAnswers;
+  notes: string;
+  expectedDoc: { raw: number; weighted: number; tier: string };
+}
+
+export const PIPELINE_ENCODINGS: readonly PipelineEncoding[] = [
+  {
+    country: "US",
+    registryAuthor: "rslurry",
+    docAuthor: "slurry",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_inferred",
+      workplace_granularity: "adm5",
+      workplace_resolution: "mesh_125_or_adm5",
+      workplace_intensity: "measured_per_unit",
+      resident_count: "employed_residents",
+      resident_granularity: "adm5",
+      resident_resolution: "mesh_125_or_adm5",
+      resident_intensity: "measured_per_unit",
+      od_metric: "full_matrix",
+      od_granularity: "adm5",
+    },
+    notes:
+      "LODES WAC (workplace, inferred physical) and RAC (employed residents) measured in-unit at census-block grain; LODES OD full matrix at block grain. docs/data-quality.md §7 (US / slurry).",
+    expectedDoc: { raw: 0.81, weighted: 0.87, tier: "very-high" },
+  },
+  {
+    country: "LV",
+    registryAuthor: "ahkimn",
+    docAuthor: "Yukina-",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_inferred",
+      workplace_granularity: "adm4",
+      workplace_resolution: "exact_footprints",
+      workplace_intensity: "fine_types_calibrated",
+      resident_count: "employed_residents",
+      resident_granularity: "adm4",
+      resident_resolution: "mesh_125_or_adm5",
+      resident_intensity: "measured_per_unit",
+      od_metric: "full_matrix",
+      od_granularity: "adm4",
+    },
+    notes:
+      "NPV020 register-inferred physical workplaces on VZD cadastre with DPA fit (pagasts grain); employed residents on 100m/200m mesh; registry-corrected full O/D at pagasts grain. docs/data-quality.md §7 (LV / Yukina-).",
+    expectedDoc: { raw: 0.74, weighted: 0.82, tier: "very-high" },
+  },
+  {
+    country: "JP",
+    registryAuthor: "ahkimn",
+    docAuthor: "Yukina-",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_measured",
+      workplace_granularity: "mesh_500",
+      workplace_resolution: "mesh_250",
+      workplace_intensity: "measured_per_unit",
+      resident_count: "employed_residents",
+      resident_granularity: "adm4",
+      resident_resolution: "mesh_250",
+      resident_intensity: "measured_per_unit",
+      od_metric: "full_matrix",
+      od_granularity: "adm3",
+    },
+    notes:
+      "経済センサス physical worker mesh (500m, refined to 100m floor area — R credited at the ≤250m tier); 国勢調査 employed residents on 250m mesh (町丁目 grain); full municipal O/D. docs/data-quality.md §7/§8 (JP / Yukina-).",
+    expectedDoc: { raw: 0.76, weighted: 0.81, tier: "very-high" },
+  },
+  {
+    country: "CZ",
+    registryAuthor: "ahkimn",
+    docAuthor: "Yukina-",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_measured",
+      workplace_granularity: "adm4",
+      workplace_resolution: "exact_footprints",
+      workplace_intensity: "fine_types_calibrated",
+      resident_count: "employed_residents",
+      resident_granularity: "adm3",
+      resident_resolution: "mesh_125_or_adm5",
+      resident_intensity: "measured_per_unit",
+      od_metric: "full_matrix",
+      od_granularity: "adm4",
+    },
+    notes:
+      "SLDB dojížďka physical count at ZSJ-díl grain on RÚIAN cadastre with NACE fit; employed residents on 100m mesh with per-building dwellings; full O/D at ZSJ-díl grain. docs/data-quality.md §7 (CZ / Yukina-).",
+    expectedDoc: { raw: 0.74, weighted: 0.78, tier: "very-high" },
+  },
+  {
+    country: "PL",
+    registryAuthor: "ahkimn",
+    docAuthor: "Yukina-",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_measured",
+      workplace_granularity: "adm3",
+      workplace_resolution: "exact_footprints",
+      workplace_intensity: "fine_types_calibrated",
+      resident_count: "employed_residents",
+      resident_granularity: "adm3",
+      resident_resolution: "mesh_125_or_adm5",
+      resident_intensity: "measured_per_unit",
+      od_metric: "full_matrix",
+      od_granularity: "adm3",
+    },
+    notes:
+      "Physical workplace count at gmina grain on BDOT10k with Tikhonov fit; NSP pracujący employed residents on 125m/250m mesh; full gmina O/D. docs/data-quality.md §7 (PL / Yukina-).",
+    expectedDoc: { raw: 0.62, weighted: 0.66, tier: "high" },
+  },
+  {
+    country: "TW",
+    registryAuthor: "ahkimn",
+    docAuthor: "Yukina-",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_measured",
+      workplace_granularity: "adm3",
+      workplace_resolution: "exact_footprints",
+      workplace_intensity: "fine_types_calibrated",
+      resident_count: "working_age",
+      resident_granularity: "adm4",
+      resident_resolution: "mesh_125_or_adm5",
+      resident_intensity: "measured_per_unit",
+      od_metric: "structured_marginals",
+      od_granularity: "adm3",
+    },
+    notes:
+      "工商業 physical count on NLSC cadastre with bounded-Tikhonov fit (鄉鎮市區 grain); working-age residents anchored to ADM3 employed, on MSA sub-里 measured blocks; structured marginals (distance bins + county pins). docs/data-quality.md §7/§8 (TW / Yukina-).",
+    expectedDoc: { raw: 0.57, weighted: 0.65, tier: "high" },
+  },
+  {
+    country: "EE",
+    registryAuthor: "ahkimn",
+    docAuthor: "Yukina-",
+    confirmed: true,
+    answers: {
+      workplace_count: "registered_self_declared",
+      workplace_granularity: "adm3",
+      workplace_resolution: "exact_footprints",
+      workplace_intensity: "fine_types_calibrated",
+      resident_count: "employed_residents",
+      resident_granularity: "mesh_1km",
+      resident_resolution: "exact_footprints",
+      resident_intensity: "measured_per_unit",
+      od_metric: "structured_marginals",
+      od_granularity: "adm3",
+    },
+    notes:
+      "TÖR + Ariregister firm-declared workplaces on ETAK/EHR with NNLS fit (omavalitsus grain); employed residents (15–64) from 1km INSPIRE mesh placed on per-building dwelling units; structured marginals (distance bins + Tallinn/Tartu pins). docs/data-quality.md §7 (EE / Yukina-).",
+    expectedDoc: { raw: 0.58, weighted: 0.65, tier: "high" },
+  },
+  {
+    country: "NO",
+    registryAuthor: "rslurry",
+    docAuthor: "slurry",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_measured",
+      workplace_granularity: "mesh_250",
+      workplace_resolution: "mesh_250",
+      workplace_intensity: "measured_per_unit",
+      resident_count: "total_population",
+      resident_granularity: "mesh_250",
+      resident_resolution: "mesh_250",
+      resident_intensity: "measured_per_unit",
+      od_metric: "none",
+      od_granularity: null,
+    },
+    notes:
+      "Physical workplace and total-population counts measured in-unit on 250m mesh; no O/D (unbounded gravity). docs/data-quality.md §7 (NO / slurry).",
+    expectedDoc: { raw: 0.52, weighted: 0.65, tier: "high" },
+  },
+  {
+    country: "LT",
+    registryAuthor: "ahkimn",
+    docAuthor: "Yukina-",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_measured",
+      workplace_granularity: "adm3",
+      workplace_resolution: "exact_footprints",
+      workplace_intensity: "fine_types_calibrated",
+      resident_count: "employed_residents",
+      resident_granularity: "adm3",
+      resident_resolution: "mesh_250",
+      resident_intensity: "measured_per_unit",
+      od_metric: "synthetic_measured_marginals",
+      od_granularity: null,
+    },
+    notes:
+      "Physical count on GRPK cadastre with measured density (savivaldybė grain); employed residents on 250m mesh; synthetic doubly-constrained O/D from measured marginals. docs/data-quality.md §7/§8 (LT / Yukina-).",
+    expectedDoc: { raw: 0.54, weighted: 0.59, tier: "medium" },
+  },
+  {
+    country: "CN",
+    registryAuthor: "Kronifer",
+    docAuthor: "Kronifer",
+    confirmed: true,
+    answers: {
+      workplace_count: "physical_measured",
+      workplace_granularity: "adm4",
+      workplace_resolution: "ml_hybrid_footprints",
+      workplace_intensity: "binary_split",
+      resident_count: "total_population",
+      resident_granularity: "adm4",
+      resident_resolution: "ml_hybrid_footprints",
+      resident_intensity: "binary_split",
+      od_metric: "none",
+      od_granularity: null,
+    },
+    notes:
+      "5th Economic Census 从业人员 physical count at 街道 grain; commercial/residential volume split over OSM + Overture + 3D-GloBFP; total population same footprints/grain; no O/D. docs/data-quality.md §7/§8 (CN / Kronifer).",
+    expectedDoc: { raw: 0.16, weighted: 0.4, tier: "low" },
+  },
+  {
+    country: "UA",
+    registryAuthor: "ahkimn",
+    docAuthor: "Yukina-",
+    confirmed: true,
+    answers: {
+      workplace_count: "estimated_proxy",
+      workplace_granularity: "adm1",
+      workplace_resolution: "ml_hybrid_footprints",
+      workplace_intensity: "fine_types_generic",
+      resident_count: "total_population",
+      resident_granularity: "adm3",
+      resident_resolution: "ml_hybrid_footprints",
+      resident_intensity: "fine_types_generic",
+      od_metric: "prior_informed_synthetic",
+      od_granularity: null,
+    },
+    notes:
+      "Oblast зайняте населення proxy scaled by population share onto Overture/GHS footprints with literature-based priors (hromada resident grain); GIPF prior-informed synthetic O/D calibrated on PL/JP/TW flows. docs/data-quality.md §7/§8 (UA / Yukina-).",
+    expectedDoc: { raw: 0.08, weighted: 0.17, tier: "very-low" },
+  },
+  // --- Best-guess encodings pending confirmation (excluded by default) ---
+  {
+    country: "MX",
+    registryAuthor: "rslurry",
+    docAuthor: "slurry",
+    confirmed: false,
+    answers: {
+      workplace_count: "physical_measured",
+      workplace_granularity: "adm4",
+      workplace_resolution: "ml_hybrid_footprints",
+      workplace_intensity: "measured_per_unit",
+      resident_count: "working_age",
+      resident_granularity: "adm5",
+      resident_resolution: "mesh_125_or_adm5",
+      resident_intensity: "measured_per_unit",
+      od_metric: "none",
+      od_granularity: null,
+    },
+    notes:
+      "DENUE establishment points with employee size bands constrained to CE totals (~ADM4 effective grain per §2 hybrid rule); working-age residents measured per manzana (ADM5); no O/D. BEST-GUESS rung assignment pending confirmation. docs/data-quality.md §7 (MX / slurry).",
+    expectedDoc: { raw: 0.52, weighted: 0.64, tier: "high" },
+  },
+  {
+    country: "PE",
+    registryAuthor: "kaicardenas0618",
+    docAuthor: "kai",
+    confirmed: false,
+    answers: {
+      workplace_count: "registered_self_declared",
+      workplace_granularity: "adm4",
+      workplace_resolution: "mesh_125_or_adm5",
+      workplace_intensity: "fine_types_generic",
+      resident_count: "total_population",
+      resident_granularity: "adm5",
+      resident_resolution: "mesh_125_or_adm5",
+      resident_intensity: "measured_per_unit",
+      od_metric: "none",
+      od_granularity: null,
+    },
+    notes:
+      "Self-declared registry workplaces on manzana registry (urban) + Overture land-use/POI hex (rural), ~ADM4 effective grain; total population measured per manzana (ADM5); no O/D. BEST-GUESS rung assignment pending confirmation. docs/data-quality.md §7 (PE / kai).",
+    expectedDoc: { raw: 0.3, weighted: 0.5, tier: "medium" },
+  },
+  {
+    country: "PR",
+    registryAuthor: "rslurry",
+    docAuthor: "slurry",
+    confirmed: false,
+    answers: {
+      workplace_count: "registered_self_declared",
+      workplace_granularity: "adm2",
+      workplace_resolution: "ml_hybrid_footprints",
+      workplace_intensity: "fine_types_calibrated",
+      resident_count: "employed_residents",
+      resident_granularity: "adm4",
+      resident_resolution: "mesh_125_or_adm5",
+      resident_intensity: "fine_types_generic",
+      od_metric: "none",
+      od_granularity: null,
+    },
+    notes:
+      "Municipio-grain (ADM2) registry workplaces on Overture footprints with calibrated 8-class job density; employed residents ~ADM4 (ADM2 employed × ADM5 working-age blocks + Overture); no O/D. BEST-GUESS rung assignment pending confirmation. docs/data-quality.md §7 (PR / slurry).",
+    expectedDoc: { raw: 0.28, weighted: 0.41, tier: "low" },
+  },
+];
+
+export function findPipelineEncoding(
+  country: string,
+  author: string,
+): PipelineEncoding | undefined {
+  return PIPELINE_ENCODINGS.find(
+    (p) => p.country === country && p.registryAuthor === author,
+  );
+}
+
+export interface EncodingRecomputation {
+  raw: number;
+  weighted: number;
+  tier: string;
+  rawDelta: number;
+  weightedDelta: number;
+}
+
+/** Recomputes an encoding's scores and their deltas vs the §8 doc table. */
+export function recomputeEncoding(encoding: PipelineEncoding): EncodingRecomputation {
+  const scores = computeScores(encoding.answers);
+  const raw = roundScore(scores.raw_score);
+  const weighted = roundScore(scores.weighted_score);
+  return {
+    raw,
+    weighted,
+    tier: scores.tier,
+    rawDelta: roundScore(raw - encoding.expectedDoc.raw),
+    weightedDelta: roundScore(weighted - encoding.expectedDoc.weighted),
+  };
+}
