@@ -174,6 +174,8 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     sources: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
     /** Audit note for ambiguous grain calls (docs/data-quality.md §2). */
     ambiguity_bounds: z.ZodOptional<z.ZodString>;
+    /** Map id whose reviewed answers these were inherited from (same-methodology flow). */
+    derived_from: z.ZodOptional<z.ZodString>;
     provenance: z.ZodObject<{
         method: z.ZodEnum<["self-reported", "reviewed", "backfill"]>;
         /** GitHub login of whoever supplied the answers (author or maintainer). */
@@ -217,6 +219,7 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     notes: string;
     sources?: string[] | undefined;
     ambiguity_bounds?: string | undefined;
+    derived_from?: string | undefined;
 }, {
     schema_version: 1;
     provenance: {
@@ -241,6 +244,7 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     notes: string;
     sources?: string[] | undefined;
     ambiguity_bounds?: string | undefined;
+    derived_from?: string | undefined;
 }>, {
     schema_version: 1;
     provenance: {
@@ -265,6 +269,7 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     notes: string;
     sources?: string[] | undefined;
     ambiguity_bounds?: string | undefined;
+    derived_from?: string | undefined;
 }, {
     schema_version: 1;
     provenance: {
@@ -289,6 +294,7 @@ export declare const DataQualityAnswersFileSchema: z.ZodEffects<z.ZodObject<{
     notes: string;
     sources?: string[] | undefined;
     ambiguity_bounds?: string | undefined;
+    derived_from?: string | undefined;
 }>;
 export type DataQualityProvenanceMethod = (typeof DATA_QUALITY_PROVENANCE_METHODS)[number];
 export type ManifestDataQuality = z.infer<typeof ManifestDataQualitySchema>;

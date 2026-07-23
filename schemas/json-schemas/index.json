@@ -3148,6 +3148,10 @@
             "type": "string",
             "minLength": 1
           },
+          "derived_from": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
           "provenance": {
             "type": "object",
             "properties": {

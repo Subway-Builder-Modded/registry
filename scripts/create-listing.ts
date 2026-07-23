@@ -10,9 +10,11 @@ import {
   getMapDataSource,
   getOptionalIssueValue,
   getRequiredIssueValue,
-  normalizeSourceQualityForDataSource,
 } from "./lib/map-field-utils.js";
-import { COUNTRY_TO_EUROPE_SUB_REGION } from "./lib/map-constants.js";
+import {
+  COUNTRY_TO_EUROPE_SUB_REGION,
+  DEFAULT_SOURCE_QUALITY,
+} from "./lib/map-constants.js";
 import {
   ensureCollaboratorAuthorAliasPrefills,
   resolvePublishCollaborators,
@@ -76,10 +78,9 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
   const dataSource = getMapDataSource(data.data_source);
   const location = getRequiredIssueValue("location", data.location);
   const specialDemand = parseTags(data.special_demand);
-  const sourceQuality = normalizeSourceQualityForDataSource(
-    dataSource,
-    getRequiredIssueValue("source_quality", data.source_quality),
-  );
+  // source_quality is machine-managed: new maps get the conservative default;
+  // the data-quality tier (reviewer-confirmed) is the real quality signal.
+  const sourceQuality = DEFAULT_SOURCE_QUALITY;
   const update = buildUpdate(data);
   const mapId = String(data["map-id"]);
   let demandStats: DemandStats;

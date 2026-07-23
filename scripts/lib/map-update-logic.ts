@@ -1,16 +1,14 @@
 import type { MapManifest } from "./manifests.js";
 import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
-import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
+import type { LevelOfDetail, LocationTag, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import {
   DEFAULT_LEVEL_OF_DETAIL,
   DEFAULT_MAP_DATA_SOURCE,
   DEFAULT_SOURCE_QUALITY,
   LEVEL_OF_DETAIL_SET,
   LOCATION_TAG_SET,
-  MAX_OSM_SOURCE_QUALITY,
   SOURCE_QUALITY_SET,
   SPECIAL_DEMAND_TAG_SET,
-  isOsmDataSource,
 } from "./map-constants.js";
 import { isPresentIssueValue } from "./map-field-utils.js";
 
@@ -92,9 +90,9 @@ export function applyMapManifestUpdates(
     manifest.level_of_detail = DEFAULT_LEVEL_OF_DETAIL;
   }
 
-  if (isPresentIssueValue(data.source_quality)) {
-    manifest.source_quality = data.source_quality as SourceQuality;
-  } else if (!isPresentIssueValue(manifest.source_quality)) {
+  // source_quality is machine-managed (write-once legacy tag; the data-quality
+  // tier supersedes it) — user updates never modify it.
+  if (!isPresentIssueValue(manifest.source_quality)) {
     manifest.source_quality = DEFAULT_SOURCE_QUALITY;
   }
 
@@ -127,14 +125,6 @@ export function applyMapManifestUpdates(
       const parsed = rawIncludedCities.split(",").map((s) => s.trim()).filter(Boolean);
       if (parsed.length > 0) manifest.included_cities = parsed;
     }
-  }
-
-  // Cap OSM quality to be medium quality since high-quality OSM data is generally not available
-  if (
-    isOsmDataSource(manifest.data_source)
-    && manifest.source_quality === "high-quality"
-  ) {
-    manifest.source_quality = MAX_OSM_SOURCE_QUALITY;
   }
 
   if (isPresentIssueValue(manifest.location)) {
@@ -200,9 +190,8 @@ export function validateMapUpdateFields(
   }
 
   const nextDataSource = isPresentIssueValue(data.data_source) ? data.data_source : currentDataSource;
-  const nextSourceQuality = isPresentIssueValue(data.source_quality)
-    ? data.source_quality
-    : currentSourceQuality;
+  // source_quality is never user-updatable; only the current value is checked.
+  const nextSourceQuality = currentSourceQuality;
   const nextLevelOfDetail = isPresentIssueValue(data.level_of_detail)
     ? data.level_of_detail
     : currentLevelOfDetail;
@@ -234,7 +223,4 @@ export function validateMapUpdateFields(
     errors.push(`**special_demand**: Invalid tag(s): ${invalidSpecialDemand.join(", ")}`);
   }
 
-  if (isOsmDataSource(nextDataSource) && nextSourceQuality === "high-quality") {
-    errors.push("**source_quality**: OSM-based data sources cannot be marked `high-quality`.");
-  }
 }
