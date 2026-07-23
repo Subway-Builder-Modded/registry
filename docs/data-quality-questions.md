@@ -192,9 +192,17 @@ for more than estimates that were never checked against anything.**
 **If unsure:** if you used any commuting or origin-destination table at all, describe it in
 Methodology.
 
+### 8. If you have commute-flow data, what is the smallest area it covers?
+
+Only answer this if question 7 selected one of the first three options — it asks for the areas the
+commute table's origins and destinations refer to (a table of town-to-town flows covers whole
+towns). The options are the same as questions 2 and 5; use the
+[area table](#rule-2--the-area-size-table). Leave it blank if there is no flow data — the grain of
+estimated flows is not scored.
+
 ---
 
-## 8. Methodology
+## 9. Methodology
 
 The dropdown answers classify the data; the **Methodology** field contextualizes them.
 This field is mandatory, and it is how ambiguous dropdown answers are resolved favorably rather than conservatively. A good methodology note includes:

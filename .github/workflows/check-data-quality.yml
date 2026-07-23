@@ -1,0 +1,122 @@
+name: Check Data Quality
+
+# Consistency guard for the seven-tier data-quality system:
+# - every maps/<id>/data-quality.json must validate against the answers schema
+# - a scored manifest data_quality block must recompute exactly from its
+#   reviewed/backfill answers file (tier + scores)
+# - confirmed answers without a stamped manifest block (and vice versa) fail
+# source_quality is deliberately NOT checked — it is decoupled and write-once.
+#
+# On pull requests that touch answers files, a second job posts (or updates)
+# a provisional-score comment so reviewers see the recomputed tier and
+# per-pillar breakdown without running anything locally.
+
+on:
+  pull_request:
+    paths:
+      - "maps/**"
+      - "schemas/**"
+      - "scripts/**"
+      - ".github/workflows/check-data-quality.yml"
+  push:
+    branches: [main]
+    paths:
+      - "maps/**"
+      - "schemas/**"
+      - "scripts/**"
+      - ".github/workflows/check-data-quality.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10.19.0"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check data-quality consistency
+        run: pnpm --dir scripts check-data-quality
+
+  report:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find changed answers files
+        id: changed
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          if ! git rev-parse --verify "${base}^{commit}" >/dev/null 2>&1; then
+            base="$(git rev-parse "${head}~1" 2>/dev/null || git rev-parse "${head}")"
+          fi
+          files="$(git diff --name-only "$base" "$head" -- 'maps/*/data-quality.json' | tr '\n' ' ')"
+          echo "files=${files}" >> "$GITHUB_OUTPUT"
+
+      - uses: pnpm/action-setup@v4
+        if: steps.changed.outputs.files != ''
+        with:
+          version: "10.19.0"
+
+      - uses: actions/setup-node@v4
+        if: steps.changed.outputs.files != ''
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        if: steps.changed.outputs.files != ''
+        run: pnpm install
+
+      - name: Build provisional-score report
+        if: steps.changed.outputs.files != ''
+        run: pnpm --silent --dir scripts check-data-quality --report ${{ steps.changed.outputs.files }} > report.md
+
+      - name: Post or update PR comment
+        if: steps.changed.outputs.files != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const body = fs.readFileSync("report.md", "utf8");
+            const marker = "<!-- data-quality-report -->";
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }

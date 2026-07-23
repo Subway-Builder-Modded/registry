@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { LocationTagSchema, LevelOfDetailSchema, SourceQualitySchema, SpecialDemandTagSchema, } from "./constants.js";
+import { ManifestDataQualitySchema } from "./data-quality.js";
 // --- Grid statistics (from map-analytics-grid.ts / map-detail-metrics.ts / map-polycentrism.ts) ---
 const MetricSummarySchema = z.object({
     p10: z.number(),
@@ -107,6 +108,11 @@ export const MapManifestSchema = BaseManifestSchema.extend({
     data_source: z.string().min(1),
     source_quality: SourceQualitySchema,
     level_of_detail: LevelOfDetailSchema,
+    // Seven-tier rubric result (docs/data-quality.md). Optional only for
+    // manifests predating the migration; the backfill stamps an explicit unknown
+    // marker on every map, and new readers always prefer this field. Fully
+    // decoupled from source_quality, which is a frozen, write-once legacy tag.
+    data_quality: ManifestDataQualitySchema.optional(),
     location: LocationTagSchema,
     // Populated during the europe→sub-region migration. New app reads
     // sub_location ?? location; old apps (≤0.2.3) read location and still see

@@ -8,36 +8,14 @@ import {
   WORKPLACE_COUNT_LADDER,
   ladderWeight,
   tierForWeightedScore,
-  type IntensityFidelity,
-  type MetricGranularity,
-  type OdMetric,
-  type ResidentCountAnchor,
+  type DataQualityAnswers,
   type ScoredDataQualityTier,
-  type SpatialResolution,
-  type WorkplaceCountAnchor,
 } from "@subway-builder-modded/registry-schemas";
 
-/**
- * Canonical rubric answers for one map (the `answers` block of
- * maps/<id>/data-quality.json). Scores are a pure function of this object;
- * see docs/data-quality.md for the ladders and composite formulas.
- */
-export interface DataQualityAnswers {
-  workplace_count: WorkplaceCountAnchor;
-  workplace_granularity: MetricGranularity;
-  workplace_resolution: SpatialResolution;
-  workplace_intensity: IntensityFidelity;
-  resident_count: ResidentCountAnchor;
-  resident_granularity: MetricGranularity;
-  resident_resolution: SpatialResolution;
-  resident_intensity: IntensityFidelity;
-  od_metric: OdMetric;
-  /**
-   * Null when the O/D rung carries no measured grain (synthetic / prior /
-   * none) — the granularity multiplier is then omitted (G ≡ 1).
-   */
-  od_granularity: MetricGranularity | null;
-}
+// Canonical rubric answers for one map: the `answers` block of
+// maps/<id>/data-quality.json, typed by DataQualityAnswersSchema in the
+// schemas package. Scores are a pure function of that object.
+export type { DataQualityAnswers } from "@subway-builder-modded/registry-schemas";
 
 export interface PillarScores {
   /** Weakest-link product: count × (R × I) × G (O/D: metric × G). */

@@ -1154,6 +1154,34 @@ export declare const MapManifestSchema: z.ZodObject<{
     data_source: z.ZodString;
     source_quality: z.ZodEnum<["low-quality", "medium-quality", "high-quality"]>;
     level_of_detail: z.ZodEnum<["low-detail", "medium-detail", "high-detail"]>;
+    data_quality: z.ZodOptional<z.ZodUnion<[z.ZodObject<{
+        tier: z.ZodEnum<[import("./data-quality-ladders.js").ScoredDataQualityTier, ...import("./data-quality-ladders.js").ScoredDataQualityTier[]]>;
+        raw_score: z.ZodOptional<z.ZodNumber>;
+        weighted_score: z.ZodOptional<z.ZodNumber>;
+        rubric_version: z.ZodNumber;
+        provenance: z.ZodEnum<["reviewed", "backfill"]>;
+    }, "strict", z.ZodTypeAny, {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    }, {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    }>, z.ZodObject<{
+        tier: z.ZodLiteral<"unknown">;
+        rubric_version: z.ZodNumber;
+    }, "strict", z.ZodTypeAny, {
+        tier: "unknown";
+        rubric_version: number;
+    }, {
+        tier: "unknown";
+        rubric_version: number;
+    }>]>>;
     location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
     sub_location: z.ZodOptional<z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
@@ -1275,6 +1303,16 @@ export declare const MapManifestSchema: z.ZodObject<{
             };
         };
     } | undefined;
+    data_quality?: {
+        tier: "unknown";
+        rubric_version: number;
+    } | {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    } | undefined;
     sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
     included_cities?: string[] | undefined;
 }, {
@@ -1392,6 +1430,16 @@ export declare const MapManifestSchema: z.ZodObject<{
                 debug?: unknown;
             };
         };
+    } | undefined;
+    data_quality?: {
+        tier: "unknown";
+        rubric_version: number;
+    } | {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
     } | undefined;
     sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
     included_cities?: string[] | undefined;
@@ -1870,6 +1918,34 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     data_source: z.ZodString;
     source_quality: z.ZodEnum<["low-quality", "medium-quality", "high-quality"]>;
     level_of_detail: z.ZodEnum<["low-detail", "medium-detail", "high-detail"]>;
+    data_quality: z.ZodOptional<z.ZodUnion<[z.ZodObject<{
+        tier: z.ZodEnum<[import("./data-quality-ladders.js").ScoredDataQualityTier, ...import("./data-quality-ladders.js").ScoredDataQualityTier[]]>;
+        raw_score: z.ZodOptional<z.ZodNumber>;
+        weighted_score: z.ZodOptional<z.ZodNumber>;
+        rubric_version: z.ZodNumber;
+        provenance: z.ZodEnum<["reviewed", "backfill"]>;
+    }, "strict", z.ZodTypeAny, {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    }, {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    }>, z.ZodObject<{
+        tier: z.ZodLiteral<"unknown">;
+        rubric_version: z.ZodNumber;
+    }, "strict", z.ZodTypeAny, {
+        tier: "unknown";
+        rubric_version: number;
+    }, {
+        tier: "unknown";
+        rubric_version: number;
+    }>]>>;
     location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
     sub_location: z.ZodOptional<z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
@@ -1991,6 +2067,16 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
             };
         };
     } | undefined;
+    data_quality?: {
+        tier: "unknown";
+        rubric_version: number;
+    } | {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    } | undefined;
     sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
     included_cities?: string[] | undefined;
 }, {
@@ -2108,6 +2194,16 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 debug?: unknown;
             };
         };
+    } | undefined;
+    data_quality?: {
+        tier: "unknown";
+        rubric_version: number;
+    } | {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
     } | undefined;
     sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
     included_cities?: string[] | undefined;

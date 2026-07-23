@@ -499,6 +499,71 @@
                 "high-detail"
               ]
             },
+            "data_quality": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "tier": {
+                      "type": "string",
+                      "enum": [
+                        "very-high",
+                        "high",
+                        "medium",
+                        "low",
+                        "very-low",
+                        "absent"
+                      ]
+                    },
+                    "raw_score": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "weighted_score": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "rubric_version": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "provenance": {
+                      "type": "string",
+                      "enum": [
+                        "reviewed",
+                        "backfill"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "tier",
+                    "rubric_version",
+                    "provenance"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tier": {
+                      "type": "string",
+                      "const": "unknown"
+                    },
+                    "rubric_version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "tier",
+                    "rubric_version"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
             "location": {
               "type": "string",
               "enum": [
