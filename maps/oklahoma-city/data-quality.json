@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "oklahoma-city",
+  "answers": {
+    "workplace_count": "physical_inferred",
+    "workplace_granularity": "adm5",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm5",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm5"
+  },
+  "notes": "LODES WAC (workplace, inferred physical) and RAC (employed residents) measured in-unit at census-block grain; LODES OD full matrix at block grain. docs/data-quality.md §7 (US / slurry).",
+  "provenance": {
+    "method": "backfill",
+    "submitted_by": "ahkimn",
+    "reviewed_by": "ahkimn",
+    "date": "2026-07-23"
+  }
+}
