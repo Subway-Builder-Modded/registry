@@ -345,19 +345,20 @@ jobs:
             sample.sort((a, b) => b.lastUpdated - a.lastUpdated);
             const sampleIds = sample.slice(0, 5).map((s) => s.id);
 
+            // Prefill only input fields: prefilling a dropdown via query
+            // params makes GitHub fall back to the blank issue editor.
             const params = new URLSearchParams({
               template: 'data-quality.yml',
               title: `[Data Quality]: ${mapId}`,
               'map-id': mapId,
             });
             if (sampleIds.length > 0) {
-              params.set('same-methodology', 'Yes — same methodology as my other maps in this country');
               params.set('same-methodology-sample', sampleIds.join(', '));
             }
             const inviteUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/issues/new?${params.toString()}`;
 
             const sampleNote = sampleIds.length > 0
-              ? `\n\nIf this map was generated with the same methodology as your other scored ${country} maps (${sampleIds.map((id) => `[\`${id}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/main/maps/${id})`).join(', ')}), answering **Yes** to the first question inherits their answers automatically.`
+              ? `\n\nIf this map was generated with the same methodology as your other scored ${country} maps (${sampleIds.map((id) => `[\`${id}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/main/maps/${id})`).join(', ')}), select **Yes** on the first question to inherit their answers automatically.`
               : '';
 
             await github.rest.issues.createComment({
