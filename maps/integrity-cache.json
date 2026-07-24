@@ -1157,6 +1157,55 @@
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-03-15T00:00:00.000Z"
         }
+      },
+      "1.1.0": {
+        "fingerprint": "rules:v6:sha256:f5e7823ddbac04b6b72c0f7062b714faa50fe4ede41388b01ff29f7a420d0207",
+        "last_checked_at": "2026-07-24T00:01:21.981Z",
+        "result": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 2 of 923 points (0.2%) with neither residents nor jobs (e.g. UNI_1, UNI_107)",
+            "demand_data resident totals mismatch (points=9004257, pops=3926141, delta=5078116)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": false,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "BER.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 159.66,
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "valdotorium/railyard-maps-2",
+            "tag": "v0.1.2",
+            "asset_name": "BER.zip",
+            "download_url": "https://github.com/Valdotorium/Railyard-Maps-2/releases/download/v0.1.2/BER.zip"
+          },
+          "fingerprint": "rules:v6:sha256:f5e7823ddbac04b6b72c0f7062b714faa50fe4ede41388b01ff29f7a420d0207",
+          "checked_at": "2026-07-24T00:01:21.981Z",
+          "released_at": "2026-07-23T00:00:00.000Z"
+        }
       }
     },
     "bilbao": {
