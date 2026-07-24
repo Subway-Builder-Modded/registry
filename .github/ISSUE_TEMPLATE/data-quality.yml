@@ -98,7 +98,7 @@
         map's demand points. If unsure: open the source table and look at what one row
         covers; when two grains are plausible, pick the coarser one and mention both in
         Methodology. See the guide's data-suppression note."
-      "options": &a1
+      "options":
         - "Small uniform grid squares, roughly 100–250 m"
         - "Individual buildings or census blocks"
         - "Neighborhoods or districts within a city"
@@ -156,7 +156,14 @@
       "label": "What is the smallest area your population numbers are reported for?"
       "description": "As with the workplace question: follow the guide's two rules — answer with
         the source table's areas — and account for potential data suppression."
-      "options": *a1
+      "options":
+        - "Small uniform grid squares, roughly 100–250 m"
+        - "Individual buildings or census blocks"
+        - "Neighborhoods or districts within a city"
+        - "Whole cities or municipalities"
+        - "Counties or larger regions"
+        - "States or provinces"
+        - "Not based on official statistics areas"
     "validations":
       "required": false
   - "type": "dropdown"
@@ -215,7 +222,14 @@
         options — it asks for the areas the commute table's origins and destinations refer
         to (a table of town-to-town flows covers whole towns). Leave it blank if there is no
         flow data — the grain of estimated flows is not scored."
-      "options": *a1
+      "options":
+        - "Small uniform grid squares, roughly 100–250 m"
+        - "Individual buildings or census blocks"
+        - "Neighborhoods or districts within a city"
+        - "Whole cities or municipalities"
+        - "Counties or larger regions"
+        - "States or provinces"
+        - "Not based on official statistics areas"
     "validations":
       "required": false
   - "type": "markdown"

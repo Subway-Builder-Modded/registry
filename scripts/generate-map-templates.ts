@@ -30,6 +30,10 @@ const YAML_OPTIONS = {
   indent: 2,
   defaultStringType: "QUOTE_DOUBLE",
   blockQuote: true,
+  // GitHub's issue-form parser rejects YAML anchors/aliases, which the
+  // emitter otherwise produces when dropdowns share an options array
+  // (the whole template then falls back to the blank issue editor).
+  aliasDuplicateObjects: false,
 } as const;
 
 const OptionItemSchema = z.union([
