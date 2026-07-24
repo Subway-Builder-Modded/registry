@@ -491,8 +491,12 @@ const dataQualityTemplateBaseDoc: TemplateDoc = {
     input(
       "same-methodology-sample",
       "Same-Methodology Sample (reference)",
-      "Auto-filled when you arrive via a prefilled link — the maps a Yes answer inherits from. Display-only: the registry re-derives the authoritative list.",
-      { required: false },
+      "Auto-filled when you arrive via a prefilled link — the maps a Yes answer inherits from. Display-only: the registry re-derives the authoritative list, so it is safe to leave blank.",
+      {
+        placeholder:
+          "Leave blank — auto-filled by the invite link; the registry derives the real list either way.",
+        required: false,
+      },
     ),
     spacer(),
     markdown(
