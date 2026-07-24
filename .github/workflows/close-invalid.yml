@@ -15,6 +15,7 @@ jobs:
       !contains(github.event.issue.labels.*.name, 'update-mod') &&
       !contains(github.event.issue.labels.*.name, 'update-map') &&
       !contains(github.event.issue.labels.*.name, 'update-author') &&
+      !contains(github.event.issue.labels.*.name, 'data-quality') &&
       !contains(github.event.issue.labels.*.name, 'report') &&
       github.event.issue.author_association != 'MEMBER' &&
       github.event.issue.author_association != 'OWNER' &&
@@ -38,6 +39,7 @@ jobs:
                 '- **[Update Existing Mod Metadata](../../issues/new?template=update-mod.yml)** - Update metadata for a mod you own',
                 '- **[Update Existing Map Metadata](../../issues/new?template=update-map.yml)** - Update metadata for a map you own',
                 '- **[Update Author Profile](../../issues/new?template=update-author.yml)** - Update your author alias, attribution, or profile metadata',
+                '- **[Map Data Quality](../../issues/new?template=data-quality.yml)** - Answer the data-quality questions for a map you own',
                 '- **[Report a Mod or Map](../../issues/new?template=report.yml)** - Report an issue with a listing',
               ].join('\n')
             });
