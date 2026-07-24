@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-07-24T10:01:25.225Z",
+  "generated_at": "2026-07-24T10:37:11.536Z",
   "valid_paths": [
     "/",
     "/community",
@@ -957,6 +957,8 @@
     "/registry/maps/saltillo/versions/1.1.2",
     "/registry/maps/san-antonio",
     "/registry/maps/san-juan",
+    "/registry/maps/san-juan/versions",
+    "/registry/maps/san-juan/versions/1.0.0",
     "/registry/maps/santa-barbara",
     "/registry/maps/sejong-3",
     "/registry/maps/sejong-4",
@@ -1297,8 +1299,8 @@
     "latest_hour": "2026-07-24T10:00:00.000Z",
     "total_days": 99,
     "total_hours": 1365,
-    "latest_day_visits": 125,
-    "latest_hour_visits": 0
+    "latest_day_visits": 170,
+    "latest_hour_visits": 45
   },
   "time_series": {
     "by_day": [
@@ -1696,7 +1698,7 @@
       },
       {
         "date": "2026-07-24",
-        "visits": 125
+        "visits": 170
       }
     ],
     "by_hour": [
@@ -7158,7 +7160,7 @@
       },
       {
         "hour": "2026-07-24T10:00:00.000Z",
-        "visits": 0
+        "visits": 45
       }
     ]
   },
@@ -21066,17 +21068,18 @@
       }
     },
     "2026-07-24": {
-      "captured_at": "2026-07-24T10:01:22.912Z",
+      "captured_at": "2026-07-24T10:37:09.307Z",
       "window_start": "2026-07-24T00:00:00.000Z",
       "window_end": "2026-07-24T11:00:00.000Z",
       "totals": {
-        "visits": 125
+        "visits": 170
       },
       "pages": {
-        "/": 43,
+        "/": 68,
         "/credits": 2,
-        "/railyard": 41,
-        "/railyard/docs": 5,
+        "/depot": 1,
+        "/railyard": 43,
+        "/railyard/docs": 6,
         "/railyard/docs/v0.2/game-version-incompatibility": 3,
         "/railyard/docs/v0.2/installing-railyard": 3,
         "/railyard/updates": 2,
@@ -21085,67 +21088,89 @@
         "/registry/authors/WillBarouch": 1,
         "/registry/authors/ahkimn/subwaybuilder-jp-maps": 1,
         "/registry/authors/ahkimn/subwaybuilder-tw-maps": 1,
+        "/registry/docs": 1,
         "/registry/maps/arequipa": 1,
+        "/registry/maps/barcelona": 1,
         "/registry/maps/chiclayo": 1,
         "/registry/maps/ciudad-de-mexico": 1,
         "/registry/maps/glasgow-edinburgh": 1,
+        "/registry/maps/greater-los-angeles/versions": 1,
         "/registry/maps/jelegend-tokyo": 2,
         "/registry/maps/rhode-island": 1,
+        "/registry/maps/san-juan/versions": 1,
+        "/registry/maps/san-juan/versions/1.0.0": 1,
+        "/registry/maps/toronto": 1,
         "/registry/maps/yukina-cz-zlin": 1,
+        "/registry/maps/yukina-ee-tallinn": 1,
+        "/registry/maps/yukina-nagasaki": 1,
+        "/registry/maps/yukina-okinawa": 1,
+        "/registry/maps/yukina-osaka": 1,
         "/registry/maps/yukina-pl-kielce/versions/0.1.0": 1,
         "/registry/maps/yukina-pl-krakow": 1,
+        "/registry/maps/yukina-sapporo-chitose": 1,
+        "/registry/maps/yukina-sendai": 1,
         "/registry/mods": 1,
+        "/registry/mods/advanced-analytics": 1,
         "/registry/mods/copy-paste": 1,
         "/registry/mods/improved-schematics": 2,
+        "/registry/mods/map-markers": 1,
         "/registry/mods/mode-manager/versions": 1,
         "/registry/mods/scrollable-dropdowns/versions/v1.2.0": 1,
         "/registry/mods/subwaybuilder-regions": 1,
         "/registry/mods/valdotoriums-trains": 1,
+        "/template-mod": 2,
         "/template-mod/docs/v1.0/type-reference": 1,
         "/terms-of-service": 2
       },
       "countries": {
         "AU": 1,
         "BE": 17,
-        "CA": 4,
+        "CA": 13,
         "CN": 1,
+        "DE": 4,
+        "ES": 3,
+        "GB": 1,
+        "IL": 4,
+        "IN": 1,
         "JP": 1,
         "MX": 5,
-        "MY": 4,
+        "MY": 12,
         "NZ": 2,
         "OM": 1,
         "PH": 2,
         "PL": 1,
+        "PR": 2,
         "TH": 4,
         "TR": 1,
         "TW": 3,
-        "US": 77,
+        "UA": 2,
+        "US": 88,
         "VN": 1
       },
       "browsers": {
-        "BingBot": 5,
-        "Chrome": 26,
-        "ChromeMobile": 7,
-        "Edge": 4,
-        "Firefox": 1,
-        "GoogleBot": 11,
-        "MobileSafari": 3,
+        "BingBot": 6,
+        "Chrome": 40,
+        "ChromeMobile": 8,
+        "Edge": 6,
+        "Firefox": 6,
+        "GoogleBot": 17,
+        "MobileSafari": 9,
         "Opera": 2,
-        "Safari": 37,
-        "Unknown": 28,
+        "Safari": 38,
+        "Unknown": 37,
         "YandexBot": 1
       },
       "operating_systems": {
-        "Android": 17,
+        "Android": 24,
         "Linux": 2,
-        "MacOSX": 40,
-        "Unknown": 35,
-        "Windows": 28,
-        "iOS": 3
+        "MacOSX": 41,
+        "Unknown": 45,
+        "Windows": 49,
+        "iOS": 9
       },
       "devices": {
-        "desktop": 102,
-        "mobile": 23
+        "desktop": 133,
+        "mobile": 37
       }
     }
   }
