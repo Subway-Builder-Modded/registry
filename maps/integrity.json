@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-24T16:02:02.017Z",
+  "generated_at": "2026-07-24T16:32:24.549Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -376,6 +376,70 @@
           "fingerprint": "rules:v6:github:pswbsf/anchorage-ak:1.0.0:Anchorage.zip",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-04-03T17:00:46.000Z"
+        }
+      }
+    },
+    "antalya": {
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1784645572,
+      "versions": {
+        "v1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "ANT.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 16.81,
+          "file_sizes": {
+            "ANT.pmtiles": 8.62,
+            "buildings_index.bin.gz": 6.57,
+            "config.json": 0,
+            "demand_data.json.gz": 0.21,
+            "ocean_depth_index.json.gz": 0.5,
+            "ocean_depth_index_contours.json.gz": 0.37,
+            "roads.geojson.gz": 0.87,
+            "runways_taxiways.geojson.gz": 0.08
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-antalya",
+            "tag": "v1.0.0",
+            "asset_name": "antalya_flat_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-antalya/releases/download/v1.0.0/antalya_flat_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-antalya:v1.0.0:antalya_flat_v1.0.0.zip|antalya_v1.0.0.zip",
+          "checked_at": "2026-07-24T16:32:24.549Z",
+          "released_at": "2026-07-21T14:52:52.000Z"
         }
       }
     },
