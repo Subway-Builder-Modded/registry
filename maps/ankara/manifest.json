@@ -47,7 +47,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "ANK.pmtiles": 19.07,
+    "buildings_index.bin.gz": 13.82,
+    "config.json": 0,
+    "demand_data.json.gz": 0.76,
+    "ocean_depth_index.json.gz": 0.66,
+    "ocean_depth_index_contours.json.gz": 0.59,
+    "roads.geojson.gz": 3.27,
+    "runways_taxiways.geojson.gz": 0.09
+  },
   "included_cities": [
     "Çankaya",
     "Keçiören",
@@ -58,5 +67,91 @@
     "Gölbaşı",
     "Pursaklar",
     "Altındağ"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.03511018018922082,
+      "p25": 0.05574192088107725,
+      "p50": 0.09452045028356601,
+      "p75": 0.1549193635679881,
+      "p90": 0.2530845620320079,
+      "mean": 0.13177006116416912
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.007554721746866661,
+      "p25": 0.015499604319683955,
+      "p50": 0.039770933733980156,
+      "p75": 0.10454003297738777,
+      "p90": 0.4202371699977973,
+      "mean": 0.1309511722494792
+    },
+    "commuteDistanceKm": {
+      "p10": 4418,
+      "p25": 5718,
+      "p50": 8103,
+      "p75": 12590,
+      "p90": 20210,
+      "mean": 10550.527978042086
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 300,
+      "p50": 800,
+      "p75": 2500,
+      "p90": 5100,
+      "mean": 1860.5228758169935
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 500,
+      "p50": 1500,
+      "p75": 4200,
+      "p90": 9000,
+      "mean": 3675.935483870968
+    },
+    "detail": {
+      "radiusKm": 0.06131204257512279,
+      "expectedPointSpacingKm": 0.31781479078726615,
+      "normalizedRadius": 0.19291752414431484,
+      "activityPerPoint": 181.80168131448224,
+      "playableAreaKm2": 2116,
+      "playableAreaPerPointKm2": 0.13475990319704495,
+      "playableCatchmentRadiusKm": 0.20711206978056598,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8134694509644791,
+        "continuousScore": 0.7732351416381346,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.6855866051031834,
+        "largestCenterShare": 0.7159459128089258,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 32.851632003156,
+            "latitude": 39.95305110567481,
+            "massShare": 0.7159459128089258,
+            "assignedMass": 4087550,
+            "assignedPointCount": 10699,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 32.6114398930168,
+            "latitude": 39.97405406844465,
+            "massShare": 0.2840540871910742,
+            "assignedMass": 1621750,
+            "assignedPointCount": 5003,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784645563
 }
