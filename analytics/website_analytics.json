@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-07-25T10:01:18.915Z",
+  "generated_at": "2026-07-25T10:55:16.241Z",
   "valid_paths": [
     "/",
     "/community",
@@ -890,6 +890,7 @@
     "/registry/maps/louisville",
     "/registry/maps/lyon",
     "/registry/maps/madrid",
+    "/registry/maps/madrid/versions",
     "/registry/maps/madrid/versions/1.0.0",
     "/registry/maps/marseille",
     "/registry/maps/memphis",
@@ -897,6 +898,7 @@
     "/registry/maps/mexicali/versions/1.1.1",
     "/registry/maps/mfn-hamptonroads",
     "/registry/maps/mfn-hong-kong",
+    "/registry/maps/mfn-hong-kong/analytics",
     "/registry/maps/mfn-hong-kong/versions",
     "/registry/maps/mfn-hong-kong/versions/0.4.0",
     "/registry/maps/mfn-hong-kong/versions/0.5.0",
@@ -1307,8 +1309,8 @@
     "latest_hour": "2026-07-25T10:00:00.000Z",
     "total_days": 100,
     "total_hours": 1389,
-    "latest_day_visits": 28,
-    "latest_hour_visits": 0
+    "latest_day_visits": 49,
+    "latest_hour_visits": 21
   },
   "time_series": {
     "by_day": [
@@ -1710,7 +1712,7 @@
       },
       {
         "date": "2026-07-25",
-        "visits": 28
+        "visits": 49
       }
     ],
     "by_hour": [
@@ -7268,7 +7270,7 @@
       },
       {
         "hour": "2026-07-25T10:00:00.000Z",
-        "visits": 0
+        "visits": 21
       }
     ]
   },
@@ -21319,25 +21321,34 @@
       }
     },
     "2026-07-25": {
-      "captured_at": "2026-07-25T10:01:16.812Z",
+      "captured_at": "2026-07-25T10:55:14.251Z",
       "window_start": "2026-07-25T00:00:00.000Z",
       "window_end": "2026-07-25T11:00:00.000Z",
       "totals": {
-        "visits": 28
+        "visits": 49
       },
       "pages": {
-        "/": 8,
+        "/": 16,
         "/depot": 1,
         "/license": 1,
-        "/railyard": 1,
-        "/railyard/docs": 2,
+        "/railyard": 3,
+        "/railyard/docs": 4,
+        "/railyard/docs/v0.2/installing-railyard/windows": 1,
+        "/railyard/updates/v0.2.8": 1,
         "/registry": 1,
+        "/registry/authors/BarKuperman": 1,
+        "/registry/authors/Bobby-047": 1,
         "/registry/authors/kaicardenas0618": 1,
+        "/registry/authors/stefanorigano": 1,
         "/registry/maps/bangkok": 1,
         "/registry/maps/greater-los-angeles": 1,
         "/registry/maps/jelegend-tokyo/versions/v0.4.0": 1,
+        "/registry/maps/madrid/versions": 1,
         "/registry/maps/madrid/versions/1.0.0": 1,
+        "/registry/maps/mfn-hong-kong/analytics": 1,
+        "/registry/maps/pianura-veneta": 1,
         "/registry/maps/providence": 1,
+        "/registry/maps/tel-aviv": 1,
         "/registry/maps/valencia/versions": 2,
         "/registry/maps/valencia/versions/1.0.2": 1,
         "/registry/mods/chinese-trains/versions/v1.1.4": 1,
@@ -21347,38 +21358,48 @@
         "/terms-of-service": 1
       },
       "countries": {
+        "AU": 1,
+        "BE": 3,
         "CA": 1,
         "CL": 1,
         "CN": 1,
         "DE": 1,
+        "ES": 2,
+        "FR": 1,
+        "HU": 1,
+        "IL": 1,
         "JP": 1,
-        "MY": 1,
+        "LV": 1,
+        "MY": 2,
+        "NL": 2,
+        "NZ": 1,
         "SG": 1,
-        "TR": 1,
-        "US": 19,
+        "TR": 2,
+        "US": 25,
         "VN": 1
       },
       "browsers": {
-        "BingBot": 2,
-        "Chrome": 4,
-        "ChromeMobile": 1,
+        "BingBot": 3,
+        "Chrome": 16,
+        "ChromeMobile": 2,
         "Edge": 2,
-        "Firefox": 1,
-        "GoogleBot": 10,
+        "Firefox": 3,
+        "GoogleBot": 11,
         "MobileSafari": 1,
         "Safari": 1,
-        "Unknown": 6
+        "Unknown": 10
       },
       "operating_systems": {
-        "Android": 11,
-        "MacOSX": 2,
-        "Unknown": 8,
-        "Windows": 6,
+        "Android": 14,
+        "MacOSX": 7,
+        "Unknown": 13,
+        "Windows": 14,
         "iOS": 1
       },
       "devices": {
-        "desktop": 16,
-        "mobile": 12
+        "desktop": 34,
+        "mobile": 14,
+        "tablet": 1
       }
     }
   }
