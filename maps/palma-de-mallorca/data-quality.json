@@ -10,7 +10,7 @@
     "resident_granularity": "adm3",
     "resident_resolution": "ml_hybrid_footprints",
     "resident_intensity": "fine_types_generic",
-    "od_metric": "synthetic_measured_marginals",
+    "od_metric": "none",
     "od_granularity": null
   },
   "notes": "Residential and employment capacities are inferred by aggregating OpenStreetMap data (building geometries and road network densities). Strict spatial constraints are enforced via land-use polygons—such as reallocating inferred residential capacities within industrial zones exclusively to employment. The resulting spatial distribution is then calibrated against census data to ensure demographic accuracy. Origin-Destination flows are generated via a stochastic gravity model based on distance-decay functions, with real-world network driving times and distances resolved through the Open Source Routing Machine (OSRM). If needed, points are slightly modified or moved manually.",
