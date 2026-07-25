@@ -270,6 +270,27 @@ export const PIPELINE_ENCODINGS: readonly PipelineEncoding[] = [
     expectedDoc: { raw: 0.08, weighted: 0.17, tier: "very-low" },
   },
   {
+    country: "ES",
+    registryAuthor: "Maximilian284",
+    docAuthor: "Max02",
+    confirmed: true,
+    answers: {
+      workplace_count: "estimated_proxy",
+      workplace_granularity: "adm3",
+      workplace_resolution: "ml_hybrid_footprints",
+      workplace_intensity: "fine_types_generic",
+      resident_count: "working_age",
+      resident_granularity: "adm3",
+      resident_resolution: "ml_hybrid_footprints",
+      resident_intensity: "fine_types_generic",
+      od_metric: "none",
+      od_granularity: null,
+    },
+    notes:
+      "Residential and employment capacities inferred from OSM/Overture footprints and road density with land-use constraints, calibrated to municipal census totals (working-age, municipio grain); workplace magnitude estimated from indirect statistics; single-pass capacity-depletion gravity reproduces no marginal (O/D none). Reviewed via palma-de-mallorca (#5967). docs/data-quality.md §7 (ES / Max02).",
+    expectedDoc: { raw: 0.12, weighted: 0.26, tier: "very-low" },
+  },
+  {
     country: "MX",
     registryAuthor: "rslurry",
     docAuthor: "slurry",
