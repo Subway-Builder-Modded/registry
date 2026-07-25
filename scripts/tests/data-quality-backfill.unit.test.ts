@@ -1,10 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
+  OSM_PATCHER_ANSWERS,
+  OSM_PATCHER_MAPS,
   PIPELINE_ENCODINGS,
   findPipelineEncoding,
   recomputeEncoding,
 } from "../lib/data-quality-backfill.js";
+import { computeScores } from "../lib/data-quality.js";
 import { applyMapManifestUpdates } from "../lib/map-update-logic.js";
 import type { MapManifest } from "../lib/manifests.js";
 
@@ -17,6 +20,29 @@ test("all pipeline encodings are confirmed and reproduce the doc §8 table exact
     assert.equal(recomputed.weighted, encoding.expectedDoc.weighted, `${label} weighted`);
     assert.equal(recomputed.tier, encoding.expectedDoc.tier, `${label} tier`);
   }
+});
+
+test("OSM patcher cohort scores zero and lands on absent by construction", () => {
+  const scores = computeScores(OSM_PATCHER_ANSWERS);
+  assert.equal(scores.raw_score, 0);
+  assert.equal(scores.weighted_score, 0);
+  assert.equal(scores.tier, "absent");
+  // Maintainer-validated cohort (2026-07-26 review of publish-issue methodologies).
+  assert.deepEqual(
+    OSM_PATCHER_MAPS.map((p) => p.id).sort(),
+    [
+      "berlin-val",
+      "cairo",
+      "greater-kuala-lumpur",
+      "ipoh",
+      "johor-bahru",
+      "pulau-pinang",
+      "pyongyang-nk",
+      "singapore-val",
+      "trondheim-val",
+      "warsaw-val",
+    ],
+  );
 });
 
 test("pipeline matching is exact on (country, registry author) plus shared data sources", () => {

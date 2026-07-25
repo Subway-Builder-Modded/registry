@@ -390,3 +390,44 @@ export function recomputeEncoding(encoding: PipelineEncoding): EncodingRecomputa
     weightedDelta: roundScore(weighted - encoding.expectedDoc.weighted),
   };
 }
+
+/**
+ * The community OSM patcher cohort (docs/data-quality.md §7/§8 "OSM (patcher)"
+ * row): pipelines with no census anchor at all — counts invented from OSM
+ * building footprints. Matched by EXPLICIT map id, maintainer-validated
+ * against each publish issue's methodology (2026-07-26 review), because the
+ * cohort spans authors and countries. Scores are zero by construction
+ * (count none + granularity none → G = 0), so the tier is always absent.
+ */
+export const OSM_PATCHER_ANSWERS: DataQualityAnswers = {
+  workplace_count: "none",
+  workplace_granularity: "none",
+  workplace_resolution: "osm_footprints",
+  workplace_intensity: "size_only",
+  resident_count: "none",
+  resident_granularity: "none",
+  resident_resolution: "osm_footprints",
+  resident_intensity: "size_only",
+  od_metric: "none",
+  od_granularity: null,
+};
+
+export const OSM_PATCHER_MAPS: readonly { id: string; issue: number }[] = [
+  { id: "greater-kuala-lumpur", issue: 234 },
+  { id: "ipoh", issue: 1146 },
+  { id: "johor-bahru", issue: 1160 },
+  { id: "pulau-pinang", issue: 1155 },
+  { id: "pyongyang-nk", issue: 806 },
+  { id: "berlin-val", issue: 197 },
+  { id: "singapore-val", issue: 198 },
+  { id: "trondheim-val", issue: 201 },
+  { id: "warsaw-val", issue: 205 },
+  { id: "cairo", issue: 430 },
+];
+
+export function osmPatcherNotes(issue: number): string {
+  return (
+    "Community OSM patcher pipeline: no census or official statistics anchor; resident and job counts derived from OSM building footprints. " +
+    `Methodology validated against publish issue #${issue} (2026-07-26 maintainer review). docs/data-quality.md §7 (OSM patcher).`
+  );
+}

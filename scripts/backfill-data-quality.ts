@@ -3,12 +3,16 @@ import { resolve } from "node:path";
 import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
 import { readJsonFile } from "./lib/json-utils.js";
 import {
+  OSM_PATCHER_ANSWERS,
+  OSM_PATCHER_MAPS,
   PIPELINE_ENCODINGS,
   findPipelineEncoding,
+  osmPatcherNotes,
   recomputeEncoding,
   type PipelineEncoding,
 } from "./lib/data-quality-backfill.js";
 import { checkMapDataQuality } from "./lib/data-quality-check.js";
+import { computeScores, roundScore } from "./lib/data-quality.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");
 const MAPS_DIR = resolve(REPO_ROOT, "maps");
@@ -51,6 +55,7 @@ function main(): void {
 
   const maps = listMaps();
   const matched = new Map<PipelineEncoding, MapEntry[]>();
+  const patcherMatched: { entry: MapEntry; issue: number }[] = [];
   const skippedScored: string[] = [];
   const skippedTest: string[] = [];
   const unmatched = new Map<string, string[]>();
@@ -64,6 +69,11 @@ function main(): void {
     }
     if (manifest.is_test === true) {
       skippedTest.push(entry.id);
+      continue;
+    }
+    const patcher = OSM_PATCHER_MAPS.find((p) => p.id === entry.id);
+    if (patcher) {
+      patcherMatched.push({ entry, issue: patcher.issue });
       continue;
     }
     const encoding = findPipelineEncoding(
@@ -97,6 +107,12 @@ function main(): void {
         `${entries.length} maps → ${recomputed.tier} (raw ${recomputed.raw}, weighted ${recomputed.weighted}; ${delta})`,
     );
   }
+
+  console.log(
+    `\nOSM patcher (maintainer-validated ids): ${patcherMatched.length} maps → absent (${patcherMatched
+      .map((p) => p.entry.id)
+      .join(", ") || "none pending"})`,
+  );
 
   console.log("\n=== Unmatched (will receive the unknown marker) ===");
   for (const [key, ids] of [...unmatched.entries()].sort()) {
@@ -156,6 +172,42 @@ function main(): void {
       );
       scoredCount += 1;
     }
+  }
+
+  const patcherScores = computeScores(OSM_PATCHER_ANSWERS);
+  for (const { entry, issue } of patcherMatched) {
+    const answersFile = {
+      schema_version: 1,
+      id: entry.id,
+      answers: OSM_PATCHER_ANSWERS,
+      notes: osmPatcherNotes(issue),
+      provenance: {
+        method: "backfill",
+        submitted_by: reviewer,
+        reviewed_by: reviewer,
+        date,
+      },
+    };
+    writeFileSync(
+      resolve(MAPS_DIR, entry.id, "data-quality.json"),
+      `${JSON.stringify(answersFile, null, 2)}\n`,
+    );
+    entry.manifest.data_quality = {
+      tier: patcherScores.tier,
+      raw_score: roundScore(patcherScores.raw_score),
+      weighted_score: roundScore(patcherScores.weighted_score),
+      rubric_version: RUBRIC_VERSION,
+      provenance: "backfill",
+    };
+    writeManifest(entry.id, entry.manifest);
+    verifyErrors.push(
+      ...checkMapDataQuality({
+        id: entry.id,
+        manifestDataQuality: entry.manifest.data_quality,
+        answersFile,
+      }),
+    );
+    scoredCount += 1;
   }
 
   const needsMarker = [
