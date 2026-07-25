@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "id": "amba",
+  "name": "Buenos Aires",
+  "author": "hernang87",
+  "github_id": 5214315,
+  "description": "This map uses INDEC Census 2022 data at census-radio level for geography and employed residents (Ocupado) as trip producers. Formal workplace capacity comes from CEP XXI/SIPA 2022 geocoded establishments, retained at their source coordinates rather than collapsed to output grid centroids. Total residential population is not used as demand. Census geometry is identified with cod_indec and represented by points inside each polygon.\n\nThe official 2022 geocoded establishment dataset is filtered to AMBA. Each establishment keeps its rounded WGS84 coordinate and its employment-band capacity (1–9: 5, 10–49: 29.5, 50–199: 124.5, 200–499: 349.5, 500+: 500). A 0.005-degree cell is used only as an internal balancing index; exported job points remain at establishment coordinates.\n\nFormal workplace capacity is balanced against scaled employed-resident origins with a 12 km doubly constrained gravity model. The formal layer contains 4,127,148 modeled jobs. The remaining 3,667,547 employed residents are represented as local residual employment at their residential origins because the available data does not locate those jobs. Every exported population and job point is capped at 200. These are modeled commuter flows, not observed individual commutes. The workplace source covers formal registered salaried employment and excludes informal, self-employed, domestic, and uncovered public employment.\n\nOSM is used only for roads, buildings, airports, and geographic context; it is not used to estimate population or employment.",
+  "tags": [
+    "south-america",
+    "airports",
+    "entertainment"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/hernang87/AMBA-Buenos-Aires-Metropolitan-Area-for-Subway-Builder/releases/latest/download/amba.zip",
+  "update": {
+    "type": "github",
+    "repo": "hernang87/AMBA-Buenos-Aires-Metropolitan-Area-for-Subway-Builder"
+  },
+  "city_code": "BUE",
+  "country": "AR",
+  "population": 7794695,
+  "residents_total": 7794695,
+  "points_count": 1502,
+  "population_count": 41522,
+  "initial_view_state": {
+    "latitude": -34.65,
+    "longitude": -58.45,
+    "zoom": 10,
+    "bearing": 0
+  },
+  "data_source": "OSM",
+  "source_quality": "low-quality",
+  "level_of_detail": "medium-detail",
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  },
+  "location": "south-america",
+  "special_demand": [
+    "airports",
+    "entertainment"
+  ],
+  "file_sizes": {}
+}
