@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "updated_at": "2026-07-26T15:00:38.601Z",
+  "updated_at": "2026-07-26T15:43:51.608Z",
   "valid_paths": [
     "/",
     "/community",
@@ -926,6 +926,7 @@
     "/registry/maps/monterrey/versions/1.2.0",
     "/registry/maps/montpellier-mediterranee",
     "/registry/maps/montreal",
+    "/registry/maps/montreal/versions/1.0.1",
     "/registry/maps/naples",
     "/registry/maps/naples/details",
     "/registry/maps/nashville",
@@ -965,6 +966,7 @@
     "/registry/maps/rochester/gallery",
     "/registry/maps/rome",
     "/registry/maps/rotterdam-the-hague",
+    "/registry/maps/rotterdam-the-hague/versions",
     "/registry/maps/rotterdam-the-hague/versions/1.0.0",
     "/registry/maps/rotterdam-the-hague/versions/1.1.0",
     "/registry/maps/sacramento",
@@ -53891,17 +53893,61 @@
       "devices": {}
     },
     "2026-07-26T15:00:00.000Z": {
-      "captured_at": "2026-07-26T15:00:38.601Z",
+      "captured_at": "2026-07-26T15:43:51.608Z",
       "window_start": "2026-07-26T15:00:00.000Z",
       "window_end": "2026-07-26T16:00:00.000Z",
       "totals": {
-        "visits": 0
+        "visits": 30
       },
-      "pages": {},
-      "countries": {},
-      "browsers": {},
-      "operating_systems": {},
-      "devices": {}
+      "pages": {
+        "/": 10,
+        "/depot": 2,
+        "/railyard": 5,
+        "/railyard/docs": 1,
+        "/railyard/updates/v0.1.0": 1,
+        "/registry": 1,
+        "/registry/authors/DanielD1909": 1,
+        "/registry/authors/soccerjonj": 1,
+        "/registry/maps/monterrey/versions/1.0.0": 1,
+        "/registry/maps/montreal/versions/1.0.1": 1,
+        "/registry/maps/paris-ile-de-france": 1,
+        "/registry/maps/rotterdam-the-hague/versions": 1,
+        "/registry/maps/yukina-ee-tartu": 1,
+        "/registry/mods": 1,
+        "/template-mod/docs": 1,
+        "/terms-of-service": 1
+      },
+      "countries": {
+        "CA": 3,
+        "CH": 1,
+        "DE": 5,
+        "GB": 2,
+        "JP": 1,
+        "MD": 1,
+        "RS": 1,
+        "SA": 1,
+        "US": 15
+      },
+      "browsers": {
+        "Chrome": 3,
+        "ChromeMobile": 1,
+        "Firefox": 5,
+        "GoogleBot": 5,
+        "MobileSafari": 1,
+        "Opera": 1,
+        "Unknown": 14
+      },
+      "operating_systems": {
+        "Android": 5,
+        "Linux": 3,
+        "Unknown": 14,
+        "Windows": 6,
+        "iOS": 2
+      },
+      "devices": {
+        "desktop": 23,
+        "mobile": 7
+      }
     }
   },
   "daily_snapshots": {
@@ -68163,41 +68209,51 @@
       }
     },
     "2026-07-26": {
-      "captured_at": "2026-07-26T15:00:38.601Z",
+      "captured_at": "2026-07-26T15:43:51.608Z",
       "window_start": "2026-07-26T00:00:00.000Z",
       "window_end": "2026-07-26T16:00:00.000Z",
       "totals": {
-        "visits": 82
+        "visits": 112
       },
       "pages": {
-        "/": 43,
+        "/": 53,
         "/credits": 1,
-        "/railyard": 4,
-        "/railyard/docs": 1,
+        "/depot": 2,
+        "/railyard": 9,
+        "/railyard/docs": 2,
+        "/railyard/updates/v0.1.0": 1,
         "/railyard/updates/v0.2.8": 1,
-        "/registry": 6,
+        "/registry": 7,
+        "/registry/authors/DanielD1909": 1,
         "/registry/authors/rexmhall09": 1,
         "/registry/authors/rslurry": 1,
+        "/registry/authors/soccerjonj": 1,
         "/registry/maps/berlin-val": 1,
         "/registry/maps/greater-los-angeles": 1,
         "/registry/maps/helsinki/versions/1.2.0": 1,
         "/registry/maps/incheon-4": 1,
         "/registry/maps/mfn-hong-kong/versions": 1,
+        "/registry/maps/monterrey/versions/1.0.0": 1,
+        "/registry/maps/montreal/versions/1.0.1": 1,
+        "/registry/maps/paris-ile-de-france": 1,
         "/registry/maps/puerto-rico/versions/1.0.1": 1,
+        "/registry/maps/rotterdam-the-hague/versions": 1,
         "/registry/maps/sevilla": 1,
         "/registry/maps/yukina-bydgoszcz-torun": 1,
         "/registry/maps/yukina-cz-jihlava": 1,
+        "/registry/maps/yukina-ee-tartu": 1,
         "/registry/maps/yukina-kagoshima-kirishima": 1,
         "/registry/maps/yukina-tw-hsinchu": 1,
         "/registry/maps/yukina-tw-taipei": 1,
-        "/registry/mods": 1,
+        "/registry/mods": 2,
         "/registry/mods/chinese-trains/versions/v1.0.0": 1,
         "/registry/mods/distance-circles": 1,
         "/registry/mods/subway-builder-performance": 1,
         "/registry/mods/track-anarchy": 2,
         "/registry/world-map": 1,
         "/template-mod": 2,
-        "/terms-of-service": 1,
+        "/template-mod/docs": 1,
+        "/terms-of-service": 2,
         "/website/updates/v1.1.0": 2
       },
       "countries": {
@@ -68205,46 +68261,50 @@
         "AU": 3,
         "AZ": 1,
         "BE": 18,
-        "CA": 1,
-        "CH": 2,
+        "CA": 4,
+        "CH": 3,
         "CZ": 1,
-        "DE": 1,
+        "DE": 6,
         "DK": 1,
         "FR": 3,
+        "GB": 2,
         "GE": 1,
         "IE": 1,
         "IT": 1,
-        "JP": 1,
+        "JP": 2,
         "KR": 2,
+        "MD": 1,
         "PL": 1,
+        "RS": 1,
         "RU": 5,
+        "SA": 1,
         "TR": 2,
         "UA": 1,
-        "US": 31
+        "US": 46
       },
       "browsers": {
         "BingBot": 1,
-        "Chrome": 23,
-        "ChromeMobile": 1,
+        "Chrome": 26,
+        "ChromeMobile": 2,
         "Edge": 6,
-        "Firefox": 4,
-        "GoogleBot": 10,
-        "MobileSafari": 2,
-        "Opera": 2,
-        "Unknown": 28,
+        "Firefox": 9,
+        "GoogleBot": 15,
+        "MobileSafari": 3,
+        "Opera": 3,
+        "Unknown": 42,
         "YandexBot": 4
       },
       "operating_systems": {
-        "Android": 12,
-        "Linux": 1,
+        "Android": 17,
+        "Linux": 4,
         "MacOSX": 3,
-        "Unknown": 33,
-        "Windows": 32,
-        "iOS": 2
+        "Unknown": 47,
+        "Windows": 38,
+        "iOS": 4
       },
       "devices": {
-        "desktop": 67,
-        "mobile": 15
+        "desktop": 90,
+        "mobile": 22
       }
     }
   }
