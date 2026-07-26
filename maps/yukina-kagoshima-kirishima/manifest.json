@@ -25,7 +25,7 @@
   },
   "city_code": "KOJ",
   "country": "JP",
-  "population": 542021,
+  "population": 751766,
   "level_of_detail": "high-detail",
   "source_quality": "high-quality",
   "data_source": "統計局・令和２年国勢調査・令和3年経済センサス",
@@ -37,82 +37,86 @@
     "schools",
     "universities"
   ],
-  "residents_total": 542021,
-  "points_count": 3562,
-  "population_count": 10719,
+  "residents_total": 751766,
+  "points_count": 9537,
+  "population_count": 17834,
   "initial_view_state": {
-    "latitude": 31.620852,
-    "longitude": 130.565392,
+    "latitude": 31.618696,
+    "longitude": 130.527374,
     "zoom": 12,
     "bearing": 0
   },
   "file_sizes": {
-    "KOJ.pmtiles": 23.17,
-    "buildings_index.json": 51.21,
-    "config.json": 0,
-    "demand_data.json": 77.94,
-    "roads.geojson": 18.29,
-    "runways_taxiways.geojson": 0.51,
-    "water.geojson": 3.09
+    ".railyard_map/landuse_provenance.parquet": 15.63,
+    ".railyard_map/special_demand_points.json": 0.19,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "KOJ.pmtiles": 70.68,
+    "buildings_index.bin.gz": 37.89,
+    "buildings_index.json": 106.33,
+    "config.json": 0.01,
+    "demand_data.json": 100.4,
+    "ocean_depth_index.json": 74.41,
+    "roads.geojson": 36.57,
+    "runways_taxiways.geojson": 0.52
   },
   "is_test": false,
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.12774759641043743,
-      "p25": 0.15029226430978895,
-      "p50": 0.20215110700267402,
-      "p75": 0.25410412957492545,
-      "p90": 0.3009037349338018,
-      "mean": 0.22021421958590728
+      "p10": 0.13508929832196281,
+      "p25": 0.15553195274733275,
+      "p50": 0.1813685131905434,
+      "p75": 0.2327732813757179,
+      "p90": 0.2954118907494642,
+      "mean": 0.21189791908282918
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.12747802130636995,
-      "p25": 0.12811998510890688,
-      "p50": 0.17097124760667937,
-      "p75": 0.23773309432509257,
-      "p90": 0.31982911370358613,
-      "mean": 0.20710342479970598
+      "p10": 0.12540566443229775,
+      "p25": 0.14092343622208064,
+      "p50": 0.16500452624111225,
+      "p75": 0.20558426847257888,
+      "p90": 0.27705331192317606,
+      "mean": 0.1909569950434562
     },
     "commuteDistanceKm": {
-      "p10": 1447,
-      "p25": 3028,
-      "p50": 6314,
-      "p75": 13043,
-      "p90": 25205,
-      "mean": 10515.606493143017
+      "p10": 1620,
+      "p25": 3893,
+      "p50": 8408,
+      "p75": 18889,
+      "p90": 37764,
+      "mean": 14481.698385107098
     },
     "residentCellDensity": {
-      "p10": 44,
-      "p25": 68,
-      "p50": 165,
-      "p75": 735,
-      "p90": 2323,
-      "mean": 715.4795244385733
+      "p10": 20,
+      "p25": 32,
+      "p50": 72,
+      "p75": 205,
+      "p90": 850,
+      "mean": 342.8978102189781
     },
     "workerCellDensity": {
-      "p10": 41,
-      "p25": 66,
-      "p50": 176,
-      "p75": 593,
-      "p90": 1679,
-      "mean": 745.222833562586
+      "p10": 21,
+      "p25": 38,
+      "p50": 102,
+      "p75": 327,
+      "p90": 1015,
+      "mean": 443.0731132075472
     },
     "detail": {
-      "radiusKm": 0.18590865221747618,
-      "expectedPointSpacingKm": 0.5046109680583487,
-      "normalizedRadius": 0.36841976093547646,
-      "activityPerPoint": 152.16760247052218,
-      "playableAreaKm2": 1307,
-      "playableAreaPerPointKm2": 0.36692869174621,
-      "playableCatchmentRadiusKm": 0.3417558047894773,
-      "localityScore": 0.9456941522354997,
+      "radiusKm": 0.17299313741897548,
+      "expectedPointSpacingKm": 0.5070541500502188,
+      "normalizedRadius": 0.34117290510656934,
+      "activityPerPoint": 78.82625563594422,
+      "playableAreaKm2": 4052,
+      "playableAreaPerPointKm2": 0.42487155289923456,
+      "playableCatchmentRadiusKm": 0.3677510239905332,
+      "localityScore": 1,
       "deaggregationScore": 1,
-      "score": 0.9724680726046998
+      "score": 1
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.2485811532611703,
+        "continuousScore": 0.9754529835182464,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +126,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 130.56914682653345,
-            "latitude": 31.620623534114543,
+            "longitude": 130.5309730003677,
+            "latitude": 31.618233942359087,
             "massShare": 1,
-            "assignedMass": 1084042,
-            "assignedPointCount": 3562,
+            "assignedMass": 1503532,
+            "assignedPointCount": 9537,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1774224000,
+  "last_updated": 1785110400,
   "search_aliases": [
     "霧島",
     "Kirishima",
