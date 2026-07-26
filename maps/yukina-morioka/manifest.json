@@ -27,13 +27,13 @@
   },
   "city_code": "HNA",
   "country": "JP",
-  "population": 407181,
-  "residents_total": 407181,
-  "points_count": 6254,
-  "population_count": 14837,
+  "population": 578328,
+  "residents_total": 578328,
+  "points_count": 15979,
+  "population_count": 25126,
   "initial_view_state": {
-    "latitude": 39.611857,
-    "longitude": 141.129203,
+    "latitude": 39.465731,
+    "longitude": 141.142097,
     "zoom": 12,
     "bearing": 0
   },
@@ -50,103 +50,112 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/special_demand_points.json": 0.08,
-    ".railyard_map/special_demand_types.json": 0.02,
-    "HNA.pmtiles": 38.23,
-    "buildings_index.json": 76.01,
+    ".railyard_map/landuse_provenance.parquet": 22.31,
+    ".railyard_map/special_demand_points.json": 0.14,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "HNA.pmtiles": 93.06,
+    "buildings_index.bin.gz": 46.08,
+    "buildings_index.json": 127.48,
     "config.json": 0.01,
-    "demand_data.json": 38.19,
-    "ocean_depth_index.json": 14.42,
-    "roads.geojson": 14.51,
-    "runways_taxiways.geojson": 0.06,
-    "water.geojson": 19.67
+    "demand_data.json": 106.98,
+    "ocean_depth_index.json": 72.25,
+    "roads.geojson": 25.44,
+    "runways_taxiways.geojson": 0.06
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.10706884418545554,
-      "p25": 0.13651448710112413,
-      "p50": 0.1796891377821131,
-      "p75": 0.21393329099133931,
-      "p90": 0.2861984577516494,
-      "mean": 0.2047670397598339
+      "p10": 0.10509968953136263,
+      "p25": 0.12177072870936448,
+      "p50": 0.15800911490907685,
+      "p75": 0.20606076879365273,
+      "p90": 0.29441986642589346,
+      "mean": 0.1901010440636177
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.10475038141897412,
-      "p25": 0.11237474216317687,
-      "p50": 0.1531656099466328,
-      "p75": 0.21347745059149634,
-      "p90": 0.2832550301275611,
-      "mean": 0.18597246553711144
+      "p10": 0.08878329284924943,
+      "p25": 0.10679611527184314,
+      "p50": 0.1386005431280264,
+      "p75": 0.1901134744182306,
+      "p90": 0.24950272798874795,
+      "mean": 0.16387323057360642
     },
     "commuteDistanceKm": {
-      "p10": 1682,
-      "p25": 3256,
-      "p50": 6529,
-      "p75": 12884,
-      "p90": 24422,
-      "mean": 10501.445642650131
+      "p10": 2431,
+      "p25": 4932,
+      "p50": 9617,
+      "p75": 19454,
+      "p90": 37305,
+      "mean": 16340.040038207435
     },
     "residentCellDensity": {
-      "p10": 27,
-      "p25": 42,
-      "p50": 87,
-      "p75": 206,
-      "p90": 752,
-      "mean": 291.7985663082437
+      "p10": 13,
+      "p25": 22,
+      "p50": 46,
+      "p75": 104,
+      "p90": 305,
+      "mean": 158.00273224043715
     },
     "workerCellDensity": {
-      "p10": 26,
-      "p25": 39,
-      "p50": 88,
-      "p75": 295,
-      "p90": 913,
-      "mean": 371.6091324200913
+      "p10": 12,
+      "p25": 22,
+      "p50": 54,
+      "p75": 197,
+      "p90": 618,
+      "mean": 253.08665207877462
     },
     "detail": {
-      "radiusKm": 0.16589815065027666,
-      "expectedPointSpacingKm": 0.4983182462165239,
-      "normalizedRadius": 0.33291606701110515,
-      "activityPerPoint": 65.10729133354653,
-      "playableAreaKm2": 2340,
-      "playableAreaPerPointKm2": 0.37416053725615606,
-      "playableCatchmentRadiusKm": 0.34510722685633954,
+      "radiusKm": 0.14798698978483474,
+      "expectedPointSpacingKm": 0.4927663742009497,
+      "normalizedRadius": 0.3003187667275482,
+      "activityPerPoint": 36.19300331685337,
+      "playableAreaKm2": 5384,
+      "playableAreaPerPointKm2": 0.33694223668564993,
+      "playableCatchmentRadiusKm": 0.3274935801048947,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
     },
     "polycentrism": {
       "activity": {
-        "score": 0.8146579517433166,
-        "continuousScore": 0.9014395286851206,
-        "detectedCenterCount": 2,
-        "effectiveCenterCount": 1.6872766835036834,
-        "largestCenterShare": 0.7152568513756782,
+        "score": 0.9237956257088414,
+        "continuousScore": 0.9287839489499062,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.603242993157223,
+        "largestCenterShare": 0.515976228022852,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 141.13383768410043,
-            "latitude": 39.70989033662367,
-            "massShare": 0.7152568513756782,
-            "assignedMass": 582478,
-            "assignedPointCount": 4011,
+            "longitude": 141.13880595215417,
+            "latitude": 39.725996548829954,
+            "massShare": 0.515976228022852,
+            "assignedMass": 596807,
+            "assignedPointCount": 6441,
             "prominenceRatio": 1
           },
           {
-            "longitude": 141.11225523764213,
-            "latitude": 39.35041532059347,
-            "massShare": 0.2847431486243219,
-            "assignedMass": 231884,
-            "assignedPointCount": 2243,
+            "longitude": 141.1694088571766,
+            "latitude": 39.034447313228675,
+            "massShare": 0.2615730173880566,
+            "assignedMass": 302550,
+            "assignedPointCount": 5625,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 141.10578115860417,
+            "latitude": 39.34574621552531,
+            "massShare": 0.2224507545890913,
+            "assignedMass": 257299,
+            "assignedPointCount": 3913,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1776297600,
+  "last_updated": 1785110400,
   "search_aliases": [
     "Morioka",
     "盛岡市",

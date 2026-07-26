@@ -27,13 +27,13 @@
   },
   "city_code": "AKJ",
   "country": "JP",
-  "population": 231968,
-  "residents_total": 231968,
-  "points_count": 3231,
-  "population_count": 8448,
+  "population": 317914,
+  "residents_total": 317914,
+  "points_count": 6738,
+  "population_count": 11845,
   "initial_view_state": {
-    "latitude": 43.769907,
-    "longitude": 142.393313,
+    "latitude": 43.784362,
+    "longitude": 142.382213,
     "zoom": 12,
     "bearing": 0
   },
@@ -50,66 +50,67 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/special_demand_points.json": 0.05,
-    ".railyard_map/special_demand_types.json": 0.02,
-    "AKJ.pmtiles": 21.68,
-    "buildings_index.json": 52.83,
+    ".railyard_map/landuse_provenance.parquet": 11.1,
+    ".railyard_map/special_demand_points.json": 0.09,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "AKJ.pmtiles": 58.07,
+    "buildings_index.bin.gz": 27.01,
+    "buildings_index.json": 75.93,
     "config.json": 0.01,
-    "demand_data.json": 9.79,
-    "ocean_depth_index.json": 4.14,
-    "roads.geojson": 4.58,
-    "runways_taxiways.geojson": 0.13,
-    "water.geojson": 6.62
+    "demand_data.json": 24.77,
+    "ocean_depth_index.json": 73.58,
+    "roads.geojson": 11.08,
+    "runways_taxiways.geojson": 0.13
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.10253930687432726,
-      "p25": 0.11412001556450711,
-      "p50": 0.13669421958273323,
-      "p75": 0.17183215570886304,
-      "p90": 0.19446961608262067,
-      "mean": 0.17031881447178812
+      "p10": 0.10374634527652574,
+      "p25": 0.10812644645598553,
+      "p50": 0.12279806356322494,
+      "p75": 0.15340282628164667,
+      "p90": 0.204786575190782,
+      "mean": 0.16815831050264662
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.09466234753657761,
-      "p25": 0.10267237681134363,
-      "p50": 0.1280250646701683,
-      "p75": 0.16534925775623294,
-      "p90": 0.22255790419319837,
-      "mean": 0.16118175061669135
+      "p10": 0.07773722983913223,
+      "p25": 0.09237655750617613,
+      "p50": 0.11282311171227438,
+      "p75": 0.15010664561882794,
+      "p90": 0.21370408667737856,
+      "mean": 0.14646436647724254
     },
     "commuteDistanceKm": {
-      "p10": 1314,
-      "p25": 2758,
-      "p50": 4929,
-      "p75": 8100,
-      "p90": 12550,
-      "mean": 6525.745501893939
+      "p10": 1205,
+      "p25": 2976,
+      "p50": 6171,
+      "p75": 11368,
+      "p90": 32509,
+      "mean": 11803.7056141832
     },
     "residentCellDensity": {
-      "p10": 27,
-      "p25": 36,
-      "p50": 89,
-      "p75": 722,
-      "p90": 1829,
-      "mean": 530.533180778032
+      "p10": 10,
+      "p25": 14,
+      "p50": 22,
+      "p75": 71,
+      "p90": 748,
+      "mean": 212.78246318607765
     },
     "workerCellDensity": {
-      "p10": 28,
-      "p25": 41,
-      "p50": 121,
-      "p75": 700,
-      "p90": 1593,
-      "mean": 582.1666666666666
+      "p10": 10,
+      "p25": 19,
+      "p50": 55,
+      "p75": 298,
+      "p90": 1083,
+      "mean": 339.6983957219251
     },
     "detail": {
-      "radiusKm": 0.1322886476690937,
-      "expectedPointSpacingKm": 0.4076793030229492,
-      "normalizedRadius": 0.3244919393458806,
-      "activityPerPoint": 71.79449086969979,
-      "playableAreaKm2": 984,
-      "playableAreaPerPointKm2": 0.3045496750232126,
-      "playableCatchmentRadiusKm": 0.31135377369473016,
+      "radiusKm": 0.1177049686438287,
+      "expectedPointSpacingKm": 0.5058283045379258,
+      "normalizedRadius": 0.23269747380260225,
+      "activityPerPoint": 47.182249925794004,
+      "playableAreaKm2": 3084,
+      "playableAreaPerPointKm2": 0.4577025823686554,
+      "playableCatchmentRadiusKm": 0.38169524086605244,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -117,7 +118,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.24478125695879815,
+        "continuousScore": 0.7962883268733467,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -127,18 +128,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 142.39481847090818,
-            "latitude": 43.76755915560284,
+            "longitude": 142.38699045357072,
+            "latitude": 43.782042424871726,
             "massShare": 1,
-            "assignedMass": 463936,
-            "assignedPointCount": 3231,
+            "assignedMass": 635828,
+            "assignedPointCount": 6738,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1776297600,
+  "last_updated": 1785110400,
   "search_aliases": [
     "旭川",
     "Асахикава",
