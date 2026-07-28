@@ -4,7 +4,7 @@
   "name": "Oklahoma City",
   "author": "ryandicicco",
   "github_id": 215120742,
-  "description": "Custom map of the Oklahoma City metro area featuring 378,004 buildings merged from five authoritative sources (Overture, OKC City Government 2020 aerial survey, FEMA/ORNL satellite imagery, Microsoft, and OpenStreetMap). High-quality LODES-based demand data with pre-calculated commute routes, airports (Will Rogers World / OKC), 7 universities, Tinker AFB military base, and entertainment venues (OKC Zoo, State Fair Park, Bricktown). Population ~1.1M covering the core metro plus surrounding areas.",
+  "description": "# Oklahoma City · OKC\n\nOklahoma City, Oklahoma; crossroads of the Great Plains. A wide, low-slung metro sprawled across the prairie, modeled from downtown and Bricktown out to Tinker AFB and Will Rogers World Airport.\n\n## Coverage\n\n<table style=\"width: auto\">\n<tr><td><strong>Region</strong></td><td>Oklahoma City metro, Oklahoma (US)</td></tr>\n<tr><td><strong>Bounding Box</strong></td><td>-97.85, 35.13 → -97.20, 35.73</td></tr>\n<tr><td><strong>Playable Area</strong></td><td>~3,910 km²</td></tr>\n</table>\n\n## Population Summary\n\n<table style=\"width: auto\">\n<tr><td><strong>Metro Population</strong></td><td align=\"right\">1,100,000</td></tr>\n<tr><td><strong>Total Modeled Demand</strong></td><td align=\"right\">2,163,635</td></tr>\n</table>\n\n## Map Statistics\n\n<table style=\"width: auto\">\n<tr><td><strong>Buildings Indexed</strong></td><td align=\"right\">455,904</td></tr>\n<tr><td><strong>Demand Points</strong></td><td align=\"right\">1,886</td></tr>\n<tr><td><strong>Population Nodes</strong></td><td align=\"right\">71,065</td></tr>\n<tr><td><strong>Median Commute Distance</strong></td><td align=\"right\">23.4 km</td></tr>\n<tr><td><strong>Mean Commute Distance</strong></td><td align=\"right\">25.1 km</td></tr>\n</table>\n\n## Special Demand\n\n<!-- Figures below are real-world source stats used to seed each generator.\n     Per-item modeled-demand splits are not tagged in the map export, so they\n     are omitted rather than estimated. -->",
   "tags": [
     "north-america",
     "airports",
@@ -14,7 +14,8 @@
   "gallery": [
     "gallery/screenshot1.webp",
     "gallery/screenshot2.webp",
-    "gallery/screenshot3.webp"
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp"
   ],
   "is_test": false,
   "source": "https://github.com/ryandicicco/Subway-Builder-Maps",
@@ -24,10 +25,10 @@
   },
   "city_code": "OKC",
   "country": "US",
-  "population": 235101,
-  "residents_total": 235101,
-  "points_count": 640,
-  "population_count": 20963,
+  "population": 2163635,
+  "residents_total": 2163635,
+  "points_count": 1886,
+  "population_count": 71065,
   "initial_view_state": {
     "latitude": 35.47,
     "longitude": -97.5,
@@ -44,99 +45,108 @@
     "universities"
   ],
   "file_sizes": {
-    "OKC.pmtiles": 11.16,
-    "buildings_index.json": 111.31,
+    "OKC.pmtiles": 55.45,
+    "buildings_index.bin": 62.98,
+    "buildings_index.json": 82.25,
     "config.json": 0,
-    "demand_data.json": 3.34,
-    "roads.geojson": 8.71,
-    "runways_taxiways.geojson": 0.91
+    "demand_data.json": 10.67,
+    "roads.geojson": 19.36,
+    "runways_taxiways.geojson": 0.64
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.47300462407833177,
-      "p25": 0.5857035059444604,
-      "p50": 0.7425111778368078,
-      "p75": 0.8956429949759861,
-      "p90": 1.134122768267562,
-      "mean": 0.7921377119506512
+      "p10": 0.44838179760611074,
+      "p25": 0.5461328737084431,
+      "p50": 0.7107039436793764,
+      "p75": 0.9879704048317631,
+      "p90": 1.3412500491114538,
+      "mean": 0.8076480754059513
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.21427480608773705,
-      "p25": 0.37499042550243616,
-      "p50": 0.4516625015764143,
-      "p75": 0.7709967880460734,
-      "p90": 1.0594144768610154,
-      "mean": 0.7693329062990467
+      "p10": 0.26211561147323276,
+      "p25": 0.3894723773735279,
+      "p50": 0.5142345431233557,
+      "p75": 0.7107039436793764,
+      "p90": 0.97848638332701,
+      "mean": 0.584385421766136
     },
     "commuteDistanceKm": {
-      "p10": 4229,
-      "p25": 8527,
-      "p50": 14663,
-      "p75": 21447,
-      "p90": 27191,
-      "mean": 15342.922053141248
+      "p10": 6646,
+      "p25": 13546,
+      "p50": 23346,
+      "p75": 34357,
+      "p90": 45518,
+      "mean": 24994.263111236192
     },
     "residentCellDensity": {
-      "p10": 19,
-      "p25": 67,
-      "p50": 347,
-      "p75": 706,
-      "p90": 1195,
-      "mean": 483.4152892561983
+      "p10": 70,
+      "p25": 215,
+      "p50": 785,
+      "p75": 2120,
+      "p90": 3765,
+      "mean": 1446.591973244147
     },
     "workerCellDensity": {
-      "p10": 27,
-      "p25": 76,
-      "p50": 173,
-      "p75": 340,
-      "p90": 750,
-      "mean": 479.8421052631579
+      "p10": 20,
+      "p25": 125,
+      "p50": 530,
+      "p75": 1610,
+      "p90": 3495,
+      "mean": 1611.7995529061102
     },
     "detail": {
-      "radiusKm": 0.5791066016116743,
-      "expectedPointSpacingKm": 0.879452954966893,
-      "normalizedRadius": 0.658485025652651,
-      "activityPerPoint": 367.3453125,
-      "playableAreaKm2": 948,
-      "playableAreaPerPointKm2": 1.48125,
-      "playableCatchmentRadiusKm": 0.6866560411951095,
-      "localityScore": 0.33082655722777576,
-      "deaggregationScore": 0.7359101863422924,
-      "score": 0.4934152747701185
+      "radiusKm": 0.6045399223987868,
+      "expectedPointSpacingKm": 0.8930033208622742,
+      "normalizedRadius": 0.6769738793524863,
+      "activityPerPoint": 1147.2083775185579,
+      "playableAreaKm2": 3828,
+      "playableAreaPerPointKm2": 2.0296924708377517,
+      "playableCatchmentRadiusKm": 0.8037855307110608,
+      "localityScore": 0.30150730471896503,
+      "deaggregationScore": 0.4275877874423905,
+      "score": 0.3590554850193782
     },
     "polycentrism": {
       "activity": {
-        "score": 0.7536171751389289,
-        "continuousScore": 0.7344875976131077,
-        "detectedCenterCount": 2,
-        "effectiveCenterCount": 1.6046434210315208,
-        "largestCenterShare": 0.7481848226932255,
+        "score": 0.7838328859410271,
+        "continuousScore": 0.8527381309773122,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.094483215654164,
+        "largestCenterShare": 0.6411790805750508,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": -97.49728171804297,
-            "latitude": 35.434176436240044,
-            "massShare": 0.7481848226932255,
-            "assignedMass": 351798,
-            "assignedPointCount": 448,
+            "longitude": -97.55387751094679,
+            "latitude": 35.46540374662214,
+            "massShare": 0.6411790805750508,
+            "assignedMass": 2774555,
+            "assignedPointCount": 1005,
             "prominenceRatio": 1
           },
           {
-            "longitude": -97.5869575557585,
-            "latitude": 35.52977243335079,
-            "massShare": 0.25181517730677455,
-            "assignedMass": 118404,
-            "assignedPointCount": 187,
-            "prominenceRatio": 0.9999999981377575
+            "longitude": -97.53306460638701,
+            "latitude": 35.62982347344637,
+            "massShare": 0.21069866220503922,
+            "assignedMass": 911750,
+            "assignedPointCount": 443,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": -97.47667195052598,
+            "latitude": 35.24899203576319,
+            "massShare": 0.14812225721991001,
+            "assignedMass": 640965,
+            "assignedPointCount": 438,
+            "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1775779200,
+  "last_updated": 1784246400,
   "search_aliases": [
     "Оклахома Сити",
     "أوكلاهوما سيتي",
@@ -160,5 +170,12 @@
     "Okla city",
     "Oklahoma Shehri",
     "ओक्लाहोमा सिटी"
-  ]
+  ],
+  "data_quality": {
+    "tier": "very-high",
+    "raw_score": 0.81,
+    "weighted_score": 0.87,
+    "rubric_version": 1,
+    "provenance": "backfill"
+  }
 }

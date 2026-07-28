@@ -32,6 +32,9 @@ export interface IntegrityVersionEntry {
   source: IntegritySource;
   fingerprint: string;
   checked_at: string;
+  // Immutable publish date (github release publishedAt, else custom update.json
+  // date). Rules-bump-proof; backfilled onto reused cache entries at no cost.
+  released_at?: string;
 }
 
 // GAME_DEPENDENCY_KEY is the manifest dependency key declaring the required
@@ -102,6 +105,12 @@ export interface IntegrityCacheEntry {
   fingerprint: string;
   last_checked_at: string;
   result: IntegrityVersionEntry;
+  // Byte sizes of ZIP assets at inspection time. Written on fresh inspection; carried forward on cache hit.
+  // If present and current GitHub sizes differ, the cache entry is invalidated to detect asset replacement.
+  asset_sizes?: Record<string, number>;
+  // GitHub `updatedAt` timestamps of ZIP assets at inspection time. Preferred over asset_sizes for clobber
+  // detection since version-string-only changes (e.g. "0.2.0"→"0.3.0") produce same-size ZIPs.
+  asset_updated_at?: Record<string, string>;
 }
 
 export interface IntegrityCache {

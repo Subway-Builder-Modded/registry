@@ -103,6 +103,13 @@
               "type": "integer",
               "minimum": 0
             },
+            "search_aliases": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
             "city_code": {
               "type": "string",
               "pattern": "^[A-Z0-9]{2,4}$"
@@ -492,24 +499,93 @@
                 "high-detail"
               ]
             },
+            "data_quality": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "tier": {
+                      "type": "string",
+                      "enum": [
+                        "very-high",
+                        "high",
+                        "medium",
+                        "low",
+                        "very-low",
+                        "absent"
+                      ]
+                    },
+                    "raw_score": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "weighted_score": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "rubric_version": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "provenance": {
+                      "type": "string",
+                      "enum": [
+                        "reviewed",
+                        "backfill"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "tier",
+                    "rubric_version",
+                    "provenance"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "tier": {
+                      "type": "string",
+                      "const": "unknown"
+                    },
+                    "rubric_version": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  "required": [
+                    "tier",
+                    "rubric_version"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
             "location": {
               "type": "string",
               "enum": [
                 "caribbean",
                 "central-america",
                 "central-asia",
+                "central-europe",
                 "east-africa",
                 "east-asia",
-                "europe",
+                "east-europe",
                 "middle-east",
                 "north-africa",
                 "north-america",
+                "north-europe",
                 "oceania",
                 "south-america",
                 "south-asia",
+                "south-europe",
                 "southeast-asia",
                 "southern-africa",
-                "west-africa"
+                "west-africa",
+                "west-europe"
               ]
             },
             "special_demand": {
@@ -532,6 +608,13 @@
               "additionalProperties": {
                 "type": "number",
                 "minimum": 0
+              }
+            },
+            "included_cities": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
               }
             }
           },
@@ -661,6 +744,13 @@
             "last_updated": {
               "type": "integer",
               "minimum": 0
+            },
+            "search_aliases": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
             }
           },
           "required": [

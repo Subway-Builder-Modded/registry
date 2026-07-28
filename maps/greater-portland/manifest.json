@@ -27,7 +27,7 @@
   "country": "US",
   "population": 1571997,
   "residents_total": 1571997,
-  "points_count": 5566,
+  "points_count": 4541,
   "population_count": 77003,
   "initial_view_state": {
     "latitude": 45.5189,
@@ -47,70 +47,75 @@
     "universities"
   ],
   "file_sizes": {
-    "GPDX.pmtiles": 140.51,
-    "buildings_index.json": 229.95,
+    ".railyard_map/special_demand_points.json": 0.16,
+    ".railyard_map/special_demand_types.json": 0.03,
+    "GPDX.pmtiles": 132.02,
+    "GPDX_foundations.pmtiles": 63.93,
+    "buildings_index.bin.gz": 64.68,
+    "buildings_index.json.gz": 43.76,
     "config.json": 0,
-    "demand_data.json": 12.99,
+    "demand_data.json": 12.89,
+    "ocean_depth_index.json.gz": 17.42,
     "roads.geojson": 47.77,
-    "runways_taxiways.geojson": 1.22
+    "runways_taxiways.geojson": 1.23
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.33742671818029457,
+      "p10": 0.33356604062741313,
       "p25": 0.4372922739474058,
-      "p50": 0.5612359947272552,
-      "p75": 0.7379416132026708,
-      "p90": 1.0363686642209649,
-      "mean": 0.6503856200660115
+      "p50": 0.5599893066444986,
+      "p75": 0.7360052157665786,
+      "p90": 1.010139105608034,
+      "mean": 0.6467806496978098
     },
     "workerWeightedNearestNeighborKm": {
       "p10": 0.2776277000867275,
       "p25": 0.32950452446998546,
       "p50": 0.4335120919942217,
       "p75": 0.6196738970906961,
-      "p90": 0.8179879647746872,
-      "mean": 0.522814190111763
+      "p90": 0.8320865576125587,
+      "mean": 0.5327786995971441
     },
     "commuteDistanceKm": {
-      "p10": 4857,
-      "p25": 10640,
-      "p50": 21261,
-      "p75": 37908,
-      "p90": 63619,
-      "mean": 28249.382050049997
+      "p10": 4768,
+      "p25": 10575,
+      "p50": 21219,
+      "p75": 37907,
+      "p90": 63794,
+      "mean": 28243.404425801593
     },
     "residentCellDensity": {
       "p10": 12,
       "p25": 33,
-      "p50": 116,
-      "p75": 576,
-      "p90": 1295,
-      "mean": 451.95255894192064
+      "p50": 114,
+      "p75": 579,
+      "p90": 1325,
+      "mean": 453.8726537684089
     },
     "workerCellDensity": {
-      "p10": 6,
-      "p25": 28,
-      "p50": 127,
-      "p75": 404,
-      "p90": 1093,
-      "mean": 513.043407310705
+      "p10": 7,
+      "p25": 29,
+      "p50": 129,
+      "p75": 401,
+      "p90": 1075,
+      "mean": 515.5532961626762
     },
     "detail": {
-      "radiusKm": 0.49325712379718384,
-      "expectedPointSpacingKm": 0.9075085042200786,
-      "normalizedRadius": 0.5435289272810657,
-      "activityPerPoint": 282.4284944304707,
-      "playableAreaKm2": 16608,
-      "playableAreaPerPointKm2": 2.9838303988501615,
-      "playableCatchmentRadiusKm": 0.9745679630737559,
-      "localityScore": 0.5339675317561575,
-      "deaggregationScore": 0.05043016596327138,
-      "score": 0.16409774905665647
+      "radiusKm": 0.4927089767985259,
+      "expectedPointSpacingKm": 0.8842999189300468,
+      "normalizedRadius": 0.5571740608035745,
+      "activityPerPoint": 346.1785950231227,
+      "playableAreaKm2": 10528,
+      "playableAreaPerPointKm2": 2.318432063422154,
+      "playableCatchmentRadiusKm": 0.8590575337151505,
+      "localityScore": 0.507714734798161,
+      "deaggregationScore": 0.29739968909766473,
+      "score": 0.3885797270564644
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.8560921792836487,
+        "continuousScore": 0.8563394756076527,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -120,8 +125,8 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": -122.70864802087954,
-            "latitude": 45.464178801300854,
+            "longitude": -122.71029055725957,
+            "latitude": 45.46438359434105,
             "massShare": 1,
             "assignedMass": 3143994,
             "assignedPointCount": 4541,
@@ -131,7 +136,7 @@
       }
     }
   },
-  "last_updated": 1778716800,
+  "last_updated": 1783814400,
   "search_aliases": [
     "Portland",
     "Портланд",
@@ -149,5 +154,12 @@
     "पोर्टलैंड",
     "พอร์ตแลนด์",
     "波特蘭"
-  ]
+  ],
+  "data_quality": {
+    "tier": "very-high",
+    "raw_score": 0.81,
+    "weighted_score": 0.87,
+    "rubric_version": 1,
+    "provenance": "backfill"
+  }
 }

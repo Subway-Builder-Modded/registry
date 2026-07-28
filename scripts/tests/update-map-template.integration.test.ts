@@ -6,8 +6,6 @@ import YAML from "yaml";
 import {
   DEFAULT_MAP_DATA_SOURCE,
   LEVEL_OF_DETAIL_VALUES,
-  LOCATION_TAGS,
-  SOURCE_QUALITY_VALUES,
   SPECIAL_DEMAND_TAGS,
 } from "../lib/map-constants.js";
 
@@ -70,20 +68,23 @@ test("publish-map.yml enforces required publish fields with blank dropdown defau
 
   assert.ok(Array.isArray(parsed.body), "Template body should be an array");
 
-  const sourceQuality = getField(parsed.body, "source_quality");
-  assert.equal(sourceQuality.type, "dropdown");
-  assert.deepEqual(getDropdownOptions(sourceQuality), ["", ...SOURCE_QUALITY_VALUES]);
-  assert.equal(sourceQuality.validations?.required, true);
+  // source_quality is machine-managed and no longer collected on the form.
+  assert.equal(
+    parsed.body.some((field) => (field as { id?: string }).id === "source_quality"),
+    false,
+  );
 
   const levelOfDetail = getField(parsed.body, "level_of_detail");
   assert.equal(levelOfDetail.type, "dropdown");
   assert.deepEqual(getDropdownOptions(levelOfDetail), ["", ...LEVEL_OF_DETAIL_VALUES]);
   assert.equal(levelOfDetail.validations?.required, true);
 
-  const location = getField(parsed.body, "location");
-  assert.equal(location.type, "dropdown");
-  assert.deepEqual(getDropdownOptions(location), ["", ...LOCATION_TAGS]);
-  assert.equal(location.validations?.required, true);
+  // location is machine-managed (derived from the country code) and no
+  // longer collected on the form.
+  assert.equal(
+    parsed.body.some((field) => (field as { id?: string }).id === "location"),
+    false,
+  );
 
   const updateType = getField(parsed.body, "update-type");
   assert.equal(updateType.type, "dropdown");
@@ -130,6 +131,27 @@ test("publish-map.yml enforces required publish fields with blank dropdown defau
   assert.equal(collaborators.validations?.required, false);
 });
 
+test("data-quality.yml contains no YAML anchors and repeats shared options inline", () => {
+  const scriptsRoot = resolve(import.meta.dirname, "..", "..");
+  const raw = readFileSync(
+    resolve(scriptsRoot, "..", ".github", "ISSUE_TEMPLATE", "data-quality.yml"),
+    "utf-8",
+  );
+  // GitHub's issue-form parser rejects anchors/aliases: the emitter must never
+  // deduplicate shared option arrays or the form falls back to the blank editor.
+  assert.doesNotMatch(raw, /[&*]a\d/);
+
+  const parsed = YAML.parse(raw) as { body: unknown[] };
+  const workplaceDetail = getField(parsed.body, "dq-workplace-detail");
+  const residenceDetail = getField(parsed.body, "dq-residence-detail");
+  const odDetail = getField(parsed.body, "dq-od-detail");
+  assert.deepEqual(
+    getDropdownOptions(residenceDetail),
+    getDropdownOptions(workplaceDetail),
+  );
+  assert.deepEqual(getDropdownOptions(odDetail), getDropdownOptions(workplaceDetail));
+});
+
 test("update-map.yml keeps map-id/terms required and makes other fields optional", () => {
   const parsed = parseTemplate("update-map.yml");
 
@@ -143,10 +165,8 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
     "city-code",
     "country",
     "description",
-    "source_quality",
     "level_of_detail",
     "methodology",
-    "location",
     "gallery",
     "source",
     "update-type",
@@ -161,14 +181,18 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
     );
   }
 
-  const sourceQuality = getField(parsed.body, "source_quality");
-  assert.deepEqual(getDropdownOptions(sourceQuality), ["", ...SOURCE_QUALITY_VALUES]);
+  assert.equal(
+    parsed.body.some((field) => (field as { id?: string }).id === "source_quality"),
+    false,
+  );
 
   const levelOfDetail = getField(parsed.body, "level_of_detail");
   assert.deepEqual(getDropdownOptions(levelOfDetail), ["", ...LEVEL_OF_DETAIL_VALUES]);
 
-  const location = getField(parsed.body, "location");
-  assert.deepEqual(getDropdownOptions(location), ["", ...LOCATION_TAGS]);
+  assert.equal(
+    parsed.body.some((field) => (field as { id?: string }).id === "location"),
+    false,
+  );
 
   const updateType = getField(parsed.body, "update-type");
   assert.deepEqual(getDropdownOptions(updateType), ["", "GitHub Releases", "Custom URL"]);

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "id": "mfn-rsw",
+  "name": "Fort Myers",
+  "author": "crumpetime",
+  "github_id": 121749023,
+  "description": "Custom map of the Fort Myers/Cape Coral area using LODES data from rslurry's demand data generator. Map built using depot.",
+  "tags": [
+    "north-america",
+    "airports",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/crumpetime/sb-maps-rsw",
+  "update": {
+    "type": "github",
+    "repo": "crumpetime/sb-maps-rsw"
+  },
+  "city_code": "RSW",
+  "country": "US",
+  "population": 229673,
+  "residents_total": 229673,
+  "points_count": 918,
+  "population_count": 27726,
+  "initial_view_state": {
+    "latitude": 26.595972,
+    "longitude": -81.904106,
+    "zoom": 13,
+    "bearing": 0
+  },
+  "data_source": "LODES",
+  "source_quality": "high-quality",
+  "level_of_detail": "high-detail",
+  "location": "north-america",
+  "special_demand": [
+    "airports",
+    "universities"
+  ],
+  "file_sizes": {
+    "RSW.pmtiles": 40.88,
+    "buildings_foundations.geojson": 343.11,
+    "buildings_index.bin": 67.76,
+    "buildings_index.json": 89.16,
+    "config.json": 0,
+    "demand_data.json": 4.42,
+    "ocean_depth_index.json": 17.72,
+    "ocean_foundations.geojson": 38.87,
+    "roads.geojson": 14.41,
+    "runways_taxiways.geojson": 0.71
+  },
+  "included_cities": [
+    "Cape Coral"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.4822777876847086,
+      "p25": 0.6996678351095648,
+      "p50": 0.9574333144429632,
+      "p75": 1.2700357058854894,
+      "p90": 1.5200436909512005,
+      "mean": 0.9911240554893459
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.32547948384557623,
+      "p25": 0.34854081023155775,
+      "p50": 0.5674014568153735,
+      "p75": 0.8923639302912593,
+      "p90": 1.3340261573159362,
+      "mean": 0.7115047785561452
+    },
+    "commuteDistanceKm": {
+      "p10": 5699,
+      "p25": 12230,
+      "p50": 21115,
+      "p75": 32014,
+      "p90": 43646,
+      "mean": 23318.6911923826
+    },
+    "residentCellDensity": {
+      "p10": 12,
+      "p25": 54,
+      "p50": 187,
+      "p75": 451,
+      "p90": 727,
+      "mean": 299.3642297650131
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 35,
+      "p50": 91,
+      "p75": 222,
+      "p90": 547,
+      "mean": 314.5473251028807
+    },
+    "detail": {
+      "radiusKm": 0.7370543110371913,
+      "expectedPointSpacingKm": 0.9194106286852647,
+      "normalizedRadius": 0.8016595501959353,
+      "activityPerPoint": 250.1884531590414,
+      "playableAreaKm2": 2276,
+      "playableAreaPerPointKm2": 2.479302832244009,
+      "playableCatchmentRadiusKm": 0.8883617519607315,
+      "localityScore": 0.12251503449509304,
+      "deaggregationScore": 0.23173512663503879,
+      "score": 0.16849640065418767
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8935007460506552,
+        "continuousScore": 0.8037301018619324,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.807502348385279,
+        "largestCenterShare": 0.6631711171970585,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -81.92514733385792,
+            "latitude": 26.62133357435367,
+            "massShare": 0.6631711171970585,
+            "assignedMass": 304625,
+            "assignedPointCount": 600,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": -81.74111901010242,
+            "latitude": 26.549585825210887,
+            "massShare": 0.3368288828029416,
+            "assignedMass": 154721,
+            "assignedPointCount": 318,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784631863,
+  "data_quality": {
+    "tier": "very-high",
+    "raw_score": 0.81,
+    "weighted_score": 0.87,
+    "rubric_version": 1,
+    "provenance": "backfill"
+  }
+}

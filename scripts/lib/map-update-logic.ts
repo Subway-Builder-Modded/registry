@@ -1,15 +1,14 @@
 import type { MapManifest } from "./manifests.js";
-import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
+import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
+import type { LevelOfDetail, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import {
+  COUNTRY_TO_LOCATION,
   DEFAULT_LEVEL_OF_DETAIL,
   DEFAULT_MAP_DATA_SOURCE,
   DEFAULT_SOURCE_QUALITY,
   LEVEL_OF_DETAIL_SET,
-  LOCATION_TAG_SET,
-  MAX_OSM_SOURCE_QUALITY,
   SOURCE_QUALITY_SET,
   SPECIAL_DEMAND_TAG_SET,
-  isOsmDataSource,
 } from "./map-constants.js";
 import { isPresentIssueValue } from "./map-field-utils.js";
 
@@ -91,9 +90,9 @@ export function applyMapManifestUpdates(
     manifest.level_of_detail = DEFAULT_LEVEL_OF_DETAIL;
   }
 
-  if (isPresentIssueValue(data.source_quality)) {
-    manifest.source_quality = data.source_quality as SourceQuality;
-  } else if (!isPresentIssueValue(manifest.source_quality)) {
+  // source_quality is machine-managed (write-once legacy tag; the data-quality
+  // tier supersedes it) — user updates never modify it.
+  if (!isPresentIssueValue(manifest.source_quality)) {
     manifest.source_quality = DEFAULT_SOURCE_QUALITY;
   }
 
@@ -103,9 +102,14 @@ export function applyMapManifestUpdates(
     manifest.data_source = DEFAULT_MAP_DATA_SOURCE;
   }
 
-  if (isPresentIssueValue(data.location)) {
-    manifest.location = data.location as LocationTag;
+  // location is machine-managed: always re-derived from the (possibly just
+  // updated) country code. The legacy sub_location bridge field is dropped on
+  // sight — any update self-heals manifests from before the europe migration.
+  const derivedLocation = COUNTRY_TO_LOCATION[manifest.country];
+  if (derivedLocation) {
+    manifest.location = derivedLocation;
   }
+  delete (manifest as Record<string, unknown>).sub_location;
   if (
     data.special_demand !== undefined
     && data.special_demand !== "_No response_"
@@ -128,20 +132,19 @@ export function applyMapManifestUpdates(
     }
   }
 
-  // Cap OSM quality to be medium quality since high-quality OSM data is generally not available
-  if (
-    isOsmDataSource(manifest.data_source)
-    && manifest.source_quality === "high-quality"
-  ) {
-    manifest.source_quality = MAX_OSM_SOURCE_QUALITY;
-  }
-
   if (isPresentIssueValue(manifest.location)) {
     const specialDemand = Array.isArray(manifest.special_demand)
       ? manifest.special_demand
       : [] as SpecialDemandTag[];
     manifest.special_demand = specialDemand;
     manifest.tags = combineMapTags(manifest.location, specialDemand);
+  }
+
+  // Self-heal the D5 presence invariant: any update to a map that predates the
+  // data-quality migration stamps the Unscored marker. An existing block
+  // (scored or unknown) is never touched here — scoring is reviewer-gated.
+  if (manifest.data_quality === undefined) {
+    manifest.data_quality = { tier: "unknown", rubric_version: RUBRIC_VERSION };
   }
 }
 
@@ -165,9 +168,9 @@ export function validateMapUpdateFields(
     manifest.level_of_detail,
     errors,
   );
-  const currentLocation = requireManifestString(
-    "location",
-    manifest.location,
+  const currentCountry = requireManifestString(
+    "country",
+    manifest.country,
     errors,
   );
   const currentSpecialDemand = requireManifestStringArray(
@@ -184,7 +187,7 @@ export function validateMapUpdateFields(
     currentDataSource === null
     || currentSourceQuality === null
     || currentLevelOfDetail === null
-    || currentLocation === null
+    || currentCountry === null
     || currentSpecialDemand === null
     || currentInitialViewState === null
   ) {
@@ -192,13 +195,14 @@ export function validateMapUpdateFields(
   }
 
   const nextDataSource = isPresentIssueValue(data.data_source) ? data.data_source : currentDataSource;
-  const nextSourceQuality = isPresentIssueValue(data.source_quality)
-    ? data.source_quality
-    : currentSourceQuality;
+  // source_quality is never user-updatable; only the current value is checked.
+  const nextSourceQuality = currentSourceQuality;
   const nextLevelOfDetail = isPresentIssueValue(data.level_of_detail)
     ? data.level_of_detail
     : currentLevelOfDetail;
-  const nextLocation = isPresentIssueValue(data.location) ? data.location : currentLocation;
+  // location is machine-managed (derived from country), so the country code
+  // is what gets validated here.
+  const nextCountry = isPresentIssueValue(data.country) ? data.country : currentCountry;
   const nextSpecialDemand = (() => {
     if (
       data.special_demand !== undefined
@@ -217,8 +221,8 @@ export function validateMapUpdateFields(
   if (!LEVEL_OF_DETAIL_SET.has(nextLevelOfDetail)) {
     errors.push("**level_of_detail**: Must be one of `low-detail`, `medium-detail`, `high-detail`.");
   }
-  if (!LOCATION_TAG_SET.has(nextLocation)) {
-    errors.push("**location**: Must be one of the supported location tags.");
+  if (!COUNTRY_TO_LOCATION[nextCountry]) {
+    errors.push("**country**: Must be an ISO 3166-1 alpha-2 country code (e.g. US, DE, JP).");
   }
 
   const invalidSpecialDemand = nextSpecialDemand.filter((tag) => !SPECIAL_DEMAND_TAG_SET.has(tag));
@@ -226,7 +230,4 @@ export function validateMapUpdateFields(
     errors.push(`**special_demand**: Invalid tag(s): ${invalidSpecialDemand.join(", ")}`);
   }
 
-  if (isOsmDataSource(nextDataSource) && nextSourceQuality === "high-quality") {
-    errors.push("**source_quality**: OSM-based data sources cannot be marked `high-quality`.");
-  }
 }

@@ -4,7 +4,7 @@
   "name": "Tri-Cities",
   "author": "ryandicicco",
   "github_id": 215120742,
-  "description": "Detailed map of the Kennewick–Pasco–Richland metro area (Tri-Cities) using US Census LODES 2023 tract-level origin-destination commute data. 334 demand points, 346K residents/jobs, 6,549 commute OD pairs. Special demand for Tri-Cities Airport (PSC; 2,700 daily pax), three universities (WSU-TC, CBC, Heritage U-TC), and TRAC event center. Includes 43,822-building collision index, multi-scale city/suburb/neighborhood labels, and PSC airport runways.",
+  "description": "# Tri-Cities, WA  · PSC\n\nThe atomic cities of southeastern Washington State; Kennewick, Pasco, and Richland, where the Columbia and Snake rivers meet.\n\n## Coverage\n\n<table style=\"width: auto\">\n<tr><td><strong>Region</strong></td><td>Tri-Cities metro, Washington (US)</td></tr>\n<tr><td><strong>Bounding Box</strong></td><td>-119.328, 46.125 → -118.906, 46.328</td></tr>\n<tr><td><strong>Playable Area</strong></td><td>~725 km²</td></tr>\n</table>\n\n## Population Summary\n\n<table style=\"width: auto\">\n<tr><td><strong>Metro Population</strong></td><td align=\"right\">340,000</td></tr>\n<tr><td><strong>Total Modeled Demand</strong></td><td align=\"right\">346,040</td></tr>\n</table>\n\n## Map Statistics\n\n<table style=\"width: auto\">\n<tr><td><strong>Buildings Indexed</strong></td><td align=\"right\">43,822</td></tr>\n<tr><td><strong>Demand Points</strong></td><td align=\"right\">334</td></tr>\n<tr><td><strong>Population Nodes</strong></td><td align=\"right\">6,659</td></tr>\n<tr><td><strong>Median Commute Distance</strong></td><td align=\"right\">11.8 km</td></tr>\n<tr><td><strong>Mean Commute Distance</strong></td><td align=\"right\">12.1 km</td></tr>\n</table>\n\n## Special Demand\n\n<!-- Figures below are real-world source stats used to seed each generator.\n     Per-item modeled-demand splits are not tagged in the map export, so they\n     are omitted rather than estimated. -->",
   "tags": [
     "north-america",
     "airports",
@@ -14,7 +14,8 @@
   "gallery": [
     "gallery/screenshot1.webp",
     "gallery/screenshot2.webp",
-    "gallery/screenshot3.webp"
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp"
   ],
   "is_test": false,
   "source": "https://github.com/ryandicicco/Subway-Builder-Maps",
@@ -26,7 +27,7 @@
   "country": "US",
   "population": 346040,
   "residents_total": 346040,
-  "points_count": 334,
+  "points_count": 325,
   "population_count": 6659,
   "initial_view_state": {
     "latitude": 46.26,
@@ -45,9 +46,10 @@
   ],
   "file_sizes": {
     "PSC.pmtiles": 7.34,
+    "buildings_index.bin": 7.84,
     "buildings_index.json": 12.39,
     "config.json": 0,
-    "demand_data.json": 1.02,
+    "demand_data.json": 1.06,
     "roads.geojson": 3.09,
     "runways_taxiways.geojson": 0.43
   },
@@ -58,7 +60,7 @@
       "p50": 0.5814542937027098,
       "p75": 0.7288051681288831,
       "p90": 0.9880671085241535,
-      "mean": 0.6509740913253829
+      "mean": 0.6509751317355995
     },
     "workerWeightedNearestNeighborKm": {
       "p10": 0.2799553342928899,
@@ -66,43 +68,43 @@
       "p50": 0.45065071848395577,
       "p75": 0.7102303328253915,
       "p90": 1.0117130450397538,
-      "mean": 0.6092658109856869
+      "mean": 0.6098556939333337
     },
     "commuteDistanceKm": {
-      "p10": 0,
-      "p25": 0,
-      "p50": 0,
-      "p75": 0,
-      "p90": 0,
-      "mean": 0
+      "p10": 3401,
+      "p25": 6832,
+      "p50": 11678,
+      "p75": 16299,
+      "p90": 20723,
+      "mean": 12031.028082294639
     },
     "residentCellDensity": {
       "p10": 40,
-      "p25": 200,
-      "p50": 810,
-      "p75": 2075,
+      "p25": 190,
+      "p50": 820,
+      "p75": 2060,
       "p90": 3845,
-      "mean": 1560.4072398190044
+      "mean": 1539.5089285714287
     },
     "workerCellDensity": {
       "p10": 45,
       "p25": 150,
       "p50": 530,
-      "p75": 1505,
-      "p90": 3470,
-      "mean": 1461.5086206896551
+      "p75": 1490,
+      "p90": 3290,
+      "mean": 1439.322033898305
     },
     "detail": {
       "radiusKm": 0.5118913900650286,
-      "expectedPointSpacingKm": 0.8651606752574784,
-      "normalizedRadius": 0.5916720497180317,
-      "activityPerPoint": 1036.0479041916167,
-      "playableAreaKm2": 640,
-      "playableAreaPerPointKm2": 1.9161676646706587,
-      "playableCatchmentRadiusKm": 0.7809834257206598,
-      "localityScore": 0.4441072544220141,
-      "deaggregationScore": 0.48392511991417736,
-      "score": 0.4635888872168198
+      "expectedPointSpacingKm": 0.8700132624983811,
+      "normalizedRadius": 0.5883719388311981,
+      "activityPerPoint": 1064.7384615384615,
+      "playableAreaKm2": 596,
+      "playableAreaPerPointKm2": 1.833846153846154,
+      "playableCatchmentRadiusKm": 0.7640231413441294,
+      "localityScore": 0.45002937376088736,
+      "deaggregationScore": 0.5269062240311477,
+      "score": 0.4869530552645206
     },
     "polycentrism": {
       "activity": {
@@ -144,9 +146,16 @@
       }
     }
   },
-  "last_updated": 1778716800,
+  "last_updated": 1784592000,
   "search_aliases": [
     "トリシティズ",
     "三城"
-  ]
+  ],
+  "data_quality": {
+    "tier": "very-high",
+    "raw_score": 0.81,
+    "weighted_score": 0.87,
+    "rubric_version": 1,
+    "provenance": "backfill"
+  }
 }

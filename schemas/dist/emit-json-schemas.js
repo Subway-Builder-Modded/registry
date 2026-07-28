@@ -1,6 +1,6 @@
 import { writeFileSync, mkdirSync } from "node:fs";
 import { zodToJsonSchema } from "zod-to-json-schema";
-import { ListingManifestSchema, ModManifestSchema, MapManifestSchema, GridStatisticsSchema, DownloadAttributionLedgerSchema, DownloadAttributionDeltaSchema, DownloadVersionBucketLedgerSchema, IntegrityOutputSchema, IntegrityCacheSchema, DownloadHistorySnapshotSchema, DownloadAttributionHistorySnapshotSchema, SecurityRulesFileSchema, } from "./index.js";
+import { ListingManifestSchema, ModManifestSchema, MapManifestSchema, GridStatisticsSchema, DownloadAttributionLedgerSchema, DownloadAttributionDeltaSchema, DownloadVersionBucketLedgerSchema, IntegrityOutputSchema, IntegrityCacheSchema, DownloadHistorySnapshotSchema, DownloadAttributionHistorySnapshotSchema, SecurityRulesFileSchema, DataQualityAnswersFileSchema, } from "./index.js";
 const SCHEMAS = {
     "manifest": ListingManifestSchema,
     "mod-manifest": ModManifestSchema,
@@ -14,6 +14,7 @@ const SCHEMAS = {
     "download-history-snapshot": DownloadHistorySnapshotSchema,
     "attribution-history-snapshot": DownloadAttributionHistorySnapshotSchema,
     "security-rules": SecurityRulesFileSchema,
+    "data-quality-answers": DataQualityAnswersFileSchema,
 };
 mkdirSync("json-schemas", { recursive: true });
 const index = {};

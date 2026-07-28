@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "id": "lille",
+  "name": "Lille",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of the greater Lille metropolitan area / Metropole Europeenne de Lille (France), from Lille-Lesquin airport to the Belgian border at Mouscron. 356k+ OSM buildings (binary format), 622k+ commuters with demand built from real INSEE census data, including a synthetic cross-border commuting model for Mouscron (Belgium). Lille-Lesquin airport with runways and taxiways. Protomaps basemap with water, parks and forests.",
+  "tags": [
+    "west-europe",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subway-builder-lille",
+  "update": {
+    "type": "github",
+    "repo": "pierreggt/subway-builder-lille"
+  },
+  "city_code": "LIL",
+  "country": "FR",
+  "population": 622652,
+  "residents_total": 622652,
+  "points_count": 6472,
+  "population_count": 11676,
+  "initial_view_state": {
+    "latitude": 50.6292,
+    "longitude": 3.0573,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "west-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "LIL.pmtiles": 27.05,
+    "buildings_index.bin.gz": 17.31,
+    "config.json": 0,
+    "demand_data.json.gz": 0.37,
+    "ocean_depth_index.json.gz": 0.6,
+    "ocean_depth_index_contours.json.gz": 0.52,
+    "roads.geojson.gz": 2.93,
+    "runways_taxiways.geojson.gz": 0.05
+  },
+  "included_cities": [
+    "Mouscron",
+    "Roubaix",
+    "Tourcoing",
+    "Villeneuve-d'Ascq",
+    "Wattrelos",
+    "Marcq-en-Barœul",
+    "Lambersart",
+    "Armentières",
+    "Seclin",
+    "Halluin"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.19877313294293847,
+      "p25": 0.19884245688198432,
+      "p50": 0.1991788887675324,
+      "p75": 0.19958521612141947,
+      "p90": 0.19983636298081883,
+      "mean": 0.19735893288177053
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1216600089185581,
+      "p25": 0.19884102284166835,
+      "p50": 0.19924026538904516,
+      "p75": 0.19977040526566317,
+      "p90": 0.351595143996631,
+      "mean": 0.21609888597535065
+    },
+    "commuteDistanceKm": {
+      "p10": 2936,
+      "p25": 5257,
+      "p50": 9158,
+      "p75": 16258,
+      "p90": 23202,
+      "mean": 11456.712230215828
+    },
+    "residentCellDensity": {
+      "p10": 20,
+      "p25": 75,
+      "p50": 335,
+      "p75": 1005,
+      "p90": 1902,
+      "mean": 730.1640718562875
+    },
+    "workerCellDensity": {
+      "p10": 11,
+      "p25": 60,
+      "p50": 222,
+      "p75": 776,
+      "p90": 1790,
+      "mean": 769.23875
+    },
+    "detail": {
+      "radiusKm": 0.1992095747145158,
+      "expectedPointSpacingKm": 0.3743556474843956,
+      "normalizedRadius": 0.5321398943843088,
+      "activityPerPoint": 96.2070457354759,
+      "playableAreaKm2": 720,
+      "playableAreaPerPointKm2": 0.11124845488257108,
+      "playableCatchmentRadiusKm": 0.18817939050755206,
+      "localityScore": 0.5563893166884335,
+      "deaggregationScore": 1,
+      "score": 0.7459150867816212
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8507778534427328,
+        "continuousScore": 0.663342175976239,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.740307568899028,
+        "largestCenterShare": 0.693146412442263,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 3.0513020425740662,
+            "latitude": 50.63141445630339,
+            "massShare": 0.693146412442263,
+            "assignedMass": 863178,
+            "assignedPointCount": 3732,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 3.1668930716308217,
+            "latitude": 50.704221497752016,
+            "massShare": 0.3068535875577369,
+            "assignedMass": 382126,
+            "assignedPointCount": 2740,
+            "prominenceRatio": 0.9999999991946844
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784576729,
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
+}

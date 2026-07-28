@@ -36,6 +36,7 @@ import {
   resolveExpectedCustomReleaseManifestAssetName,
   versionedFingerprint,
   withReleaseSizeIfMissing,
+  withReleasedAtIfMissing,
   withBuildingsIndexPresenceIfMissing,
 } from "./downloads-full/integrity-completeness.js";
 import {
@@ -81,6 +82,27 @@ function countIntegrityVersions(entry: ListingIntegrityEntry | undefined): {
     }
   }
   return { complete, incomplete };
+}
+
+// Checks added after the v6 baseline that must not retroactively fail versions
+// that were already passing before these checks existed. If a fresh inspection
+// (triggered by an empty cache) fails ONLY due to these keys, we preserve the
+// previous passing result instead of marking the version incomplete.
+const GRANDFATHERED_CHECK_KEYS: ReadonlySet<string> = new Set([
+  "demand_phantom_points",
+  "demand_residents_match",
+]);
+
+function isGrandfatheredDowngrade(
+  previousEntry: IntegrityVersionEntry | undefined,
+  newResult: IntegrityVersionEntry,
+): boolean {
+  if (!previousEntry?.is_complete) return false;
+  if (newResult.is_complete) return false;
+  const failingKeys = Object.entries(newResult.required_checks)
+    .filter(([, pass]) => pass === false)
+    .map(([key]) => key);
+  return failingKeys.length > 0 && failingKeys.every((key) => GRANDFATHERED_CHECK_KEYS.has(key));
 }
 
 function getAdjustedGithubZipTotal(params: {
@@ -255,7 +277,14 @@ export async function generateDownloadsDataFull(
 
   const downloadsByListing: D.DownloadsByListing = {};
   const listingContexts = new Map<string, ListingContext>();
+  const listingMeta = new Map<string, { listingName: string; authorId: string }>();
   const repoSet = new Set<string>();
+
+  // Pace unauthenticated raw.githubusercontent.com custom-update fetches to
+  // avoid GitHub secondary rate limits (429s). 200ms between each fetch.
+  const CUSTOM_UPDATE_INTER_FETCH_DELAY_MS = 200;
+  let customFetchCount = 0;
+  const transientErrorListings = new Set<string>();
 
   for (const id of ids) {
     downloadsByListing[id] = {};
@@ -266,6 +295,8 @@ export async function generateDownloadsDataFull(
       warnListing(warnings, id, `failed to read manifest (${(error as Error).message})`);
       continue;
     }
+
+    listingMeta.set(id, { listingName: manifest.name, authorId: manifest.author });
 
     if (manifest.update.type === "github") {
       const repo = manifest.update.repo.toLowerCase();
@@ -279,9 +310,14 @@ export async function generateDownloadsDataFull(
       continue;
     }
 
+    if (customFetchCount > 0) {
+      await new Promise<void>((resolve) => setTimeout(resolve, CUSTOM_UPDATE_INTER_FETCH_DELAY_MS));
+    }
+    customFetchCount += 1;
     const customFetch = await fetchCustomVersions(id, manifest.update.url, fetchImpl, warnings);
     if (customFetch.transientError) {
       downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
+      transientErrorListings.add(id);
       warnListing(warnings, id, "preserved previous custom-update downloads (transient fetch error)");
       continue;
     }
@@ -312,6 +348,7 @@ export async function generateDownloadsDataFull(
 
   const integrityListings: Record<string, ListingIntegrityEntry> = {};
   const versionBucketInputs: D.VersionBucketInputsByListing = {};
+  const integrityAlerts: D.IntegrityAlert[] = [];
   let versionsChecked = 0;
   let completeVersions = 0;
   let incompleteVersions = 0;
@@ -325,7 +362,18 @@ export async function generateDownloadsDataFull(
     versionBucketInputs[id] = {};
     const context = listingContexts.get(id);
     if (!context) {
-      integrityListings[id] = createListingIntegrityEntry({});
+      if (transientErrorListings.has(id)) {
+        const listingCacheEntries = cache.entries[id] ?? {};
+        const preservedListing = previousIntegrity?.listings[id];
+        integrityListings[id] = preservedListing ?? createListingIntegrityEntry({});
+        nextCache.entries[id] = sortObjectByKeys(listingCacheEntries);
+        const preservedCounts = countIntegrityVersions(preservedListing);
+        completeVersions += preservedCounts.complete;
+        incompleteVersions += preservedCounts.incomplete;
+        warnListing(warnings, id, "preserved previous integrity state (transient custom-update fetch error)");
+      } else {
+        integrityListings[id] = createListingIntegrityEntry({});
+      }
       continue;
     }
 
@@ -381,13 +429,14 @@ export async function generateDownloadsDataFull(
         versionsChecked += 1;
 
         const zipAssets = Array.from(releaseData.assets.entries())
-          .filter(([assetName]) => assetName.toLowerCase().endsWith(".zip"));
-        const zipAssetNames = zipAssets.map(([assetName]) => assetName).sort();
+          .filter(([assetName]) => assetName.toLowerCase().endsWith(".zip"))
+          .sort(([a], [b]) => a.localeCompare(b));
+        const zipAssetNames = zipAssets.map(([name]) => name);
         const securityFingerprintPart = getSecurityFingerprintPart(
           listingType,
           modSecurityRules,
         );
-        const fingerprintBase = zipAssetNames.length > 0
+        const fingerprintBase = zipAssets.length > 0
           ? `github:${repo}:${tag}:${zipAssetNames.join("|")}${securityFingerprintPart}`
           : `github:${repo}:${tag}:no-zip${securityFingerprintPart}`;
         const fingerprint = versionedFingerprint(fingerprintBase);
@@ -397,7 +446,13 @@ export async function generateDownloadsDataFull(
           repo,
           tag,
         };
-        const shouldReuseCached = (
+        const currentZipSizes: Record<string, number> = Object.fromEntries(
+          zipAssets.flatMap(([name, a]) => a.sizeBytes != null ? [[name, a.sizeBytes]] : []),
+        );
+        const currentZipUpdatedAt: Record<string, string> = Object.fromEntries(
+          zipAssets.flatMap(([name, a]) => a.assetUpdatedAt != null ? [[name, a.assetUpdatedAt]] : []),
+        );
+        let shouldReuseCached = (
           !forceIntegrityRecheck
           && shouldUseCachedIntegrity(
             cached,
@@ -408,6 +463,24 @@ export async function generateDownloadsDataFull(
           && !isLegacyMapCacheMissingFileSizes(listingType, cached)
           && !isLegacyModCacheMissingSecurityCheck(listingType, cached)
         );
+        if (shouldReuseCached && cached != null) {
+          // Prefer updatedAt timestamps (catches same-size replacements, e.g. config.json version bump).
+          // Fall back to byte-size check for entries written before updatedAt was recorded.
+          const storedUpdatedAt = cached.asset_updated_at;
+          const storedSizes = cached.asset_sizes;
+          const updatedAtMismatch = storedUpdatedAt != null && (
+            Object.keys(currentZipUpdatedAt).some((name) => currentZipUpdatedAt[name] !== storedUpdatedAt[name])
+            || Object.keys(storedUpdatedAt).some((name) => !(name in currentZipUpdatedAt))
+          );
+          const sizeMismatch = storedSizes != null && storedUpdatedAt == null && (
+            Object.keys(currentZipSizes).some((name) => currentZipSizes[name] !== storedSizes[name])
+            || Object.keys(storedSizes).some((name) => !(name in currentZipSizes))
+          );
+          if (updatedAtMismatch || sizeMismatch) {
+            warnListing(warnings, id, "zip asset replaced since last inspection; forcing re-check", tag);
+            shouldReuseCached = false;
+          }
+        }
 
         if (shouldReuseCached) {
           cacheHits += 1;
@@ -528,12 +601,31 @@ export async function generateDownloadsDataFull(
                   attemptedReleaseSizeMiB,
                 )
             );
-          versionEntries[tag] = result;
-          nextListingCacheEntries[tag] = {
-            fingerprint,
-            last_checked_at: nowIso,
-            result,
-          };
+          const previousVersionEntry = previousIntegrity?.listings[id]?.versions?.[tag];
+          const zipSizesEntry = Object.keys(currentZipSizes).length > 0 ? currentZipSizes : undefined;
+          const zipUpdatedAtEntry = Object.keys(currentZipUpdatedAt).length > 0 ? currentZipUpdatedAt : undefined;
+          if (isGrandfatheredDowngrade(previousVersionEntry, result)) {
+            versionEntries[tag] = previousVersionEntry!;
+            nextListingCacheEntries[tag] = {
+              fingerprint,
+              last_checked_at: nowIso,
+              result: previousVersionEntry!,
+              asset_sizes: zipSizesEntry,
+              asset_updated_at: zipUpdatedAtEntry,
+            };
+            const failingKeys = Object.entries(result.required_checks)
+              .filter(([, v]) => !v).map(([k]) => k).join(", ");
+            warnListing(warnings, id, `preserved previous is_complete=true (grandfathered checks: ${failingKeys})`, tag);
+          } else {
+            versionEntries[tag] = result;
+            nextListingCacheEntries[tag] = {
+              fingerprint,
+              last_checked_at: nowIso,
+              result,
+              asset_sizes: zipSizesEntry,
+              asset_updated_at: zipUpdatedAtEntry,
+            };
+          }
         }
 
         if (isSupportedReleaseTag(tag)) {
@@ -808,12 +900,24 @@ export async function generateDownloadsDataFull(
                     releaseSizeMiB,
                     candidate.gameMeta,
                   );
-                  versionEntries[versionKey] = result;
-                  nextListingCacheEntries[versionKey] = {
-                    fingerprint,
-                    last_checked_at: nowIso,
-                    result,
-                  };
+                  if (isGrandfatheredDowngrade(previousVersionEntry, result)) {
+                    versionEntries[versionKey] = previousVersionEntry!;
+                    nextListingCacheEntries[versionKey] = {
+                      fingerprint,
+                      last_checked_at: nowIso,
+                      result: previousVersionEntry!,
+                    };
+                    const failingKeys = Object.entries(result.required_checks)
+                      .filter(([, v]) => !v).map(([k]) => k).join(", ");
+                    warnListing(warnings, id, `preserved previous is_complete=true (grandfathered checks: ${failingKeys})`, versionKey);
+                  } else {
+                    versionEntries[versionKey] = result;
+                    nextListingCacheEntries[versionKey] = {
+                      fingerprint,
+                      last_checked_at: nowIso,
+                      result,
+                    };
+                  }
                 }
               }
             }
@@ -889,6 +993,40 @@ export async function generateDownloadsDataFull(
       warnListing(warnings, id, `game_version required [${listingType}]: ${violation.reason}`, violation.version);
     }
 
+    // Stamp released_at (immutable publish date) onto every version — fresh, reused,
+    // and legacy cache entries alike. The output entry and its cache entry share a
+    // reference, so re-point both to the stamped copy.
+    for (const version of Object.keys(versionEntries)) {
+      const stamped = withReleasedAtIfMissing(versionEntries[version], publishEpochByVersion.get(version));
+      if (stamped === versionEntries[version]) continue;
+      versionEntries[version] = stamped;
+      const cacheEntry = nextListingCacheEntries[version];
+      if (cacheEntry) nextListingCacheEntries[version] = { ...cacheEntry, result: stamped };
+    }
+
+    for (const [version, entry] of Object.entries(versionEntries)) {
+      if (!entry.is_complete && Object.values(entry.required_checks).some((v) => v === false)) {
+        const prevEntry = previousIntegrity?.listings[id]?.versions?.[version];
+        if (prevEntry === undefined || prevEntry.is_complete === true) {
+          const meta = listingMeta.get(id);
+          integrityAlerts.push({
+            listingId: id,
+            listingName: meta?.listingName ?? id,
+            listingType,
+            authorId: meta?.authorId ?? "",
+            version,
+            isRegression: prevEntry?.is_complete === true,
+            failingChecks: Object.entries(entry.required_checks)
+              .filter(([, v]) => v === false)
+              .map(([k]) => k),
+            errors: entry.errors,
+            sourceRepo: entry.source.repo,
+            sourceTag: entry.source.tag,
+          });
+        }
+      }
+    }
+
     for (const result of Object.values(versionEntries)) {
       if (result.is_complete) {
         completeVersions += 1;
@@ -918,6 +1056,7 @@ export async function generateDownloadsDataFull(
       schema_version: 1,
       entries: sortObjectByKeys(nextCache.entries),
     },
+    integrityAlerts,
     stats: {
       listings: ids.length,
       versions_checked: versionsChecked,

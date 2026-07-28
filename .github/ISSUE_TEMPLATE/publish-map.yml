@@ -73,8 +73,9 @@
     "attributes":
       "label": "Country Code"
       "description": "ISO 3166-1 alpha-2 country code - two uppercase letters (e.g. US, GB, CA,
-        DE, JP). Used to group maps by country in Railyard. It is REQUIRED that you use ISO
-        codes according to this list:
+        DE, JP). Used to group maps by country in Railyard, and your map's location/region
+        tag (e.g. `DE` → `central-europe`) is derived from it automatically. It is REQUIRED
+        that you use ISO codes according to this list:
         https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes."
       "placeholder": "US"
     "validations":
@@ -98,11 +99,19 @@
       "value": "## Data Attestation
 
 
-        Provide details about your map's data source, data source quality, and level of
-        detail. Be honest and transparent in your descriptions and please include the
-        methodology you used to generate the map's data. See the [Data
-        Quality](https://subwaybuildermodded.com/wiki/railyard/latest/developers/data-quali\
-        ty) guide for more information."
+        Provide details about your map's data source and level of detail. Be honest and
+        transparent in your descriptions and please include the methodology you used to
+        generate the map's data. See the [Data
+        Quality](https://subwaybuildermodded.com/registry/docs/data-quality) guide for more
+        information.
+
+
+        After your submission is validated, you will be invited to answer the [data-quality
+        questions](https://subwaybuildermodded.com/registry/docs/data-quality/questions) — a
+        **required step**: your map cannot merge until a maintainer confirms your answers,
+        and new submissions are subject to the [quality
+        floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for
+        countries with existing maps."
   - "type": "input"
     "id": "data_source"
     "attributes":
@@ -113,21 +122,6 @@
       "value": "OSM"
     "validations":
       "required": false
-  - "type": "dropdown"
-    "id": "source_quality"
-    "attributes":
-      "label": "Source Quality"
-      "description": "Approximate quality of the data source used for your map. Official gov't
-        sources are considered high-quality while raw open-source data is considered
-        low-quality. If your data source includes OSM, we will not consider that
-        high-quality data."
-      "options":
-        - ""
-        - "low-quality"
-        - "medium-quality"
-        - "high-quality"
-    "validations":
-      "required": true
   - "type": "dropdown"
     "id": "level_of_detail"
     "attributes":
@@ -161,41 +155,8 @@
 
 
         Railyard allows users to search for maps based on tags and presents a preview image
-        for discovery. Please check whichever tags best represent your map. Note that
-        `Location` is required."
-  - "type": "dropdown"
-    "id": "location"
-    "attributes":
-      "label": "Location"
-      "description": "Select all tags that apply to your map. These help users find your map in
-        the browser."
-      "options":
-        - ""
-        - "caribbean"
-        - "central-america"
-        - "central-asia"
-        - "central-europe"
-        - "east-africa"
-        - "east-asia"
-        - "east-europe"
-        - "europe"
-        - "middle-east"
-        - "north-africa"
-        - "north-america"
-        - "north-europe"
-        - "oceania"
-        - "south-america"
-        - "south-asia"
-        - "south-europe"
-        - "southeast-asia"
-        - "southern-africa"
-        - "west-africa"
-        - "west-europe"
-    "validations":
-      "required": true
-  - "type": "markdown"
-    "attributes":
-      "value": "<br>"
+        for discovery. Please check whichever tags best represent your map. Your map's
+        location/region tag is derived automatically from the Country Code above."
   - "type": "markdown"
     "attributes":
       "value": "### Special Demand Tag Guide
@@ -314,4 +275,7 @@
       "options":
         - "label": "I attest that I am the author or this map or have been granted permission by the
             author to publish this map to Railyard."
+          "required": true
+        - "label": "I attest that I have reviewed the Subway Builder Modded platform [Terms of
+            Service](https://subwaybuildermodded.com/terms-of-service)."
           "required": true

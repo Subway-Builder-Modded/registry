@@ -6,7 +6,7 @@
   "github_id": 403544,
   "description": "**Porto Metropolitan Area (AMP)** — 17 municipalities, 1.7M inhabitants.\n\n(Vibecoded with Claude )\n\n## Demand Model\n- 59,992 O/D pairs generated from **INE BGRI 2021** (census tract level)\n- **1.20M simulated passengers** — 70.6% population coverage\n- Realistic urban drive-times (20/30/60 km/h by zone + 20% congestion penalty)\n- Captive boost for low car-ownership areas (Porto ×1.8, Gaia ×1.6, Matosinhos ×1.35)\n\n## Points of Interest\n- Francisco Sá Carneiro Airport, Port of Leixões, Cruise Terminal\n- Major hospitals (São João, Santo António, Pedro Hispano) and universities (UP, FEUP, ISEP)\n- CP rail stations (Campanhã, São Bento, Devesas) and bus terminals\n- 30+ tourist POIs: Ribeira, Torre dos Clérigos, Serralves, Casa da Música, Port Wine Caves\n\n## Coverage\n- Full detail up to zoom 15 across the AMP\n- Northern Portugal at low zoom (Braga, Aveiro, Viana do Castelo, Bragança) for geographic context",
   "tags": [
-    "europe",
+    "south-europe",
     "airports",
     "hospitals",
     "schools",
@@ -38,7 +38,7 @@
   "data_source": "OSM, INE",
   "source_quality": "medium-quality",
   "level_of_detail": "high-detail",
-  "location": "europe",
+  "location": "south-europe",
   "special_demand": [
     "airports",
     "hospitals",
@@ -47,12 +47,12 @@
   ],
   "file_sizes": {
     "OPO.pmtiles": 41.94,
-    "buildings_index.bin": 116.22,
+    "buildings_index.bin.gz": 37.7,
     "config.json": 0,
-    "demand_data.json": 14.1,
-    "ocean_depth_index.json": 0,
-    "roads.geojson": 26.1,
-    "runways_taxiways.geojson": 0.31
+    "demand_data.json.gz": 1.89,
+    "ocean_depth_index.json.gz": 0,
+    "roads.geojson.gz": 5.2,
+    "runways_taxiways.geojson.gz": 0.11
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
@@ -131,7 +131,7 @@
       }
     }
   },
-  "last_updated": 1783457763,
+  "last_updated": 1783560953,
   "search_aliases": [
     "Porto",
     "Oporto",
@@ -147,5 +147,11 @@
     "पोर्टो",
     "পোর্তো"
   ],
-  "sub_location": "south-europe"
+  "collaborators": [
+    198279488
+  ],
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
 }

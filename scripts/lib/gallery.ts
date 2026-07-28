@@ -2,8 +2,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import sharp from "sharp";
 
-const MIN_SCREENSHOT_SIZE = 5 * 1024; // 5KB — badges/icons are typically smaller
-// Matches scripts/convert-galleries-to-webp.ts; visually lossless for screenshots.
+// Visually lossless for screenshots (same setting the one-time gallery
+// conversion used when existing listings were migrated to webp).
 const GALLERY_WEBP_QUALITY = 82;
 
 /**
@@ -132,8 +132,7 @@ export async function resolveGalleryUrls(
 /**
  * Download gallery images to disk.
  *
- * Skips SVG images (likely badges) and images smaller than MIN_SCREENSHOT_SIZE
- * (likely icons/badges rather than actual screenshots).
+ * Skips SVG images (likely badges)
  */
 export async function downloadGalleryImages(
   urls: string[],
@@ -164,14 +163,6 @@ export async function downloadGalleryImages(
       }
 
       const buffer = Buffer.from(await response.arrayBuffer());
-
-      // Skip very small images (badges, icons)
-      if (buffer.length < MIN_SCREENSHOT_SIZE) {
-        console.warn(
-          `Skipping image ${i + 1}: too small (${buffer.length} bytes, likely a badge/icon)`
-        );
-        continue;
-      }
 
       // Transcode all gallery screenshots to WebP to keep the registry (and the
       // Railyard app's clone) small. The app has rendered image/webp since its

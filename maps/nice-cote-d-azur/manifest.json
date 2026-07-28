@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "id": "nice-cote-d-azur",
+  "name": "Nice",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of the greater Nice - Cote d'Azur area (France), from Cannes and Sophia Antipolis to Menton and the Italian border. 245k OSM buildings (binary format), 478k+ commuters with demand built from real INSEE census data (Filosofi 2021, mobilites professionnelles 2021). Realistic traffic generators: Nice Cote d'Azur airport (Terminal 1 and Terminal 2), Universite Cote d'Azur campuses, Sophia Antipolis technology park, CHU Pasteur hospital, Promenade des Anglais. Protomaps basemap with water, parks and forests. Ocean depth data for the Mediterranean coastline.",
+  "tags": [
+    "west-europe",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subway-builder-nice",
+  "update": {
+    "type": "github",
+    "repo": "pierreggt/subway-builder-nice"
+  },
+  "city_code": "NCE",
+  "country": "FR",
+  "population": 478024,
+  "residents_total": 478024,
+  "points_count": 6538,
+  "population_count": 8676,
+  "initial_view_state": {
+    "latitude": 43.7102,
+    "longitude": 7.262,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "west-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "NCE.pmtiles": 28.3,
+    "buildings_index.bin.gz": 14.36,
+    "config.json": 0,
+    "demand_data.json.gz": 0.29,
+    "ocean_depth_index.json.gz": 3.75,
+    "ocean_depth_index_contours.json.gz": 2.95,
+    "roads.geojson.gz": 2.84,
+    "runways_taxiways.geojson.gz": 0.09
+  },
+  "included_cities": [
+    "Cannes",
+    "Antibes",
+    "Cagnes-sur-Mer",
+    "Saint-Laurent-du-Var",
+    "Villeneuve-Loubet",
+    "Vence",
+    "Valbonne",
+    "Sophia Antipolis",
+    "Grasse",
+    "Mougins",
+    "Menton",
+    "Beaulieu-sur-Mer",
+    "Villefranche-sur-Mer",
+    "Roquebrune-Cap-Martin"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1985231991163556,
+      "p25": 0.19864539750316917,
+      "p50": 0.19885009323801447,
+      "p75": 0.19921618443078912,
+      "p90": 0.20031337324060317,
+      "mean": 0.24365120622931838
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.19855062639375176,
+      "p25": 0.19866130754564842,
+      "p50": 0.19890901125961225,
+      "p75": 0.19944240121164714,
+      "p90": 0.4299676142437948,
+      "mean": 0.3111866684502301
+    },
+    "commuteDistanceKm": {
+      "p10": 2879,
+      "p25": 4701,
+      "p50": 9541,
+      "p75": 18051,
+      "p90": 29953,
+      "mean": 13388.77305209774
+    },
+    "residentCellDensity": {
+      "p10": 23,
+      "p25": 70,
+      "p50": 210,
+      "p75": 614,
+      "p90": 1381,
+      "mean": 495.6071805702218
+    },
+    "workerCellDensity": {
+      "p10": 15,
+      "p25": 60,
+      "p50": 180,
+      "p75": 600,
+      "p90": 1319,
+      "mean": 518.3825799338479
+    },
+    "detail": {
+      "radiusKm": 0.19887955006700705,
+      "expectedPointSpacingKm": 0.39921918284299884,
+      "normalizedRadius": 0.49817132696556954,
+      "activityPerPoint": 73.11471397981033,
+      "playableAreaKm2": 1320,
+      "playableAreaPerPointKm2": 0.20189660446619762,
+      "playableCatchmentRadiusKm": 0.25350677542923616,
+      "localityScore": 0.6262305528109041,
+      "deaggregationScore": 1,
+      "score": 0.791347302270567
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9887886198393068,
+        "continuousScore": 0.8012932332996926,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9778258425871125,
+        "largestCenterShare": 0.5529419024986193,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 7.242487344898882,
+            "latitude": 43.71625015320489,
+            "massShare": 0.5529419024986193,
+            "assignedMass": 528639,
+            "assignedPointCount": 3747,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 6.999288639687037,
+            "latitude": 43.58805673743415,
+            "massShare": 0.4470580975013807,
+            "assignedMass": 427409,
+            "assignedPointCount": 2791,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784381653,
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
+}

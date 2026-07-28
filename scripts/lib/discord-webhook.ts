@@ -21,13 +21,15 @@ export function buildDiscordMarkdownMessage(options: SendDiscordMarkdownOptions)
   return messageLines.join("\n");
 }
 
-interface DiscordEmbed {
+export interface DiscordEmbed {
   title?: string;
   description: string;
   color: number;
+  footer?: { text: string };
 }
 
 interface DiscordWebhookPayload {
+  content?: string;
   embeds: DiscordEmbed[];
 }
 
@@ -115,6 +117,35 @@ export async function sendDiscordMarkdown(options: SendDiscordMarkdownOptions): 
       timeoutMs,
       heartbeatPrefix: "[discord]",
       heartbeatLabel: "send-webhook",
+    },
+  );
+  if (!response.ok) {
+    throw new Error(`Discord webhook returned HTTP ${response.status}`);
+  }
+}
+
+export async function sendDiscordPayload(
+  webhookUrl: string,
+  content: string | undefined,
+  embeds: DiscordEmbed[],
+): Promise<void> {
+  const timeoutMs = resolveTimeoutMsFromEnv("DISCORD_WEBHOOK_TIMEOUT_MS", 15_000);
+  const payload: DiscordWebhookPayload = { embeds };
+  if (content && content.trim() !== "") {
+    payload.content = content;
+  }
+  const response = await fetchWithTimeout(
+    fetch,
+    webhookUrl,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    },
+    {
+      timeoutMs,
+      heartbeatPrefix: "[discord]",
+      heartbeatLabel: "send-payload",
     },
   );
   if (!response.ok) {

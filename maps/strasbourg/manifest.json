@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "id": "strasbourg",
+  "name": "Strasbourg",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of the greater Strasbourg metropolitan area (France), from Strasbourg-Entzheim airport to the European institutions and across the Rhine to Kehl (Germany). 122k+ OSM buildings (binary format), 371k+ commuters with demand built from real INSEE census data, including a synthetic cross-border commuting model for Kehl. Strasbourg-Entzheim airport with runways and taxiways. The Rhine and Ill rivers fully modelled with depth data. Protomaps basemap with water, parks and forests.",
+  "tags": [
+    "west-europe",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subway-builder-strasbourg",
+  "update": {
+    "type": "github",
+    "repo": "pierreggt/subway-builder-strasbourg"
+  },
+  "city_code": "STR",
+  "country": "FR",
+  "population": 371948,
+  "residents_total": 371948,
+  "points_count": 2794,
+  "population_count": 5509,
+  "initial_view_state": {
+    "latitude": 48.5734,
+    "longitude": 7.7521,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "west-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "STR.pmtiles": 12.45,
+    "buildings_index.bin.gz": 6.28,
+    "config.json": 0,
+    "demand_data.json.gz": 0.16,
+    "ocean_depth_index.json.gz": 0.65,
+    "ocean_depth_index_contours.json.gz": 0.55,
+    "roads.geojson.gz": 1.03,
+    "runways_taxiways.geojson.gz": 0.09
+  },
+  "included_cities": [
+    "Kehl",
+    "Schiltigheim",
+    "Illkirch-Graffenstaden",
+    "Lingolsheim",
+    "Ostwald",
+    "Bischheim",
+    "Hoenheim",
+    "Eckbolsheim",
+    "Oberhausbergen",
+    "Mundolsheim"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.14123170424223982,
+      "p25": 0.1988886062411349,
+      "p50": 0.19919150380334802,
+      "p75": 0.19944574327145134,
+      "p90": 0.20023744134396837,
+      "mean": 0.20877242498639667
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1987426371605591,
+      "p25": 0.1991260969574419,
+      "p50": 0.19952770203591308,
+      "p75": 0.5034875341359834,
+      "p90": 0.6084929435589067,
+      "mean": 0.3351907909239241
+    },
+    "commuteDistanceKm": {
+      "p10": 2086,
+      "p25": 4735,
+      "p50": 7059,
+      "p75": 10900,
+      "p90": 16946,
+      "mean": 8458.418406244327
+    },
+    "residentCellDensity": {
+      "p10": 60,
+      "p25": 128,
+      "p50": 370,
+      "p75": 1117,
+      "p90": 2728,
+      "mean": 991.5335120643432
+    },
+    "workerCellDensity": {
+      "p10": 21,
+      "p25": 67,
+      "p50": 228,
+      "p75": 810,
+      "p90": 1962,
+      "mean": 1048.1610169491526
+    },
+    "detail": {
+      "radiusKm": 0.19935953204941034,
+      "expectedPointSpacingKm": 0.3740892065148678,
+      "normalizedRadius": 0.5329197650654136,
+      "activityPerPoint": 133.12383679312813,
+      "playableAreaKm2": 464,
+      "playableAreaPerPointKm2": 0.16607015032211883,
+      "playableCatchmentRadiusKm": 0.22991687769182725,
+      "localityScore": 0.5548387358164201,
+      "deaggregationScore": 1,
+      "score": 0.7448749799908841
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.16219479984777121,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 7.738879448687724,
+            "latitude": 48.580012796612266,
+            "massShare": 1,
+            "assignedMass": 743896,
+            "assignedPointCount": 2794,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784576716,
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
+}

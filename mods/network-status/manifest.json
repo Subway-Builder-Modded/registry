@@ -4,7 +4,7 @@
   "name": "Network Status",
   "author": "Valdotorium",
   "github_id": 116170877,
-  "description": "This mod adds a panel to the game, showing average delays per line, service disruptions and some more insights. Great for finding bottlenecks and disruptions on networks. (though it is definitely more fun the larger the network is...)\nIt aims to make delays and disruptions included in the vanilla game more clearly and understandable.\n(And even if it turns out to be not useful, I still think it is fun to look at)\nInspired by the little disruptions panel in the TfLGo app.\n\nTo calculate all of these stats, all trains (with reasonable delays < 10000 seconds) in the current game are periodically analysed every few seconds.\n\nA train classifies as \"Minor Delay\" as soon as it is delayed by 90 seconds, and as \"Major Delay\" by 300 seconds.\n\nKnown issues: \n-Does not look that good with long line names.\n-As just displaying line names (e.g. \"1\") in the stats, lines with different bullet shapes might look the same.\n\nFeature ideas:\n-Average/24h punctuality stats for the whole network and individual lines.",
+  "description": "This mod adds a panel to the game, showing average delays per line, service disruptions and some more insights. Great for finding bottlenecks and disruptions on networks. (though it is definitely more fun the larger the network is...) It aims to make delays and disruptions included in the vanilla game visible. (And even if it turns out to be not useful, I still think it is fun to look at)\n_Inspired by the disruptions panel in the TfLGo app._\n\n**Statistics shown:**\n\n-Amount of routes with minor/severe disruptions as coloured bars\n-Amount of trains delayed with minor/severe delays\n-Average delay per route\n-Current and average historic punctuality rates (sometimes slightly inaccurate)\n\nTo calculate all of these stats, all trains (with reasonable delays < 10000 seconds) in the current game are periodically analysed every few seconds according to simulation speed.\n\nA train classifies as \"Minor Delay\" as soon as it is delayed by 90 seconds, and as \"Major Delay\" by 300 seconds.\n\nKnown issues: -Does not look that good with long line names. -As just displaying line names (e.g. \"1\") in the stats, lines with different bullet shapes might look the same.",
   "tags": [
     "cosmetic",
     "misc",
@@ -14,7 +14,8 @@
   "gallery": [
     "gallery/screenshot1.webp",
     "gallery/screenshot2.webp",
-    "gallery/screenshot3.webp"
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp"
   ],
   "is_test": false,
   "source": "https://github.com/Valdotorium/network-status",
@@ -22,5 +23,5 @@
     "type": "github",
     "repo": "Valdotorium/network-status"
   },
-  "last_updated": 1775548550
+  "last_updated": 1784762796
 }

@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "id": "ankara",
+  "name": "Ankara",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of the Ankara metropolitan area (Turkiye), Turkey's capital, covering the nine core metropolitan districts from Esenboga Airport to Golbasi. 285,900+ OSM buildings, 2.85M+ commuters built from TUIK population data by district with jobs estimated from OpenStreetMap commercial density. Special demand points: Esenboga International Airport (real 2025 traffic), Ankara Gari (YHT high-speed rail hub), five university campuses (Ankara University, METU/ODTU, Hacettepe), Anitkabir, Museum of Anatolian Civilizations, and two major industrial zones (OSTIM, ASO 1st OIZ). Simulated traffic congestion on longer commutes.",
+  "tags": [
+    "middle-east",
+    "airports",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subway-builder-ankara",
+  "update": {
+    "type": "github",
+    "repo": "pierreggt/subway-builder-ankara"
+  },
+  "city_code": "ANK",
+  "country": "TR",
+  "population": 2854650,
+  "residents_total": 2854650,
+  "points_count": 15702,
+  "population_count": 27325,
+  "initial_view_state": {
+    "latitude": 39.9334,
+    "longitude": 32.8597,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "TUIK, OSM",
+  "source_quality": "medium-quality",
+  "level_of_detail": "medium-detail",
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  },
+  "location": "middle-east",
+  "special_demand": [
+    "airports",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "ANK.pmtiles": 19.07,
+    "buildings_index.bin.gz": 13.82,
+    "config.json": 0,
+    "demand_data.json.gz": 0.76,
+    "ocean_depth_index.json.gz": 0.66,
+    "ocean_depth_index_contours.json.gz": 0.59,
+    "roads.geojson.gz": 3.27,
+    "runways_taxiways.geojson.gz": 0.09
+  },
+  "included_cities": [
+    "Çankaya",
+    "Keçiören",
+    "Yenimahalle",
+    "Mamak",
+    "Sincan",
+    "Etimesgut",
+    "Gölbaşı",
+    "Pursaklar",
+    "Altındağ"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.03511018018922082,
+      "p25": 0.05574192088107725,
+      "p50": 0.09452045028356601,
+      "p75": 0.1549193635679881,
+      "p90": 0.2530845620320079,
+      "mean": 0.13177006116416912
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.007554721746866661,
+      "p25": 0.015499604319683955,
+      "p50": 0.039770933733980156,
+      "p75": 0.10454003297738777,
+      "p90": 0.4202371699977973,
+      "mean": 0.1309511722494792
+    },
+    "commuteDistanceKm": {
+      "p10": 4418,
+      "p25": 5718,
+      "p50": 8103,
+      "p75": 12590,
+      "p90": 20210,
+      "mean": 10550.527978042086
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 300,
+      "p50": 800,
+      "p75": 2500,
+      "p90": 5100,
+      "mean": 1860.5228758169935
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 500,
+      "p50": 1500,
+      "p75": 4200,
+      "p90": 9000,
+      "mean": 3675.935483870968
+    },
+    "detail": {
+      "radiusKm": 0.06131204257512279,
+      "expectedPointSpacingKm": 0.31781479078726615,
+      "normalizedRadius": 0.19291752414431484,
+      "activityPerPoint": 181.80168131448224,
+      "playableAreaKm2": 2116,
+      "playableAreaPerPointKm2": 0.13475990319704495,
+      "playableCatchmentRadiusKm": 0.20711206978056598,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8134694509644791,
+        "continuousScore": 0.7732351416381346,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.6855866051031834,
+        "largestCenterShare": 0.7159459128089258,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 32.851632003156,
+            "latitude": 39.95305110567481,
+            "massShare": 0.7159459128089258,
+            "assignedMass": 4087550,
+            "assignedPointCount": 10699,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 32.6114398930168,
+            "latitude": 39.97405406844465,
+            "massShare": 0.2840540871910742,
+            "assignedMass": 1621750,
+            "assignedPointCount": 5003,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784645563
+}

@@ -54,7 +54,8 @@ test("map update applies only provided fields", () => {
     country: "",
   });
 
-  assert.equal(manifest.source_quality, "low-quality");
+  // source_quality is machine-managed; a user-supplied value is ignored.
+  assert.equal(manifest.source_quality, "medium-quality");
   assert.equal(manifest.id, before.id);
   assert.equal(manifest.city_code, before.city_code);
   assert.equal(manifest.country, before.country);

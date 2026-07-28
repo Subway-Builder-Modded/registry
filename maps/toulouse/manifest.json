@@ -1,0 +1,160 @@
+{
+  "schema_version": 1,
+  "id": "toulouse",
+  "name": "Toulouse",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of the greater Toulouse metropolitan area (France), from Toulouse-Blagnac airport to Muret and from Colomiers to Balma. 245k+ OSM buildings (binary format), 554k+ commuters with demand built from real INSEE census data. Toulouse-Blagnac airport with runways and taxiways. The Garonne river fully modelled with depth data. Protomaps basemap with water, parks and forests.",
+  "tags": [
+    "west-europe",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subway-builder-toulouse",
+  "update": {
+    "type": "github",
+    "repo": "pierreggt/subway-builder-toulouse"
+  },
+  "city_code": "TLS",
+  "country": "FR",
+  "population": 554668,
+  "residents_total": 554668,
+  "points_count": 5959,
+  "population_count": 9397,
+  "initial_view_state": {
+    "latitude": 43.6045,
+    "longitude": 1.4442,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "west-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "TLS.pmtiles": 22.05,
+    "buildings_index.bin.gz": 14.01,
+    "config.json": 0,
+    "demand_data.json.gz": 0.3,
+    "ocean_depth_index.json.gz": 1.53,
+    "ocean_depth_index_contours.json.gz": 1.33,
+    "roads.geojson.gz": 2.33,
+    "runways_taxiways.geojson.gz": 0.15
+  },
+  "included_cities": [
+    "Blagnac",
+    "Colomiers",
+    "Muret",
+    "Balma",
+    "Tournefeuille",
+    "L'Union",
+    "Cugnaux",
+    "Ramonville-Saint-Agne",
+    "Castanet-Tolosan",
+    "Saint-Orens-de-Gameville"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.19870545525004008,
+      "p25": 0.19905767544300013,
+      "p50": 0.19931690515456454,
+      "p75": 0.19947958724217338,
+      "p90": 0.20021931438353355,
+      "mean": 0.21220623265487182
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1987225781439308,
+      "p25": 0.1991949119321164,
+      "p50": 0.19935128778043404,
+      "p75": 0.2001384260099288,
+      "p90": 0.5235609136182743,
+      "mean": 0.2719131880778751
+    },
+    "commuteDistanceKm": {
+      "p10": 3801,
+      "p25": 6302,
+      "p50": 10411,
+      "p75": 16390,
+      "p90": 22813,
+      "mean": 12000.397360859848
+    },
+    "residentCellDensity": {
+      "p10": 60,
+      "p25": 120,
+      "p50": 360,
+      "p75": 900,
+      "p90": 2018,
+      "mean": 726.1773981603154
+    },
+    "workerCellDensity": {
+      "p10": 15,
+      "p25": 64,
+      "p50": 215,
+      "p75": 729,
+      "p90": 2242,
+      "mean": 773.5027932960894
+    },
+    "detail": {
+      "radiusKm": 0.19933409572617794,
+      "expectedPointSpacingKm": 0.36640239246887285,
+      "normalizedRadius": 0.5440305517194789,
+      "activityPerPoint": 93.08071824131565,
+      "playableAreaKm2": 724,
+      "playableAreaPerPointKm2": 0.12149689545225709,
+      "playableCatchmentRadiusKm": 0.1966562049951434,
+      "localityScore": 0.5329908088208323,
+      "deaggregationScore": 1,
+      "score": 0.7300621951730087
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.7110357011001391,
+        "continuousScore": 0.5549968676277907,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.5516333553280044,
+        "largestCenterShare": 0.768776998132216,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 1.4447195396045147,
+            "latitude": 43.59176773414937,
+            "massShare": 0.768776998132216,
+            "assignedMass": 852832,
+            "assignedPointCount": 3978,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 1.3342179908305563,
+            "latitude": 43.58826567191936,
+            "massShare": 0.23122300186778397,
+            "assignedMass": 256504,
+            "assignedPointCount": 1981,
+            "prominenceRatio": 0.9999999921339113
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784468332,
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
+}

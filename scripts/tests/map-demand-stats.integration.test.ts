@@ -40,7 +40,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://github.com/owner/repo",
     update: { type: "github", repo: "owner/repo" },
@@ -53,7 +53,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
 
@@ -64,7 +64,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/update.json" },
@@ -77,7 +77,7 @@ test("generateMapDemandStats updates manifests for github/custom install targets
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
 
@@ -204,7 +204,7 @@ test("generateMapDemandStats chooses latest semver custom version (not versions[
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/custom-latest-update.json" },
@@ -217,7 +217,7 @@ test("generateMapDemandStats chooses latest semver custom version (not versions[
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
 
@@ -294,7 +294,7 @@ test("generateMapDemandStats prefers the github asset named by manifest source f
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["east-europe"],
     gallery: ["gallery/a.png"],
     source: "https://github.com/owner/romania/releases/latest/download/BUC.zip",
     update: { type: "github", repo: "owner/romania" },
@@ -307,7 +307,7 @@ test("generateMapDemandStats prefers the github asset named by manifest source f
     data_source: "Kontur",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "east-europe",
     special_demand: [],
   });
 
@@ -409,7 +409,7 @@ test("generateMapDemandStats warns when fetched custom payload is not a ZIP", as
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/nonzip-update.json" },
@@ -422,7 +422,7 @@ test("generateMapDemandStats warns when fetched custom payload is not a ZIP", as
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
 
@@ -482,7 +482,7 @@ test("generateMapDemandStats skips failed maps and keeps existing manifests", as
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/broken-update.json" },
@@ -496,7 +496,7 @@ test("generateMapDemandStats skips failed maps and keeps existing manifests", as
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
 
@@ -549,7 +549,7 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/cached-update.json" },
@@ -563,7 +563,7 @@ test("generateMapDemandStats skips unchanged sha fingerprint regardless of cache
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
   writeDemandStatsCacheV2(repoRoot, {
@@ -839,7 +839,7 @@ test("generateMapDemandStats syncs grid_statistics from existing grid.geojson on
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/cached-grid-update.json" },
@@ -853,7 +853,7 @@ test("generateMapDemandStats syncs grid_statistics from existing grid.geojson on
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
   writeDemandStatsCacheV2(repoRoot, {
@@ -993,7 +993,7 @@ test("generateMapDemandStats recomputes when unchanged fingerprint cache is miss
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/grid-refresh-update.json" },
@@ -1006,7 +1006,7 @@ test("generateMapDemandStats recomputes when unchanged fingerprint cache is miss
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
   writeDemandStatsCacheV2(repoRoot, {
@@ -1077,7 +1077,7 @@ test("generateMapDemandStats treats legacy cache schema as invalid and rewrites 
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/legacy-update.json" },
@@ -1090,7 +1090,7 @@ test("generateMapDemandStats treats legacy cache schema as invalid and rewrites 
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
   writeJson(join(repoRoot, "maps", "demand-stats-cache.json"), {
@@ -1164,7 +1164,7 @@ test("generateMapDemandStats force mode bypasses unchanged sha cache checks", as
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/force-update.json" },
@@ -1177,7 +1177,7 @@ test("generateMapDemandStats force mode bypasses unchanged sha cache checks", as
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
   writeDemandStatsCacheV2(repoRoot, {
@@ -1263,7 +1263,7 @@ test("generateMapDemandStats mapId option processes only the target map", async 
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/target-update.json" },
@@ -1276,7 +1276,7 @@ test("generateMapDemandStats mapId option processes only the target map", async 
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
   writeJson(join(repoRoot, "maps", "other-map", "manifest.json"), {
@@ -1286,7 +1286,7 @@ test("generateMapDemandStats mapId option processes only the target map", async 
     author: "test",
     github_id: 1,
     description: "desc",
-    tags: ["europe"],
+    tags: ["north-america"],
     gallery: ["gallery/a.png"],
     source: "https://example.com/source",
     update: { type: "custom", url: "https://example.com/other-update.json" },
@@ -1299,7 +1299,7 @@ test("generateMapDemandStats mapId option processes only the target map", async 
     data_source: "LODES",
     source_quality: "medium-quality",
     level_of_detail: "medium-detail",
-    location: "europe",
+    location: "north-america",
     special_demand: [],
   });
 

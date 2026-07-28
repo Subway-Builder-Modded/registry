@@ -10,9 +10,11 @@ import {
   getMapDataSource,
   getOptionalIssueValue,
   getRequiredIssueValue,
-  normalizeSourceQualityForDataSource,
 } from "./lib/map-field-utils.js";
-import { COUNTRY_TO_EUROPE_SUB_REGION } from "./lib/map-constants.js";
+import {
+  COUNTRY_TO_LOCATION,
+  DEFAULT_SOURCE_QUALITY,
+} from "./lib/map-constants.js";
 import {
   ensureCollaboratorAuthorAliasPrefills,
   resolvePublishCollaborators,
@@ -26,7 +28,8 @@ import {
 import { resolveAndExtractDemandStatsForMapSource } from "./lib/map-demand-stats.js";
 import type { DemandStats } from "./lib/map-demand-stats.js";
 import { assertValidRegistryManifest } from "./lib/registry-manifest.js";
-import type { LevelOfDetail, LocationTag, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
+import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
+import type { LevelOfDetail, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import { ensureAuthorAliasPrefill } from "./lib/author-aliases.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");
@@ -73,12 +76,17 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
     data.level_of_detail,
   );
   const dataSource = getMapDataSource(data.data_source);
-  const location = getRequiredIssueValue("location", data.location);
+  // location is machine-managed: derived from the country code, never
+  // user-selected (validate-publish rejects unmapped countries first).
+  const country = String(data.country);
+  const location = COUNTRY_TO_LOCATION[country];
+  if (!location) {
+    throw new Error(`No location mapping for country "${country}" — must be an ISO 3166-1 alpha-2 code.`);
+  }
   const specialDemand = parseTags(data.special_demand);
-  const sourceQuality = normalizeSourceQualityForDataSource(
-    dataSource,
-    getRequiredIssueValue("source_quality", data.source_quality),
-  );
+  // source_quality is machine-managed: new maps get the conservative default;
+  // the data-quality tier (reviewer-confirmed) is the real quality signal.
+  const sourceQuality = DEFAULT_SOURCE_QUALITY;
   const update = buildUpdate(data);
   const mapId = String(data["map-id"]);
   let demandStats: DemandStats;
@@ -101,11 +109,6 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
   }
 
   const includedCities = parseCommaSeparated(data["included-cities"]);
-  const country = String(data.country);
-  const subLocation = location === "europe" ? COUNTRY_TO_EUROPE_SUB_REGION[country] : undefined;
-  if (location === "europe" && !subLocation) {
-    console.warn(`[create-listing] No sub_location mapping for country="${country}"; leaving sub_location unset.`);
-  }
 
   return {
     tags: combineMapTags(location, specialDemand),
@@ -120,8 +123,10 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
       data_source: dataSource,
       source_quality: sourceQuality as SourceQuality,
       level_of_detail: levelOfDetail as LevelOfDetail,
-      location: location as LocationTag,
-      ...(subLocation ? { sub_location: subLocation as LocationTag } : {}),
+      // Every new map starts Unscored; a scored block is written only after a
+      // reviewer confirms the map's data-quality answers (plan D3/D5).
+      data_quality: { tier: "unknown", rubric_version: RUBRIC_VERSION },
+      location,
       special_demand: specialDemand as SpecialDemandTag[],
       file_sizes: {},
       ...(includedCities.length > 0 ? { included_cities: includedCities } : {}),

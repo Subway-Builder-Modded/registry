@@ -13,6 +13,7 @@ import {
   DownloadHistorySnapshotSchema,
   DownloadAttributionHistorySnapshotSchema,
   SecurityRulesFileSchema,
+  DataQualityAnswersFileSchema,
 } from "./index.js";
 
 const SCHEMAS = {
@@ -28,6 +29,7 @@ const SCHEMAS = {
   "download-history-snapshot": DownloadHistorySnapshotSchema,
   "attribution-history-snapshot": DownloadAttributionHistorySnapshotSchema,
   "security-rules": SecurityRulesFileSchema,
+  "data-quality-answers": DataQualityAnswersFileSchema,
 } as const;
 
 mkdirSync("json-schemas", { recursive: true });

@@ -14,7 +14,7 @@ const BASE_ANNOUNCEMENT = `# New $TYPE! 🎉🎉
 
 $DESCRIPTION
 
-See more [here](https://subwaybuildermodded.com/railyard/$TYPE_LOWER/$NAME_LOWER).`
+See more [here](https://subwaybuildermodded.com/registry/$TYPE_LOWER/$NAME_LOWER).`
 
 const ALLOWED_MENTIONS = {
     parse: [],

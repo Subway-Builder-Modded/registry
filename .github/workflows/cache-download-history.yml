@@ -295,19 +295,26 @@ jobs:
           title: "chore: cache download history snapshot"
           body: "Automated update from cache-download-history workflow."
 
+      - name: Mint bot token
+        id: bot-token
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Finalize bot PR automation
         id: bot_pr
         if: ${{ steps.commit_changes.outputs.committed == 'true' }}
         uses: ./.github/actions/bot-pr-automation
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_token: ${{ steps.bot-token.outputs.token }}
           repo: ${{ github.repository }}
           bot_branch: bot/cache-download-history
           pr_number: ${{ steps.create_pr.outputs.pull-request-number }}
           pr_url: ${{ steps.create_pr.outputs.pull-request-url }}
           pr_head_sha: ${{ steps.create_pr.outputs.pull-request-head-sha }}
-          source_workflow: ${{ github.workflow }}
-          source_run_id: ${{ github.run_id }}
 
       - name: Finalize change outputs
         id: finalize_changes

@@ -90,6 +90,7 @@ export declare const IntegrityVersionEntrySchema: z.ZodObject<{
     }>;
     fingerprint: z.ZodString;
     checked_at: z.ZodString;
+    released_at: z.ZodOptional<z.ZodString>;
 }, "strip", z.ZodTypeAny, {
     source: {
         update_type: "custom" | "github";
@@ -118,6 +119,7 @@ export declare const IntegrityVersionEntrySchema: z.ZodObject<{
             snippet?: string | undefined;
         }[];
     } | undefined;
+    released_at?: string | undefined;
 }, {
     source: {
         update_type: "custom" | "github";
@@ -146,6 +148,7 @@ export declare const IntegrityVersionEntrySchema: z.ZodObject<{
             snippet?: string | undefined;
         }[];
     } | undefined;
+    released_at?: string | undefined;
 }>;
 export declare const ListingIntegrityEntrySchema: z.ZodObject<{
     has_complete_version: z.ZodBoolean;
@@ -226,6 +229,7 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
         }>;
         fingerprint: z.ZodString;
         checked_at: z.ZodString;
+        released_at: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         source: {
             update_type: "custom" | "github";
@@ -254,6 +258,7 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
                 snippet?: string | undefined;
             }[];
         } | undefined;
+        released_at?: string | undefined;
     }, {
         source: {
             update_type: "custom" | "github";
@@ -282,6 +287,7 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
                 snippet?: string | undefined;
             }[];
         } | undefined;
+        released_at?: string | undefined;
     }>>;
 }, "strip", z.ZodTypeAny, {
     has_complete_version: boolean;
@@ -317,6 +323,7 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
                 snippet?: string | undefined;
             }[];
         } | undefined;
+        released_at?: string | undefined;
     }>;
     last_updated?: number | undefined;
 }, {
@@ -353,6 +360,7 @@ export declare const ListingIntegrityEntrySchema: z.ZodObject<{
                 snippet?: string | undefined;
             }[];
         } | undefined;
+        released_at?: string | undefined;
     }>;
     last_updated?: number | undefined;
 }>;
@@ -438,6 +446,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
             }>;
             fingerprint: z.ZodString;
             checked_at: z.ZodString;
+            released_at: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             source: {
                 update_type: "custom" | "github";
@@ -466,6 +475,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         }, {
             source: {
                 update_type: "custom" | "github";
@@ -494,6 +504,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         }>>;
     }, "strip", z.ZodTypeAny, {
         has_complete_version: boolean;
@@ -529,6 +540,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         }>;
         last_updated?: number | undefined;
     }, {
@@ -565,6 +577,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         }>;
         last_updated?: number | undefined;
     }>>;
@@ -605,6 +618,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         }>;
         last_updated?: number | undefined;
     }>;
@@ -645,6 +659,7 @@ export declare const IntegrityOutputSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         }>;
         last_updated?: number | undefined;
     }>;
@@ -724,6 +739,7 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
         }>;
         fingerprint: z.ZodString;
         checked_at: z.ZodString;
+        released_at: z.ZodOptional<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
         source: {
             update_type: "custom" | "github";
@@ -752,6 +768,7 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
                 snippet?: string | undefined;
             }[];
         } | undefined;
+        released_at?: string | undefined;
     }, {
         source: {
             update_type: "custom" | "github";
@@ -780,6 +797,7 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
                 snippet?: string | undefined;
             }[];
         } | undefined;
+        released_at?: string | undefined;
     }>;
 }, "strip", z.ZodTypeAny, {
     fingerprint: string;
@@ -812,6 +830,7 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
                 snippet?: string | undefined;
             }[];
         } | undefined;
+        released_at?: string | undefined;
     };
 }, {
     fingerprint: string;
@@ -844,6 +863,7 @@ export declare const IntegrityCacheEntrySchema: z.ZodObject<{
                 snippet?: string | undefined;
             }[];
         } | undefined;
+        released_at?: string | undefined;
     };
 }>;
 export declare const IntegrityCacheSchema: z.ZodObject<{
@@ -923,6 +943,7 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
             }>;
             fingerprint: z.ZodString;
             checked_at: z.ZodString;
+            released_at: z.ZodOptional<z.ZodString>;
         }, "strip", z.ZodTypeAny, {
             source: {
                 update_type: "custom" | "github";
@@ -951,6 +972,7 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         }, {
             source: {
                 update_type: "custom" | "github";
@@ -979,6 +1001,7 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         }>;
     }, "strip", z.ZodTypeAny, {
         fingerprint: string;
@@ -1011,6 +1034,7 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         };
     }, {
         fingerprint: string;
@@ -1043,6 +1067,7 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         };
     }>>>;
 }, "strip", z.ZodTypeAny, {
@@ -1077,6 +1102,7 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         };
     }>>;
     schema_version: 1;
@@ -1112,6 +1138,7 @@ export declare const IntegrityCacheSchema: z.ZodObject<{
                     snippet?: string | undefined;
                 }[];
             } | undefined;
+            released_at?: string | undefined;
         };
     }>>;
     schema_version: 1;

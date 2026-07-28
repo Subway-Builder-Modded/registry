@@ -1,0 +1,35 @@
+name: Mint Bot Token
+description: >-
+  Mints a registry bot app installation token (CI-triggering identity with its
+  own API rate-limit bucket). Outputs an empty token when the app is not
+  configured, so callers can fall back to GITHUB_TOKEN with
+  `steps.<id>.outputs.token || ...`.
+  NOTE: as a local composite action this requires the repo to be checked out —
+  workflows that must mint BEFORE checkout (the publish/update family, where
+  the checkout itself uses the token) keep an inline create-github-app-token
+  step instead.
+
+inputs:
+  app-id:
+    description: The bot app ID; pass vars.REGISTRY_BOT_APP_ID.
+    required: false
+    default: ""
+  private-key:
+    description: The bot app private key; pass secrets.REGISTRY_BOT_PRIVATE_KEY.
+    required: false
+    default: ""
+
+outputs:
+  token:
+    description: Installation token, or empty when the app is unconfigured.
+    value: ${{ steps.mint.outputs.token }}
+
+runs:
+  using: composite
+  steps:
+    - id: mint
+      if: ${{ inputs.app-id != '' }}
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ inputs.app-id }}
+        private-key: ${{ inputs.private-key }}

@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "id": "marseille",
+  "name": "Marseille",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of the greater Marseille - Aix-en-Provence metropolitan area (France), from Marseille-Provence airport to Aubagne and the Calanques to Aix-en-Provence. 333k+ OSM buildings (binary format), 681k+ commuters with demand built from real INSEE census data. Marseille-Provence airport with runways and taxiways. Mediterranean coastline and the Calanques fully modelled with depth data. Protomaps basemap with water, parks and forests.",
+  "tags": [
+    "west-europe",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subway-builder-marseille",
+  "update": {
+    "type": "github",
+    "repo": "pierreggt/subway-builder-marseille"
+  },
+  "city_code": "MRS",
+  "country": "FR",
+  "population": 681085,
+  "residents_total": 681085,
+  "points_count": 7402,
+  "population_count": 11992,
+  "initial_view_state": {
+    "latitude": 43.2965,
+    "longitude": 5.3698,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "west-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "MRS.pmtiles": 33.47,
+    "buildings_index.bin.gz": 18.06,
+    "config.json": 0,
+    "demand_data.json.gz": 0.38,
+    "ocean_depth_index.json.gz": 3.12,
+    "ocean_depth_index_contours.json.gz": 2.64,
+    "roads.geojson.gz": 3.01,
+    "runways_taxiways.geojson.gz": 0.08
+  },
+  "included_cities": [
+    "Aix-en-Provence",
+    "Aubagne",
+    "Martigues",
+    "Istres",
+    "Vitrolles",
+    "La Ciotat",
+    "Cassis",
+    "Marignane",
+    "Salon-de-Provence",
+    "Gardanne"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.19857321752252344,
+      "p25": 0.19865049796175027,
+      "p50": 0.1987780737416319,
+      "p75": 0.19927354838466296,
+      "p90": 0.2004715922612479,
+      "mean": 0.2142774542749093
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.19859079902972585,
+      "p25": 0.19866237674503104,
+      "p50": 0.19884609662995362,
+      "p75": 0.19962334001582804,
+      "p90": 0.41096756326769507,
+      "mean": 0.26175321236716986
+    },
+    "commuteDistanceKm": {
+      "p10": 1815,
+      "p25": 4595,
+      "p50": 8032,
+      "p75": 20528,
+      "p90": 32726,
+      "mean": 13386.54878252168
+    },
+    "residentCellDensity": {
+      "p10": 52,
+      "p25": 81,
+      "p50": 249,
+      "p75": 660,
+      "p90": 1603,
+      "mean": 615.3153918791313
+    },
+    "workerCellDensity": {
+      "p10": 32,
+      "p25": 60,
+      "p50": 185,
+      "p75": 600,
+      "p90": 1387,
+      "mean": 638.4044834307992
+    },
+    "detail": {
+      "radiusKm": 0.19881208227656733,
+      "expectedPointSpacingKm": 0.39774424741916653,
+      "normalizedRadius": 0.4998490451253399,
+      "activityPerPoint": 92.0136449608214,
+      "playableAreaKm2": 1400,
+      "playableAreaPerPointKm2": 0.18913807079167794,
+      "playableCatchmentRadiusKm": 0.24536608931700557,
+      "localityScore": 0.6226707520246698,
+      "deaggregationScore": 1,
+      "score": 0.7890948941823599
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.8954859932615594,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 5.391364025584166,
+            "latitude": 43.35595375298242,
+            "massShare": 1,
+            "assignedMass": 1362170,
+            "assignedPointCount": 7402,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784466595,
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
+}

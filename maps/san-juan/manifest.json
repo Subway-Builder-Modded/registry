@@ -24,7 +24,7 @@
   "country": "PR",
   "population": 773862,
   "residents_total": 773862,
-  "points_count": 2901,
+  "points_count": 2686,
   "population_count": 9703,
   "initial_view_state": {
     "latitude": 18.41649,
@@ -42,31 +42,33 @@
     "universities"
   ],
   "file_sizes": {
-    "SJU.pmtiles": 27.11,
-    "buildings_index.json": 143.38,
+    "SJU.pmtiles": 34.19,
+    "SJU_foundations.pmtiles": 29.19,
+    "buildings_index.bin.gz": 27.17,
+    "buildings_index.json.gz": 20.3,
     "config.json": 0,
-    "demand_data.json": 1.76,
-    "ocean_depth_index.json": 0.71,
-    "roads.geojson": 14.46,
-    "runways_taxiways.geojson": 0.27
+    "demand_data.json": 1.74,
+    "ocean_depth_index.json.gz": 1.3,
+    "roads.geojson": 14.47,
+    "runways_taxiways.geojson": 0.14
   },
   "is_test": false,
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.2713251495474443,
-      "p25": 0.313365008420864,
-      "p50": 0.36252926413193065,
-      "p75": 0.43394396762991216,
-      "p90": 0.5625497161844494,
-      "mean": 0.40140738422902617
+      "p10": 0.27142290099926897,
+      "p25": 0.3135579440654787,
+      "p50": 0.3636306251644302,
+      "p75": 0.4362083588572299,
+      "p90": 0.5722150177608564,
+      "mean": 0.4052017909188865
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.2799672560674955,
-      "p25": 0.3210314588060464,
+      "p10": 0.2815561063924151,
+      "p25": 0.3235515636003606,
       "p50": 0.3898362914512872,
-      "p75": 0.4470066184994017,
-      "p90": 0.6120234093979916,
-      "mean": 0.4197283167600308
+      "p75": 0.45037048476922753,
+      "p90": 0.6282954413003763,
+      "mean": 0.4245311815581962
     },
     "commuteDistanceKm": {
       "p10": 2009,
@@ -78,36 +80,36 @@
     },
     "residentCellDensity": {
       "p10": 44,
-      "p25": 98,
-      "p50": 408,
-      "p75": 1112,
-      "p90": 2151,
-      "mean": 825.3205128205128
+      "p25": 99,
+      "p50": 413,
+      "p75": 1125,
+      "p90": 2153,
+      "mean": 830.0729613733905
     },
     "workerCellDensity": {
       "p10": 31,
       "p25": 76,
       "p50": 253,
-      "p75": 624,
+      "p75": 635,
       "p90": 1333,
-      "mean": 618.4719551282051
+      "mean": 621.711182622687
     },
     "detail": {
-      "radiusKm": 0.3759349197291414,
-      "expectedPointSpacingKm": 0.685698691571013,
-      "normalizedRadius": 0.548250892630161,
-      "activityPerPoint": 266.7569803516029,
-      "playableAreaKm2": 1762,
-      "playableAreaPerPointKm2": 0.6073767666321958,
-      "playableCatchmentRadiusKm": 0.43969765687046025,
-      "localityScore": 0.5248087833782692,
+      "radiusKm": 0.37650553033416995,
+      "expectedPointSpacingKm": 0.684092193758038,
+      "normalizedRadius": 0.5503724991595784,
+      "activityPerPoint": 288.1094564408042,
+      "playableAreaKm2": 1780,
+      "playableAreaPerPointKm2": 0.6626954579300074,
+      "playableCatchmentRadiusKm": 0.4592847872379573,
+      "localityScore": 0.5207193585632232,
       "deaggregationScore": 1,
-      "score": 0.7244368732872929
+      "score": 0.7216088681295589
     },
     "polycentrism": {
       "activity": {
         "score": 0.9058980843055613,
-        "continuousScore": 0.40298394242509106,
+        "continuousScore": 0.7951801624214566,
         "detectedCenterCount": 3,
         "effectiveCenterCount": 2.5248193287622516,
         "largestCenterShare": 0.5343342869917376,
@@ -144,7 +146,7 @@
       }
     }
   },
-  "last_updated": 1773964800,
+  "last_updated": 1784160000,
   "search_aliases": [
     "산후안",
     "サンフアン",
@@ -162,5 +164,12 @@
     "San Xuan",
     "圣胡安",
     "샌환"
-  ]
+  ],
+  "data_quality": {
+    "tier": "low",
+    "raw_score": 0.27,
+    "weighted_score": 0.4,
+    "rubric_version": 1,
+    "provenance": "backfill"
+  }
 }

@@ -7,9 +7,9 @@ import { validateGitHubRepo } from "./lib/github.js";
 import { parseGalleryImages } from "./lib/gallery.js";
 import { resolvePublishCollaborators } from "./lib/collaborators.js";
 import {
+  COUNTRY_TO_LOCATION,
   DEFAULT_MAP_DATA_SOURCE,
   LEVEL_OF_DETAIL_VALUES,
-  LOCATION_TAGS,
   SOURCE_QUALITY_VALUES,
   SPECIAL_DEMAND_TAG_SET,
   VANILLA_CITY_CODE_SET,
@@ -44,9 +44,13 @@ const PublishMapInput = PublishModInput.omit({ "mod-id": true }).extend({
   country: z.string().length(2).regex(/^[A-Z]{2}$/, "Country must be a 2-letter ISO 3166-1 alpha-2 code"),
   gallery: z.string().min(1, "At least one gallery image is required"),
   data_source: z.string().optional(),
-  source_quality: z.enum(SOURCE_QUALITY_VALUES),
+  // Tolerated for issues predating the field's removal from the form; never
+  // used — source_quality is machine-managed (data-quality tiers supersede it).
+  source_quality: z.enum(SOURCE_QUALITY_VALUES).optional(),
   level_of_detail: z.enum(LEVEL_OF_DETAIL_VALUES),
-  location: z.enum(LOCATION_TAGS),
+  // Tolerated for issues predating the field's removal from the form; never
+  // used — location is machine-managed (derived from the country code).
+  location: z.string().optional(),
   special_demand: z.union([z.string(), z.array(z.string())]).optional(),
 });
 
@@ -149,6 +153,13 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
     errors.push(`**collaborators**: ${message}`);
   }
 
+  if (!COUNTRY_TO_LOCATION[parsed.data.country]) {
+    errors.push(
+      `**country**: \`${parsed.data.country}\` is not a recognized ISO 3166-1 alpha-2 country code. ` +
+      "The map's location/region tag is derived from it automatically.",
+    );
+  }
+
   if (VANILLA_CITY_CODE_SET.has(parsed.data["city-code"])) {
     errors.push(`**city-code**: \`${parsed.data["city-code"]}\` clashes with a vanilla city code.`);
   }
@@ -161,13 +172,6 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
   const invalidSpecialDemand = specialDemand.filter((tag) => !SPECIAL_DEMAND_TAG_SET.has(tag));
   if (invalidSpecialDemand.length > 0) {
     errors.push(`**special_demand**: Invalid tag(s): ${invalidSpecialDemand.join(", ")}`);
-  }
-
-  const dataSource = isPresentIssueValue(parsed.data.data_source)
-    ? parsed.data.data_source
-    : DEFAULT_MAP_DATA_SOURCE;
-  if (isOsmDataSource(dataSource) && parsed.data.source_quality === "high-quality") {
-    errors.push("**source_quality**: OSM-based data sources cannot be marked `high-quality`.");
   }
 
   if (parsed.data["update-type"] === "GitHub Releases") {

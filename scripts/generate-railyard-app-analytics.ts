@@ -3,9 +3,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   buildRailyardAppAnalytics,
-  buildRailyardAppAnalyticsCsvRows,
   buildRailyardAppByDayCsvRows,
-  listRailyardAppAnalyticsAssetNames,
   loadRailyardAppDownloadHistory,
 } from "./lib/railyard-app-downloads.js";
 import { writeCsv } from "./lib/csv.js";
@@ -18,32 +16,12 @@ function run(): void {
 
   const history = loadRailyardAppDownloadHistory(repoRoot);
   const analytics = buildRailyardAppAnalytics(history);
-  const rows = buildRailyardAppAnalyticsCsvRows(analytics);
   const byDay = buildRailyardAppByDayCsvRows(history);
-  const assetNames = listRailyardAppAnalyticsAssetNames(analytics);
-  const headers = [
-    "version",
-    "total_downloads",
-    "last_1d_downloads",
-    "last_3d_downloads",
-    "last_7d_downloads",
-    ...assetNames.flatMap((assetName) => ([
-      `${assetName}_total_downloads`,
-      `${assetName}_last_1d_downloads`,
-      `${assetName}_last_3d_downloads`,
-      `${assetName}_last_7d_downloads`,
-    ])),
-  ];
 
   writeFileSync(
     join(analyticsDir, "railyard_app_downloads.json"),
     `${JSON.stringify(analytics, null, 2)}\n`,
     "utf-8",
-  );
-  writeCsv(
-    join(analyticsDir, "railyard_app_downloads.csv"),
-    headers,
-    rows,
   );
   writeCsv(
     join(analyticsDir, "railyard_app_by_day.csv"),
@@ -52,7 +30,7 @@ function run(): void {
   );
 
   console.log(
-    `Generated railyard app download analytics in ${analyticsDir} (versions=${rows.length}, assets=${assetNames.length}, byDayVersions=${byDay.rows.length})`,
+    `Generated railyard app download analytics in ${analyticsDir} (versions=${Object.keys(analytics.versions).length}, byDayVersions=${byDay.rows.length})`,
   );
 }
 

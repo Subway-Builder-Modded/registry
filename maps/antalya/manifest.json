@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "id": "antalya",
+  "name": "Antalya",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of the Antalya metropolitan area on Turkey's Mediterranean coast (Turkiye), from Konyaalti to the airport and Kundu hotel district. 142,100+ OSM buildings, 841,000+ commuters built from TUIK population data by district with jobs estimated from OpenStreetMap commercial density. Special demand points: Antalya Airport (AYT) with separate international and domestic terminals (real 2025 traffic, 39M+ passengers/year), Akdeniz University, and two major hospitals (Antalya City Hospital, Antalya Training & Research Hospital). Simulated traffic congestion on longer commutes.",
+  "tags": [
+    "middle-east",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subway-builder-antalya",
+  "update": {
+    "type": "github",
+    "repo": "pierreggt/subway-builder-antalya"
+  },
+  "city_code": "ANT",
+  "country": "TR",
+  "population": 841300,
+  "residents_total": 841300,
+  "points_count": 5129,
+  "population_count": 7532,
+  "initial_view_state": {
+    "latitude": 36.8969,
+    "longitude": 30.7133,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "TUIK, OSM",
+  "source_quality": "medium-quality",
+  "level_of_detail": "medium-detail",
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  },
+  "location": "middle-east",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "ANT.pmtiles": 8.62,
+    "buildings_index.bin.gz": 6.57,
+    "config.json": 0,
+    "demand_data.json.gz": 0.21,
+    "ocean_depth_index.json.gz": 0.5,
+    "ocean_depth_index_contours.json.gz": 0.37,
+    "roads.geojson.gz": 0.87,
+    "runways_taxiways.geojson.gz": 0.08
+  },
+  "included_cities": [
+    "Konyaalti",
+    "Kundu",
+    "Muratpasa",
+    "Kepez",
+    "Aksu",
+    "Dosemealti",
+    "Lara",
+    "Kaleici"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.04165845901684585,
+      "p25": 0.06778057360824594,
+      "p50": 0.12103571947701364,
+      "p75": 0.19591438575030137,
+      "p90": 0.28753188467872287,
+      "mean": 0.14851620326117213
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.012506561993637647,
+      "p25": 0.024988707265705845,
+      "p50": 0.057295552253549466,
+      "p75": 0.21480633838687888,
+      "p90": 0.5083816213221038,
+      "mean": 0.161649175147736
+    },
+    "commuteDistanceKm": {
+      "p10": 4543,
+      "p25": 5978,
+      "p50": 8488,
+      "p75": 11839,
+      "p90": 15289,
+      "mean": 9395.348513011153
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 350,
+      "p50": 1200,
+      "p75": 2700,
+      "p90": 4450,
+      "mean": 1805.0549450549452
+    },
+    "workerCellDensity": {
+      "p10": 300,
+      "p25": 600,
+      "p50": 1600,
+      "p75": 3600,
+      "p90": 6400,
+      "mean": 3368.1451612903224
+    },
+    "detail": {
+      "radiusKm": 0.08327549693542026,
+      "expectedPointSpacingKm": 0.30206929154116563,
+      "normalizedRadius": 0.2756834251854813,
+      "activityPerPoint": 164.02807564827452,
+      "playableAreaKm2": 560,
+      "playableAreaPerPointKm2": 0.10918307662312342,
+      "playableCatchmentRadiusKm": 0.18642438867568403,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9831213174145976,
+        "continuousScore": 0.7037603001229903,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9668029571777657,
+        "largestCenterShare": 0.5649589920361345,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 30.66929474384597,
+            "latitude": 36.90350126919838,
+            "massShare": 0.5649589920361345,
+            "assignedMass": 950600,
+            "assignedPointCount": 3094,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 30.795701463797762,
+            "latitude": 36.90659250546447,
+            "massShare": 0.43504100796386547,
+            "assignedMass": 732000,
+            "assignedPointCount": 2035,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784645572
+}

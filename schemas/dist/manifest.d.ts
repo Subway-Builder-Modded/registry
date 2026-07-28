@@ -118,7 +118,7 @@ declare const PolycentrismVariantMetricsSchema: z.ZodObject<{
     largestCenterShare: number;
     bandwidthKm: number;
     reliabilityScore: number;
-    supportLevel: "low" | "medium" | "high";
+    supportLevel: "high" | "medium" | "low";
     usedFallback: boolean;
     topCenters: {
         longitude: number;
@@ -137,7 +137,7 @@ declare const PolycentrismVariantMetricsSchema: z.ZodObject<{
     largestCenterShare: number;
     bandwidthKm: number;
     reliabilityScore: number;
-    supportLevel: "low" | "medium" | "high";
+    supportLevel: "high" | "medium" | "low";
     usedFallback: boolean;
     topCenters: {
         longitude: number;
@@ -336,7 +336,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "low" | "medium" | "high";
+            supportLevel: "high" | "medium" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -355,7 +355,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "low" | "medium" | "high";
+            supportLevel: "high" | "medium" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -376,7 +376,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "low" | "medium" | "high";
+            supportLevel: "high" | "medium" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -397,7 +397,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "low" | "medium" | "high";
+            supportLevel: "high" | "medium" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -472,7 +472,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "low" | "medium" | "high";
+            supportLevel: "high" | "medium" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -547,7 +547,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "low" | "medium" | "high";
+            supportLevel: "high" | "medium" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -926,7 +926,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -945,7 +945,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -966,7 +966,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -987,7 +987,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1062,7 +1062,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1137,7 +1137,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1154,8 +1154,35 @@ export declare const MapManifestSchema: z.ZodObject<{
     data_source: z.ZodString;
     source_quality: z.ZodEnum<["low-quality", "medium-quality", "high-quality"]>;
     level_of_detail: z.ZodEnum<["low-detail", "medium-detail", "high-detail"]>;
-    location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
-    sub_location: z.ZodOptional<z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>>;
+    data_quality: z.ZodOptional<z.ZodUnion<[z.ZodObject<{
+        tier: z.ZodEnum<[import("./data-quality-ladders.js").ScoredDataQualityTier, ...import("./data-quality-ladders.js").ScoredDataQualityTier[]]>;
+        raw_score: z.ZodOptional<z.ZodNumber>;
+        weighted_score: z.ZodOptional<z.ZodNumber>;
+        rubric_version: z.ZodNumber;
+        provenance: z.ZodEnum<["reviewed", "backfill"]>;
+    }, "strict", z.ZodTypeAny, {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    }, {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    }>, z.ZodObject<{
+        tier: z.ZodLiteral<"unknown">;
+        rubric_version: z.ZodNumber;
+    }, "strict", z.ZodTypeAny, {
+        tier: "unknown";
+        rubric_version: number;
+    }, {
+        tier: "unknown";
+        rubric_version: number;
+    }>]>>;
+    location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
     file_sizes: z.ZodRecord<z.ZodString, z.ZodNumber>;
     included_cities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
@@ -1193,7 +1220,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
     level_of_detail: "low-detail" | "medium-detail" | "high-detail";
-    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
+    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
@@ -1261,7 +1288,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1275,7 +1302,16 @@ export declare const MapManifestSchema: z.ZodObject<{
             };
         };
     } | undefined;
-    sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
+    data_quality?: {
+        tier: "unknown";
+        rubric_version: number;
+    } | {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    } | undefined;
     included_cities?: string[] | undefined;
 }, {
     schema_version: 1;
@@ -1311,7 +1347,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
     level_of_detail: "low-detail" | "medium-detail" | "high-detail";
-    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
+    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
@@ -1379,7 +1415,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1393,7 +1429,16 @@ export declare const MapManifestSchema: z.ZodObject<{
             };
         };
     } | undefined;
-    sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
+    data_quality?: {
+        tier: "unknown";
+        rubric_version: number;
+    } | {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    } | undefined;
     included_cities?: string[] | undefined;
 }>;
 export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
@@ -1642,7 +1687,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1661,7 +1706,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1682,7 +1727,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1703,7 +1748,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1778,7 +1823,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1853,7 +1898,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1870,8 +1915,35 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     data_source: z.ZodString;
     source_quality: z.ZodEnum<["low-quality", "medium-quality", "high-quality"]>;
     level_of_detail: z.ZodEnum<["low-detail", "medium-detail", "high-detail"]>;
-    location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
-    sub_location: z.ZodOptional<z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>>;
+    data_quality: z.ZodOptional<z.ZodUnion<[z.ZodObject<{
+        tier: z.ZodEnum<[import("./data-quality-ladders.js").ScoredDataQualityTier, ...import("./data-quality-ladders.js").ScoredDataQualityTier[]]>;
+        raw_score: z.ZodOptional<z.ZodNumber>;
+        weighted_score: z.ZodOptional<z.ZodNumber>;
+        rubric_version: z.ZodNumber;
+        provenance: z.ZodEnum<["reviewed", "backfill"]>;
+    }, "strict", z.ZodTypeAny, {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    }, {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    }>, z.ZodObject<{
+        tier: z.ZodLiteral<"unknown">;
+        rubric_version: z.ZodNumber;
+    }, "strict", z.ZodTypeAny, {
+        tier: "unknown";
+        rubric_version: number;
+    }, {
+        tier: "unknown";
+        rubric_version: number;
+    }>]>>;
+    location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
     file_sizes: z.ZodRecord<z.ZodString, z.ZodNumber>;
     included_cities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
@@ -1909,7 +1981,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
     level_of_detail: "low-detail" | "medium-detail" | "high-detail";
-    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
+    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
@@ -1977,7 +2049,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1991,7 +2063,16 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
             };
         };
     } | undefined;
-    sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
+    data_quality?: {
+        tier: "unknown";
+        rubric_version: number;
+    } | {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    } | undefined;
     included_cities?: string[] | undefined;
 }, {
     schema_version: 1;
@@ -2027,7 +2108,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     data_source: string;
     source_quality: "low-quality" | "medium-quality" | "high-quality";
     level_of_detail: "low-detail" | "medium-detail" | "high-detail";
-    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
+    location: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe";
     special_demand: ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[];
     file_sizes: Record<string, number>;
     collaborators?: number[] | undefined;
@@ -2095,7 +2176,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "low" | "medium" | "high";
+                supportLevel: "high" | "medium" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -2109,7 +2190,16 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
             };
         };
     } | undefined;
-    sub_location?: "caribbean" | "central-america" | "central-asia" | "central-europe" | "east-africa" | "east-asia" | "east-europe" | "europe" | "middle-east" | "north-africa" | "north-america" | "north-europe" | "oceania" | "south-america" | "south-asia" | "south-europe" | "southeast-asia" | "southern-africa" | "west-africa" | "west-europe" | undefined;
+    data_quality?: {
+        tier: "unknown";
+        rubric_version: number;
+    } | {
+        tier: import("./data-quality-ladders.js").ScoredDataQualityTier;
+        rubric_version: number;
+        provenance: "reviewed" | "backfill";
+        raw_score?: number | undefined;
+        weighted_score?: number | undefined;
+    } | undefined;
     included_cities?: string[] | undefined;
 }>, z.ZodObject<{
     schema_version: z.ZodLiteral<1>;

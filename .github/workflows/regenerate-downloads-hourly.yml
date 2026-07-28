@@ -52,6 +52,7 @@ jobs:
       warning_count: ${{ steps.generate_map_downloads.outputs.warning_count }}
       adjusted_delta_total: ${{ steps.generate_map_downloads.outputs.adjusted_delta_total }}
       clamped_versions: ${{ steps.generate_map_downloads.outputs.clamped_versions }}
+      token_auth_status: ${{ steps.generate_map_downloads.outputs.token_auth_status }}
     steps:
       - uses: actions/checkout@v4
 
@@ -69,10 +70,19 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: scripts
 
+      # App token: separate ~5k/hr rate-limit bucket, isolated from the
+      # repo-wide 1k/hr GITHUB_TOKEN pool shared by every workflow run.
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Generate map download counts (download-only mode)
         id: generate_map_downloads
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run generate-downloads:maps:download-only
 
       - name: Upload map downloads artifact
@@ -93,6 +103,7 @@ jobs:
       warning_count: ${{ steps.generate_mod_downloads.outputs.warning_count }}
       adjusted_delta_total: ${{ steps.generate_mod_downloads.outputs.adjusted_delta_total }}
       clamped_versions: ${{ steps.generate_mod_downloads.outputs.clamped_versions }}
+      token_auth_status: ${{ steps.generate_mod_downloads.outputs.token_auth_status }}
     steps:
       - uses: actions/checkout@v4
 
@@ -110,10 +121,17 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: scripts
 
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Generate mod download counts (download-only mode)
         id: generate_mod_downloads
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run generate-downloads:mods:download-only
 
       - name: Upload mod downloads artifact
@@ -204,9 +222,16 @@ jobs:
           cp "${MAP_BUCKETS_FILE}" maps/download-version-buckets.json
           cp "${MOD_BUCKETS_FILE}" mods/download-version-buckets.json
 
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Capture Railyard app download history
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run capture-railyard-app-downloads
 
       - name: Generate Railyard app analytics
@@ -328,7 +353,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json history/railyard_app_downloads.json analytics/railyard_app_downloads.json analytics/railyard_app_downloads.csv 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json history/railyard_app_downloads.json analytics/railyard_app_downloads.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No download changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -355,13 +380,12 @@ jobs:
         uses: ./.github/actions/bot-pr-automation
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_token: ${{ steps.bot-token.outputs.token }}
           repo: ${{ github.repository }}
           bot_branch: bot/regenerate-downloads-hourly
           pr_number: ${{ steps.create_pr.outputs.pull-request-number }}
           pr_url: ${{ steps.create_pr.outputs.pull-request-url }}
           pr_head_sha: ${{ steps.create_pr.outputs.pull-request-head-sha }}
-          source_workflow: ${{ github.workflow }}
-          source_run_id: ${{ github.run_id }}
 
       - name: Finalize change outputs
         id: commit_changes
@@ -406,6 +430,8 @@ jobs:
           CLAMPED_VERSIONS_MODS: ${{ needs.generate-mods.outputs.clamped_versions }}
           MAP_WARNINGS_JSON: ${{ needs.generate-maps.outputs.warnings_json }}
           MOD_WARNINGS_JSON: ${{ needs.generate-mods.outputs.warnings_json }}
+          MAP_AUTH_STATUS: ${{ needs.generate-maps.outputs.token_auth_status }}
+          MOD_AUTH_STATUS: ${{ needs.generate-mods.outputs.token_auth_status }}
           COMMITTED: ${{ steps.commit_changes.outputs.committed }}
           COMMIT_SHA: ${{ steps.commit_changes.outputs.commit_sha }}
           PULL_REQUEST_URL: ${{ steps.commit_changes.outputs.pull_request_url }}
@@ -430,6 +456,26 @@ jobs:
             --arg maps "${MAP_WARNINGS_JSON_SAFE}" \
             --arg mods "${MOD_WARNINGS_JSON_SAFE}" \
             '($maps | fromjson) + ($mods | fromjson)')"
+
+          # Escalate to error (red) if GitHub token auth failed for either listing type
+          AUTH_ERRORS=()
+          if [ "${MAP_AUTH_STATUS}" = "missing" ]; then
+            AUTH_ERRORS+=("Maps: no GitHub token configured (GH_DOWNLOADS_TOKEN / GITHUB_TOKEN both empty)")
+          elif [ "${MAP_AUTH_STATUS}" = "invalid" ]; then
+            AUTH_ERRORS+=("Maps: GitHub token appears invalid or expired — GraphQL returned HTTP 401")
+          fi
+          if [ "${MOD_AUTH_STATUS}" = "missing" ]; then
+            AUTH_ERRORS+=("Mods: no GitHub token configured (GH_DOWNLOADS_TOKEN / GITHUB_TOKEN both empty)")
+          elif [ "${MOD_AUTH_STATUS}" = "invalid" ]; then
+            AUTH_ERRORS+=("Mods: GitHub token appears invalid or expired — GraphQL returned HTTP 401")
+          fi
+          if [ "${#AUTH_ERRORS[@]}" -gt 0 ]; then
+            AUTH_ERRORS+=("Download counts for GitHub-hosted listings may be stale. Check/rotate GH_DOWNLOADS_TOKEN, or verify GITHUB_TOKEN permissions.")
+            export DISCORD_STATUS="error"
+            export DISCORD_ERRORS_JSON="$(jq -cn '$ARGS.positional' --args "${AUTH_ERRORS[@]}")"
+          else
+            export DISCORD_ERRORS_JSON='[]'
+          fi
 
           export DISCORD_LINES_JSON="$(jq -nc \
             --arg updated_records_total "${UPDATED_RECORDS_TOTAL}" \

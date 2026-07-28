@@ -116,6 +116,20 @@ export function withReleaseSizeIfMissing(
   };
 }
 
+// Stamps the immutable publish date onto an entry that lacks one. publishEpoch is
+// seconds since epoch (github publishedAt / custom update date); it backfills
+// reused cache entries for free since the date comes from the release, not the check.
+export function withReleasedAtIfMissing(
+  result: IntegrityVersionEntry,
+  publishEpoch: number | undefined,
+): IntegrityVersionEntry {
+  if (result.released_at !== undefined || publishEpoch === undefined) return result;
+  return {
+    ...result,
+    released_at: new Date(publishEpoch * 1000).toISOString(),
+  };
+}
+
 // Backfills the buildings-index presence keys onto a reused cache entry without
 // re-inspecting the zip. Entries written before the buildings_index_json/_bin split
 // only carry the combined buildings_index match; no release ships the binary twin yet,

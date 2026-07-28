@@ -25,7 +25,23 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+      # CI-triggering identity (optional): pushes and PRs made with the
+      # workflow's GITHUB_TOKEN never trigger pull_request workflows, so
+      # publish PRs get no CI. When the registry bot app is configured
+      # (REGISTRY_BOT_APP_ID repo variable + REGISTRY_BOT_PRIVATE_KEY secret),
+      # branch pushes and PR creation use its token instead and CI runs
+      # normally. Falls back to GITHUB_TOKEN when unconfigured.
+      - name: Mint bot token
+        id: bot-token
+        if: vars.REGISTRY_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot-token.outputs.token || github.token }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -40,6 +56,19 @@ jobs:
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile
         working-directory: scripts
+
+      - name: Acknowledge submission
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Validating your submission — [follow the run here](${runUrl}). Results are posted in this issue when it finishes (usually a few minutes).`
+            });
 
       - name: Acknowledge revalidation
         if: github.event_name == 'issue_comment'
@@ -79,6 +108,8 @@ jobs:
         run: pnpm --dir scripts run create-listing
 
       - name: Commit and push changes
+        env:
+          GH_TOKEN: ${{ steps.bot-token.outputs.token || github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -92,6 +123,7 @@ jobs:
       - name: Create or update pull request
         uses: actions/github-script@v7
         with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
             const branch = 'publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}';
             const { data: existing } = await github.rest.pulls.list({
@@ -188,7 +220,18 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+      # See the publish-mod job for why this optional bot identity exists.
+      - name: Mint bot token
+        id: bot-token
+        if: vars.REGISTRY_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot-token.outputs.token || github.token }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -203,6 +246,19 @@ jobs:
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile
         working-directory: scripts
+
+      - name: Acknowledge submission
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Validating your submission — [follow the run here](${runUrl}). Results are posted in this issue when it finishes (usually a few minutes).`
+            });
 
       - name: Acknowledge revalidation
         if: github.event_name == 'issue_comment'
@@ -241,7 +297,24 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
+      - name: Resolve GeoNames cache key
+        id: geonames-key
+        run: echo "week=$(date +%Y-%U)" >> $GITHUB_OUTPUT
+
+      - name: Cache GeoNames data
+        uses: actions/cache@v4
+        with:
+          path: tmp/geonames
+          key: geonames-${{ steps.geonames-key.outputs.week }}
+          restore-keys: |
+            geonames-
+
+      - name: Generate search aliases
+        run: pnpm --dir scripts run generate-search-aliases -- --map-id "${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+
       - name: Commit and push changes
+        env:
+          GH_TOKEN: ${{ steps.bot-token.outputs.token || github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -255,6 +328,7 @@ jobs:
       - name: Create or update pull request
         uses: actions/github-script@v7
         with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
             const branch = 'publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
             const { data: existing } = await github.rest.pulls.list({
@@ -267,6 +341,11 @@ jobs:
               console.log(`PR #${existing[0].number} already exists — updated via force push`);
               return;
             }
+            // Draft until data quality is confirmed (plan C1): GitHub cannot
+            // merge a draft, which is the hard publish gate. rescore_data
+            // marks it ready after confirming the answers; a maintainer can
+            // mark it ready manually to grandfather (add dq-grandfathered so
+            // CI's publish gate is exempted too).
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -276,10 +355,13 @@ jobs:
                 '',
                 'Automated PR to add map `${{ fromJson(steps.parser.outputs.jsonString).map-id }}` to the registry.',
                 '',
-                'Submitted by @${{ github.event.issue.user.login }}'
+                'Submitted by @${{ github.event.issue.user.login }}',
+                '',
+                '**Draft until data quality is confirmed** — the author answers the data-quality questions (invite on the submission issue), then a maintainer reviews and comments `rescore_data` here, which marks this PR ready to merge.'
               ].join('\n'),
               head: branch,
-              base: 'main'
+              base: 'main',
+              draft: true
             });
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
@@ -303,11 +385,56 @@ jobs:
               });
             } catch {}
 
+            // Phase-two invite: prefilled data-quality form link, with the
+            // same-(author, country) scored maps a "Yes" answer inherits from.
+            const fs = require('fs');
+            const path = require('path');
+            const mapId = '${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
+            const author = '${{ github.event.issue.user.login }}';
+            let country = '';
+            try {
+              country = JSON.parse(fs.readFileSync(path.join('maps', mapId, 'manifest.json'), 'utf-8')).country ?? '';
+            } catch {}
+
+            const sample = [];
+            try {
+              for (const entry of fs.readdirSync('maps', { withFileTypes: true })) {
+                if (!entry.isDirectory() || entry.name === mapId) continue;
+                try {
+                  const manifest = JSON.parse(fs.readFileSync(path.join('maps', entry.name, 'manifest.json'), 'utf-8'));
+                  if (manifest.author !== author || manifest.country !== country) continue;
+                  const dq = JSON.parse(fs.readFileSync(path.join('maps', entry.name, 'data-quality.json'), 'utf-8'));
+                  if (dq.provenance?.method !== 'reviewed' && dq.provenance?.method !== 'backfill') continue;
+                  sample.push({ id: entry.name, lastUpdated: manifest.last_updated ?? 0 });
+                } catch {}
+              }
+            } catch {}
+            sample.sort((a, b) => b.lastUpdated - a.lastUpdated);
+            const sampleIds = sample.slice(0, 5).map((s) => s.id);
+
+            // Prefill only input fields: prefilling a dropdown via query
+            // params makes GitHub fall back to the blank issue editor.
+            const params = new URLSearchParams({
+              template: 'data-quality.yml',
+              title: `[Data Quality]: ${mapId}`,
+              'map-id': mapId,
+            });
+            if (sampleIds.length > 0) {
+              params.set('same-methodology-sample', sampleIds.join(', '));
+            }
+            const inviteUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/issues/new?${params.toString()}`;
+
+            const sampleNote = sampleIds.length > 0
+              ? `\n\nIf this map was generated with the same methodology as your other scored ${country} maps (${sampleIds.map((id) => `[\`${id}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/main/maps/${id})`).join(', ')}), select **Yes** on the first question to inherit their answers automatically.`
+              : '';
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'A pull request has been created for your map submission. A maintainer will review it shortly.'
+              body: 'A pull request has been created for your map submission. A maintainer will review it shortly.\n\n' +
+                `**Required next step — data quality:** [answer the data-quality questions](${inviteUrl}) so your map can receive its data-quality tier. **Your submission cannot merge until a maintainer confirms your answers**; the publish PR stays in draft until then. The [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) explains every question in plain language, and new submissions are subject to the [quality floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for countries with existing maps.` +
+                sampleNote
             });
 
       - name: Handle failure

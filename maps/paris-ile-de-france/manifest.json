@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "id": "paris-ile-de-france",
+  "name": "Paris",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of the greater Paris - Ile-de-France metropolitan area (France), from Roissy-Charles de Gaulle airport to Corbeil-Essonnes and from Versailles to Meaux. 1.53M+ OSM buildings (binary format), 5.76M+ commuters with demand built from real INSEE census data (Filosofi 2021, mobilites professionnelles 2021). Roissy-Charles de Gaulle airport with runways and taxiways. Full Seine river and waterway depth data. Protomaps basemap with water, parks and forests.",
+  "tags": [
+    "west-europe",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subway-builder-paris",
+  "update": {
+    "type": "github",
+    "repo": "pierreggt/subway-builder-paris"
+  },
+  "city_code": "PAR",
+  "country": "FR",
+  "population": 5758500,
+  "residents_total": 5758500,
+  "points_count": 33218,
+  "population_count": 137626,
+  "initial_view_state": {
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "west-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "PAR.pmtiles": 124.39,
+    "buildings_index.bin.gz": 78.91,
+    "config.json": 0,
+    "demand_data.json.gz": 3.93,
+    "ocean_depth_index.json.gz": 3.24,
+    "ocean_depth_index_contours.json.gz": 2.83,
+    "roads.geojson.gz": 11.41,
+    "runways_taxiways.geojson.gz": 0.74
+  },
+  "included_cities": [
+    "Roissy-en-France",
+    "Versailles",
+    "Meaux",
+    "Corbeil-Essonnes",
+    "Saint-Denis",
+    "Boulogne-Billancourt",
+    "Argenteuil",
+    "Montreuil",
+    "Nanterre",
+    "Creteil",
+    "Vitry-sur-Seine",
+    "Colombes",
+    "Aulnay-sous-Bois",
+    "Rueil-Malmaison",
+    "Aubervilliers"
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.19891277181355715,
+      "p25": 0.19898410159434435,
+      "p50": 0.19921994301374182,
+      "p75": 0.19947736214562173,
+      "p90": 0.19971782928958054,
+      "mean": 0.2108279996436905
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.19892029102089326,
+      "p25": 0.19898511140952868,
+      "p50": 0.19930347566674592,
+      "p75": 0.19965650141870353,
+      "p90": 0.7279220993260427,
+      "mean": 0.31369477994589096
+    },
+    "commuteDistanceKm": {
+      "p10": 2910,
+      "p25": 6208,
+      "p50": 15602,
+      "p75": 28407,
+      "p90": 40809,
+      "mean": 19121.39412610989
+    },
+    "residentCellDensity": {
+      "p10": 29,
+      "p25": 130,
+      "p50": 611,
+      "p75": 1838,
+      "p90": 3562,
+      "mean": 1465.9253387880337
+    },
+    "workerCellDensity": {
+      "p10": 17,
+      "p25": 79,
+      "p50": 368,
+      "p75": 1132,
+      "p90": 2880,
+      "mean": 1539.3002142474559
+    },
+    "detail": {
+      "radiusKm": 0.19926170496302043,
+      "expectedPointSpacingKm": 0.3502061527858896,
+      "normalizedRadius": 0.568984020919946,
+      "activityPerPoint": 173.35480763441507,
+      "playableAreaKm2": 4176,
+      "playableAreaPerPointKm2": 0.12571497380938046,
+      "playableCatchmentRadiusKm": 0.2000407933519114,
+      "localityScore": 0.4855066717818511,
+      "deaggregationScore": 1,
+      "score": 0.6967830880423628
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.7882868720938321,
+        "continuousScore": 0.7750789920308244,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.6505556917221706,
+        "largestCenterShare": 0.7300614743422766,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 2.4193158355615285,
+            "latitude": 48.839956209083624,
+            "massShare": 0.7300614743422766,
+            "assignedMass": 8408118,
+            "assignedPointCount": 23190,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 2.2013307909196866,
+            "latitude": 48.888288453276175,
+            "massShare": 0.26993852565772336,
+            "assignedMass": 3108882,
+            "assignedPointCount": 10028,
+            "prominenceRatio": 0.9999999935300342
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784385339,
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
+}

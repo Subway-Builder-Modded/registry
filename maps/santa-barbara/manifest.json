@@ -34,7 +34,7 @@
     "universities"
   ],
   "residents_total": 475304,
-  "points_count": 1431,
+  "points_count": 1181,
   "population_count": 30058,
   "initial_view_state": {
     "latitude": 34.42,
@@ -43,13 +43,15 @@
     "bearing": 0
   },
   "file_sizes": {
-    "SBA.pmtiles": 28.89,
-    "buildings_index.json": 46.16,
+    "SBA.pmtiles": 44.1,
+    "SBA_foundations.pmtiles": 15.43,
+    "buildings_index.bin.gz": 12.72,
+    "buildings_index.json.gz": 9.27,
     "config.json": 0,
-    "demand_data.json": 4.84,
-    "ocean_depth_index.json": 2.25,
-    "roads.geojson": 12.76,
-    "runways_taxiways.geojson": 0.9
+    "demand_data.json": 4.82,
+    "ocean_depth_index.json.gz": 14.08,
+    "roads.geojson": 12.96,
+    "runways_taxiways.geojson": 0.56
   },
   "is_test": false,
   "grid_statistics": {
@@ -59,7 +61,7 @@
       "p50": 0.4927848874932136,
       "p75": 0.6284272327416364,
       "p90": 0.8020654985404936,
-      "mean": 0.5530856702985494
+      "mean": 0.5539639824840495
     },
     "workerWeightedNearestNeighborKm": {
       "p10": 0.1328944135742788,
@@ -67,7 +69,7 @@
       "p50": 0.4142530476647303,
       "p75": 0.5729895164208023,
       "p90": 0.9694708225043668,
-      "mean": 0.494549185574701
+      "mean": 0.4989571901997651
     },
     "commuteDistanceKm": {
       "p10": 3447,
@@ -80,35 +82,35 @@
     "residentCellDensity": {
       "p10": 3,
       "p25": 9,
-      "p50": 86,
-      "p75": 651,
-      "p90": 1947,
-      "mean": 600.8887484197219
+      "p50": 82,
+      "p75": 615,
+      "p90": 1964,
+      "mean": 603.7763659466328
     },
     "workerCellDensity": {
       "p10": 8,
-      "p25": 42,
-      "p50": 208,
-      "p75": 569,
-      "p90": 1333,
-      "mean": 632.8868175765646
+      "p25": 44,
+      "p50": 213,
+      "p75": 562,
+      "p90": 1286,
+      "mean": 638.5645161290323
     },
     "detail": {
       "radiusKm": 0.45181593761971806,
-      "expectedPointSpacingKm": 0.8775482012758864,
-      "normalizedRadius": 0.5148616759316617,
-      "activityPerPoint": 332.14814814814815,
-      "playableAreaKm2": 2749,
-      "playableAreaPerPointKm2": 1.9210342417889588,
-      "playableCatchmentRadiusKm": 0.7819745461707869,
-      "localityScore": 0.5913384767929845,
-      "deaggregationScore": 0.481442349753709,
-      "score": 0.5335685389591421
+      "expectedPointSpacingKm": 0.847369791225846,
+      "normalizedRadius": 0.5331980704269612,
+      "activityPerPoint": 402.458933107536,
+      "playableAreaKm2": 2820,
+      "playableAreaPerPointKm2": 2.3878069432684166,
+      "playableCatchmentRadiusKm": 0.8718156664918535,
+      "localityScore": 0.5542859434201526,
+      "deaggregationScore": 0.26854030548816515,
+      "score": 0.3858083936021139
     },
     "polycentrism": {
       "activity": {
         "score": 0.9382878051205555,
-        "continuousScore": 0.665508551450209,
+        "continuousScore": 0.9109751845359975,
         "detectedCenterCount": 3,
         "effectiveCenterCount": 2.6704066845512093,
         "largestCenterShare": 0.4191727820510663,
@@ -145,7 +147,7 @@
       }
     }
   },
-  "last_updated": 1773273600,
+  "last_updated": 1784160000,
   "search_aliases": [
     "Ventura",
     "Вентура",
@@ -153,5 +155,12 @@
     "ベンチュラ",
     "فينتورا",
     "文图拉"
-  ]
+  ],
+  "data_quality": {
+    "tier": "very-high",
+    "raw_score": 0.81,
+    "weighted_score": 0.87,
+    "rubric_version": 1,
+    "provenance": "backfill"
+  }
 }

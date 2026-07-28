@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "id": "sofia-bulgaria",
+  "name": "Sofia",
+  "author": "giannons46",
+  "github_id": 156072592,
+  "description": "Map of the Sofia metropolitan area (Bulgaria), including Sofia Airport and the surrounding urban region. 130k+ OSM buildings with binary building index, 1.23M residents and 552k+ jobs with demand built from Bulgarian census data, OpenStreetMap buildings and an IPF-based origin-destination model. Density-adaptive demand grid with 1 km, 500 m and 250 m cells, producing 2,793 active demand points. Commuting, student, urban mobility and special-attractor demand for Sofia Airport, major universities, hospitals, shopping centres and entertainment venues. Sofia Airport runways and taxiways. Native PMTiles basemap with water, parks and buildings.",
+  "tags": [
+    "south-europe",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/giannons46/sofia-subway-builder-map",
+  "update": {
+    "type": "github",
+    "repo": "giannons46/sofia-subway-builder-map"
+  },
+  "city_code": "SOF",
+  "country": "BG",
+  "population": 1229754,
+  "residents_total": 1229754,
+  "points_count": 2793,
+  "population_count": 436879,
+  "initial_view_state": {
+    "latitude": 42.6977,
+    "longitude": 23.3219,
+    "zoom": 12.3,
+    "bearing": 0
+  },
+  "data_source": "Bulgarian census grid data, OSM",
+  "source_quality": "medium-quality",
+  "level_of_detail": "high-detail",
+  "location": "south-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {
+    "SOF.pmtiles": 11.81,
+    "buildings_index.bin.gz": 10.88,
+    "buildings_index.json.gz": 6.06,
+    "config.json": 0,
+    "demand_data.json.gz": 7,
+    "roads.geojson.gz": 1.78,
+    "runways_taxiways.geojson.gz": 0.08
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.24963388549639356,
+      "p25": 0.24963776941908125,
+      "p50": 0.24964398103413402,
+      "p75": 0.24965010040869623,
+      "p90": 0.39315961044260855,
+      "mean": 0.2814029798920055
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.24963788566433337,
+      "p25": 0.24964335214544875,
+      "p50": 0.2496476027876237,
+      "p75": 0.4992913787075707,
+      "p90": 0.7871365086907224,
+      "mean": 0.3954929512046224
+    },
+    "commuteDistanceKm": {
+      "p10": 2758,
+      "p25": 4536,
+      "p50": 7118,
+      "p75": 11011,
+      "p90": 15679,
+      "mean": 8351.481156109587
+    },
+    "residentCellDensity": {
+      "p10": 19,
+      "p25": 95,
+      "p50": 421,
+      "p75": 1942,
+      "p90": 7452,
+      "mean": 1992.1685575364668
+    },
+    "workerCellDensity": {
+      "p10": 2,
+      "p25": 8,
+      "p50": 49,
+      "p75": 474,
+      "p90": 2046,
+      "mean": 837.430303030303
+    },
+    "detail": {
+      "radiusKm": 0.249645791904311,
+      "expectedPointSpacingKm": 0.5119411888886978,
+      "normalizedRadius": 0.48764545092812805,
+      "activityPerPoint": 295.17860973908904,
+      "playableAreaKm2": 932,
+      "playableAreaPerPointKm2": 0.33369137128535625,
+      "playableCatchmentRadiusKm": 0.3259098992273091,
+      "localityScore": 0.6488417853861281,
+      "deaggregationScore": 1,
+      "score": 0.8055071603568327
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.44708739058029673,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 23.326278824719957,
+            "latitude": 42.68728613593325,
+            "massShare": 1,
+            "assignedMass": 1782459,
+            "assignedPointCount": 2793,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1784703726,
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
+}

@@ -99,6 +99,13 @@
         "last_updated": {
           "type": "integer",
           "minimum": 0
+        },
+        "search_aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       },
       "required": [

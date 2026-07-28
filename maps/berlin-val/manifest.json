@@ -6,7 +6,7 @@
   "github_id": 116170877,
   "description": "Custom map of Germanys capital, Berlin, including most of the city area, BER, Spandau and a bit of Potsdam. Demand Data was procedurally generated using generation scripts from the patcher. Data quality: Good (for generated data standards).\nNOTE: population counts on Railyard probably differ from the values in game. This map has a population of 3.9 Million in game.",
   "tags": [
-    "europe",
+    "central-europe",
     "airports",
     "schools",
     "universities"
@@ -24,12 +24,12 @@
   "country": "DE",
   "population": 3926141,
   "residents_total": 3926141,
-  "points_count": 923,
+  "points_count": 921,
   "population_count": 39805,
   "data_source": "OSM",
   "source_quality": "low-quality",
   "level_of_detail": "medium-detail",
-  "location": "europe",
+  "location": "central-europe",
   "special_demand": [
     "airports",
     "schools",
@@ -43,9 +43,17 @@
   },
   "file_sizes": {
     "BER.pmtiles": 59.88,
-    "buildings_index.json": 224.68,
+    "__MACOSX/._BER.pmtiles": 0,
+    "__MACOSX/._buildings_index.bin": 0,
+    "__MACOSX/._config.json": 0,
+    "__MACOSX/._demand_data.json": 0,
+    "__MACOSX/._manifest.json": 0,
+    "__MACOSX/._roads.geojson": 0,
+    "__MACOSX/._runways_taxiways.geojson": 0,
+    "buildings_index.bin": 150.68,
     "config.json": 0,
-    "demand_data.json": 5.16,
+    "demand_data.json": 8.11,
+    "manifest.json": 0,
     "roads.geojson": 30.32,
     "runways_taxiways.geojson": 0.85
   },
@@ -57,7 +65,7 @@
       "p50": 0.5988135360512482,
       "p75": 0.8741812415668168,
       "p90": 1.2341553477701415,
-      "mean": 0.7244636923495954
+      "mean": 0.7244650704352824
     },
     "workerWeightedNearestNeighborKm": {
       "p10": 0.10099457677015267,
@@ -65,7 +73,7 @@
       "p50": 0.5938388965467648,
       "p75": 0.8769315473748113,
       "p90": 1.3018260364495167,
-      "mean": 0.7236172236152453
+      "mean": 0.723617236367836
     },
     "commuteDistanceKm": {
       "p10": 4380,
@@ -76,12 +84,12 @@
       "mean": 14925.876070845372
     },
     "residentCellDensity": {
-      "p10": 1809,
-      "p25": 4489,
-      "p50": 10312,
-      "p75": 19737,
-      "p90": 31782,
-      "mean": 14212.281645569621
+      "p10": 788,
+      "p25": 1957,
+      "p50": 4496,
+      "p75": 8606,
+      "p90": 13858,
+      "mean": 6197.004746835443
     },
     "workerCellDensity": {
       "p10": 557,
@@ -93,20 +101,20 @@
     },
     "detail": {
       "radiusKm": 0.5963210288812055,
-      "expectedPointSpacingKm": 0.8281347418119125,
-      "normalizedRadius": 0.7200772999530106,
-      "activityPerPoint": 9245.12854992496,
-      "playableAreaKm2": 1009,
-      "playableAreaPerPointKm2": 1.0931744312026002,
-      "playableCatchmentRadiusKm": 0.5898883189003913,
-      "localityScore": 0.23615168043186127,
-      "deaggregationScore": 1,
-      "score": 0.4859544015973734
+      "expectedPointSpacingKm": 0.8290334232937239,
+      "normalizedRadius": 0.7192967281247127,
+      "activityPerPoint": 6118.064203400307,
+      "playableAreaKm2": 1344,
+      "playableAreaPerPointKm2": 1.4592833876221498,
+      "playableCatchmentRadiusKm": 0.6815455443504146,
+      "localityScore": 0.237300058633389,
+      "deaggregationScore": 0.7505343950530526,
+      "score": 0.42202115581148836
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.3192568911790704,
+        "continuousScore": 0.8386514849778041,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -116,10 +124,10 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 13.387941994960624,
-            "latitude": 52.502822536550774,
+            "longitude": 13.386645593276898,
+            "latitude": 52.50161667540002,
             "massShare": 1,
-            "assignedMass": 17091145,
+            "assignedMass": 12013029,
             "assignedPointCount": 921,
             "prominenceRatio": 1
           }
@@ -127,7 +135,7 @@
       }
     }
   },
-  "last_updated": 1773532800,
+  "last_updated": 1784851200,
   "search_aliases": [
     "Berlín",
     "Berlino",
@@ -154,5 +162,11 @@
     "Բեռլին",
     "বার্লিন"
   ],
-  "sub_location": "central-europe"
+  "data_quality": {
+    "tier": "absent",
+    "raw_score": 0,
+    "weighted_score": 0,
+    "rubric_version": 1,
+    "provenance": "backfill"
+  }
 }

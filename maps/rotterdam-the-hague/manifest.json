@@ -4,13 +4,17 @@
   "name": "Rotterdam-The Hague",
   "author": "ryandicicco",
   "github_id": 215120742,
-  "description": "Original map by Lawrencelot. Covers the Rotterdam-The Hague metro corridor in the Netherlands' Randstad region -- the port city and the seat of government, connected by rail. Includes Rotterdam Centrum, The Hague, Delft, Schiedam, Vlaardingen, and Rotterdam The Hague Airport (RTM).",
+  "description": "# Rotterdam-The Hague · RTM\n\nThe Rotterdam-The Hague metro corridor in the Netherlands' Randstad region; the port city and the seat of government, connected by rail. Coverage spans both cities and the dense urban belt between them.\n\n## Coverage\n\n<table style=\"width: auto\">\n<tr><td><strong>Region</strong></td><td>Rotterdam-The Hague metro, South Holland (NL)</td></tr>\n<tr><td><strong>Bounding Box</strong></td><td>3.947, 51.805 → 4.641, 52.137</td></tr>\n<tr><td><strong>Playable Area</strong></td><td>~1,745 km²</td></tr>\n</table>\n\n## Population Summary\n\n<table style=\"width: auto\">\n<tr><td><strong>Metro Population</strong></td><td align=\"right\">1,500,000</td></tr>\n<tr><td><strong>Total Modeled Demand</strong></td><td align=\"right\">712,179</td></tr>\n</table>\n\n## Map Statistics\n\n<table style=\"width: auto\">\n<tr><td><strong>Buildings Indexed</strong></td><td align=\"right\">1,146,671</td></tr>\n<tr><td><strong>Demand Points</strong></td><td align=\"right\">415</td></tr>\n<tr><td><strong>Population Nodes</strong></td><td align=\"right\">10,723</td></tr>\n<tr><td><strong>Median Commute Distance</strong></td><td align=\"right\">11.3 km</td></tr>\n<tr><td><strong>Mean Commute Distance</strong></td><td align=\"right\">12.4 km</td></tr>\n</table>\n\n## Additional Features\n\n- **Building Collision** — A buildings index of 1,146,671 structures is included, providing in-game collision geometry for all non-filtered buildings (multi-level depth data included).\n- **Road & Runway Overlays** — Road network plus runway/taxiway geometry are bundled, covering Rotterdam The Hague Airport and surface routing across the corridor.",
   "tags": [
-    "europe",
+    "west-europe",
     "airports"
   ],
   "gallery": [
-    "gallery/screenshot1.webp"
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp",
+    "gallery/screenshot5.webp"
   ],
   "source": "https://github.com/ryandicicco/Subway-Builder-Maps",
   "update": {
@@ -19,17 +23,17 @@
   },
   "city_code": "RTM",
   "country": "NL",
-  "population": 613773,
+  "population": 712179,
   "level_of_detail": "medium-detail",
   "source_quality": "low-quality",
   "data_source": "OSM",
-  "location": "europe",
+  "location": "west-europe",
   "special_demand": [
     "airports"
   ],
-  "residents_total": 613773,
-  "points_count": 854,
-  "population_count": 6740,
+  "residents_total": 712179,
+  "points_count": 415,
+  "population_count": 10723,
   "initial_view_state": {
     "latitude": 51.93,
     "longitude": 4.2,
@@ -37,100 +41,101 @@
     "bearing": 0
   },
   "file_sizes": {
-    "RTM.pmtiles": 87.83,
+    "RTM.pmtiles": 87.07,
+    "buildings_index.bin": 183.89,
     "buildings_index.json": 262.53,
     "config.json": 0,
-    "demand_data.json": 0.91,
+    "demand_data.json": 1.28,
     "roads.geojson": 21.27,
     "runways_taxiways.geojson": 0.1
   },
   "is_test": false,
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.08458081246692056,
-      "p25": 0.21264160210446198,
-      "p50": 0.4133438273710306,
-      "p75": 0.7174614978444775,
-      "p90": 1.2621174070000762,
-      "mean": 0.5933090529421449
+      "p10": 0.17099053060391503,
+      "p25": 0.3538345241236856,
+      "p50": 0.6457033712197578,
+      "p75": 0.975591199122098,
+      "p90": 2.0389524009743814,
+      "mean": 0.8345338355146011
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.07661135298823918,
-      "p25": 0.19870788369945186,
-      "p50": 0.38919102093431807,
-      "p75": 0.6780889360346932,
-      "p90": 1.4177142412213115,
-      "mean": 0.6064424922569223
+      "p10": 0.13162852811218614,
+      "p25": 0.2234997403978038,
+      "p50": 0.5360553833047196,
+      "p75": 0.8845184744858393,
+      "p90": 2.0389524009743814,
+      "mean": 0.7476403023833906
     },
     "commuteDistanceKm": {
-      "p10": 4295,
-      "p25": 9176,
-      "p50": 15579,
-      "p75": 21350,
-      "p90": 26274,
-      "mean": 15561.185459940652
+      "p10": 2446,
+      "p25": 5027,
+      "p50": 11241,
+      "p75": 18364,
+      "p90": 23899,
+      "mean": 12408.095868693463
     },
     "residentCellDensity": {
-      "p10": 953,
-      "p25": 1655,
-      "p50": 3509,
-      "p75": 7475,
-      "p90": 11731,
-      "mean": 5289.109131403118
+      "p10": 75,
+      "p25": 308,
+      "p50": 1111,
+      "p75": 3689,
+      "p90": 6479,
+      "mean": 2765.715953307393
     },
     "workerCellDensity": {
-      "p10": 168,
-      "p25": 482,
-      "p50": 1216,
-      "p75": 3234,
-      "p90": 7194,
-      "mean": 2655.2
+      "p10": 80,
+      "p25": 331,
+      "p50": 968,
+      "p75": 3589,
+      "p90": 9192,
+      "mean": 3740.0756756756755
     },
     "detail": {
-      "radiusKm": 0.40108565939388796,
-      "expectedPointSpacingKm": 0.725093872627386,
-      "normalizedRadius": 0.5531499775891767,
-      "activityPerPoint": 1986.7183075992377,
-      "playableAreaKm2": 868,
-      "playableAreaPerPointKm2": 1.0163934426229508,
-      "playableCatchmentRadiusKm": 0.5687952892203509,
-      "localityScore": 0.5153894947151066,
-      "deaggregationScore": 1,
-      "score": 0.7179063272566322
+      "radiusKm": 0.5883304922918384,
+      "expectedPointSpacingKm": 0.8359396992145376,
+      "normalizedRadius": 0.70379537285362,
+      "activityPerPoint": 1716.0939759036144,
+      "playableAreaKm2": 728,
+      "playableAreaPerPointKm2": 1.7542168674698795,
+      "playableCatchmentRadiusKm": 0.7472513442115867,
+      "localityScore": 0.26036750533365965,
+      "deaggregationScore": 0.5703583872589276,
+      "score": 0.3853605979297006
     },
     "polycentrism": {
       "activity": {
-        "score": 0.9972521818227806,
-        "continuousScore": 0.8055954103113873,
+        "score": 0.9436487697038478,
+        "continuousScore": 0.8056117296672526,
         "detectedCenterCount": 2,
-        "effectiveCenterCount": 1.994519423273911,
-        "largestCenterShare": 0.5262098177083478,
+        "effectiveCenterCount": 1.8933096707231478,
+        "largestCenterShare": 0.6186920703924154,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 4.329903298930904,
-            "latitude": 52.04778189922079,
-            "massShare": 0.5262098177083478,
-            "assignedMass": 1890574,
-            "assignedPointCount": 311,
+            "longitude": 4.321818300419521,
+            "latitude": 52.048123266177285,
+            "massShare": 0.6186920703924154,
+            "assignedMass": 881239,
+            "assignedPointCount": 201,
             "prominenceRatio": 1
           },
           {
-            "longitude": 4.452305397801044,
-            "latitude": 51.91135774534272,
-            "massShare": 0.47379018229165215,
-            "assignedMass": 1702240,
-            "assignedPointCount": 542,
+            "longitude": 4.449226962927829,
+            "latitude": 51.91514128139526,
+            "massShare": 0.3813079296075846,
+            "assignedMass": 543119,
+            "assignedPointCount": 214,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1775779200,
+  "last_updated": 1784073600,
   "search_aliases": [
     "Rotterdam",
     "روتردام",
@@ -150,5 +155,8 @@
     "როტერდამი",
     "Roterdami"
   ],
-  "sub_location": "west-europe"
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  }
 }
