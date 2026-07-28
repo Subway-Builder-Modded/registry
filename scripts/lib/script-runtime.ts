@@ -1,13 +1,21 @@
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
-import { basename, resolve } from "node:path";
+import { resolve } from "node:path";
 
 export function resolveRepoRoot(importMetaDir: string): string {
-  // Scripts live at scripts/ (one level below the repo root); compiled output
-  // (dist/) and manual ops tooling (ops/) sit one level deeper.
-  const dir = basename(importMetaDir);
-  return dir === "dist" || dir === "ops"
-    ? resolve(importMetaDir, "..", "..")
-    : resolve(importMetaDir, "..");
+  // Walk up until the repository root (marked by pnpm-workspace.yaml), so the
+  // caller's depth — scripts/, a domain folder, ops/, or compiled dist output —
+  // never matters.
+  let dir = resolve(importMetaDir);
+  for (;;) {
+    if (existsSync(resolve(dir, "pnpm-workspace.yaml"))) {
+      return dir;
+    }
+    const parent = resolve(dir, "..");
+    if (parent === dir) {
+      throw new Error(`Could not locate repo root (pnpm-workspace.yaml) above ${importMetaDir}`);
+    }
+    dir = parent;
+  }
 }
 
 export function getNonEmptyEnv(name: string): string | undefined {

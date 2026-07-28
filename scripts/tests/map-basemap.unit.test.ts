@@ -10,7 +10,7 @@ import {
   squareBboxFromLonLatBbox,
   writeBasemapFromGrid,
 } from "../lib/map-basemap.js";
-import { isBasemapCacheHit } from "../generate-map-basemaps.js";
+import { isBasemapCacheHit } from "../listings/generate-map-basemaps.js";
 
 function toMercator(lon: number, lat: number): { x: number; y: number } {
   const radius = 6_378_137;
