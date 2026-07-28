@@ -1,0 +1,68 @@
+name: Bot Token Smoke Test
+
+# Manual diagnostic for the registry bot app (REGISTRY_BOT_APP_ID variable +
+# REGISTRY_BOT_PRIVATE_KEY secret): mints an installation token, pushes a
+# scratch branch touching maps/ with it, and opens a draft PR — if the app is
+# healthy, pull_request CI (e.g. Check Data Quality) appears on that PR within
+# a minute, which GITHUB_TOKEN pushes can never do. Clean up by closing the PR
+# and deleting the test/bot-token-smoke branch.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mint bot token
+        id: bot-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot-token.outputs.token }}
+
+      - name: Push scratch branch with app identity
+        run: |
+          set -euo pipefail
+          git config user.name "registry-bot-smoke"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B test/bot-token-smoke
+          date -u > maps/.bot-token-smoke
+          git add maps/.bot-token-smoke
+          git commit -m "test: bot token smoke (safe to delete)"
+          git push --force origin test/bot-token-smoke
+
+      - name: Open draft PR with app token
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.bot-token.outputs.token }}
+          script: |
+            const head = `${context.repo.owner}:test/bot-token-smoke`;
+            const { data: existing } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head,
+              state: 'open',
+            });
+            if (existing.length > 0) {
+              console.log(`Smoke PR already open: #${existing[0].number}`);
+              return;
+            }
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'test: bot token smoke (do not merge)',
+              body: 'Scratch PR from the Bot Token Smoke Test workflow. If the bot app is healthy, CI checks appear here within a minute. Close and delete the branch when done.',
+              head: 'test/bot-token-smoke',
+              base: 'main',
+              draft: true,
+            });
+            console.log(`Opened smoke PR #${pr.number} — check whether CI checks appear on it.`);
