@@ -3,10 +3,13 @@ import { dirname, resolve } from "node:path";
 import { isObject } from "./json-utils.js";
 
 export type AttributionMethod = "github" | "discord" | "custom";
-export type ContributorTier = "developer" | "executive" | "engineer" | "collaborator";
+export type ContributorTier = "developer" | "executive" | "engineer" | "conductor" | "collaborator";
+export type CreditRole = "maintainer" | "supporter";
 
 export interface AuthorAliasEntry {
-  github_id: number;
+  // Absent for credit-only entries (supporters/maintainers without a GitHub
+  // account); those are keyed by author_id instead.
+  github_id?: number;
   author_id?: string;
   author_alias?: string;
   attribution_method?: AttributionMethod;
@@ -15,6 +18,10 @@ export interface AuthorAliasEntry {
   attribution_link?: string;
   ko_fi_username?: string;
   contributor_tier?: ContributorTier;
+  // Which credits sections (website + app) this person appears in. Authors of
+  // listings appear in credits regardless; these roles cover maintainers and
+  // ko-fi supporters, who may have no listings at all (issue #1901).
+  credit_roles?: CreditRole[];
 }
 
 export interface AuthorAliasIndex {
@@ -39,10 +46,30 @@ function parseAttributionMethod(value: unknown): AttributionMethod {
 }
 
 function parseContributorTier(value: unknown): ContributorTier | undefined {
-  if (value === "developer" || value === "executive" || value === "engineer" || value === "collaborator") {
+  if (
+    value === "developer" || value === "executive" || value === "engineer"
+    || value === "conductor" || value === "collaborator"
+  ) {
     return value;
   }
   return undefined;
+}
+
+function parseCreditRoles(value: unknown): CreditRole[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const roles = value.filter((role): role is CreditRole => role === "maintainer" || role === "supporter");
+  return roles.length > 0 ? roles : undefined;
+}
+
+// GitHub-backed entries first (by id), then credit-only entries (by author_id)
+// so rewrites are deterministic.
+function sortAuthorEntries(authors: AuthorAliasEntry[]): AuthorAliasEntry[] {
+  return [...authors].sort((a, b) => {
+    const aId = a.github_id ?? Number.POSITIVE_INFINITY;
+    const bId = b.github_id ?? Number.POSITIVE_INFINITY;
+    if (aId !== bId) return aId - bId;
+    return (a.author_id ?? "").localeCompare(b.author_id ?? "");
+  });
 }
 
 function trimmedStringOrUndefined(value: unknown): string | undefined {
@@ -70,7 +97,9 @@ export function loadAuthorAliasIndex(repoRoot: string): AuthorAliasIndex {
     const authors = raw.authors
       .filter((entry): entry is Record<string, unknown> => isObject(entry))
       .map((entry) => ({
-        github_id: typeof entry.github_id === "number" && Number.isFinite(entry.github_id) ? entry.github_id : 0,
+        github_id: typeof entry.github_id === "number" && Number.isFinite(entry.github_id) && entry.github_id > 0
+          ? entry.github_id
+          : undefined,
         author_id: trimmedStringOrUndefined(entry.author_id),
         author_alias: trimmedStringOrUndefined(entry.author_alias),
         attribution_method: parseAttributionMethod(entry.attribution_method),
@@ -79,13 +108,15 @@ export function loadAuthorAliasIndex(repoRoot: string): AuthorAliasIndex {
         attribution_link: trimmedStringOrUndefined(entry.attribution_link),
         ko_fi_username: trimmedStringOrUndefined(entry.ko_fi_username),
         contributor_tier: parseContributorTier(entry.contributor_tier),
+        credit_roles: parseCreditRoles(entry.credit_roles),
       }))
-      .filter((entry) => entry.github_id > 0)
-      .sort((a, b) => a.github_id - b.github_id);
+      // Credit-only entries (no GitHub account) are keyed by author_id;
+      // entries with neither identity are dropped as malformed.
+      .filter((entry) => entry.github_id !== undefined || entry.author_id !== undefined);
 
     return {
       schema_version: 1,
-      authors,
+      authors: sortAuthorEntries(authors),
     };
   } catch {
     return { schema_version: 1, authors: [] };
@@ -180,10 +211,10 @@ export function updateAuthorEntry(
     entry.attribution_link = updates.attribution_link;
   }
 
-  const authors = [
+  const authors = sortAuthorEntries([
     ...index.authors.filter((e) => e.github_id !== githubId),
     entry,
-  ].sort((a, b) => a.github_id - b.github_id);
+  ]);
 
   return { schema_version: 1, authors };
 }
@@ -205,7 +236,7 @@ export function ensureAuthorAliasPrefill(
     return { created: false, path };
   }
 
-  const authors: AuthorAliasEntry[] = [
+  const authors: AuthorAliasEntry[] = sortAuthorEntries([
     ...index.authors,
     {
       github_id: githubId,
@@ -214,7 +245,7 @@ export function ensureAuthorAliasPrefill(
       attribution_method: "github" as AttributionMethod,
       attribution_link: `https://github.com/${normalizedAuthorLogin}`,
     },
-  ].sort((a, b) => a.github_id - b.github_id);
+  ]);
 
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(

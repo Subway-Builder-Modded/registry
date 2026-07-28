@@ -223,3 +223,99 @@ test("updateAuthorEntry stores discord fields without affecting attribution", ()
   assert.equal(alice.discord_id, "123456789012345678");
   assert.equal(alice.attribution_method, "github");
 });
+
+test("loadAuthorAliasIndex keeps credit-only entries (no github_id) with roles and conductor tier", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-author-credit-only-test-"));
+  try {
+    writeJson(join(repoRoot, "authors", "index.json"), {
+      schema_version: 1,
+      authors: [
+        {
+          github_id: 10,
+          author_id: "alice",
+          author_alias: "Alice",
+          credit_roles: ["maintainer"],
+        },
+        {
+          author_id: "supporter-only",
+          author_alias: "Supporter",
+          attribution_method: "custom",
+          attribution_link: "https://ko-fi.com/supporter",
+          ko_fi_username: "supporter-kofi",
+          contributor_tier: "conductor",
+          credit_roles: ["supporter"],
+        },
+      ],
+    });
+
+    const aliases = loadAuthorAliasIndex(repoRoot);
+    assert.equal(aliases.authors.length, 2);
+    const supporter = aliases.authors.find((entry) => entry.author_id === "supporter-only");
+    assert.ok(supporter);
+    assert.equal(supporter.github_id, undefined);
+    assert.equal(supporter.contributor_tier, "conductor");
+    assert.deepEqual(supporter.credit_roles, ["supporter"]);
+    const alice = aliases.authors.find((entry) => entry.author_id === "alice");
+    assert.ok(alice);
+    assert.deepEqual(alice.credit_roles, ["maintainer"]);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("ensureAuthorAliasPrefill rewrite preserves credit-only entries", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-author-credit-rewrite-test-"));
+  try {
+    writeJson(join(repoRoot, "authors", "index.json"), {
+      schema_version: 1,
+      authors: [
+        {
+          author_id: "supporter-only",
+          author_alias: "Supporter",
+          attribution_method: "custom",
+          attribution_link: "https://ko-fi.com/supporter",
+          contributor_tier: "executive",
+          credit_roles: ["supporter"],
+        },
+      ],
+    });
+
+    const result = ensureAuthorAliasPrefill(repoRoot, 20, "newauthor");
+    assert.equal(result.created, true);
+
+    const raw = JSON.parse(readFileSync(join(repoRoot, "authors", "index.json"), "utf-8")) as {
+      authors: Array<{ author_id?: string; github_id?: number; credit_roles?: string[] }>;
+    };
+    assert.equal(raw.authors.length, 2);
+    // GitHub-backed entries sort first; credit-only entries follow.
+    assert.equal(raw.authors[0].github_id, 20);
+    assert.equal(raw.authors[1].author_id, "supporter-only");
+    assert.deepEqual(raw.authors[1].credit_roles, ["supporter"]);
+    assert.equal("github_id" in raw.authors[1], false);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("updateAuthorEntry preserves credit-only entries and their order", () => {
+  const index: AuthorAliasIndex = {
+    schema_version: 1,
+    authors: [
+      { github_id: 10, author_id: "alice", author_alias: "Alice", attribution_method: "github" },
+      {
+        author_id: "supporter-only",
+        author_alias: "Supporter",
+        attribution_method: "custom",
+        contributor_tier: "engineer",
+        credit_roles: ["supporter"],
+      },
+    ],
+  };
+
+  const result = updateAuthorEntry(index, 10, "alice", { author_alias: "Alice Prime" });
+  assert.equal(result.authors.length, 2);
+  assert.equal(result.authors[0].github_id, 10);
+  assert.equal(result.authors[0].author_alias, "Alice Prime");
+  assert.equal(result.authors[1].author_id, "supporter-only");
+  assert.deepEqual(result.authors[1].credit_roles, ["supporter"]);
+});
