@@ -9,6 +9,11 @@ name: Bot Token Smoke Test
 
 on:
   workflow_dispatch:
+  # Branch-only workflows cannot be dispatched by name; touching this file on
+  # the branch re-runs the smoke test instead.
+  push:
+    branches: [feat/publish-ci-bot-token]
+    paths: [".github/workflows/bot-token-smoke.yml"]
 
 permissions:
   contents: write
