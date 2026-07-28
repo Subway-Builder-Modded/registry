@@ -7,9 +7,9 @@ import { validateGitHubRepo } from "./lib/github.js";
 import { parseGalleryImages } from "./lib/gallery.js";
 import { resolvePublishCollaborators } from "./lib/collaborators.js";
 import {
+  COUNTRY_TO_LOCATION,
   DEFAULT_MAP_DATA_SOURCE,
   LEVEL_OF_DETAIL_VALUES,
-  LOCATION_TAGS,
   SOURCE_QUALITY_VALUES,
   SPECIAL_DEMAND_TAG_SET,
   VANILLA_CITY_CODE_SET,
@@ -48,7 +48,9 @@ const PublishMapInput = PublishModInput.omit({ "mod-id": true }).extend({
   // used — source_quality is machine-managed (data-quality tiers supersede it).
   source_quality: z.enum(SOURCE_QUALITY_VALUES).optional(),
   level_of_detail: z.enum(LEVEL_OF_DETAIL_VALUES),
-  location: z.enum(LOCATION_TAGS),
+  // Tolerated for issues predating the field's removal from the form; never
+  // used — location is machine-managed (derived from the country code).
+  location: z.string().optional(),
   special_demand: z.union([z.string(), z.array(z.string())]).optional(),
 });
 
@@ -149,6 +151,13 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     errors.push(`**collaborators**: ${message}`);
+  }
+
+  if (!COUNTRY_TO_LOCATION[parsed.data.country]) {
+    errors.push(
+      `**country**: \`${parsed.data.country}\` is not a recognized ISO 3166-1 alpha-2 country code. ` +
+      "The map's location/region tag is derived from it automatically.",
+    );
   }
 
   if (VANILLA_CITY_CODE_SET.has(parsed.data["city-code"])) {

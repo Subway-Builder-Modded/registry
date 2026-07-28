@@ -113,11 +113,8 @@ export const MapManifestSchema = BaseManifestSchema.extend({
     // marker on every map, and new readers always prefer this field. Fully
     // decoupled from source_quality, which is a frozen, write-once legacy tag.
     data_quality: ManifestDataQualitySchema.optional(),
+    // Machine-managed: derived from `country` via COUNTRY_TO_LOCATION at intake.
     location: LocationTagSchema,
-    // Populated during the europe→sub-region migration. New app reads
-    // sub_location ?? location; old apps (≤0.2.3) read location and still see
-    // "europe". Removed once location is updated to the sub-region directly.
-    sub_location: LocationTagSchema.optional(),
     special_demand: z.array(SpecialDemandTagSchema).refine((a) => new Set(a).size === a.length, { message: "special_demand must be unique" }),
     file_sizes: z.record(z.number().min(0)),
     // Author-provided list of major cities whose territory this map covers but

@@ -8,9 +8,6 @@ export const LocationTagSchema = z.enum([
   "east-africa",
   "east-asia",
   "east-europe",
-  // "europe" kept during transition so existing manifests remain valid until
-  // sub_location migration is complete and location fields are updated.
-  "europe",
   "middle-east",
   "north-africa",
   "north-america",
@@ -51,3 +48,308 @@ export type LocationTag = z.infer<typeof LocationTagSchema>;
 export type SourceQuality = z.infer<typeof SourceQualitySchema>;
 export type LevelOfDetail = z.infer<typeof LevelOfDetailSchema>;
 export type SpecialDemandTag = z.infer<typeof SpecialDemandTagSchema>;
+
+// Canonical ISO 3166-1 alpha-2 → location tag mapping. `location` is derived
+// from `country` at intake, so this is the single source of truth for how the
+// registry buckets the world into the LocationTagSchema regions.
+//
+// Seeded from UN M49 regions, with these standing adjustments:
+//   - European sub-regions follow CIA World Factbook definitions:
+//       Central  : DE AT CH LI SI + Visegrád (PL CZ SK HU)
+//       Western  : FR Benelux + British Isles (GB IE) + Monaco
+//       Southern : Iberia + Italian peninsula + Balkans (incl. BG)
+//       Northern : Scandinavia + Baltic states
+//       Eastern  : RO MD UA BY RU + Caucasus (AM AZ GE)
+//   - TR and IR are middle-east (conventional, not M49 Western/Southern Asia).
+//   - The enum has no central-africa tag, so M49 Middle Africa is split
+//     between west-africa (Gulf of Guinea + Sahel) and southern-africa (AO).
+//   - AQ (Antarctica) is intentionally unmapped: submissions are rejected at
+//     intake with an unknown-country error.
+export const COUNTRY_TO_LOCATION: Readonly<Record<string, LocationTag>> = {
+  // ===== North America =====
+  US: "north-america",
+  CA: "north-america",
+  MX: "north-america",
+  BM: "north-america",
+  GL: "north-america",
+  PM: "north-america",
+
+  // ===== Central America =====
+  BZ: "central-america",
+  CR: "central-america",
+  GT: "central-america",
+  HN: "central-america",
+  NI: "central-america",
+  PA: "central-america",
+  SV: "central-america",
+
+  // ===== Caribbean =====
+  AG: "caribbean",
+  AI: "caribbean",
+  AW: "caribbean",
+  BB: "caribbean",
+  BL: "caribbean",
+  BQ: "caribbean",
+  BS: "caribbean",
+  CU: "caribbean",
+  CW: "caribbean",
+  DM: "caribbean",
+  DO: "caribbean",
+  GD: "caribbean",
+  GP: "caribbean",
+  HT: "caribbean",
+  JM: "caribbean",
+  KN: "caribbean",
+  KY: "caribbean",
+  LC: "caribbean",
+  MF: "caribbean",
+  MQ: "caribbean",
+  MS: "caribbean",
+  PR: "caribbean",
+  SX: "caribbean",
+  TC: "caribbean",
+  TT: "caribbean",
+  VC: "caribbean",
+  VG: "caribbean",
+  VI: "caribbean",
+
+  // ===== South America =====
+  AR: "south-america",
+  BO: "south-america",
+  BR: "south-america",
+  BV: "south-america",
+  CL: "south-america",
+  CO: "south-america",
+  EC: "south-america",
+  FK: "south-america",
+  GF: "south-america",
+  GS: "south-america",
+  GY: "south-america",
+  PE: "south-america",
+  PY: "south-america",
+  SR: "south-america",
+  UY: "south-america",
+  VE: "south-america",
+
+  // ===== Northern Europe — Scandinavia + Baltic states =====
+  AX: "north-europe",
+  DK: "north-europe",
+  EE: "north-europe",
+  FI: "north-europe",
+  FO: "north-europe",
+  IS: "north-europe",
+  LT: "north-europe",
+  LV: "north-europe",
+  NO: "north-europe",
+  SE: "north-europe",
+  SJ: "north-europe",
+
+  // ===== Western Europe — Atlantic seaboard + British Isles =====
+  BE: "west-europe",
+  FR: "west-europe",
+  GB: "west-europe",
+  GG: "west-europe",
+  IE: "west-europe",
+  IM: "west-europe",
+  JE: "west-europe",
+  LU: "west-europe",
+  MC: "west-europe",
+  NL: "west-europe",
+
+  // ===== Central Europe — CIA Factbook definition + Visegrád =====
+  AT: "central-europe",
+  CH: "central-europe",
+  CZ: "central-europe",
+  DE: "central-europe",
+  HU: "central-europe",
+  LI: "central-europe",
+  PL: "central-europe",
+  SI: "central-europe",
+  SK: "central-europe",
+
+  // ===== Southern Europe — Iberia, Italian peninsula, Balkans =====
+  AD: "south-europe",
+  AL: "south-europe",
+  BA: "south-europe",
+  BG: "south-europe",
+  CY: "south-europe",
+  ES: "south-europe",
+  GI: "south-europe",
+  GR: "south-europe",
+  HR: "south-europe",
+  IT: "south-europe",
+  ME: "south-europe",
+  MK: "south-europe",
+  MT: "south-europe",
+  PT: "south-europe",
+  RS: "south-europe",
+  SM: "south-europe",
+  VA: "south-europe",
+  XK: "south-europe",
+
+  // ===== Eastern Europe + Caucasus =====
+  AM: "east-europe",
+  AZ: "east-europe",
+  BY: "east-europe",
+  GE: "east-europe",
+  MD: "east-europe",
+  RO: "east-europe",
+  RU: "east-europe",
+  UA: "east-europe",
+
+  // ===== Middle East =====
+  AE: "middle-east",
+  BH: "middle-east",
+  IL: "middle-east",
+  IQ: "middle-east",
+  IR: "middle-east",
+  JO: "middle-east",
+  KW: "middle-east",
+  LB: "middle-east",
+  OM: "middle-east",
+  PS: "middle-east",
+  QA: "middle-east",
+  SA: "middle-east",
+  SY: "middle-east",
+  TR: "middle-east",
+  YE: "middle-east",
+
+  // ===== Central Asia =====
+  KG: "central-asia",
+  KZ: "central-asia",
+  TJ: "central-asia",
+  TM: "central-asia",
+  UZ: "central-asia",
+
+  // ===== South Asia =====
+  AF: "south-asia",
+  BD: "south-asia",
+  BT: "south-asia",
+  IN: "south-asia",
+  LK: "south-asia",
+  MV: "south-asia",
+  NP: "south-asia",
+  PK: "south-asia",
+
+  // ===== East Asia =====
+  CN: "east-asia",
+  HK: "east-asia",
+  JP: "east-asia",
+  KP: "east-asia",
+  KR: "east-asia",
+  MN: "east-asia",
+  MO: "east-asia",
+  TW: "east-asia",
+
+  // ===== Southeast Asia =====
+  BN: "southeast-asia",
+  ID: "southeast-asia",
+  KH: "southeast-asia",
+  LA: "southeast-asia",
+  MM: "southeast-asia",
+  MY: "southeast-asia",
+  PH: "southeast-asia",
+  SG: "southeast-asia",
+  TH: "southeast-asia",
+  TL: "southeast-asia",
+  VN: "southeast-asia",
+
+  // ===== Oceania =====
+  AS: "oceania",
+  AU: "oceania",
+  CC: "oceania",
+  CK: "oceania",
+  CX: "oceania",
+  FJ: "oceania",
+  FM: "oceania",
+  GU: "oceania",
+  HM: "oceania",
+  KI: "oceania",
+  MH: "oceania",
+  MP: "oceania",
+  NC: "oceania",
+  NF: "oceania",
+  NR: "oceania",
+  NU: "oceania",
+  NZ: "oceania",
+  PF: "oceania",
+  PG: "oceania",
+  PN: "oceania",
+  PW: "oceania",
+  SB: "oceania",
+  TK: "oceania",
+  TO: "oceania",
+  TV: "oceania",
+  UM: "oceania",
+  VU: "oceania",
+  WF: "oceania",
+  WS: "oceania",
+
+  // ===== Northern Africa =====
+  DZ: "north-africa",
+  EG: "north-africa",
+  EH: "north-africa",
+  LY: "north-africa",
+  MA: "north-africa",
+  SD: "north-africa",
+  TN: "north-africa",
+
+  // ===== Western Africa (+ M49 Middle Africa, minus AO) =====
+  BF: "west-africa",
+  BJ: "west-africa",
+  CD: "west-africa",
+  CF: "west-africa",
+  CG: "west-africa",
+  CI: "west-africa",
+  CM: "west-africa",
+  CV: "west-africa",
+  GA: "west-africa",
+  GH: "west-africa",
+  GM: "west-africa",
+  GN: "west-africa",
+  GQ: "west-africa",
+  GW: "west-africa",
+  LR: "west-africa",
+  ML: "west-africa",
+  MR: "west-africa",
+  NE: "west-africa",
+  NG: "west-africa",
+  SH: "west-africa",
+  SL: "west-africa",
+  SN: "west-africa",
+  ST: "west-africa",
+  TD: "west-africa",
+  TG: "west-africa",
+
+  // ===== Eastern Africa =====
+  BI: "east-africa",
+  DJ: "east-africa",
+  ER: "east-africa",
+  ET: "east-africa",
+  IO: "east-africa",
+  KE: "east-africa",
+  KM: "east-africa",
+  MG: "east-africa",
+  MU: "east-africa",
+  MW: "east-africa",
+  MZ: "east-africa",
+  RE: "east-africa",
+  RW: "east-africa",
+  SC: "east-africa",
+  SO: "east-africa",
+  SS: "east-africa",
+  TF: "east-africa",
+  TZ: "east-africa",
+  UG: "east-africa",
+  YT: "east-africa",
+  ZM: "east-africa",
+  ZW: "east-africa",
+
+  // ===== Southern Africa (+ AO) =====
+  AO: "southern-africa",
+  BW: "southern-africa",
+  LS: "southern-africa",
+  NA: "southern-africa",
+  SZ: "southern-africa",
+  ZA: "southern-africa",
+};
