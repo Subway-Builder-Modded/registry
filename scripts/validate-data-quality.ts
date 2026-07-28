@@ -136,10 +136,17 @@ function main(): void {
 
   // If the map was previously scored, reset the manifest to the Unscored
   // marker so the branch stays CI-consistent; the reviewer re-stamps via
-  // rescore_data before merge.
+  // rescore_data before merge. Pre-migration publish branches carry no
+  // data_quality block at all — stamp the marker there too, or the manifest
+  // would fail --require-presence on main after the publish PR merges.
   const existingBlock = manifest.data_quality as { tier?: string } | undefined;
   let manifestReset = false;
-  if (existingBlock !== undefined && existingBlock.tier !== "unknown") {
+  let markerStamped = false;
+  if (existingBlock === undefined) {
+    manifest.data_quality = { tier: "unknown", rubric_version: RUBRIC_VERSION };
+    writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    markerStamped = true;
+  } else if (existingBlock.tier !== "unknown") {
     manifest.data_quality = { tier: "unknown", rubric_version: RUBRIC_VERSION };
     writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
     manifestReset = true;
@@ -166,6 +173,11 @@ function main(): void {
   if (manifestReset) {
     extras.push(
       "This map was previously scored; its manifest is reset to `unknown` on this branch until a reviewer re-confirms with `rescore_data`.",
+    );
+  }
+  if (markerStamped) {
+    extras.push(
+      "The manifest predates the data-quality system; the `unknown` marker was stamped alongside the answers.",
     );
   }
   writeFileSync(

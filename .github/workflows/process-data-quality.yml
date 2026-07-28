@@ -98,6 +98,11 @@ jobs:
         # Unmerged maps (plan C1.2): when the map is not on main but an open
         # publish branch exists, the answers land on that branch so the publish
         # PR carries them — review gates the publish merge itself.
+        #
+        # Only the submission's maps/<id> directory is overlaid; the working
+        # tree stays on main so validation runs with current scripts/schemas.
+        # Old publish branches predate the data-quality tooling entirely —
+        # checking out the whole branch broke on "Missing script".
         id: target
         env:
           MAP_ID: ${{ fromJson(steps.parser.outputs.jsonString).map-id }}
@@ -106,7 +111,7 @@ jobs:
           if [ ! -f "maps/${MAP_ID}/manifest.json" ] \
             && git ls-remote --exit-code origin "refs/heads/publish/map/${MAP_ID}" >/dev/null 2>&1; then
             git fetch origin "publish/map/${MAP_ID}"
-            git checkout -B "publish/map/${MAP_ID}" "origin/publish/map/${MAP_ID}"
+            git checkout FETCH_HEAD -- "maps/${MAP_ID}"
             echo "mode=publish" >> "$GITHUB_OUTPUT"
           else
             echo "mode=merged" >> "$GITHUB_OUTPUT"
@@ -126,12 +131,21 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add maps/
+          # Commit through a worktree pinned to the publish branch tip: the
+          # main working tree only holds the maps/<id> overlay + validation
+          # output, never a full checkout of the (possibly stale) branch.
+          git fetch origin "publish/map/${MAP_ID}"
+          git worktree add /tmp/publish-branch FETCH_HEAD
+          mkdir -p "/tmp/publish-branch/maps/${MAP_ID}"
+          cp "maps/${MAP_ID}/data-quality.json" "/tmp/publish-branch/maps/${MAP_ID}/"
+          cp "maps/${MAP_ID}/manifest.json" "/tmp/publish-branch/maps/${MAP_ID}/"
+          cd /tmp/publish-branch
+          git add "maps/${MAP_ID}"
           if git diff --cached --quiet; then
             echo "No changes (answers already on the publish branch)."
           else
             git commit -m "chore(data-quality): answers for ${MAP_ID} (self-reported)"
-            git push origin "publish/map/${MAP_ID}"
+            git push origin "HEAD:publish/map/${MAP_ID}"
           fi
 
       - name: Comment on publish pull request
