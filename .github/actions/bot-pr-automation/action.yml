@@ -1,5 +1,5 @@
 name: Bot PR Automation
-description: Resolve bot PR, apply label, and merge — directly via the bot app (ruleset bypass) when merge_token is given, else by dispatching auto-approval and enabling auto-merge.
+description: Resolve bot PR, apply label, and squash-merge it directly with the bot app identity (Main-ruleset bypass); falls back to enabling auto-merge, which then waits for a manual code-owner approval.
 
 inputs:
   github_token:
@@ -7,10 +7,10 @@ inputs:
     required: true
   merge_token:
     description: >-
-      Optional GitHub App installation token that bypasses the Main ruleset.
-      When set, the PR is squash-merged directly with this identity and the
-      approval dispatch/auto-merge path is skipped (used as fallback if the
-      direct merge fails, e.g. the app is not a bypass actor yet).
+      GitHub App installation token that bypasses the Main ruleset. When set,
+      the PR is squash-merged directly with this identity. When empty or the
+      direct merge fails, auto-merge is enabled instead and the PR waits for
+      a manual code-owner approval.
     required: false
     default: ""
   repo:
@@ -18,12 +18,6 @@ inputs:
     required: true
   bot_branch:
     description: Bot branch name used to resolve PR fallback.
-    required: true
-  source_workflow:
-    description: Workflow name for repository_dispatch payload.
-    required: true
-  source_run_id:
-    description: Workflow run id for repository_dispatch payload.
     required: true
   pr_number:
     description: PR number from create-pull-request output.
@@ -47,14 +41,6 @@ inputs:
     default: "automation"
   apply_label:
     description: Whether to apply label.
-    required: false
-    default: "true"
-  dispatch_event_type:
-    description: repository_dispatch event type.
-    required: false
-    default: "auto-approve-actions-bot-pr"
-  dispatch_enabled:
-    description: Whether to call repository_dispatch.
     required: false
     default: "true"
   enable_auto_merge:
@@ -83,16 +69,12 @@ runs:
         INPUT_MERGE_TOKEN: ${{ inputs.merge_token }}
         INPUT_REPO: ${{ inputs.repo }}
         INPUT_BOT_BRANCH: ${{ inputs.bot_branch }}
-        INPUT_SOURCE_WORKFLOW: ${{ inputs.source_workflow }}
-        INPUT_SOURCE_RUN_ID: ${{ inputs.source_run_id }}
         INPUT_PR_NUMBER: ${{ inputs.pr_number }}
         INPUT_PR_URL: ${{ inputs.pr_url }}
         INPUT_PR_HEAD_SHA: ${{ inputs.pr_head_sha }}
         INPUT_MAX_ATTEMPTS: ${{ inputs.max_attempts }}
         INPUT_LABEL: ${{ inputs.label }}
         INPUT_APPLY_LABEL: ${{ inputs.apply_label }}
-        INPUT_DISPATCH_EVENT_TYPE: ${{ inputs.dispatch_event_type }}
-        INPUT_DISPATCH_ENABLED: ${{ inputs.dispatch_enabled }}
         INPUT_ENABLE_AUTO_MERGE: ${{ inputs.enable_auto_merge }}
       run: |
         set -euo pipefail
@@ -178,32 +160,23 @@ runs:
           retry_run "${MAX_ATTEMPTS}" gh pr edit "${PR_NUMBER}" --repo "${REPO}" --add-label "${INPUT_LABEL}"
         fi
 
-        # Direct bypass merge with the bot app identity when a merge token is
-        # provided; the approval-dispatch path below remains the fallback (and
-        # the only path while the app is not a Main-ruleset bypass actor).
+        # Direct bypass merge with the bot app identity. The fallback (no
+        # token, or the app is not a Main-ruleset bypass actor) enables
+        # auto-merge, which then waits for a manual code-owner approval —
+        # the old auto-approve dispatch workflow is gone.
         merged_directly=false
         if [ -n "${INPUT_MERGE_TOKEN}" ]; then
           if retry_run 2 env GH_TOKEN="${INPUT_MERGE_TOKEN}" gh pr merge "${PR_NUMBER}" --repo "${REPO}" --squash; then
             merged_directly=true
             echo "Merged PR #${PR_NUMBER} directly with the bot app identity."
           else
-            echo "Direct app merge failed; falling back to approval dispatch + auto-merge." >&2
+            echo "Direct app merge failed; enabling auto-merge (needs a manual approval)." >&2
           fi
         fi
 
-        if [ "${merged_directly}" != "true" ]; then
-          if bool_true "${INPUT_DISPATCH_ENABLED}"; then
-            retry_run "${MAX_ATTEMPTS}" gh api "repos/${REPO}/dispatches" \
-              -f event_type="${INPUT_DISPATCH_EVENT_TYPE}" \
-              -f client_payload[pull_request_number]="${PR_NUMBER}" \
-              -f client_payload[source_workflow]="${INPUT_SOURCE_WORKFLOW}" \
-              -f client_payload[source_run_id]="${INPUT_SOURCE_RUN_ID}"
-          fi
-
-          if bool_true "${INPUT_ENABLE_AUTO_MERGE}"; then
-            retry_run "${MAX_ATTEMPTS}" gh pr merge "${PR_NUMBER}" --repo "${REPO}" --auto --squash \
-              || echo "Could not enable auto-merge after retries (auto-merge may be disabled or blocked by branch rules)."
-          fi
+        if [ "${merged_directly}" != "true" ] && bool_true "${INPUT_ENABLE_AUTO_MERGE}"; then
+          retry_run "${MAX_ATTEMPTS}" gh pr merge "${PR_NUMBER}" --repo "${REPO}" --auto --squash \
+            || echo "Could not enable auto-merge after retries (auto-merge may be disabled or blocked by branch rules)."
         fi
 
         echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"
