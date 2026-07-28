@@ -96,12 +96,17 @@ runs:
           local delay=5
           local attempt=1
           local output=""
+          local status=0
           while true; do
+            # Capture the command's status directly: `$?` read after an
+            # if-statement whose condition failed is the if's status (0),
+            # which made terminal failures return success.
             if output="$("$@" 2>&1)"; then
               printf '%s' "$output"
               return 0
+            else
+              status=$?
             fi
-            local status=$?
             if [ "$attempt" -ge "$max_attempts" ]; then
               echo "$output" >&2
               return "$status"
@@ -119,11 +124,13 @@ runs:
           shift
           local delay=5
           local attempt=1
+          local status=0
           while true; do
             if "$@"; then
               return 0
+            else
+              status=$?
             fi
-            local status=$?
             if [ "$attempt" -ge "$max_attempts" ]; then
               return "$status"
             fi
@@ -166,7 +173,11 @@ runs:
         # the old auto-approve dispatch workflow is gone.
         merged_directly=false
         if [ -n "${INPUT_MERGE_TOKEN}" ]; then
-          if retry_run 2 env GH_TOKEN="${INPUT_MERGE_TOKEN}" gh pr merge "${PR_NUMBER}" --repo "${REPO}" --squash; then
+          # --admin: a plain merge is refused while the ruleset's review
+          # requirement is unmet ("base branch policy prohibits the merge")
+          # even for a bypass actor — the override path is what exercises
+          # the app's Main-ruleset bypass.
+          if retry_run 2 env GH_TOKEN="${INPUT_MERGE_TOKEN}" gh pr merge "${PR_NUMBER}" --repo "${REPO}" --squash --admin; then
             merged_directly=true
             echo "Merged PR #${PR_NUMBER} directly with the bot app identity."
           else
