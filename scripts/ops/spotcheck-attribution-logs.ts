@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import JSZip from "jszip";
+import { getFlagValue } from "../lib/cli.js";
 import { parseAttributionBackfillLogHits } from "../lib/download-attribution-backfill-core.js";
 import type { DownloadAttributionLedger } from "../lib/download-attribution.js";
 import type { IntegrityOutput } from "../lib/integrity.js";
@@ -47,19 +48,6 @@ function parseIntArg(value: string | undefined, fallback: number): number {
   return parsed;
 }
 
-function getArgValue(args: string[], name: string): string | undefined {
-  const key = `--${name}=`;
-  for (const arg of args) {
-    if (arg.startsWith(key)) return arg.slice(key.length);
-  }
-  for (let i = 0; i < args.length; i += 1) {
-    if (args[i] === `--${name}`) {
-      return args[i + 1];
-    }
-  }
-  return undefined;
-}
-
 function parseMaps(raw: string | undefined): string[] {
   if (!raw) return [];
   return raw
@@ -71,12 +59,12 @@ function parseMaps(raw: string | undefined): string[] {
 function parseArgs(argv: string[]): CliArgs {
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const repoFullName = (
-    getArgValue(argv, "repo")
+    getFlagValue(argv, "repo")
     ?? process.env.GITHUB_REPOSITORY
     ?? "Subway-Builder-Modded/registry"
   ).trim();
   const token = (
-    getArgValue(argv, "token")
+    getFlagValue(argv, "token")
     ?? process.env.GH_DOWNLOADS_TOKEN
     ?? process.env.GITHUB_TOKEN
     ?? ""
@@ -85,12 +73,12 @@ function parseArgs(argv: string[]): CliArgs {
     throw new Error("Missing token. Provide --token or GH_DOWNLOADS_TOKEN/GITHUB_TOKEN.");
   }
 
-  const days = parseIntArg(getArgValue(argv, "days"), 90);
-  const maxRuns = parseIntArg(getArgValue(argv, "max-runs"), 120);
-  const maps = parseMaps(getArgValue(argv, "maps"));
-  const compareRef = getArgValue(argv, "compare-ref")?.trim() || undefined;
-  const topLoss = parseIntArg(getArgValue(argv, "top-loss"), 12);
-  const outputPath = getArgValue(argv, "output")?.trim() || undefined;
+  const days = parseIntArg(getFlagValue(argv, "days"), 90);
+  const maxRuns = parseIntArg(getFlagValue(argv, "max-runs"), 120);
+  const maps = parseMaps(getFlagValue(argv, "maps"));
+  const compareRef = getFlagValue(argv, "compare-ref")?.trim() || undefined;
+  const topLoss = parseIntArg(getFlagValue(argv, "top-loss"), 12);
+  const outputPath = getFlagValue(argv, "output")?.trim() || undefined;
 
   return {
     repoRoot,

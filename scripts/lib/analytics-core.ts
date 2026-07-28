@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { getFlagValue } from "./cli.js";
 import { writeCsv } from "./csv.js";
 import { isFiniteNumber, isObject, readJsonFile } from "./json-utils.js";
 import { resolveRepoRoot } from "./script-runtime.js";
@@ -213,21 +214,6 @@ type ListingKey = `${"maps" | "mods"}:${string}`;
 const DEFAULT_TOP_LISTINGS: number | null = null;
 const DEFAULT_TOP_AUTHORS: number | null = null;
 const WINDOWS = [1, 3, 7, 14, 30] as const;
-
-function getArgValue(argv: string[], name: string): string | undefined {
-  const exact = `--${name}=`;
-  for (const arg of argv) {
-    if (arg.startsWith(exact)) {
-      return arg.slice(exact.length);
-    }
-  }
-  for (let index = 0; index < argv.length; index += 1) {
-    if (argv[index] === `--${name}`) {
-      return argv[index + 1];
-    }
-  }
-  return undefined;
-}
 
 function validateArgs(argv: string[]): void {
   const valueFlags = new Set(["--top-k-listings", "--top-k-authors"]);
@@ -1190,14 +1176,14 @@ export function runGenerateAnalyticsCli(
   const resolvedRepoRoot = repoRoot ?? process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   validateArgs(argv);
   const topListings = parseTopK(
-    getArgValue(argv, "top-k-listings")
+    getFlagValue(argv, "top-k-listings")
       ?? process.env.ANALYTICS_TOP_K_LISTINGS
       ?? process.env.ANALYTICS_TOP_K,
     DEFAULT_TOP_LISTINGS,
     "top-k-listings",
   );
   const topAuthors = parseTopK(
-    getArgValue(argv, "top-k-authors") ?? process.env.ANALYTICS_TOP_K_AUTHORS,
+    getFlagValue(argv, "top-k-authors") ?? process.env.ANALYTICS_TOP_K_AUTHORS,
     DEFAULT_TOP_AUTHORS,
     "top-k-authors",
   );
