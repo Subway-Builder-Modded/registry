@@ -9,6 +9,7 @@ import {
 import {
   combineMapTags,
   getMapDataSource,
+  getMapLevelOfDetail,
   getOptionalIssueValue,
   getRequiredIssueValue,
   parseCheckedBoxes,
@@ -65,10 +66,10 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
   tags: string[];
   mapFields: Omit<MapManifest, keyof ModManifest>;
 }> {
-  const levelOfDetail = getRequiredIssueValue(
-    "level_of_detail",
-    data.level_of_detail,
-  );
+  // level_of_detail is deprecated (D4): the form no longer asks; new listings
+  // get the conservative default. The manifest field stays until pre-0.2.9
+  // clients (which still read it) have aged out.
+  const levelOfDetail = getMapLevelOfDetail(data.level_of_detail);
   const dataSource = getMapDataSource(data.data_source);
   // location is machine-managed: derived from the country code, never
   // user-selected (validate-publish rejects unmapped countries first).

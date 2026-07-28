@@ -5,7 +5,6 @@ import { resolve } from "node:path";
 import YAML from "yaml";
 import {
   DEFAULT_MAP_DATA_SOURCE,
-  LEVEL_OF_DETAIL_VALUES,
   SPECIAL_DEMAND_TAGS,
 } from "../lib/map-constants.js";
 
@@ -74,10 +73,12 @@ test("publish-map.yml enforces required publish fields with blank dropdown defau
     false,
   );
 
-  const levelOfDetail = getField(parsed.body, "level_of_detail");
-  assert.equal(levelOfDetail.type, "dropdown");
-  assert.deepEqual(getDropdownOptions(levelOfDetail), ["", ...LEVEL_OF_DETAIL_VALUES]);
-  assert.equal(levelOfDetail.validations?.required, true);
+  // level_of_detail is deprecated (D4) and no longer collected on the form;
+  // new listings default conservatively in create-listing.
+  assert.equal(
+    parsed.body.some((field) => (field as { id?: string }).id === "level_of_detail"),
+    false,
+  );
 
   // location is machine-managed (derived from the country code) and no
   // longer collected on the form.
@@ -165,7 +166,6 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
     "city-code",
     "country",
     "description",
-    "level_of_detail",
     "methodology",
     "gallery",
     "source",
@@ -186,8 +186,11 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
     false,
   );
 
-  const levelOfDetail = getField(parsed.body, "level_of_detail");
-  assert.deepEqual(getDropdownOptions(levelOfDetail), ["", ...LEVEL_OF_DETAIL_VALUES]);
+  // level_of_detail is deprecated (D4) and no longer collected on the form.
+  assert.equal(
+    parsed.body.some((field) => (field as { id?: string }).id === "level_of_detail"),
+    false,
+  );
 
   assert.equal(
     parsed.body.some((field) => (field as { id?: string }).id === "location"),

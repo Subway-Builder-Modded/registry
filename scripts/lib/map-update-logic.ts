@@ -68,6 +68,9 @@ export function applyMapManifestUpdates(
   if (isPresentIssueValue(data["city-code"])) manifest.city_code = data["city-code"];
   if (isPresentIssueValue(data.country)) manifest.country = data.country;
 
+  // level_of_detail is deprecated (D4) and no longer on the form; the first
+  // branch only fires for issues predating its removal. Existing manifest
+  // values are preserved (pre-0.2.9 clients still read the field).
   if (isPresentIssueValue(data.level_of_detail)) {
     manifest.level_of_detail = data.level_of_detail as LevelOfDetail;
   } else if (!isPresentIssueValue(manifest.level_of_detail)) {

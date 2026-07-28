@@ -48,7 +48,9 @@ const PublishMapInput = PublishModInput.omit({ "mod-id": true }).extend({
   // Tolerated for issues predating the field's removal from the form; never
   // used — source_quality is machine-managed (data-quality tiers supersede it).
   source_quality: z.enum(SOURCE_QUALITY_VALUES).optional(),
-  level_of_detail: z.enum(LEVEL_OF_DETAIL_VALUES),
+  // Tolerated for issues predating the field's removal from the form; never
+  // required — level_of_detail is deprecated (D4) and defaults conservatively.
+  level_of_detail: z.enum(LEVEL_OF_DETAIL_VALUES).optional(),
   // Tolerated for issues predating the field's removal from the form; never
   // used — location is machine-managed (derived from the country code).
   location: z.string().optional(),
