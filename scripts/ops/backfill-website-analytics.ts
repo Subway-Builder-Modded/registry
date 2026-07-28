@@ -7,24 +7,18 @@ import {
   updateValidPaths,
   toHourBucketIso,
   toDateKey,
-  normalizeAndCanonicalizePath,
   mergeSortedUniqueStrings,
-  sortMetricMap,
   type WebsiteAnalyticsSnapshot,
-  type WebsiteAnalyticsMetricMap,
 } from "../lib/website-analytics.js";
 import {
-  fetchCloudflareWindowMetrics,
-  resolveZoneTag,
-  resolveApiToken,
-  type CloudflareWebsiteAnalyticsQueryParams,
-} from "../lib/cloudflare-website-analytics.js";
+  captureWindowSnapshot,
+  requireCloudflareCredentials,
+  type CloudflareCredentials,
+} from "../lib/website-analytics-capture.js";
 import { loadLocalDotEnv, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
-interface CliArgs {
+interface CliArgs extends CloudflareCredentials {
   repoRoot: string;
-  zoneTag: string;
-  apiToken: string;
   days: number;
   resetHistory: boolean;
 }
@@ -35,20 +29,7 @@ function parseArgs(argv: string[]): CliArgs {
   const repoRoot = resolveRepoRoot(import.meta.dirname);
   loadLocalDotEnv(repoRoot);
 
-  const zoneTag = resolveZoneTag();
-  const apiToken = resolveApiToken();
-
-  if (!zoneTag) {
-    throw new Error(
-      "Cloudflare zone identifier not found. Set CLOUDFLARE_ZONE_TAG.",
-    );
-  }
-
-  if (!apiToken) {
-    throw new Error(
-      "Cloudflare API token not found. Set CLOUDFLARE_API_TOKEN.",
-    );
-  }
+  const credentials = requireCloudflareCredentials();
 
   let days = DEFAULT_BACKFILL_DAYS;
   let resetHistory = false;
@@ -76,79 +57,9 @@ function parseArgs(argv: string[]): CliArgs {
 
   return {
     repoRoot,
-    zoneTag,
-    apiToken,
+    ...credentials,
     days,
     resetHistory,
-  };
-}
-
-function normalizeMetricMap(
-  raw: Record<string, unknown>,
-  pathAliases: Record<string, string>,
-  canonicalizePath: boolean,
-): WebsiteAnalyticsMetricMap {
-  const normalized: WebsiteAnalyticsMetricMap = {};
-
-  for (const [key, value] of Object.entries(raw)) {
-    const visits = typeof value === "object" && value !== null && "visits" in value
-      ? typeof (value as Record<string, unknown>).visits === "number"
-        ? (value as Record<string, unknown>).visits as number
-        : 0
-      : 0;
-
-    if (visits <= 0) continue;
-
-    if (canonicalizePath) {
-      const normKey = normalizeAndCanonicalizePath(key, pathAliases);
-      if (!normKey) continue;
-      if (!normalized[normKey]) {
-        normalized[normKey] = 0;
-      }
-      normalized[normKey] += visits;
-    } else {
-      normalized[key] = visits;
-    }
-  }
-
-  return sortMetricMap(normalized);
-}
-
-async function captureWindowAnalytics(
-  zoneTag: string,
-  apiToken: string,
-  pathAliases: Record<string, string>,
-  windowStartIso: string,
-  windowEndIso: string,
-  capturedAtIso: string,
-): Promise<WebsiteAnalyticsSnapshot> {
-  const queryParams: CloudflareWebsiteAnalyticsQueryParams = {
-    zoneTag,
-    apiToken,
-    windowStartIso,
-    windowEndIso,
-  };
-
-  const metrics = await fetchCloudflareWindowMetrics(queryParams);
-
-  const normalizedPages = normalizeMetricMap(metrics.pages, pathAliases, true);
-  const normalizedCountries = normalizeMetricMap(metrics.countries, pathAliases, false);
-  const normalizedBrowsers = normalizeMetricMap(metrics.browsers, pathAliases, false);
-  const normalizedOs = normalizeMetricMap(metrics.operatingSystems, pathAliases, false);
-  const normalizedDevices = normalizeMetricMap(metrics.devices, pathAliases, false);
-
-  return {
-    captured_at: capturedAtIso,
-    window_start: windowStartIso,
-    window_end: windowEndIso,
-    totals: {
-      visits: metrics.totalVisits,
-    },
-    pages: normalizedPages,
-    countries: normalizedCountries,
-    browsers: normalizedBrowsers,
-    operating_systems: normalizedOs,
-    devices: normalizedDevices,
   };
 }
 
@@ -184,14 +95,14 @@ async function run(): Promise<void> {
     console.log(`Fetching hour ${hourKey}...`);
     let hourlySnapshot: WebsiteAnalyticsSnapshot;
     try {
-      hourlySnapshot = await captureWindowAnalytics(
-        args.zoneTag,
-        args.apiToken,
-        history.path_aliases,
+      hourlySnapshot = await captureWindowSnapshot({
+        zoneTag: args.zoneTag,
+        apiToken: args.apiToken,
+        pathAliases: history.path_aliases,
         windowStartIso,
         windowEndIso,
         capturedAtIso,
-      );
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (message.includes("cannot request data older than")) {
