@@ -1,3 +1,4 @@
+import { getFlagValue, hasFlag } from "../lib/cli.js";
 import { writeJsonFile } from "../lib/json-utils.js";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -28,6 +29,7 @@ import {
   isTruthyEnv,
   resolveRepoRoot,
   runAndExitOnError,
+  toWarningsOutputJson,
 } from "../lib/script-runtime.js";
 import { compareStableSemverAsc, isStableSemverTag } from "../lib/semver.js";
 import { filterListingMessages, isTestListing } from "../lib/test-listings.js";
@@ -47,28 +49,6 @@ export function buildZeroValidSemverWarnings(integrity: IntegrityOutput): string
     .map((listingId) => `listing=${listingId}: no valid semver release tags found`);
 }
 
-function getArgValue(name: string): string | undefined {
-  const exact = `--${name}=`;
-  for (const arg of process.argv.slice(2)) {
-    if (arg.startsWith(exact)) {
-      return arg.slice(exact.length);
-    }
-  }
-
-  const args = process.argv.slice(2);
-  for (let index = 0; index < args.length; index += 1) {
-    if (args[index] === `--${name}`) {
-      return args[index + 1];
-    }
-  }
-  return undefined;
-}
-
-function hasArgFlag(name: string): boolean {
-  const target = `--${name}`;
-  return process.argv.slice(2).includes(target);
-}
-
 function resolveListingType(rawValue: string | undefined): ManifestType {
   if (rawValue === "map" || rawValue === "mod") {
     return rawValue;
@@ -82,19 +62,6 @@ function resolveMode(rawValue: string | undefined): "full" | "download-only" {
     return rawValue;
   }
   throw new Error("Missing or invalid --mode. Expected one of: full, download-only");
-}
-
-function toWarningsOutputJson(listingType: ManifestType, warnings: string[]): string {
-  const MAX_WARNINGS = 30;
-  const normalized = warnings
-    .map((warning) => warning.trim())
-    .filter((warning) => warning !== "")
-    .map((warning) => `${listingType}: ${warning}`);
-  const displayed = normalized.slice(0, MAX_WARNINGS);
-  if (normalized.length > displayed.length) {
-    displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
-  }
-  return JSON.stringify(displayed);
 }
 
 function toLimitedOutputJson(items: string[]): string {
@@ -211,18 +178,19 @@ function collectSecurityAlerts(integrity: IntegrityOutput, listingType: Manifest
 }
 
 async function run(): Promise<void> {
+  const argv = process.argv.slice(2);
   const listingType = resolveListingType(
-    getArgValue("type") ?? process.env.LISTING_TYPE,
+    getFlagValue(argv, "type") ?? process.env.LISTING_TYPE,
   );
-  const mode = resolveMode(getArgValue("mode") ?? process.env.DOWNLOADS_MODE);
+  const mode = resolveMode(getFlagValue(argv, "mode") ?? process.env.DOWNLOADS_MODE);
   const strictFingerprintCache = (
-    hasArgFlag("strict-fingerprint-cache")
+    hasFlag(argv, "strict-fingerprint-cache")
     || isTruthyEnv(process.env.STRICT_FINGERPRINT_CACHE)
     || isTruthyEnv(process.env.REGISTRY_STRICT_FINGERPRINT_CACHE)
   );
   const forceIntegrityRecheck = (
-    hasArgFlag("force")
-    || hasArgFlag("force-integrity")
+    hasFlag(argv, "force")
+    || hasFlag(argv, "force-integrity")
     || isTruthyEnv(process.env.FORCE_INTEGRITY_RECHECK)
   );
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
@@ -238,7 +206,7 @@ async function run(): Promise<void> {
   const pendingAnnouncementsPath = resolve(repoRoot, outputDir, "pending-announcements.json");
   const defaultAttributionDeltaPath = resolve(repoRoot, outputDir, "download-attribution-delta.json");
   const attributionDeltaPath = (
-    getArgValue("attribution-delta-path")
+    getFlagValue(argv, "attribution-delta-path")
     ?? getNonEmptyEnv("DOWNLOAD_ATTRIBUTION_DELTA_PATH")
     ?? defaultAttributionDeltaPath
   );
@@ -421,7 +389,7 @@ async function run(): Promise<void> {
   const tokenAuthStatus = !token ? "missing" : hasAuthFailure401 ? "invalid" : "ok";
   appendGitHubOutput([
     `warning_count=${warningsForGitHub.length}`,
-    `warnings_json=${toWarningsOutputJson(listingType, warningsForGitHub)}`,
+    `warnings_json=${toWarningsOutputJson(`${listingType}: `, warningsForGitHub)}`,
     `security_error_count=${securityErrorsForOutput.length}`,
     `security_warning_count=${securityWarningsForOutput.length}`,
     `security_errors_json=${toLimitedOutputJson(securityErrorsForOutput)}`,

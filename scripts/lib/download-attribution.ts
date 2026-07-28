@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 import type { ParsedReleaseAssetUrl } from "./download-definitions.js";
 import { isObject, toFiniteNonNegativeNumber, sortObjectByKeys, writeJsonFile } from "./json-utils.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
+import { toUtcDateKey as toUtcDateKeyFromIso } from "./time-buckets.js";
 import type {
   DownloadAttributionEntry,
   DownloadAttributionDailyEntry,
@@ -379,12 +380,6 @@ export function adjustDownloadCount(
     subtracted: normalizedRaw - adjusted,
     clamped: false,
   };
-}
-
-function toUtcDateKeyFromIso(isoLike: string): string | null {
-  const parsed = Date.parse(isoLike);
-  if (!Number.isFinite(parsed)) return null;
-  return new Date(parsed).toISOString().slice(0, 10).replaceAll("-", "_");
 }
 
 function hasTimelineEntries(ledger: DownloadAttributionLedger): boolean {

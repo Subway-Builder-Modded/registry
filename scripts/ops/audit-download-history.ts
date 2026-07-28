@@ -1,7 +1,8 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import type { DownloadHistorySnapshot } from "../lib/download-history.js";
+import { listSnapshotFileNames } from "../lib/history-utils.js";
 import { resolveRepoRoot } from "../lib/script-runtime.js";
 
 type SectionName = "maps" | "mods";
@@ -28,9 +29,7 @@ function sumDownloads(downloads: Record<string, Record<string, number>> | undefi
 }
 
 function listSnapshots(repoRoot: string): string[] {
-  return readdirSync(resolve(repoRoot, "history"))
-    .filter((name) => /^snapshot_\d{4}_\d{2}_\d{2}\.json$/.test(name))
-    .sort();
+  return listSnapshotFileNames(resolve(repoRoot, "history")).sort();
 }
 
 function readSnapshot(repoRoot: string, fileName: string): DownloadHistorySnapshot {

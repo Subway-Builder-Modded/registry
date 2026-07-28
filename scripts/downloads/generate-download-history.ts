@@ -5,21 +5,8 @@ import {
   backfillDownloadAttributionHistorySnapshots,
   generateDownloadAttributionHistorySnapshot,
 } from "../lib/download-attribution-history.js";
-import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
+import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError, toWarningsOutputJson } from "../lib/script-runtime.js";
 import { isTestListing } from "../lib/test-listings.js";
-
-function toWarningsOutputJson(warnings: string[]): string {
-  const MAX_WARNINGS = 30;
-  const normalized = warnings
-    .map((warning) => warning.trim())
-    .filter((warning) => warning !== "")
-    .map((warning) => `download-history: ${warning}`);
-  const displayed = normalized.slice(0, MAX_WARNINGS);
-  if (normalized.length > displayed.length) {
-    displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
-  }
-  return JSON.stringify(displayed);
-}
 
 function filterHistoryWarningsForDiscord(repoRoot: string, warnings: string[]): string[] {
   return warnings.filter((warning) => {
@@ -100,7 +87,7 @@ async function run(): Promise<void> {
       "mods_net_downloads=",
       "mods_entries=",
       `warning_count=${warningCount}`,
-      `warnings_json=${toWarningsOutputJson(filteredWarnings)}`,
+      `warnings_json=${toWarningsOutputJson("download-history: ", filteredWarnings)}`,
     ]);
     return;
   }
@@ -149,7 +136,7 @@ async function run(): Promise<void> {
     `mods_net_downloads=${result.snapshot.mods.net_downloads}`,
     `mods_entries=${result.snapshot.mods.entries}`,
     `warning_count=${warningCount}`,
-    `warnings_json=${toWarningsOutputJson(filteredWarnings)}`,
+    `warnings_json=${toWarningsOutputJson("download-history: ", filteredWarnings)}`,
   ]);
 }
 

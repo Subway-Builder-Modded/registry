@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { isObject, sortObjectByKeys, toFiniteNonNegativeNumber } from "./json-utils.js";
+import { toDateKey } from "./time-buckets.js";
 
 const DISCORD_SERVER_METRICS_HISTORY_FILE = ["history", "discord_server_metrics.json"] as const;
 export const DEFAULT_DISCORD_SERVER_GUILD_ID = "1476290196139147376";
@@ -109,17 +110,7 @@ export function getDiscordServerMetricsHistoryPath(repoRoot: string): string {
   return resolve(repoRoot, ...DISCORD_SERVER_METRICS_HISTORY_FILE);
 }
 
-export function toHourBucketIso(date: Date): string {
-  const bucket = new Date(date.getTime());
-  bucket.setUTCMinutes(0, 0, 0);
-  return bucket.toISOString();
-}
-
-export function toDateKey(isoValue: string): string | null {
-  const parsed = Date.parse(isoValue);
-  if (!Number.isFinite(parsed)) return null;
-  return new Date(parsed).toISOString().slice(0, 10);
-}
+export { toDateKey, toHourBucketIso } from "./time-buckets.js";
 
 function normalizeMessageCreationCounts(value: unknown): DiscordMessageCreationCounts | null {
   if (!isObject(value)) return null;

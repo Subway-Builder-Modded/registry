@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { writeJsonFile } from "../lib/json-utils.js";
+import { readListingIdsFromIndex } from "../lib/manifests.js";
 import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
 // sync-last-updated copies the per-listing `last_updated` (newest release date,
@@ -35,16 +36,6 @@ function readJsonFile<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf-8")) as T;
 }
 
-function getListingIds(repoRoot: string, dir: string): string[] {
-  const indexPath = resolve(repoRoot, dir, "index.json");
-  const parsed = readJsonFile<Record<string, unknown>>(indexPath);
-  const ids = parsed[dir];
-  if (!Array.isArray(ids)) {
-    throw new Error(`Invalid ${dir}/index.json at ${indexPath}: missing ${dir} array`);
-  }
-  return ids.filter((value): value is string => typeof value === "string");
-}
-
 function resolveLastUpdated(listing: ListingIntegrityEntry | undefined): number | undefined {
   const value = listing?.last_updated;
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : undefined;
@@ -63,7 +54,7 @@ export function syncLastUpdatedFromIntegrity(repoRoot: string): SyncLastUpdatedR
     }
     const listings = integrity.listings as Record<string, ListingIntegrityEntry>;
 
-    for (const id of getListingIds(repoRoot, dir).sort()) {
+    for (const id of readListingIdsFromIndex(repoRoot, dir).sort()) {
       processed += 1;
       const lastUpdated = resolveLastUpdated(listings[id]);
       if (lastUpdated === undefined) {

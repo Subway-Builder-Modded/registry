@@ -37,6 +37,20 @@ export function appendGitHubOutput(lines: string[]): void {
   appendFileSync(outputPath, `${lines.join("\n")}\n`);
 }
 
+/** JSON array of prefixed warnings capped at 30 entries for GitHub Actions output. */
+export function toWarningsOutputJson(prefix: string, warnings: string[]): string {
+  const MAX_WARNINGS = 30;
+  const normalized = warnings
+    .map((warning) => warning.trim())
+    .filter((warning) => warning !== "")
+    .map((warning) => `${prefix}${warning}`);
+  const displayed = normalized.slice(0, MAX_WARNINGS);
+  if (normalized.length > displayed.length) {
+    displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
+  }
+  return JSON.stringify(displayed);
+}
+
 function stripWrappedQuotes(value: string): string {
   if (value.length >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
     return value.slice(1, -1);

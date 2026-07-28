@@ -7,6 +7,8 @@ import {
 } from "./semver.js";
 export { normalizeStableSemverTag } from "./semver.js";
 import { isObject, toFiniteNonNegativeNumber, sortObjectByKeys } from "./json-utils.js";
+import { findLastAtOrBefore } from "./history-utils.js";
+import { toUtcDateKey } from "./time-buckets.js";
 
 const RAILYARD_APP_DOWNLOAD_HISTORY_FILE = ["history", "railyard_app_downloads.json"] as const;
 
@@ -81,11 +83,7 @@ export function getRailyardAppDownloadHistoryPath(repoRoot: string): string {
   return resolve(repoRoot, ...RAILYARD_APP_DOWNLOAD_HISTORY_FILE);
 }
 
-export function toHourBucketIso(date: Date): string {
-  const bucket = new Date(date.getTime());
-  bucket.setUTCMinutes(0, 0, 0);
-  return bucket.toISOString();
-}
+export { toHourBucketIso } from "./time-buckets.js";
 
 export function compareSemverDescending(a: string, b: string): number {
   return compareStableSemverDesc(a, b);
@@ -249,24 +247,11 @@ function listSnapshotKeys(history: RailyardAppDownloadHistory): string[] {
   return Object.keys(history.snapshots).sort((a, b) => Date.parse(a) - Date.parse(b));
 }
 
-function toDateKey(isoValue: string): string | null {
-  const parsed = Date.parse(isoValue);
-  if (!Number.isFinite(parsed)) return null;
-  return new Date(parsed).toISOString().slice(0, 10).replaceAll("-", "_");
-}
-
 function findSnapshotAtOrBefore(history: RailyardAppDownloadHistory, targetMs: number): string | null {
-  let selected: string | null = null;
-  for (const key of listSnapshotKeys(history)) {
+  return findLastAtOrBefore(listSnapshotKeys(history), (key) => {
     const keyMs = Date.parse(key);
-    if (!Number.isFinite(keyMs)) continue;
-    if (keyMs <= targetMs) {
-      selected = key;
-    } else {
-      break;
-    }
-  }
-  return selected;
+    return Number.isFinite(keyMs) ? keyMs : null;
+  }, targetMs);
 }
 
 function toWindowDelta(current: number, baseline: number): number {
@@ -403,7 +388,7 @@ export function buildRailyardAppByDayCsvRows(history: RailyardAppDownloadHistory
 
   const dayToSnapshot = new Map<string, RailyardAppHistorySnapshot>();
   for (const key of snapshotKeys) {
-    const dateKey = toDateKey(key);
+    const dateKey = toUtcDateKey(key);
     if (!dateKey) continue;
     dayToSnapshot.set(dateKey, history.snapshots[key]!);
   }
