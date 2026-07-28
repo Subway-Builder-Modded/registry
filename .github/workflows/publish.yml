@@ -25,7 +25,23 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+      # CI-triggering identity (optional): pushes and PRs made with the
+      # workflow's GITHUB_TOKEN never trigger pull_request workflows, so
+      # publish PRs get no CI. When the registry bot app is configured
+      # (REGISTRY_BOT_APP_ID repo variable + REGISTRY_BOT_PRIVATE_KEY secret),
+      # branch pushes and PR creation use its token instead and CI runs
+      # normally. Falls back to GITHUB_TOKEN when unconfigured.
+      - name: Mint bot token
+        id: bot-token
+        if: vars.REGISTRY_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot-token.outputs.token || github.token }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -40,6 +56,19 @@ jobs:
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile
         working-directory: scripts
+
+      - name: Acknowledge submission
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Validating your submission — [follow the run here](${runUrl}). Results are posted in this issue when it finishes (usually a few minutes).`
+            });
 
       - name: Acknowledge revalidation
         if: github.event_name == 'issue_comment'
@@ -92,6 +121,7 @@ jobs:
       - name: Create or update pull request
         uses: actions/github-script@v7
         with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
             const branch = 'publish/mod/${{ fromJson(steps.parser.outputs.jsonString).mod-id }}';
             const { data: existing } = await github.rest.pulls.list({
@@ -188,7 +218,18 @@ jobs:
       )
     runs-on: ubuntu-latest
     steps:
+      # See the publish-mod job for why this optional bot identity exists.
+      - name: Mint bot token
+        id: bot-token
+        if: vars.REGISTRY_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot-token.outputs.token || github.token }}
 
       - uses: pnpm/action-setup@v4
         with:
@@ -203,6 +244,19 @@ jobs:
       - name: Install script dependencies
         run: pnpm install --frozen-lockfile
         working-directory: scripts
+
+      - name: Acknowledge submission
+        if: github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `Validating your submission — [follow the run here](${runUrl}). Results are posted in this issue when it finishes (usually a few minutes).`
+            });
 
       - name: Acknowledge revalidation
         if: github.event_name == 'issue_comment'
@@ -270,6 +324,7 @@ jobs:
       - name: Create or update pull request
         uses: actions/github-script@v7
         with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
             const branch = 'publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
             const { data: existing } = await github.rest.pulls.list({
