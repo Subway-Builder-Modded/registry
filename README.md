@@ -3,6 +3,13 @@
 
 The central registry for all **Subway Builder Modded** community created content.
 
+[![Download Counts (Hourly)](https://github.com/Subway-Builder-Modded/registry/actions/workflows/regenerate-downloads-hourly.yml/badge.svg)](https://github.com/Subway-Builder-Modded/registry/actions/workflows/regenerate-downloads-hourly.yml)
+[![Registry Analytics](https://github.com/Subway-Builder-Modded/registry/actions/workflows/regenerate-registry-analytics.yml/badge.svg)](https://github.com/Subway-Builder-Modded/registry/actions/workflows/regenerate-registry-analytics.yml)
+[![Website Analytics Cache](https://github.com/Subway-Builder-Modded/registry/actions/workflows/cache-website-analytics.yml/badge.svg)](https://github.com/Subway-Builder-Modded/registry/actions/workflows/cache-website-analytics.yml)
+[![Download History Cache](https://github.com/Subway-Builder-Modded/registry/actions/workflows/cache-download-history.yml/badge.svg)](https://github.com/Subway-Builder-Modded/registry/actions/workflows/cache-download-history.yml)
+[![Data Quality](https://github.com/Subway-Builder-Modded/registry/actions/workflows/check-data-quality.yml/badge.svg?branch=main)](https://github.com/Subway-Builder-Modded/registry/actions/workflows/check-data-quality.yml)
+[![Schemas](https://github.com/Subway-Builder-Modded/registry/actions/workflows/check-schemas.yml/badge.svg?branch=main)](https://github.com/Subway-Builder-Modded/registry/actions/workflows/check-schemas.yml)
+
 > [!WARNING]
 > **Work in Progress** - `monorepo` and `registry` are still under active development. Expect changes to the submission process, schema, and tooling.
 
