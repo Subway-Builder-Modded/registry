@@ -73,8 +73,9 @@
     "attributes":
       "label": "Country Code"
       "description": "ISO 3166-1 alpha-2 country code - two uppercase letters (e.g. US, GB, CA,
-        DE, JP). Used to group maps by country in Railyard. It is REQUIRED that you use ISO
-        codes according to this list:
+        DE, JP). Used to group maps by country in Railyard, and your map's location/region
+        tag (e.g. `DE` → `central-europe`) is derived from it automatically. It is REQUIRED
+        that you use ISO codes according to this list:
         https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes."
       "placeholder": "US"
     "validations":
@@ -152,41 +153,8 @@
 
 
         Railyard allows users to search for maps based on tags and presents a preview image
-        for discovery. Please check whichever tags best represent your map. Note that
-        `Location` is required."
-  - "type": "dropdown"
-    "id": "location"
-    "attributes":
-      "label": "Location"
-      "description": "Select all tags that apply to your map. These help users find your map in
-        the browser."
-      "options":
-        - ""
-        - "caribbean"
-        - "central-america"
-        - "central-asia"
-        - "central-europe"
-        - "east-africa"
-        - "east-asia"
-        - "east-europe"
-        - "europe"
-        - "middle-east"
-        - "north-africa"
-        - "north-america"
-        - "north-europe"
-        - "oceania"
-        - "south-america"
-        - "south-asia"
-        - "south-europe"
-        - "southeast-asia"
-        - "southern-africa"
-        - "west-africa"
-        - "west-europe"
-    "validations":
-      "required": true
-  - "type": "markdown"
-    "attributes":
-      "value": "<br>"
+        for discovery. Please check whichever tags best represent your map. Your map's
+        location/region tag is derived automatically from the Country Code above."
   - "type": "markdown"
     "attributes":
       "value": "### Special Demand Tag Guide

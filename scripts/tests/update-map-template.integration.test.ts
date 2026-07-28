@@ -6,7 +6,6 @@ import YAML from "yaml";
 import {
   DEFAULT_MAP_DATA_SOURCE,
   LEVEL_OF_DETAIL_VALUES,
-  LOCATION_TAGS,
   SPECIAL_DEMAND_TAGS,
 } from "../lib/map-constants.js";
 
@@ -80,10 +79,12 @@ test("publish-map.yml enforces required publish fields with blank dropdown defau
   assert.deepEqual(getDropdownOptions(levelOfDetail), ["", ...LEVEL_OF_DETAIL_VALUES]);
   assert.equal(levelOfDetail.validations?.required, true);
 
-  const location = getField(parsed.body, "location");
-  assert.equal(location.type, "dropdown");
-  assert.deepEqual(getDropdownOptions(location), ["", ...LOCATION_TAGS]);
-  assert.equal(location.validations?.required, true);
+  // location is machine-managed (derived from the country code) and no
+  // longer collected on the form.
+  assert.equal(
+    parsed.body.some((field) => (field as { id?: string }).id === "location"),
+    false,
+  );
 
   const updateType = getField(parsed.body, "update-type");
   assert.equal(updateType.type, "dropdown");
@@ -166,7 +167,6 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
     "description",
     "level_of_detail",
     "methodology",
-    "location",
     "gallery",
     "source",
     "update-type",
@@ -189,8 +189,10 @@ test("update-map.yml keeps map-id/terms required and makes other fields optional
   const levelOfDetail = getField(parsed.body, "level_of_detail");
   assert.deepEqual(getDropdownOptions(levelOfDetail), ["", ...LEVEL_OF_DETAIL_VALUES]);
 
-  const location = getField(parsed.body, "location");
-  assert.deepEqual(getDropdownOptions(location), ["", ...LOCATION_TAGS]);
+  assert.equal(
+    parsed.body.some((field) => (field as { id?: string }).id === "location"),
+    false,
+  );
 
   const updateType = getField(parsed.body, "update-type");
   assert.deepEqual(getDropdownOptions(updateType), ["", "GitHub Releases", "Custom URL"]);

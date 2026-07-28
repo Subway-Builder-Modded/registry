@@ -1,12 +1,12 @@
 import type { MapManifest } from "./manifests.js";
 import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
-import type { LevelOfDetail, LocationTag, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
+import type { LevelOfDetail, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
 import {
+  COUNTRY_TO_LOCATION,
   DEFAULT_LEVEL_OF_DETAIL,
   DEFAULT_MAP_DATA_SOURCE,
   DEFAULT_SOURCE_QUALITY,
   LEVEL_OF_DETAIL_SET,
-  LOCATION_TAG_SET,
   SOURCE_QUALITY_SET,
   SPECIAL_DEMAND_TAG_SET,
 } from "./map-constants.js";
@@ -102,9 +102,14 @@ export function applyMapManifestUpdates(
     manifest.data_source = DEFAULT_MAP_DATA_SOURCE;
   }
 
-  if (isPresentIssueValue(data.location)) {
-    manifest.location = data.location as LocationTag;
+  // location is machine-managed: always re-derived from the (possibly just
+  // updated) country code. The legacy sub_location bridge field is dropped on
+  // sight — any update self-heals manifests from before the europe migration.
+  const derivedLocation = COUNTRY_TO_LOCATION[manifest.country];
+  if (derivedLocation) {
+    manifest.location = derivedLocation;
   }
+  delete (manifest as Record<string, unknown>).sub_location;
   if (
     data.special_demand !== undefined
     && data.special_demand !== "_No response_"
@@ -163,9 +168,9 @@ export function validateMapUpdateFields(
     manifest.level_of_detail,
     errors,
   );
-  const currentLocation = requireManifestString(
-    "location",
-    manifest.location,
+  const currentCountry = requireManifestString(
+    "country",
+    manifest.country,
     errors,
   );
   const currentSpecialDemand = requireManifestStringArray(
@@ -182,7 +187,7 @@ export function validateMapUpdateFields(
     currentDataSource === null
     || currentSourceQuality === null
     || currentLevelOfDetail === null
-    || currentLocation === null
+    || currentCountry === null
     || currentSpecialDemand === null
     || currentInitialViewState === null
   ) {
@@ -195,7 +200,9 @@ export function validateMapUpdateFields(
   const nextLevelOfDetail = isPresentIssueValue(data.level_of_detail)
     ? data.level_of_detail
     : currentLevelOfDetail;
-  const nextLocation = isPresentIssueValue(data.location) ? data.location : currentLocation;
+  // location is machine-managed (derived from country), so the country code
+  // is what gets validated here.
+  const nextCountry = isPresentIssueValue(data.country) ? data.country : currentCountry;
   const nextSpecialDemand = (() => {
     if (
       data.special_demand !== undefined
@@ -214,8 +221,8 @@ export function validateMapUpdateFields(
   if (!LEVEL_OF_DETAIL_SET.has(nextLevelOfDetail)) {
     errors.push("**level_of_detail**: Must be one of `low-detail`, `medium-detail`, `high-detail`.");
   }
-  if (!LOCATION_TAG_SET.has(nextLocation)) {
-    errors.push("**location**: Must be one of the supported location tags.");
+  if (!COUNTRY_TO_LOCATION[nextCountry]) {
+    errors.push("**country**: Must be an ISO 3166-1 alpha-2 country code (e.g. US, DE, JP).");
   }
 
   const invalidSpecialDemand = nextSpecialDemand.filter((tag) => !SPECIAL_DEMAND_TAG_SET.has(tag));

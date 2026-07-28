@@ -13,7 +13,6 @@ import {
 import {
   DEFAULT_MAP_DATA_SOURCE,
   LEVEL_OF_DETAIL_VALUES,
-  LOCATION_TAGS,
   SPECIAL_DEMAND_TAGS,
 } from "./lib/map-constants.js";
 
@@ -275,7 +274,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   input(
     "country",
     "Country Code",
-    "ISO 3166-1 alpha-2 country code - two uppercase letters (e.g. US, GB, CA, DE, JP). Used to group maps by country in Railyard. It is REQUIRED that you use ISO codes according to this list: https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes.",
+    "ISO 3166-1 alpha-2 country code - two uppercase letters (e.g. US, GB, CA, DE, JP). Used to group maps by country in Railyard, and your map's location/region tag (e.g. `DE` → `central-europe`) is derived from it automatically. It is REQUIRED that you use ISO codes according to this list: https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes.",
     { placeholder: "US", required: true },
   ),
   textarea(
@@ -315,16 +314,8 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   spacer(),
   // ===== Map Tagging / Images  ===== //
   markdown(
-    "## Tagging & Image Preview\n\nRailyard allows users to search for maps based on tags and presents a preview image for discovery. Please check whichever tags best represent your map. Note that `Location` is required.",
+    "## Tagging & Image Preview\n\nRailyard allows users to search for maps based on tags and presents a preview image for discovery. Please check whichever tags best represent your map. Your map's location/region tag is derived automatically from the Country Code above.",
   ),
-  dropdown(
-    "location",
-    "Location",
-    "Select all tags that apply to your map. These help users find your map in the browser.",
-    LOCATION_TAGS,
-    true,
-  ),
-  spacer(),
   markdown(
     "### Special Demand Tag Guide\n\nUse these tags only when the map models a meaningful amount of demand related to the feature.\n\n- `airports`: passenger (non-worker) demand from major airports\n- `entertainment`: leisure/tourist demand at stadiums/venues/nightlife\n- `ferries`: passenger (non-worker) demand from ferry terminals\n- `hospitals`: visitation demand for major medical centers\n- `parks`: leisure/tourist demand from large local or national parks\n- `schools`: demand from primary/secondary school students\n- `universities`: demand from university school students",
   ),
