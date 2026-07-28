@@ -1,8 +1,8 @@
 import { pathToFileURL } from "node:url";
-import { runDownloadAttributionBackfillCli } from "./lib/download-attribution-backfill-core.js";
-import { backfillDownloadAttributionHistorySnapshots } from "./lib/download-attribution-history.js";
-import { rebuildDownloadVersionBucketsFromHistory } from "./lib/download-version-buckets-history.js";
-import { resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
+import { runDownloadAttributionBackfillCli } from "../lib/download-attribution-backfill-core.js";
+import { backfillDownloadAttributionHistorySnapshots } from "../lib/download-attribution-history.js";
+import { rebuildDownloadVersionBucketsFromHistory } from "../lib/download-version-buckets-history.js";
+import { resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
   async function run(): Promise<void> {

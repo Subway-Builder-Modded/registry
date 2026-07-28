@@ -1,14 +1,14 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdtempSync, mkdirSync, readFileSync, readdirSync, rmSync } from "node:fs";
-import { writeJsonFile } from "./lib/json-utils.js";
+import { writeJsonFile } from "../lib/json-utils.js";
 import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   normalizeDownloadHistorySnapshot,
   type DownloadHistorySnapshot,
-} from "./lib/download-history.js";
-import { resolveRepoRoot } from "./lib/script-runtime.js";
+} from "../lib/download-history.js";
+import { resolveRepoRoot } from "../lib/script-runtime.js";
 
 const ATTRIBUTION_ROLLOUT_COMMIT = "60e49f4cb10e6900e12bfaf3b48a06a27eb48f85";
 const DOWNLOAD_SOURCE_PATHS = [

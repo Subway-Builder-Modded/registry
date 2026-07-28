@@ -5,15 +5,15 @@ import {
   buildManualDownloadAttributionDelta,
   normalizeManualDownloadAttributionSpec,
   type ResolveManualDownloadAttributionVersionInput,
-} from "./lib/manual-download-attribution.js";
+} from "../lib/manual-download-attribution.js";
 import {
   loadDownloadAttributionLedger,
   mergeDownloadAttributionDeltas,
   toDownloadAttributionAssetKey,
   writeDownloadAttributionLedger,
-} from "./lib/download-attribution.js";
-import { readJsonFile, writeJsonFile } from "./lib/json-utils.js";
-import { resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
+} from "../lib/download-attribution.js";
+import { readJsonFile, writeJsonFile } from "../lib/json-utils.js";
+import { resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
 interface CliArgs {
   repoRoot: string;

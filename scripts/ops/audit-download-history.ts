@@ -1,8 +1,8 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
-import type { DownloadHistorySnapshot } from "./lib/download-history.js";
-import { resolveRepoRoot } from "./lib/script-runtime.js";
+import type { DownloadHistorySnapshot } from "../lib/download-history.js";
+import { resolveRepoRoot } from "../lib/script-runtime.js";
 
 type SectionName = "maps" | "mods";
 

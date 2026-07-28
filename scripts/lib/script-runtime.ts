@@ -2,7 +2,10 @@ import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import { basename, resolve } from "node:path";
 
 export function resolveRepoRoot(importMetaDir: string): string {
-  return basename(importMetaDir) === "dist"
+  // Scripts live at scripts/ (one level below the repo root); compiled output
+  // (dist/) and manual ops tooling (ops/) sit one level deeper.
+  const dir = basename(importMetaDir);
+  return dir === "dist" || dir === "ops"
     ? resolve(importMetaDir, "..", "..")
     : resolve(importMetaDir, "..");
 }
