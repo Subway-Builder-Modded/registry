@@ -70,10 +70,19 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: scripts
 
+      # App token: separate ~5k/hr rate-limit bucket, isolated from the
+      # repo-wide 1k/hr GITHUB_TOKEN pool shared by every workflow run.
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Generate map download counts (download-only mode)
         id: generate_map_downloads
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run generate-downloads:maps:download-only
 
       - name: Upload map downloads artifact
@@ -112,10 +121,17 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: scripts
 
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Generate mod download counts (download-only mode)
         id: generate_mod_downloads
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run generate-downloads:mods:download-only
 
       - name: Upload mod downloads artifact
@@ -206,9 +222,16 @@ jobs:
           cp "${MAP_BUCKETS_FILE}" maps/download-version-buckets.json
           cp "${MOD_BUCKETS_FILE}" mods/download-version-buckets.json
 
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Capture Railyard app download history
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run capture-railyard-app-downloads
 
       - name: Generate Railyard app analytics
@@ -350,14 +373,6 @@ jobs:
           delete-branch: true
           title: "chore: regenerate download counts (hourly)"
           body: "Automated update from regenerate-downloads-hourly workflow."
-
-      - name: Mint bot token
-        id: bot-token
-        if: ${{ steps.stage_changes.outputs.has_changes == 'true' && vars.REGISTRY_BOT_APP_ID != '' }}
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
-          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
 
       - name: Finalize bot PR automation
         id: bot_pr

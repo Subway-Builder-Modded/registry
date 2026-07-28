@@ -56,8 +56,8 @@ jobs:
 
       - name: Mint bot token
         id: bot-token
-        if: ${{ steps.stage_changes.outputs.has_changes == 'true' && vars.REGISTRY_BOT_APP_ID != '' }}
-        uses: actions/create-github-app-token@v2
+        if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
+        uses: ./.github/actions/mint-bot-token
         with:
           app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
           private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}

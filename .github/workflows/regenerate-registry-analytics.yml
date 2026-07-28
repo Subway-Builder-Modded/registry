@@ -115,10 +115,19 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: scripts
 
+      # App token: separate ~5k/hr rate-limit bucket, isolated from the
+      # repo-wide 1k/hr GITHUB_TOKEN pool shared by every workflow run.
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Generate map registry analytics
         id: generate_map_analytics
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_integrity_recheck }}" = "true" ]; then
@@ -177,10 +186,17 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: scripts
 
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Generate mod registry analytics
         id: generate_mod_analytics
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_integrity_recheck }}" = "true" ]; then
@@ -235,9 +251,16 @@ jobs:
         run: pnpm install --frozen-lockfile
         working-directory: scripts
 
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Restore grid + basemap from map-data
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           # map-data is the persistent store for grid/basemap (kept off main).
@@ -252,7 +275,7 @@ jobs:
       - name: Generate map demand stats
         id: generate_map_demand_stats
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_demand_stats }}" = "true" ]; then
             pnpm --dir scripts run generate-registry-demand-stats -- --force --strict-fingerprint-cache
@@ -271,7 +294,7 @@ jobs:
       - name: Publish grid + basemap to map-data
         if: ${{ always() }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           shopt -s nullglob
@@ -453,10 +476,17 @@ jobs:
         id: merge_attribution
         run: pnpm --dir scripts run merge-download-attribution
 
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Reconcile adjusted downloads using merged attribution
         id: reconcile_downloads
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run reconcile-attributed-downloads -- --no-refresh-history
 
       - name: Validate attribution reconciliation outputs
@@ -625,14 +655,6 @@ jobs:
             maps/demand-stats-cache.json
             history/registry-download-attribution.json
             history/content-announcements.json
-
-      - name: Mint bot token
-        id: bot-token
-        if: ${{ steps.stage_changes.outputs.has_changes == 'true' && vars.REGISTRY_BOT_APP_ID != '' }}
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
-          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
 
       - name: Finalize bot PR automation
         id: bot_pr
