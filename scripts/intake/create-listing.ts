@@ -7,9 +7,11 @@ import {
   downloadGalleryImages,
 } from "../lib/gallery.js";
 import {
+  combineMapTags,
   getMapDataSource,
   getOptionalIssueValue,
   getRequiredIssueValue,
+  parseCheckedBoxes,
 } from "../lib/map-field-utils.js";
 import {
   COUNTRY_TO_LOCATION,
@@ -41,11 +43,7 @@ function parseTags(raw: unknown): string[] {
   if (typeof raw !== "string") return [];
   // Handle checkbox markdown format: "- [X] tag\n- [x] tag"
   if (raw.includes("- [")) {
-    return raw
-      .split("\n")
-      .filter((line) => line.startsWith("- [X]") || line.startsWith("- [x]"))
-      .map((line) => line.replace(/^- \[[Xx]\]\s*/, "").trim())
-      .filter(Boolean);
+    return parseCheckedBoxes(raw);
   }
   // Handle comma-separated: "tag1, tag2, tag3"
   return raw.split(",").map((t) => t.trim()).filter(Boolean);
@@ -61,10 +59,6 @@ function buildUpdate(data: Record<string, unknown>): ModManifest["update"] {
     return { type: "github", repo: String(data["github-repo"]) };
   }
   return { type: "custom", url: String(data["custom-update-url"]) };
-}
-
-function combineMapTags(location: string, specialDemand: string[]): string[] {
-  return Array.from(new Set([location, ...specialDemand]));
 }
 
 async function buildMapManifestData(data: Record<string, unknown>): Promise<{

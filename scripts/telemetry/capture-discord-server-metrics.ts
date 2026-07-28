@@ -1,4 +1,5 @@
 import { pathToFileURL } from "node:url";
+import { parseRetryAfterMs } from "../lib/discord-webhook.js";
 import { fetchWithTimeout } from "../lib/http.js";
 import {
   createEmptyDiscordServerMetricsHistory,
@@ -208,18 +209,6 @@ function normalizeGuildChannel(value: unknown): GuildChannel | null {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-function parseRetryAfterMs(payload: unknown): number | null {
-  if (!payload || typeof payload !== "object") return null;
-  const retryAfter = (payload as { retry_after?: unknown }).retry_after;
-  if (typeof retryAfter !== "number" || !Number.isFinite(retryAfter) || retryAfter < 0) {
-    return null;
-  }
-  if (retryAfter > 1000) {
-    return Math.ceil(retryAfter);
-  }
-  return Math.ceil(retryAfter * 1000);
 }
 
 async function fetchDiscordResponse(url: string, token: string, heartbeatLabel: string): Promise<Response> {

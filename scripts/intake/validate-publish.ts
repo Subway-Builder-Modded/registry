@@ -18,6 +18,7 @@ import {
 import {
   getOptionalIssueValue,
   isPresentIssueValue,
+  parseCheckedBoxes,
 } from "../lib/map-field-utils.js";
 import { resolveAndExtractDemandStatsForMapSource } from "../lib/map-demand-stats.js";
 import { checkCityCodeUniqueness, checkCrossTypeIdUniqueness } from "../lib/registry-uniqueness.js";
@@ -57,18 +58,6 @@ const PublishMapInput = PublishModInput.omit({ "mod-id": true }).extend({
 interface ValidationResult {
   success: boolean;
   errors: string[];
-}
-
-function parseCheckedBoxes(raw: unknown): string[] {
-  if (Array.isArray(raw)) {
-    return raw.map((tag) => String(tag).trim()).filter(Boolean);
-  }
-  if (typeof raw !== "string" || !raw || raw === "_No response_") return [];
-  return raw
-    .split("\n")
-    .filter((line) => line.startsWith("- [X]") || line.startsWith("- [x]"))
-    .map((line) => line.replace(/^- \[[Xx]\]\s*/, "").trim())
-    .filter(Boolean);
 }
 
 async function validateMod(data: Record<string, string>): Promise<ValidationResult> {

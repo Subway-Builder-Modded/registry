@@ -29,6 +29,7 @@ import {
   isTruthyEnv,
   resolveRepoRoot,
   runAndExitOnError,
+  toWarningsOutputJson,
 } from "../lib/script-runtime.js";
 import { compareStableSemverAsc, isStableSemverTag } from "../lib/semver.js";
 import { filterListingMessages, isTestListing } from "../lib/test-listings.js";
@@ -61,19 +62,6 @@ function resolveMode(rawValue: string | undefined): "full" | "download-only" {
     return rawValue;
   }
   throw new Error("Missing or invalid --mode. Expected one of: full, download-only");
-}
-
-function toWarningsOutputJson(listingType: ManifestType, warnings: string[]): string {
-  const MAX_WARNINGS = 30;
-  const normalized = warnings
-    .map((warning) => warning.trim())
-    .filter((warning) => warning !== "")
-    .map((warning) => `${listingType}: ${warning}`);
-  const displayed = normalized.slice(0, MAX_WARNINGS);
-  if (normalized.length > displayed.length) {
-    displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
-  }
-  return JSON.stringify(displayed);
 }
 
 function toLimitedOutputJson(items: string[]): string {
@@ -401,7 +389,7 @@ async function run(): Promise<void> {
   const tokenAuthStatus = !token ? "missing" : hasAuthFailure401 ? "invalid" : "ok";
   appendGitHubOutput([
     `warning_count=${warningsForGitHub.length}`,
-    `warnings_json=${toWarningsOutputJson(listingType, warningsForGitHub)}`,
+    `warnings_json=${toWarningsOutputJson(`${listingType}: `, warningsForGitHub)}`,
     `security_error_count=${securityErrorsForOutput.length}`,
     `security_warning_count=${securityWarningsForOutput.length}`,
     `security_errors_json=${toLimitedOutputJson(securityErrorsForOutput)}`,

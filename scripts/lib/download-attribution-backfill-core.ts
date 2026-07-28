@@ -24,6 +24,7 @@ import type { MapManifest } from "./manifests.js";
 import { resolveZipUrlForMapSource } from "./map-demand-stats/source-resolution.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
 import { resolveRepoRoot } from "./script-runtime.js";
+import { toUtcDateKey } from "./time-buckets.js";
 import { isObject } from "./json-utils.js";
 
 const GITHUB_API_BASE = "https://api.github.com";
@@ -248,12 +249,6 @@ function addIntegrityMappingsToLineIndex(
       index.set(`${listingId}::${version}::${assetName.toLowerCase()}`, assetKey);
     }
   }
-}
-
-function toUtcDateKey(isoLike: string): string | null {
-  const parsed = Date.parse(isoLike);
-  if (!Number.isFinite(parsed)) return null;
-  return new Date(parsed).toISOString().slice(0, 10).replaceAll("-", "_");
 }
 
 function parseDownloadsFetchZipHits(

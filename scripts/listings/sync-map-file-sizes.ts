@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import { writeJsonFile } from "../lib/json-utils.js";
+import { readListingIdsFromIndex } from "../lib/manifests.js";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
@@ -53,15 +54,6 @@ function normalizeFileSizes(value: unknown): Record<string, number> {
   return sortNumericRecord(normalized);
 }
 
-function getMapIds(repoRoot: string): string[] {
-  const indexPath = resolve(repoRoot, "maps", "index.json");
-  const parsed = readJsonFile<{ maps?: unknown }>(indexPath);
-  if (!Array.isArray(parsed.maps)) {
-    throw new Error(`Invalid maps/index.json at ${indexPath}: missing maps array`);
-  }
-  return parsed.maps.filter((value): value is string => typeof value === "string");
-}
-
 function resolveLatestCompleteFileSizes(
   listing: ListingIntegrityEntry | undefined,
 ): {
@@ -107,7 +99,7 @@ export function syncMapFileSizesFromIntegrity(
   }
 
   const listings = integrity.listings as Record<string, ListingIntegrityEntry>;
-  const ids = getMapIds(repoRoot).sort();
+  const ids = readListingIdsFromIndex(repoRoot, "maps").sort();
   let updatedMaps = 0;
   let mapsWithoutCompleteVersion = 0;
   let mapsWithMissingFileSizes = 0;

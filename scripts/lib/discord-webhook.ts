@@ -1,5 +1,21 @@
 import { fetchWithTimeout, resolveTimeoutMsFromEnv } from "./http.js";
 
+/**
+ * Retry delay in milliseconds from a Discord 429 payload's retry_after field
+ * (seconds, or already-milliseconds when > 1000), or null when absent/invalid.
+ */
+export function parseRetryAfterMs(payload: unknown): number | null {
+  if (!payload || typeof payload !== "object") return null;
+  const retryAfter = (payload as { retry_after?: unknown }).retry_after;
+  if (typeof retryAfter !== "number" || !Number.isFinite(retryAfter) || retryAfter < 0) {
+    return null;
+  }
+  if (retryAfter > 1000) {
+    return Math.ceil(retryAfter);
+  }
+  return Math.ceil(retryAfter * 1000);
+}
+
 interface SendDiscordMarkdownOptions {
   webhookUrl: string;
   title: string;

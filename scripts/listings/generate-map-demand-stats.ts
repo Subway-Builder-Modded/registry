@@ -6,7 +6,7 @@ import {
   sumDownloadAttributionDeltaFetches,
   writeDownloadAttributionDeltaFile,
 } from "../lib/download-attribution.js";
-import { appendGitHubOutput, getNonEmptyEnv, isTruthyEnv, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
+import { appendGitHubOutput, getNonEmptyEnv, isTruthyEnv, resolveRepoRoot, runAndExitOnError, toWarningsOutputJson } from "../lib/script-runtime.js";
 import { filterListingMessages, isTestListing } from "../lib/test-listings.js";
 
 function parseCliArgs(argv: string[]): { force: boolean; mapId?: string; strictFingerprintCache: boolean } {
@@ -50,19 +50,6 @@ function parseCliArgs(argv: string[]): { force: boolean; mapId?: string; strictF
   }
 
   return { force, mapId, strictFingerprintCache };
-}
-
-function toWarningsOutputJson(prefix: string, warnings: string[]): string {
-  const MAX_WARNINGS = 30;
-  const normalized = warnings
-    .map((warning) => warning.trim())
-    .filter((warning) => warning !== "")
-    .map((warning) => `${prefix}${warning}`);
-  const displayed = normalized.slice(0, MAX_WARNINGS);
-  if (normalized.length > displayed.length) {
-    displayed.push(`...and ${normalized.length - displayed.length} more warnings`);
-  }
-  return JSON.stringify(displayed);
 }
 
 async function run(): Promise<void> {

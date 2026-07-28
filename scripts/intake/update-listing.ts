@@ -14,6 +14,7 @@ import {
 import {
   getOptionalIssueValue,
   isPresentIssueValue,
+  parseCheckedBoxes as parseCheckedBoxesList,
 } from "../lib/map-field-utils.js";
 import {
   ensureCollaboratorAuthorAliasPrefills,
@@ -26,17 +27,7 @@ import { assertValidRegistryManifest } from "../lib/registry-manifest.js";
 const REPO_ROOT = resolve(import.meta.dirname, "..", "..");
 
 function parseCheckedBoxes(raw: unknown): string[] | null {
-  if (!raw) return null;
-  if (Array.isArray(raw)) {
-    const selected = raw.map((tag) => String(tag).trim()).filter(Boolean);
-    return selected.length > 0 ? selected : null;
-  }
-  if (typeof raw !== "string") return null;
-  const checked = raw
-    .split("\n")
-    .filter((line) => line.startsWith("- [X]") || line.startsWith("- [x]"))
-    .map((line) => line.replace(/^- \[[Xx]\]\s*/, "").trim())
-    .filter(Boolean);
+  const checked = parseCheckedBoxesList(raw);
   // Return null if nothing was checked (user wants to keep current tags)
   return checked.length > 0 ? checked : null;
 }

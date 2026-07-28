@@ -1,8 +1,9 @@
-import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { getFlagValue } from "./cli.js";
 import { writeCsv } from "./csv.js";
+import { findLastAtOrBefore, listSnapshotFileNames } from "./history-utils.js";
 import { isFiniteNumber, isObject, readJsonFile } from "./json-utils.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 import { isTestListing } from "./test-listings.js";
@@ -255,8 +256,7 @@ function parseSnapshotDate(fileName: string): Date | null {
 }
 
 function listSnapshots(historyDir: string): SnapshotEntry[] {
-  return readdirSync(historyDir)
-    .filter((file) => /^snapshot_\d{4}_\d{2}_\d{2}\.json$/.test(file))
+  return listSnapshotFileNames(historyDir)
     .map((file) => ({ file, date: parseSnapshotDate(file) }))
     .filter((entry): entry is SnapshotEntry => entry.date instanceof Date)
     .sort((a, b) => a.date.getTime() - b.date.getTime());
@@ -388,15 +388,7 @@ function addDays(date: Date, days: number): Date {
 }
 
 function findSnapshotAtOrBefore(snapshots: SnapshotEntry[], targetDate: Date): SnapshotEntry | null {
-  let selected: SnapshotEntry | null = null;
-  for (const entry of snapshots) {
-    if (entry.date <= targetDate) {
-      selected = entry;
-    } else {
-      break;
-    }
-  }
-  return selected;
+  return findLastAtOrBefore(snapshots, (entry) => entry.date.getTime(), targetDate.getTime());
 }
 
 function resolveBaselineSnapshot(snapshots: SnapshotEntry[], latestDate: Date, days: number): SnapshotEntry {
