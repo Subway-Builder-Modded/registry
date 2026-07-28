@@ -246,6 +246,19 @@ function withTemplatePolicy(baseDoc: TemplateDoc, mode: TemplateMode): TemplateD
       field.attributes.description =
         "Leave blank to keep current additional cities. Enter `None` to clear. Otherwise, enter a comma-separated list to replace (e.g. `Gdynia, Sopot`).";
     }
+
+    // The publish attestation describes the required data-quality step, which
+    // only applies to NEW submissions; metadata updates never re-gate on it.
+    if (
+      mode === "update" &&
+      type === "markdown" &&
+      field.attributes &&
+      typeof field.attributes.value === "string" &&
+      field.attributes.value.startsWith("## Data Attestation")
+    ) {
+      field.attributes.value =
+        "## Data Attestation\n\nProvide details about your map's data source and level of detail. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/registry/docs/data-quality) guide for more information.\n\nUpdating metadata does not change your map's data-quality tier. If the underlying data changed, submit new answers via the [data-quality questions](https://subwaybuildermodded.com/registry/docs/data-quality/questions) form.";
+    }
   }
 
   return doc;
@@ -290,7 +303,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   spacer(),
   // ===== Data Validation ===== //
   markdown(
-    "## Data Attestation\n\nProvide details about your map's data source and level of detail. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/wiki/railyard/latest/developers/data-quality) guide for more information.\n\nAfter your map is published, you will be invited to answer the [data-quality questions](https://github.com/Subway-Builder-Modded/registry/blob/main/docs/data-quality-questions.md) so the map can receive its data-quality tier; until then it is listed as `unknown-quality`.",
+    "## Data Attestation\n\nProvide details about your map's data source and level of detail. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/registry/docs/data-quality) guide for more information.\n\nAfter your submission is validated, you will be invited to answer the [data-quality questions](https://subwaybuildermodded.com/registry/docs/data-quality/questions) — a **required step**: your map cannot merge until a maintainer confirms your answers, and new submissions are subject to the [quality floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for countries with existing maps.",
   ),
   input(
     "data_source",
@@ -463,11 +476,11 @@ const dataQualityTemplateBaseDoc: TemplateDoc = {
   labels: ["data-quality"],
   body: [
     markdown(
-      "# Map Data Quality\n\nThese questions classify the census / official data behind your map so it can receive a data-quality tier. Every question is optional — **leaving a question blank is always safe** — but unanswered questions may keep the map at `unknown-quality` until a reviewer works through them with you.\n\nPlease read the [Data Quality Questions guide](https://github.com/Subway-Builder-Modded/registry/blob/main/docs/data-quality-questions.md) — it explains each question in plain language, including the golden rule: **answer with where the numbers are published, not where you placed them**.\n\nYour answers produce a provisional score in a pull request; a reviewer confirms it before the tier appears.\n\nIf validation fails, you can edit this issue and comment **revalidate** to retry.",
+      "# Map Data Quality\n\nThese questions classify the census / official data behind your map so it can receive a data-quality tier. Every question is optional — **leaving a question blank is always safe** — but unanswered questions may keep the map at `unknown-quality` until a reviewer works through them with you.\n\nPlease read the [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) — it explains each question in plain language, including the golden rule: **answer with where the numbers are published, not where you placed them**.\n\nYour answers produce a provisional score in a pull request; a reviewer confirms it before the tier appears.\n\nIf validation fails, you can edit this issue and comment **revalidate** to retry.",
     ),
     spacer(),
     mapIdField(
-      "The ID of the map these answers describe. Must already exist in the registry and be published by your GitHub account.",
+      "The ID of the map these answers describe. Must already exist in the registry — or have an open publish submission — and be published by your GitHub account.",
     ),
     dropdown(
       "same-methodology",

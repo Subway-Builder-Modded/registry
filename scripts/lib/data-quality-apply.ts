@@ -1,8 +1,11 @@
 import {
+  DATA_QUALITY_TIERS,
   DataQualityAnswersFileSchema,
   RUBRIC_VERSION,
   type DataQualityAnswersFile,
+  type DataQualityTier,
   type ManifestDataQuality,
+  type ScoredDataQualityTier,
 } from "@subway-builder-modded/registry-schemas";
 import {
   computeScores,
@@ -93,4 +96,71 @@ export function applyDataQualityAnswers(
   };
 
   return { id, answersFile, manifestBlock, scores, provenanceFlipped };
+}
+
+/** A same-country map considered for the quality-floor context. */
+export interface CountryFloorPeer {
+  id: string;
+  tier: ScoredDataQualityTier;
+  weightedScore: number;
+}
+
+export interface CountryFloorContext {
+  /** Plain-text lines for the (code-fenced) rescore_data comment. */
+  lines: string[];
+  /** True when the confirmed tier sits below the country's best scored tier. */
+  floorViolation: boolean;
+}
+
+function tierRank(tier: DataQualityTier): number {
+  return DATA_QUALITY_TIERS.indexOf(tier);
+}
+
+/**
+ * Builds the country quality-floor context shown in the rescore_data
+ * confirmation comment: the country's other scored maps ranked best-first,
+ * plus an explicit FLOOR VIOLATION line when the newly confirmed tier falls
+ * below the country's demonstrated best. Advisory by design — whether the
+ * city-specific exception applies is reviewer judgment (see the Quality
+ * Floor policy).
+ */
+export function buildCountryFloorContext(
+  target: { id: string; country: string; tier: ScoredDataQualityTier },
+  peers: CountryFloorPeer[],
+): CountryFloorContext {
+  const country = target.country || "??";
+  if (peers.length === 0) {
+    return {
+      lines: [
+        `Country floor (${country}): no other scored maps — this confirmation sets the floor.`,
+      ],
+      floorViolation: false,
+    };
+  }
+
+  const sorted = [...peers].sort(
+    (a, b) =>
+      tierRank(a.tier) - tierRank(b.tier) || b.weightedScore - a.weightedScore,
+  );
+  const best = sorted[0];
+  const lines = [
+    `Country floor context (${country}):`,
+    ...sorted.map(
+      (peer) =>
+        `  ${peer.tier} (${peer.weightedScore.toFixed(2)})  ${peer.id}`,
+    ),
+  ];
+
+  const floorViolation = tierRank(target.tier) > tierRank(best.tier);
+  if (floorViolation) {
+    lines.push(
+      `FLOOR VIOLATION: ${target.id} confirmed at ${target.tier}, below the ${country} floor of ${best.tier} (set by ${best.id}).`,
+      `A city-specific exception may apply — reviewer judgment. See the Quality Floor policy before merging.`,
+    );
+  } else {
+    lines.push(
+      `${target.id} (${target.tier}) meets the ${country} floor (${best.tier}, set by ${best.id}).`,
+    );
+  }
+  return { lines, floorViolation };
 }

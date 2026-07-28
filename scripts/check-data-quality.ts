@@ -63,11 +63,12 @@ function runReport(paths: string[]): void {
   process.stdout.write(`${buildProvisionalReport(entries)}\n`);
 }
 
-function runCheck(requirePresence: boolean): void {
+function runCheck(requirePresence: boolean, requireScoredIds: string[]): void {
   const ids = listMapIds();
   const errors: string[] = [];
   let scored = 0;
   let withAnswers = 0;
+  const scoredIds = new Set<string>();
 
   for (const id of ids) {
     const manifest = readJsonFile<Record<string, unknown>>(
@@ -83,12 +84,26 @@ function runCheck(requirePresence: boolean): void {
       (dataQuality as Record<string, unknown>).tier !== "unknown"
     ) {
       scored += 1;
+      scoredIds.add(id);
     }
     errors.push(
       ...checkMapDataQuality(
         { id, manifestDataQuality: dataQuality, answersFile },
         { requirePresence },
       ),
+    );
+  }
+
+  // Publish gate (plan C1.3): manifests newly added in a PR must carry a
+  // confirmed scored block before the PR can merge. The workflow computes the
+  // added ids; the dq-grandfathered label bypasses this rule entirely.
+  for (const id of requireScoredIds) {
+    if (scoredIds.has(id)) continue;
+    errors.push(
+      `maps/${id}: new maps require a confirmed data-quality tier before merge — ` +
+        `the author answers the data-quality questions (see the publish issue's invite), ` +
+        `then a maintainer confirms with the \`rescore_data\` PR comment. ` +
+        `Maintainers can exempt this PR with the \`dq-grandfathered\` label.`,
     );
   }
 
@@ -107,5 +122,10 @@ const reportIndex = args.indexOf("--report");
 if (reportIndex !== -1) {
   runReport(args.slice(reportIndex + 1).filter((a) => !a.startsWith("--")));
 } else {
-  runCheck(args.includes("--require-presence"));
+  const requireScoredIndex = args.indexOf("--require-scored");
+  const requireScoredIds =
+    requireScoredIndex === -1
+      ? []
+      : args.slice(requireScoredIndex + 1).filter((a) => !a.startsWith("--"));
+  runCheck(args.includes("--require-presence"), requireScoredIds);
 }

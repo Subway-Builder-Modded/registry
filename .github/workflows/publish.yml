@@ -282,6 +282,11 @@ jobs:
               console.log(`PR #${existing[0].number} already exists — updated via force push`);
               return;
             }
+            // Draft until data quality is confirmed (plan C1): GitHub cannot
+            // merge a draft, which is the hard publish gate. rescore_data
+            // marks it ready after confirming the answers; a maintainer can
+            // mark it ready manually to grandfather (add dq-grandfathered so
+            // CI's publish gate is exempted too).
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -291,10 +296,13 @@ jobs:
                 '',
                 'Automated PR to add map `${{ fromJson(steps.parser.outputs.jsonString).map-id }}` to the registry.',
                 '',
-                'Submitted by @${{ github.event.issue.user.login }}'
+                'Submitted by @${{ github.event.issue.user.login }}',
+                '',
+                '**Draft until data quality is confirmed** — the author answers the data-quality questions (invite on the submission issue), then a maintainer reviews and comments `rescore_data` here, which marks this PR ready to merge.'
               ].join('\n'),
               head: branch,
-              base: 'main'
+              base: 'main',
+              draft: true
             });
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
@@ -366,7 +374,7 @@ jobs:
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body: 'A pull request has been created for your map submission. A maintainer will review it shortly.\n\n' +
-                `**Next step — data quality:** once the PR merges, [answer the data-quality questions](${inviteUrl}) so your map can receive its data-quality tier. Until then it is listed as \`unknown-quality\`. The [guide](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/blob/main/docs/data-quality-questions.md) explains every question in plain language.` +
+                `**Required next step — data quality:** [answer the data-quality questions](${inviteUrl}) so your map can receive its data-quality tier. **Your submission cannot merge until a maintainer confirms your answers**; the publish PR stays in draft until then. The [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) explains every question in plain language, and new submissions are subject to the [quality floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for countries with existing maps.` +
                 sampleNote
             });
 

@@ -2,8 +2,11 @@ name: Process Data Quality Submission
 
 # Phase two of a map submission: parses the data-quality issue form, resolves
 # same-methodology inheritance, writes maps/<id>/data-quality.json
-# (provenance self-reported), and opens a PR with the provisional scores.
-# A maintainer confirms on that PR with the `rescore_data` comment command.
+# (provenance self-reported), and lands it where the map lives:
+# - merged maps: a dq/<id> branch + standalone PR with the provisional scores
+# - unmerged maps: the open publish/map/<id> branch, so the publish PR carries
+#   the answers and stays draft until a maintainer confirms
+# A maintainer confirms with the `rescore_data` comment command on the PR.
 
 on:
   issues:
@@ -65,13 +68,80 @@ jobs:
           template-path: .github/ISSUE_TEMPLATE/data-quality.yml
           issue-body: ${{ github.event.issue.body }}
 
+      - name: Resolve target branch
+        # Unmerged maps (plan C1.2): when the map is not on main but an open
+        # publish branch exists, the answers land on that branch so the publish
+        # PR carries them — review gates the publish merge itself.
+        id: target
+        env:
+          MAP_ID: ${{ fromJson(steps.parser.outputs.jsonString).map-id }}
+        run: |
+          set -euo pipefail
+          if [ ! -f "maps/${MAP_ID}/manifest.json" ] \
+            && git ls-remote --exit-code origin "refs/heads/publish/map/${MAP_ID}" >/dev/null 2>&1; then
+            git fetch origin "publish/map/${MAP_ID}"
+            git checkout -B "publish/map/${MAP_ID}" "origin/publish/map/${MAP_ID}"
+            echo "mode=publish" >> "$GITHUB_OUTPUT"
+          else
+            echo "mode=merged" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Validate answers
         env:
           ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
           ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
         run: pnpm --dir scripts run validate-data-quality
 
+      - name: Commit and push to publish branch
+        if: steps.target.outputs.mode == 'publish'
+        env:
+          MAP_ID: ${{ fromJson(steps.parser.outputs.jsonString).map-id }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add maps/
+          if git diff --cached --quiet; then
+            echo "No changes (answers already on the publish branch)."
+          else
+            git commit -m "chore(data-quality): answers for ${MAP_ID} (self-reported)"
+            git push origin "publish/map/${MAP_ID}"
+          fi
+
+      - name: Comment on publish pull request
+        if: steps.target.outputs.mode == 'publish'
+        id: publish-pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const branch = 'publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branch}`,
+              state: 'open'
+            });
+            if (prs.length === 0) {
+              core.setFailed(`No open PR found for ${branch}`);
+              return;
+            }
+            core.setOutput('number', prs[0].number);
+            let report = '';
+            try {
+              report = fs.readFileSync('dq-validation-report.md', 'utf-8');
+            } catch {}
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prs[0].number,
+              body: 'Self-reported data-quality answers from #${{ github.event.issue.number }} added to this publish PR.\n\n' +
+                report +
+                '\n\nA maintainer confirms by commenting `rescore_data` after review; the PR stays draft until then.'
+            });
+
       - name: Commit and push changes
+        if: steps.target.outputs.mode != 'publish'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -81,6 +151,7 @@ jobs:
           git push --force origin "dq/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
 
       - name: Create or update pull request
+        if: steps.target.outputs.mode != 'publish'
         uses: actions/github-script@v7
         with:
           script: |
@@ -138,11 +209,15 @@ jobs:
               report = fs.readFileSync('dq-validation-report.md', 'utf-8');
             } catch {}
 
+            const publishPr = '${{ steps.publish-pr.outputs.number }}';
+            const intro = '${{ steps.target.outputs.mode }}' === 'publish'
+              ? `Your data-quality answers have been added to your publish pull request (#${publishPr}). A maintainer will review and confirm them; once confirmed, your map merges with its tier.`
+              : 'A pull request has been created with your data-quality answers. A maintainer will review and confirm it shortly.';
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: 'A pull request has been created with your data-quality answers. A maintainer will review and confirm it shortly.\n\n' + report
+              body: intro + '\n\n' + report
             });
 
       - name: Handle failure
