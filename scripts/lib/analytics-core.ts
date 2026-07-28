@@ -1,7 +1,9 @@
-import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { getFlagValue } from "./cli.js";
 import { writeCsv } from "./csv.js";
+import { findLastAtOrBefore, listSnapshotFileNames } from "./history-utils.js";
 import { isFiniteNumber, isObject, readJsonFile } from "./json-utils.js";
 import { resolveRepoRoot } from "./script-runtime.js";
 import { isTestListing } from "./test-listings.js";
@@ -214,21 +216,6 @@ const DEFAULT_TOP_LISTINGS: number | null = null;
 const DEFAULT_TOP_AUTHORS: number | null = null;
 const WINDOWS = [1, 3, 7, 14, 30] as const;
 
-function getArgValue(argv: string[], name: string): string | undefined {
-  const exact = `--${name}=`;
-  for (const arg of argv) {
-    if (arg.startsWith(exact)) {
-      return arg.slice(exact.length);
-    }
-  }
-  for (let index = 0; index < argv.length; index += 1) {
-    if (argv[index] === `--${name}`) {
-      return argv[index + 1];
-    }
-  }
-  return undefined;
-}
-
 function validateArgs(argv: string[]): void {
   const valueFlags = new Set(["--top-k-listings", "--top-k-authors"]);
   for (let index = 0; index < argv.length; index += 1) {
@@ -269,8 +256,7 @@ function parseSnapshotDate(fileName: string): Date | null {
 }
 
 function listSnapshots(historyDir: string): SnapshotEntry[] {
-  return readdirSync(historyDir)
-    .filter((file) => /^snapshot_\d{4}_\d{2}_\d{2}\.json$/.test(file))
+  return listSnapshotFileNames(historyDir)
     .map((file) => ({ file, date: parseSnapshotDate(file) }))
     .filter((entry): entry is SnapshotEntry => entry.date instanceof Date)
     .sort((a, b) => a.date.getTime() - b.date.getTime());
@@ -402,15 +388,7 @@ function addDays(date: Date, days: number): Date {
 }
 
 function findSnapshotAtOrBefore(snapshots: SnapshotEntry[], targetDate: Date): SnapshotEntry | null {
-  let selected: SnapshotEntry | null = null;
-  for (const entry of snapshots) {
-    if (entry.date <= targetDate) {
-      selected = entry;
-    } else {
-      break;
-    }
-  }
-  return selected;
+  return findLastAtOrBefore(snapshots, (entry) => entry.date.getTime(), targetDate.getTime());
 }
 
 function resolveBaselineSnapshot(snapshots: SnapshotEntry[], latestDate: Date, days: number): SnapshotEntry {
@@ -1190,14 +1168,14 @@ export function runGenerateAnalyticsCli(
   const resolvedRepoRoot = repoRoot ?? process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   validateArgs(argv);
   const topListings = parseTopK(
-    getArgValue(argv, "top-k-listings")
+    getFlagValue(argv, "top-k-listings")
       ?? process.env.ANALYTICS_TOP_K_LISTINGS
       ?? process.env.ANALYTICS_TOP_K,
     DEFAULT_TOP_LISTINGS,
     "top-k-listings",
   );
   const topAuthors = parseTopK(
-    getArgValue(argv, "top-k-authors") ?? process.env.ANALYTICS_TOP_K_AUTHORS,
+    getFlagValue(argv, "top-k-authors") ?? process.env.ANALYTICS_TOP_K_AUTHORS,
     DEFAULT_TOP_AUTHORS,
     "top-k-authors",
   );

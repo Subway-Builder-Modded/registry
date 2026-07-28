@@ -1,0 +1,221 @@
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import { resolve } from "node:path";
+import {
+  parseGalleryImages,
+  resolveGalleryUrls,
+  downloadGalleryImages,
+} from "../lib/gallery.js";
+import {
+  combineMapTags,
+  getMapDataSource,
+  getMapLevelOfDetail,
+  getOptionalIssueValue,
+  getRequiredIssueValue,
+  parseCheckedBoxes,
+} from "../lib/map-field-utils.js";
+import {
+  COUNTRY_TO_LOCATION,
+  DEFAULT_SOURCE_QUALITY,
+} from "../lib/map-constants.js";
+import {
+  ensureCollaboratorAuthorAliasPrefills,
+  resolvePublishCollaborators,
+} from "../lib/collaborators.js";
+import {
+  type MapManifest,
+  type ModManifest,
+  resolveListingIdAndDir,
+  resolveManifestType,
+} from "../lib/manifests.js";
+import { resolveAndExtractDemandStatsForMapSource } from "../lib/map-demand-stats.js";
+import type { DemandStats } from "../lib/map-demand-stats.js";
+import { assertValidRegistryManifest } from "../lib/registry-manifest.js";
+import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
+import type { LevelOfDetail, SourceQuality, SpecialDemandTag } from "@subway-builder-modded/registry-schemas";
+import { ensureAuthorAliasPrefill } from "../lib/author-aliases.js";
+
+const REPO_ROOT = resolve(import.meta.dirname, "..", "..");
+
+function parseTags(raw: unknown): string[] {
+  if (!raw) return [];
+  // Issue parser may return an array of strings or comma-separated string
+  if (Array.isArray(raw)) return raw.map((t) => String(t).trim()).filter(Boolean);
+  if (typeof raw !== "string") return [];
+  // Handle checkbox markdown format: "- [X] tag\n- [x] tag"
+  if (raw.includes("- [")) {
+    return parseCheckedBoxes(raw);
+  }
+  // Handle comma-separated: "tag1, tag2, tag3"
+  return raw.split(",").map((t) => t.trim()).filter(Boolean);
+}
+
+function parseCommaSeparated(raw: unknown): string[] {
+  if (!raw || typeof raw !== "string") return [];
+  return raw.split(",").map((s) => s.trim()).filter(Boolean);
+}
+
+function buildUpdate(data: Record<string, unknown>): ModManifest["update"] {
+  if (data["update-type"] === "GitHub Releases") {
+    return { type: "github", repo: String(data["github-repo"]) };
+  }
+  return { type: "custom", url: String(data["custom-update-url"]) };
+}
+
+async function buildMapManifestData(data: Record<string, unknown>): Promise<{
+  tags: string[];
+  mapFields: Omit<MapManifest, keyof ModManifest>;
+}> {
+  // level_of_detail is deprecated (D4): the form no longer asks; new listings
+  // get the conservative default. The manifest field stays until pre-0.2.9
+  // clients (which still read it) have aged out.
+  const levelOfDetail = getMapLevelOfDetail(data.level_of_detail);
+  const dataSource = getMapDataSource(data.data_source);
+  // location is machine-managed: derived from the country code, never
+  // user-selected (validate-publish rejects unmapped countries first).
+  const country = String(data.country);
+  const location = COUNTRY_TO_LOCATION[country];
+  if (!location) {
+    throw new Error(`No location mapping for country "${country}" — must be an ISO 3166-1 alpha-2 code.`);
+  }
+  const specialDemand = parseTags(data.special_demand);
+  // source_quality is machine-managed: new maps get the conservative default;
+  // the data-quality tier (reviewer-confirmed) is the real quality signal.
+  const sourceQuality = DEFAULT_SOURCE_QUALITY;
+  const update = buildUpdate(data);
+  const mapId = String(data["map-id"]);
+  let demandStats: DemandStats;
+  try {
+    const cached = JSON.parse(
+      readFileSync(resolve(os.tmpdir(), `railyard-publish-demand-stats-${mapId}.json`), "utf-8"),
+    ) as { mapId: string; stats: DemandStats };
+    if (cached.mapId !== mapId) throw new Error("mapId mismatch");
+    demandStats = cached.stats;
+    console.log(`[create-listing] Reusing demand stats from validate-publish step (mapId=${mapId}).`);
+  } catch {
+    demandStats = await resolveAndExtractDemandStatsForMapSource(
+      mapId,
+      update,
+      {
+        token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
+        requireResidentTotalsMatch: true,
+      },
+    );
+  }
+
+  const includedCities = parseCommaSeparated(data["included-cities"]);
+
+  return {
+    tags: combineMapTags(location, specialDemand),
+    mapFields: {
+      city_code: String(data["city-code"]),
+      country,
+      population: demandStats.residents_total,
+      residents_total: demandStats.residents_total,
+      points_count: demandStats.points_count,
+      population_count: demandStats.population_count,
+      initial_view_state: demandStats.initial_view_state,
+      data_source: dataSource,
+      source_quality: sourceQuality as SourceQuality,
+      level_of_detail: levelOfDetail as LevelOfDetail,
+      // Every new map starts Unscored; a scored block is written only after a
+      // reviewer confirms the map's data-quality answers (plan D3/D5).
+      data_quality: { tier: "unknown", rubric_version: RUBRIC_VERSION },
+      location,
+      special_demand: specialDemand as SpecialDemandTag[],
+      file_sizes: {},
+      ...(includedCities.length > 0 ? { included_cities: includedCities } : {}),
+    },
+  };
+}
+
+async function main() {
+  const manifestType = resolveManifestType(process.env.LISTING_TYPE);
+  const issueJson = process.env.ISSUE_JSON;
+  const issueAuthorId = process.env.ISSUE_AUTHOR_ID;
+  const issueAuthorLogin = process.env.ISSUE_AUTHOR_LOGIN;
+
+  if (!issueJson || !issueAuthorId || !issueAuthorLogin) {
+    console.error("ISSUE_JSON, ISSUE_AUTHOR_ID, and ISSUE_AUTHOR_LOGIN are required");
+    process.exit(1);
+  }
+  const issueAuthorGithubId = Number.parseInt(issueAuthorId, 10);
+  if (!Number.isFinite(issueAuthorGithubId) || issueAuthorGithubId <= 0) {
+    throw new Error(`Invalid ISSUE_AUTHOR_ID '${issueAuthorId}'`);
+  }
+
+  const data = JSON.parse(issueJson) as Record<string, unknown>;
+  const { id, dir } = resolveListingIdAndDir(manifestType, data);
+  const listingDir = resolve(REPO_ROOT, dir, id);
+  const galleryDir = resolve(listingDir, "gallery");
+  const description = getOptionalIssueValue(data.description);
+  const collaboratorResult = await resolvePublishCollaborators(data.collaborators);
+  if (collaboratorResult.errors.length > 0) {
+    throw new Error(`Invalid collaborators: ${collaboratorResult.errors.join("; ")}`);
+  }
+  const collaborators = collaboratorResult.collaborators;
+
+  if (!description) {
+    throw new Error("description is required");
+  }
+
+  mkdirSync(galleryDir, { recursive: true });
+
+  // Download gallery images — resolve markdown URLs to JWT-signed URLs
+  // via the GitHub API HTML body (required for private repo attachments)
+  const imageUrls = parseGalleryImages(
+    typeof data.gallery === "string" ? data.gallery : undefined,
+  );
+  const resolvedUrls = await resolveGalleryUrls(imageUrls);
+  const galleryPaths = await downloadGalleryImages(resolvedUrls, galleryDir);
+
+  const rawTags = parseTags(data.tags);
+  const mapData = manifestType === "map" ? await buildMapManifestData(data) : undefined;
+  const tags = mapData ? mapData.tags : rawTags;
+
+  const manifest: ModManifest | MapManifest = {
+    schema_version: 1,
+    id,
+    name: String(data.name),
+    author: issueAuthorLogin,
+    github_id: issueAuthorGithubId,
+    ...(collaborators.length > 0 ? { collaborators } : {}),
+    description,
+    tags,
+    gallery: galleryPaths,
+    is_test: false,
+    source: String(data.source),
+    update: buildUpdate(data),
+    ...(mapData ? mapData.mapFields : {}),
+  };
+
+  const authorPrefillResult = ensureAuthorAliasPrefill(
+    REPO_ROOT,
+    issueAuthorGithubId,
+    issueAuthorLogin,
+  );
+  if (authorPrefillResult.created) {
+    console.log(`Updated ${authorPrefillResult.path} with author '${issueAuthorLogin}'`);
+  }
+  const createdCollaboratorAliases = ensureCollaboratorAuthorAliasPrefills(
+    REPO_ROOT,
+    collaboratorResult.users,
+  );
+  if (createdCollaboratorAliases.length > 0) {
+    console.log(`Updated authors/index.json with collaborator(s): ${createdCollaboratorAliases.join(", ")}`);
+  }
+
+  assertValidRegistryManifest(
+    manifest,
+    `Generated ${dir}/${id}/manifest.json`,
+  );
+
+  writeFileSync(
+    resolve(listingDir, "manifest.json"),
+    JSON.stringify(manifest, null, 2) + "\n"
+  );
+
+  console.log(`Created ${dir}/${id}/manifest.json`);
+}
+
+main();

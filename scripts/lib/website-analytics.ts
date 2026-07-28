@@ -88,17 +88,7 @@ export function getWebsiteAnalyticsDayFilePath(repoRoot: string, dateKey: string
   );
 }
 
-export function toHourBucketIso(date: Date): string {
-  const bucket = new Date(date.getTime());
-  bucket.setUTCMinutes(0, 0, 0);
-  return bucket.toISOString();
-}
-
-export function toDateKey(isoValue: string): string | null {
-  const parsed = Date.parse(isoValue);
-  if (!Number.isFinite(parsed)) return null;
-  return new Date(parsed).toISOString().slice(0, 10);
-}
+export { toDateKey, toHourBucketIso } from "./time-buckets.js";
 
 function normalizeMetricMap(value: unknown): WebsiteAnalyticsMetricMap {
   const map: WebsiteAnalyticsMetricMap = {};

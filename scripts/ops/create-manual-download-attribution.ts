@@ -12,6 +12,7 @@ import {
   toDownloadAttributionAssetKey,
   writeDownloadAttributionLedger,
 } from "../lib/download-attribution.js";
+import { getFlagValue, hasFlag } from "../lib/cli.js";
 import { readJsonFile, writeJsonFile } from "../lib/json-utils.js";
 import { resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
@@ -34,31 +35,14 @@ interface ModIntegrityCacheEntry {
   };
 }
 
-function getArgValue(args: string[], name: string): string | undefined {
-  const key = `--${name}=`;
-  for (const arg of args) {
-    if (arg.startsWith(key)) return arg.slice(key.length);
-  }
-  for (let i = 0; i < args.length; i += 1) {
-    if (args[i] === `--${name}`) {
-      return args[i + 1];
-    }
-  }
-  return undefined;
-}
-
-function hasFlag(args: string[], name: string): boolean {
-  return args.includes(`--${name}`);
-}
-
 function parseArgs(argv: string[]): CliArgs {
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
-  const specValue = getArgValue(argv, "spec");
+  const specValue = getFlagValue(argv, "spec");
   if (!specValue || specValue.trim() === "") {
     throw new Error("Missing --spec <path>.");
   }
   const specPath = resolve(repoRoot, specValue.trim());
-  const outputValue = getArgValue(argv, "output")?.trim();
+  const outputValue = getFlagValue(argv, "output")?.trim();
   const outputPath = outputValue
     ? resolve(repoRoot, outputValue)
     : resolve(repoRoot, "tmp", "manual-download-attribution.delta.json");

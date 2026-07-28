@@ -1,0 +1,169 @@
+import { readFileSync, writeFileSync } from "node:fs";
+import { resolve } from "node:path";
+import {
+  parseGalleryImages,
+  resolveGalleryUrls,
+  downloadGalleryImages,
+} from "../lib/gallery.js";
+import {
+  type MapManifest,
+  type ModManifest,
+  resolveListingIdAndDir,
+  resolveManifestType,
+} from "../lib/manifests.js";
+import {
+  getOptionalIssueValue,
+  isPresentIssueValue,
+  parseCheckedBoxes as parseCheckedBoxesList,
+} from "../lib/map-field-utils.js";
+import {
+  ensureCollaboratorAuthorAliasPrefills,
+  resolveCollaboratorUpdate,
+} from "../lib/collaborators.js";
+import { applyMapManifestUpdates } from "../lib/map-update-logic.js";
+import { resolveDemandStatsForMapUpdate } from "../lib/map-demand-stats.js";
+import { assertValidRegistryManifest } from "../lib/registry-manifest.js";
+
+const REPO_ROOT = resolve(import.meta.dirname, "..", "..");
+
+function parseCheckedBoxes(raw: unknown): string[] | null {
+  const checked = parseCheckedBoxesList(raw);
+  // Return null if nothing was checked (user wants to keep current tags)
+  return checked.length > 0 ? checked : null;
+}
+
+function applyCommonMetadataUpdates(
+  manifest: ModManifest,
+  data: Record<string, unknown>,
+): void {
+  const description = getOptionalIssueValue(data.description);
+
+  if (isPresentIssueValue(data.name)) manifest.name = data.name;
+  if (description) manifest.description = description;
+  if (isPresentIssueValue(data.source)) manifest.source = data.source;
+}
+
+function applyModTagUpdates(
+  manifest: ModManifest,
+  data: Record<string, unknown>,
+): void {
+  const newTags = parseCheckedBoxes(data.tags);
+  if (newTags) manifest.tags = newTags;
+}
+
+function applyUpdateTypeChanges(
+  manifest: ModManifest,
+  data: Record<string, unknown>,
+): void {
+  const update = manifest.update;
+
+  if (isPresentIssueValue(data["update-type"])) {
+    if (data["update-type"] === "GitHub Releases" && isPresentIssueValue(data["github-repo"])) {
+      manifest.update = { type: "github", repo: data["github-repo"] };
+    } else if (data["update-type"] === "Custom URL" && isPresentIssueValue(data["custom-update-url"])) {
+      manifest.update = { type: "custom", url: data["custom-update-url"] };
+    }
+    return;
+  }
+
+  // Update type not changing, but repo/url might be updated
+  if (update.type === "github" && isPresentIssueValue(data["github-repo"])) {
+    update.repo = data["github-repo"];
+  }
+  if (update.type === "custom" && isPresentIssueValue(data["custom-update-url"])) {
+    update.url = data["custom-update-url"];
+  }
+}
+
+async function main() {
+  const manifestType = resolveManifestType(process.env.LISTING_TYPE);
+  const issueJson = process.env.ISSUE_JSON;
+
+  if (!issueJson) {
+    console.error("ISSUE_JSON environment variable is required");
+    process.exit(1);
+  }
+
+  const data = JSON.parse(issueJson) as Record<string, unknown>;
+  const { id, dir } = resolveListingIdAndDir(manifestType, data);
+  const manifestPath = resolve(REPO_ROOT, dir, id, "manifest.json");
+
+  const manifest = JSON.parse(readFileSync(manifestPath, "utf-8")) as
+    | ModManifest
+    | MapManifest;
+
+  applyCommonMetadataUpdates(manifest, data);
+  const collaboratorUpdate = await resolveCollaboratorUpdate(data.collaborators);
+  if (collaboratorUpdate.errors.length > 0) {
+    throw new Error(`Invalid collaborators: ${collaboratorUpdate.errors.join("; ")}`);
+  }
+  if (collaboratorUpdate.kind === "clear") {
+    delete manifest.collaborators;
+  } else if (collaboratorUpdate.kind === "replace") {
+    manifest.collaborators = collaboratorUpdate.collaborators;
+    const createdCollaboratorAliases = ensureCollaboratorAuthorAliasPrefills(
+      REPO_ROOT,
+      collaboratorUpdate.users,
+    );
+    if (createdCollaboratorAliases.length > 0) {
+      console.log(`Updated authors/index.json with collaborator(s): ${createdCollaboratorAliases.join(", ")}`);
+    }
+  }
+  if (typeof manifest.is_test !== "boolean") {
+    manifest.is_test = false;
+  }
+
+  if (manifestType === "mod") {
+    applyModTagUpdates(manifest as ModManifest, data);
+  }
+
+  const originalUpdateJson = JSON.stringify(manifest.update);
+  applyUpdateTypeChanges(manifest as ModManifest, data);
+
+  if (manifestType === "map") {
+    applyMapManifestUpdates(manifest as MapManifest, data);
+    const mapManifest = manifest as MapManifest;
+    if (!mapManifest.file_sizes || typeof mapManifest.file_sizes !== "object" || Array.isArray(mapManifest.file_sizes)) {
+      mapManifest.file_sizes = {};
+    }
+    if (JSON.stringify(mapManifest.update) !== originalUpdateJson) {
+      const demandStatsResult = await resolveDemandStatsForMapUpdate(
+        mapManifest.id,
+        mapManifest.update,
+        {
+          repoRoot: REPO_ROOT,
+          token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
+          sourceUrl: mapManifest.source,
+        },
+      );
+      const demandStats = demandStatsResult.stats;
+      mapManifest.population = demandStats.residents_total;
+      mapManifest.residents_total = demandStats.residents_total;
+      mapManifest.points_count = demandStats.points_count;
+      mapManifest.population_count = demandStats.population_count;
+      mapManifest.initial_view_state = demandStats.initial_view_state;
+    } else {
+      console.log(`[update-listing] Map source unchanged; demand stats will be refreshed by the next analytics run.`);
+    }
+  }
+
+  // Gallery images — resolve URLs via GitHub API (same as create-listing)
+  const galleryUrls = parseGalleryImages(
+    typeof data.gallery === "string" ? data.gallery : undefined,
+  );
+  if (galleryUrls.length > 0) {
+    const galleryDir = resolve(REPO_ROOT, dir, id, "gallery");
+    const resolvedUrls = await resolveGalleryUrls(galleryUrls);
+    manifest.gallery = await downloadGalleryImages(resolvedUrls, galleryDir);
+  }
+
+  assertValidRegistryManifest(
+    manifest,
+    `Updated ${dir}/${id}/manifest.json`,
+  );
+
+  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n");
+  console.log(`Updated ${dir}/${id}/manifest.json`);
+}
+
+main();

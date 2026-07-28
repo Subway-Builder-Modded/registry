@@ -1,0 +1,246 @@
+import { existsSync, writeFileSync } from "node:fs";
+import os from "node:os";
+import { resolve } from "node:path";
+import { z } from "zod";
+import { validateCustomUpdateUrl } from "../lib/custom-url.js";
+import { validateGitHubRepo } from "../lib/github.js";
+import { parseGalleryImages } from "../lib/gallery.js";
+import { resolvePublishCollaborators } from "../lib/collaborators.js";
+import {
+  COUNTRY_TO_LOCATION,
+  DEFAULT_MAP_DATA_SOURCE,
+  LEVEL_OF_DETAIL_VALUES,
+  SOURCE_QUALITY_VALUES,
+  SPECIAL_DEMAND_TAG_SET,
+  VANILLA_CITY_CODE_SET,
+  isOsmDataSource,
+} from "../lib/map-constants.js";
+import {
+  getOptionalIssueValue,
+  isPresentIssueValue,
+  parseCheckedBoxes,
+} from "../lib/map-field-utils.js";
+import { resolveAndExtractDemandStatsForMapSource } from "../lib/map-demand-stats.js";
+import { checkCityCodeUniqueness, checkCrossTypeIdUniqueness } from "../lib/registry-uniqueness.js";
+
+
+const REPO_ROOT = process.env.RAILYARD_REPO_ROOT
+  ? resolve(process.env.RAILYARD_REPO_ROOT)
+  : resolve(import.meta.dirname, "..", "..");
+
+const PublishModInput = z.object({
+  "mod-id": z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Mod ID must be kebab-case (lowercase letters, numbers, hyphens)"),
+  name: z.string().min(1, "Display name is required"),
+  description: z.string().min(1, "Description is required"),
+  source: z.string().url("Source must be a valid URL"),
+  collaborators: z.string().optional(),
+  "update-type": z.enum(["GitHub Releases", "Custom URL"]),
+  "github-repo": z.string().optional(),
+  "custom-update-url": z.string().optional(),
+});
+
+const PublishMapInput = PublishModInput.omit({ "mod-id": true }).extend({
+  "map-id": z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Map ID must be kebab-case (lowercase letters, numbers, hyphens)"),
+  "city-code": z.string().min(2).max(4).regex(/^[A-Z0-9]+$/, "City code must be 2-4 uppercase letters/numbers"),
+  country: z.string().length(2).regex(/^[A-Z]{2}$/, "Country must be a 2-letter ISO 3166-1 alpha-2 code"),
+  gallery: z.string().min(1, "At least one gallery image is required"),
+  data_source: z.string().optional(),
+  // Tolerated for issues predating the field's removal from the form; never
+  // used — source_quality is machine-managed (data-quality tiers supersede it).
+  source_quality: z.enum(SOURCE_QUALITY_VALUES).optional(),
+  // Tolerated for issues predating the field's removal from the form; never
+  // required — level_of_detail is deprecated (D4) and defaults conservatively.
+  level_of_detail: z.enum(LEVEL_OF_DETAIL_VALUES).optional(),
+  // Tolerated for issues predating the field's removal from the form; never
+  // used — location is machine-managed (derived from the country code).
+  location: z.string().optional(),
+  special_demand: z.union([z.string(), z.array(z.string())]).optional(),
+});
+
+interface ValidationResult {
+  success: boolean;
+  errors: string[];
+}
+
+async function validateMod(data: Record<string, string>): Promise<ValidationResult> {
+  const errors: string[] = [];
+
+  const parsed = PublishModInput.safeParse(data);
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      errors.push(`**${issue.path.join(".")}**: ${issue.message}`);
+    }
+    return { success: false, errors };
+  }
+
+  const id = parsed.data["mod-id"];
+  const modDir = resolve(REPO_ROOT, "mods", id);
+  if (existsSync(modDir)) {
+    errors.push(`**mod-id**: A mod with ID \`${id}\` already exists.`);
+  }
+  errors.push(...checkCrossTypeIdUniqueness({ repoRoot: REPO_ROOT, id, currentType: "mod" }));
+  if (!getOptionalIssueValue(parsed.data.description)) {
+    errors.push("**description**: Description is required.");
+  }
+  try {
+    const collaboratorResult = await resolvePublishCollaborators(parsed.data.collaborators);
+    errors.push(...collaboratorResult.errors.map((message) => `**collaborators**: ${message}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`**collaborators**: ${message}`);
+  }
+
+  if (parsed.data["update-type"] === "GitHub Releases") {
+    if (!parsed.data["github-repo"] || !/^[^/]+\/[^/]+$/.test(parsed.data["github-repo"])) {
+      errors.push("**github-repo**: Must provide a valid `owner/repo` when using GitHub Releases.");
+    } else {
+      const ghErrors = await validateGitHubRepo(parsed.data["github-repo"], parsed.data.source, "mod", id);
+      errors.push(...ghErrors);
+    }
+  } else {
+    if (!parsed.data["custom-update-url"]) {
+      errors.push("**custom-update-url**: Must provide a URL when using Custom URL.");
+    } else {
+      try {
+        new URL(parsed.data["custom-update-url"]);
+      } catch {
+        errors.push("**custom-update-url**: Must be a valid URL.");
+      }
+      if (!errors.some((e) => e.includes("custom-update-url"))) {
+        const urlErrors = await validateCustomUpdateUrl(parsed.data["custom-update-url"], "mod", id);
+        errors.push(...urlErrors);
+      }
+    }
+  }
+
+  return { success: errors.length === 0, errors };
+}
+
+async function validateMap(data: Record<string, string>): Promise<ValidationResult> {
+  const errors: string[] = [];
+
+  const parsed = PublishMapInput.safeParse(data);
+  if (!parsed.success) {
+    for (const issue of parsed.error.issues) {
+      errors.push(`**${issue.path.join(".")}**: ${issue.message}`);
+    }
+    return { success: false, errors };
+  }
+
+  const id = parsed.data["map-id"];
+  const mapDir = resolve(REPO_ROOT, "maps", id);
+  if (existsSync(mapDir)) {
+    errors.push(`**map-id**: A map with ID \`${id}\` already exists.`);
+  }
+  errors.push(...checkCrossTypeIdUniqueness({ repoRoot: REPO_ROOT, id, currentType: "map" }));
+  if (!getOptionalIssueValue(parsed.data.description)) {
+    errors.push("**description**: Description is required.");
+  }
+  try {
+    const collaboratorResult = await resolvePublishCollaborators(parsed.data.collaborators);
+    errors.push(...collaboratorResult.errors.map((message) => `**collaborators**: ${message}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`**collaborators**: ${message}`);
+  }
+
+  if (!COUNTRY_TO_LOCATION[parsed.data.country]) {
+    errors.push(
+      `**country**: \`${parsed.data.country}\` is not a recognized ISO 3166-1 alpha-2 country code. ` +
+      "The map's location/region tag is derived from it automatically.",
+    );
+  }
+
+  if (VANILLA_CITY_CODE_SET.has(parsed.data["city-code"])) {
+    errors.push(`**city-code**: \`${parsed.data["city-code"]}\` clashes with a vanilla city code.`);
+  }
+  errors.push(...checkCityCodeUniqueness({ repoRoot: REPO_ROOT, cityCode: parsed.data["city-code"], currentMapId: null }));
+
+  if (parseGalleryImages(data.gallery).length === 0) {
+    errors.push("**gallery**: At least one gallery image is required.");
+  }
+  const specialDemand = parseCheckedBoxes(data.special_demand);
+  const invalidSpecialDemand = specialDemand.filter((tag) => !SPECIAL_DEMAND_TAG_SET.has(tag));
+  if (invalidSpecialDemand.length > 0) {
+    errors.push(`**special_demand**: Invalid tag(s): ${invalidSpecialDemand.join(", ")}`);
+  }
+
+  if (parsed.data["update-type"] === "GitHub Releases") {
+    if (!parsed.data["github-repo"] || !/^[^/]+\/[^/]+$/.test(parsed.data["github-repo"])) {
+      errors.push("**github-repo**: Must provide a valid `owner/repo` when using GitHub Releases.");
+    } else {
+      const ghErrors = await validateGitHubRepo(parsed.data["github-repo"], parsed.data.source, "map");
+      errors.push(...ghErrors);
+    }
+  } else {
+    if (!parsed.data["custom-update-url"]) {
+      errors.push("**custom-update-url**: Must provide a URL when using Custom URL.");
+    } else {
+      try {
+        new URL(parsed.data["custom-update-url"]);
+      } catch {
+        errors.push("**custom-update-url**: Must be a valid URL.");
+      }
+      if (!errors.some((e) => e.includes("custom-update-url"))) {
+        const urlErrors = await validateCustomUpdateUrl(parsed.data["custom-update-url"]);
+        errors.push(...urlErrors);
+      }
+    }
+  }
+
+  const hasUpdateFieldErrors = errors.some((error) =>
+    error.startsWith("**github-repo**") || error.startsWith("**custom-update-url**")
+  );
+  if (!hasUpdateFieldErrors) {
+    try {
+      const demandStats = await resolveAndExtractDemandStatsForMapSource(
+        id,
+        parsed.data["update-type"] === "GitHub Releases"
+          ? { type: "github", repo: parsed.data["github-repo"] as string }
+          : { type: "custom", url: parsed.data["custom-update-url"] as string },
+        {
+          token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
+          requireResidentTotalsMatch: true,
+        },
+      );
+      writeFileSync(
+        resolve(os.tmpdir(), `railyard-publish-demand-stats-${id}.json`),
+        JSON.stringify({ mapId: id, stats: demandStats }),
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      errors.push(`**demand_data**: ${message}`);
+    }
+  }
+
+  return { success: errors.length === 0, errors };
+}
+
+async function main() {
+  const type = process.env.LISTING_TYPE;
+  const issueJson = process.env.ISSUE_JSON;
+
+  if (!issueJson) {
+    console.error("ISSUE_JSON environment variable is required");
+    process.exit(1);
+  }
+
+  const data = JSON.parse(issueJson);
+  const result = type === "map" ? await validateMap(data) : await validateMod(data);
+
+  if (!result.success) {
+    const errorMessage = [
+      "Validation failed with the following errors:\n",
+      ...result.errors.map((e) => `- ${e}`),
+    ].join("\n");
+
+    writeFileSync(resolve(REPO_ROOT, "scripts", "validation-error.md"), errorMessage);
+    console.error(errorMessage);
+    process.exit(1);
+  }
+
+  console.log("Validation passed.");
+}
+
+main();
+

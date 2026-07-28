@@ -20,7 +20,7 @@ function runScript(
   env: Record<string, string>,
 ): SpawnSyncReturns<string> {
   cleanupValidationErrorFile();
-  const compiledScriptPath = resolve(scriptsRoot, ".test-dist", `${scriptName}.js`);
+  const compiledScriptPath = resolve(scriptsRoot, ".test-dist", "intake", `${scriptName}.js`);
   return spawnSync(
     process.execPath,
     [compiledScriptPath],

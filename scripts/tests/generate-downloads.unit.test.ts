@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import {
   buildZeroValidSemverWarnings,
   listZeroValidSemverListings,
-} from "../generate-downloads.js";
+} from "../downloads/generate-downloads.js";
 import {
   buildPendingAnnouncements,
   getAnnouncementListingIds,

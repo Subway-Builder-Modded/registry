@@ -10,23 +10,7 @@ import {
   SOURCE_QUALITY_SET,
   SPECIAL_DEMAND_TAG_SET,
 } from "./map-constants.js";
-import { isPresentIssueValue } from "./map-field-utils.js";
-
-function parseCheckedBoxes(raw: unknown): string[] {
-  if (Array.isArray(raw)) {
-    return raw.map((tag) => String(tag).trim()).filter(Boolean);
-  }
-  if (typeof raw !== "string" || !raw || raw === "_No response_") return [];
-  return raw
-    .split("\n")
-    .filter((line) => line.startsWith("- [X]") || line.startsWith("- [x]"))
-    .map((line) => line.replace(/^- \[[Xx]\]\s*/, "").trim())
-    .filter(Boolean);
-}
-
-function combineMapTags(location: string, specialDemand: string[]): string[] {
-  return Array.from(new Set([location, ...specialDemand]));
-}
+import { combineMapTags, isPresentIssueValue, parseCheckedBoxes } from "./map-field-utils.js";
 
 function requireManifestString(
   fieldName: string,
