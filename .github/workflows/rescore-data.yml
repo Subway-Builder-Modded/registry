@@ -56,19 +56,27 @@ jobs:
           fetch-depth: 0
           token: ${{ steps.bot-token.outputs.token || github.token }}
 
-      - name: Check out PR branch
+      - name: Locate PR branch
+        # The working tree stays on main so the apply CLI runs with current
+        # scripts/schemas — publish branches can be arbitrarily old (some
+        # predate the data-quality tooling). The PR's maps/<id> directories
+        # are overlaid below; commits go through a worktree pinned to the
+        # PR head.
         id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
-          cross="$(gh pr view "${{ github.event.issue.number }}" --json isCrossRepository -q .isCrossRepository)"
+          info="$(gh pr view "${{ github.event.issue.number }}" --json isCrossRepository,headRefName)"
+          cross="$(echo "$info" | jq -r .isCrossRepository)"
+          head_ref="$(echo "$info" | jq -r .headRefName)"
           echo "cross=${cross}" >> "$GITHUB_OUTPUT"
+          echo "head_ref=${head_ref}" >> "$GITHUB_OUTPUT"
           if [ "$cross" = "true" ]; then
             echo "Fork PR — cannot push; will comment instructions."
             exit 0
           fi
-          gh pr checkout "${{ github.event.issue.number }}"
+          git fetch origin "${head_ref}"
 
       - name: Explain fork limitation
         if: steps.pr.outputs.cross == 'true'
@@ -82,18 +90,23 @@ jobs:
               body: "`rescore_data` cannot push to a fork branch. Run locally instead:\n\n```\npnpm --dir scripts apply-data-quality --reviewer <your-login> <map-id>\n```",
             });
 
-      - name: Resolve target maps
+      - name: Resolve target maps and overlay PR content
         if: steps.pr.outputs.cross != 'true'
         id: targets
+        env:
+          HEAD_REF: ${{ steps.pr.outputs.head_ref }}
         run: |
           set -euo pipefail
           args="$(echo "${{ github.event.comment.body }}" | head -1 | sed 's/^rescore_data//' | xargs || true)"
           if [ -n "$args" ]; then
             ids="$args"
           else
-            ids="$(git diff --name-only origin/main...HEAD -- 'maps/*/data-quality.json' | sed 's|maps/||; s|/data-quality.json||' | tr '\n' ' ' | xargs || true)"
+            ids="$(git diff --name-only "origin/main...origin/${HEAD_REF}" -- 'maps/*/data-quality.json' | sed 's|maps/||; s|/data-quality.json||' | tr '\n' ' ' | xargs || true)"
           fi
           echo "ids=${ids}" >> "$GITHUB_OUTPUT"
+          for id in ${ids}; do
+            git checkout "origin/${HEAD_REF}" -- "maps/${id}"
+          done
 
       - uses: pnpm/action-setup@v4
         if: steps.pr.outputs.cross != 'true' && steps.targets.outputs.ids != ''
@@ -121,16 +134,24 @@ jobs:
 
       - name: Commit and push
         if: steps.pr.outputs.cross != 'true' && steps.targets.outputs.ids != '' && steps.apply.outcome == 'success'
+        env:
+          HEAD_REF: ${{ steps.pr.outputs.head_ref }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git worktree add /tmp/pr-branch "origin/${HEAD_REF}"
+          for id in ${{ steps.targets.outputs.ids }}; do
+            mkdir -p "/tmp/pr-branch/maps/${id}"
+            cp "maps/${id}/data-quality.json" "maps/${id}/manifest.json" "/tmp/pr-branch/maps/${id}/"
+          done
+          cd /tmp/pr-branch
           git add maps/
           if git diff --cached --quiet; then
             echo "No changes to commit (already applied)."
           else
             git commit -m "chore(data-quality): confirm reviewed answers via rescore_data (by ${{ github.event.comment.user.login }})"
-            git push
+            git push origin "HEAD:${HEAD_REF}"
           fi
 
       - name: Mark publish PR ready for review
