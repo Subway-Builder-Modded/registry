@@ -47,6 +47,46 @@ and record the measured gap here.
 
 ---
 
+## 2026-07-08 → 2026-07-09 — Integrity cache wipe + 429 cascade (fully recovered)
+
+**What happened:** a sequence of integrity-pipeline bugs wiped download
+counts and integrity data for 20+ map listings across analytics runs
+#4418–#4449 (~3,000 downloads temporarily zeroed). Three stacked root
+causes:
+
+1. **`INTEGRITY_RULES_VERSION` bump (v6 → v7)** invalidated every existing
+   cache entry; the next analytics run re-inspected all versions under the
+   new phantom-points check and retroactively failed grandfathered versions
+   (`is_complete: false` → undownloadable). Reverted to `v6`; integrity
+   files restored from `ae1322f5d`. **Standing rule: never bump
+   `INTEGRITY_RULES_VERSION`** — new versions always get fresh inspection
+   with all current checks anyway (new fingerprints), while existing cache
+   entries must stay valid.
+2. **429 cascade:** `fetchCustomVersions` hit `raw.githubusercontent.com`
+   unauthenticated with no pacing; burst requests triggered secondary rate
+   limits, and transiently-errored listings had empty integrity entries
+   written over their previous state. Fixed in `dcb0b9cbe`
+   (transient-error listings preserve previous integrity/cache/stats) and
+   `a74d7ea7c` (200ms inter-fetch pacing).
+3. **Phantom-points check on cache-empty listings:** with the cache wiped
+   by (2), re-inspections fired the new `demand_phantom_points` /
+   `demand_residents_match` checks against pre-existing versions, silently
+   dropping their counts to 0 on every run until the cache was repopulated.
+
+**Recovery:** integrity + cache + download counts restored from last
+known-good commits in `a88f8e81b`, `1746fb8a8`, and `17fb22550`/`f501f7518`
+(2026-07-09). **No lasting data loss** — counts and integrity state were
+fully recovered from git history.
+
+**Detection/recovery playbook:** listings dropping non-zero → 0 in
+`downloads.json`, or appearing in `incomplete_versions` with
+`demand_phantom_points: false` after previously being complete. Restore
+integrity entries **and cache entries and download counts together in one
+commit** from the last known-good analytics commit — without the cache
+restore, the next run re-inspects and the cycle repeats.
+
+---
+
 ## 2026-04-07 → 2026-04-10 — App-side download inflation + integrity invalidation (corrected)
 
 Two related problems, corrected as of 2026-04-11.
