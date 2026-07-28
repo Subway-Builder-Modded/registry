@@ -7,9 +7,11 @@ name: Rescore Data
 # map's manifest, and pushes the result to the PR branch. Optional arguments
 # select specific maps: `rescore_data map-id-a map-id-b`.
 #
-# The commit is pushed with GITHUB_TOKEN, which does NOT retrigger the PR's CI
-# — the CLI runs the same consistency verification itself and the result is
-# posted in the confirmation comment.
+# When the registry bot app is configured (REGISTRY_BOT_APP_ID variable +
+# REGISTRY_BOT_PRIVATE_KEY secret), the confirmation commit is pushed with its
+# token so the PR's CI re-runs on it. Without it the push uses GITHUB_TOKEN,
+# which does NOT retrigger CI — the CLI runs the same consistency verification
+# itself either way and the result is posted in the confirmation comment.
 
 on:
   issue_comment:
@@ -41,9 +43,18 @@ jobs:
               content: "eyes",
             });
 
+      - name: Mint bot token
+        id: bot-token
+        if: vars.REGISTRY_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ steps.bot-token.outputs.token || github.token }}
 
       - name: Check out PR branch
         id: pr
@@ -162,8 +173,11 @@ jobs:
                 ? fs.readFileSync("apply-output.txt", "utf8").trim()
                 : "(no output)";
               const ok = "${{ steps.apply.outcome }}" === "success";
+              const ciNote = "${{ steps.bot-token.outcome }}" === "success"
+                ? "CI re-runs on the pushed commit"
+                : "CI does not retrigger on this push";
               body = ok
-                ? `✅ \`rescore_data\` applied and self-verified (CI does not retrigger on this push):\n\n\`\`\`\n${output}\n\`\`\``
+                ? `✅ \`rescore_data\` applied and self-verified (${ciNote}):\n\n\`\`\`\n${output}\n\`\`\``
                 : `❌ \`rescore_data\` failed — nothing was pushed:\n\n\`\`\`\n${output}\n\`\`\``;
               if ("${{ steps.undraft.outputs.undrafted }}" === "true") {
                 body += "\n\nData quality confirmed — this publish PR is now marked **ready for review** and can merge.";
