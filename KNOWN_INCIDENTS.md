@@ -6,6 +6,53 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 ---
 
+## 2026-04 → 2026-07 — charleston-huntington-wv faulty-client inflation (corrected 2026-07-29)
+
+**What happened:** an automated client repeatedly re-downloaded the map's
+**re-uploaded** `CHA.zip` asset (the re-upload gave the asset a new node id
+and reset GitHub's counter; the original asset's count was frozen at 5 on
+2026-04-11 as part of the April grandfathering). The listing climbed 5 → 800
+at a metronomic **~8–10 downloads/day from mid-April through June**, with
+increments spread around the clock — including ~03:00 US Eastern for a small
+West Virginia–audience map — then cliffed to ~2/day in early July with no
+release event. Registry-wide screens (metronomic-growth and July-cliff
+signatures across all maps and mods) found no other listing with this
+pattern; every other candidate resolved to organic popularity or version
+supersession.
+
+**Correction:** peer-scaled organic estimate of **65** (versus small-metro
+peers at 18–206 lifetime); **735 downloads attributed to the faulty client**.
+Applied across every path that could resurrect the inflated value:
+
+- `+735` manual attribution on the asset's base key (prefix matching covers
+  all node-id re-uploads) via `create-manual-download-attribution --apply`;
+  the spec is committed at
+  `history/manual-attribution-specs/2026_07_28_charleston_huntington_faulty_client.json`
+  and re-application is idempotent (`applied_delta_ids`).
+- Version-bucket max/last lowered to 65 (both download writers are
+  monotonic and would otherwise hold 800 forever).
+- `maps/downloads.json` set to 65.
+- 106 `history/snapshot_*.json` files re-interpolated (linear 5 → 65 over
+  the bot window, never exceeding the recorded value) via
+  `scripts/ops/backfill-charleston-snapshot-clamp.ts`, so bucket rebuilds
+  from history no longer seed an inflated `history-max:` floor.
+
+**Re-application rules** (see `scripts/ops/README.md`): after any
+attribution-ledger rebuild, re-apply the committed manual-attribution specs;
+after any snapshot rebuild from git, re-run the charleston clamp script.
+
+**Residual effect:** the listing's historical trajectory Apr–Jul is a
+corrected estimate. Going forward the count grows organically once the
+asset's raw counter exceeds 800 (`adjusted = raw − 735`).
+
+**Detection notes:** the tell was the combination of (1) rate wildly
+disproportionate to the map's audience, (2) metronomic day-over-day
+constancy, (3) increments in dead local-time hours, (4) an abrupt rate
+cliff untied to any release, and (5) an asset re-upload restarting the
+counter right as the pattern began.
+
+---
+
 ## 2026-07-28 — GitHub release download-counter stall (no correction applied)
 
 **Window:** ~08:00–19:20 UTC (≈11.5 hours).
