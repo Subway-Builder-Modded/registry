@@ -4,6 +4,11 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import JSZip from "jszip";
 import { getFlagValue } from "../lib/cli.js";
+import {
+  fetchGitHubArrayBuffer,
+  fetchGitHubJson,
+  type GitHubFetchOptions,
+} from "../lib/git-history.js";
 import { parseAttributionBackfillLogHits } from "../lib/download-attribution-backfill-core.js";
 import type { DownloadAttributionLedger } from "../lib/download-attribution.js";
 import type { IntegrityOutput } from "../lib/integrity.js";
@@ -93,32 +98,17 @@ function parseArgs(argv: string[]): CliArgs {
   };
 }
 
+const GITHUB_FETCH_OPTIONS: GitHubFetchOptions = {
+  userAgent: "railyard-attribution-spotcheck",
+  formatHttpError: (status, url) => `GitHub API ${status} for ${url}`,
+};
+
 async function fetchJson<T>(url: string, token: string): Promise<T> {
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "User-Agent": "railyard-attribution-spotcheck",
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`GitHub API ${response.status} for ${url}`);
-  }
-  return await response.json() as T;
+  return fetchGitHubJson<T>(url, token, GITHUB_FETCH_OPTIONS);
 }
 
 async function fetchArrayBuffer(url: string, token: string): Promise<ArrayBuffer> {
-  const response = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-      Accept: "application/vnd.github+json",
-      "User-Agent": "railyard-attribution-spotcheck",
-    },
-  });
-  if (!response.ok) {
-    throw new Error(`GitHub API ${response.status} for ${url}`);
-  }
-  return await response.arrayBuffer();
+  return fetchGitHubArrayBuffer(url, token, GITHUB_FETCH_OPTIONS);
 }
 
 function normalizeAssetBaseKey(assetKey: string): string {

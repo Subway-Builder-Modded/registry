@@ -1,7 +1,6 @@
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
-import { execFileSync } from "node:child_process";
 import JSZip from "jszip";
 import {
   createDownloadAttributionDelta,
@@ -13,6 +12,14 @@ import {
   writeDownloadAttributionLedger,
   type DownloadAttributionDelta,
 } from "./download-attribution.js";
+import {
+  fetchGitHubArrayBuffer,
+  fetchGitHubJson,
+  readJsonFromCommit,
+  resolveSourceCommitAtTime,
+  runGitCommand,
+  type GitHubFetchOptions,
+} from "./git-history.js";
 import type { MapManifest } from "./manifests.js";
 import { resolveZipUrlForMapSource } from "./map-demand-stats/source-resolution.js";
 import { parseGitHubReleaseAssetDownloadUrl } from "./release-resolution.js";
@@ -182,46 +189,17 @@ function parseArgs(argv: string[]): CliArgs {
   };
 }
 
+const GITHUB_FETCH_OPTIONS: GitHubFetchOptions = {
+  userAgent: "registry-download-attribution-backfill",
+  timeoutMs: FETCH_TIMEOUT_MS,
+};
+
 async function fetchJson<T>(url: string, token: string): Promise<T> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  try {
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${token}`,
-        "User-Agent": "registry-download-attribution-backfill",
-      },
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    return await response.json() as T;
-  } finally {
-    clearTimeout(timeout);
-  }
+  return fetchGitHubJson<T>(url, token, GITHUB_FETCH_OPTIONS);
 }
 
 async function fetchArrayBuffer(url: string, token: string): Promise<ArrayBuffer> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
-  try {
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/vnd.github+json",
-        Authorization: `Bearer ${token}`,
-        "User-Agent": "registry-download-attribution-backfill",
-      },
-      signal: controller.signal,
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-    return response.arrayBuffer();
-  } finally {
-    clearTimeout(timeout);
-  }
+  return fetchGitHubArrayBuffer(url, token, GITHUB_FETCH_OPTIONS);
 }
 
 function buildLineToAssetKeyIndex(repoRoot: string): Map<string, string> {
@@ -387,19 +365,6 @@ function workflowSourceLabel(workflowFile: string): string {
   return `backfill:${workflowFile.replace(/\.yml$/i, "")}`;
 }
 
-function runGitCommand(repoRoot: string, args: string[]): string | null {
-  try {
-    const output = execFileSync("git", args, {
-      cwd: repoRoot,
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "ignore"],
-    }).trim();
-    return output === "" ? null : output;
-  } catch {
-    return null;
-  }
-}
-
 function listCommitShasForPathSince(
   repoRoot: string,
   relativePath: string,
@@ -415,20 +380,6 @@ function listCommitShasForPathSince(
     .split(/\r?\n/)
     .map((line) => line.trim())
     .filter((line) => line !== "");
-}
-
-function readJsonFromCommit(
-  repoRoot: string,
-  commitSha: string,
-  relativePath: string,
-): unknown | null {
-  const raw = runGitCommand(repoRoot, ["show", `${commitSha}:${relativePath}`]);
-  if (!raw) return null;
-  try {
-    return JSON.parse(raw) as unknown;
-  } catch {
-    return null;
-  }
 }
 
 function collectDeltasFromGitHistory(
@@ -475,13 +426,6 @@ function collectDeltasFromGitHistory(
   }
 
   return { deltas, stats, runIdsWithDelta };
-}
-
-function resolveSourceCommitAtTime(repoRoot: string, timestampIso: string): string | null {
-  return runGitCommand(
-    repoRoot,
-    ["rev-list", "-1", "--first-parent", `--before=${timestampIso}`, "HEAD"],
-  );
 }
 
 function readTextAtSource(
