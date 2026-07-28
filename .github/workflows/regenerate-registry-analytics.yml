@@ -119,8 +119,7 @@ jobs:
       # repo-wide 1k/hr GITHUB_TOKEN pool shared by every workflow run.
       - name: Mint bot token
         id: bot-token
-        if: ${{ vars.REGISTRY_BOT_APP_ID != '' }}
-        uses: actions/create-github-app-token@v2
+        uses: ./.github/actions/mint-bot-token
         with:
           app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
           private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
@@ -189,8 +188,7 @@ jobs:
 
       - name: Mint bot token
         id: bot-token
-        if: ${{ vars.REGISTRY_BOT_APP_ID != '' }}
-        uses: actions/create-github-app-token@v2
+        uses: ./.github/actions/mint-bot-token
         with:
           app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
           private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
@@ -255,8 +253,7 @@ jobs:
 
       - name: Mint bot token
         id: bot-token
-        if: ${{ vars.REGISTRY_BOT_APP_ID != '' }}
-        uses: actions/create-github-app-token@v2
+        uses: ./.github/actions/mint-bot-token
         with:
           app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
           private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
@@ -481,8 +478,7 @@ jobs:
 
       - name: Mint bot token
         id: bot-token
-        if: ${{ vars.REGISTRY_BOT_APP_ID != '' }}
-        uses: actions/create-github-app-token@v2
+        uses: ./.github/actions/mint-bot-token
         with:
           app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
           private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
