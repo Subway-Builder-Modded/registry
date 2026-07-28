@@ -1,5 +1,11 @@
 name: Auto-Approve GitHub Actions PRs
 
+# DEPRECATION PATH: with the registry bot app configured as a Main-ruleset
+# bypass actor, bot-pr-automation merges bot PRs directly and never sends the
+# auto-approve dispatch — this workflow (and BOT_APPROVAL_PAT) then only serve
+# as the fallback when the app is unavailable. Delete both once the bypass
+# path has been observed working for a while.
+
 on:
   repository_dispatch:
     types: [auto-approve-actions-bot-pr]

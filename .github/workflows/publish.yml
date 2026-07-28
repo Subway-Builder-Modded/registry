@@ -108,6 +108,8 @@ jobs:
         run: pnpm --dir scripts run create-listing
 
       - name: Commit and push changes
+        env:
+          GH_TOKEN: ${{ steps.bot-token.outputs.token || github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -311,6 +313,8 @@ jobs:
         run: pnpm --dir scripts run generate-search-aliases -- --map-id "${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
 
       - name: Commit and push changes
+        env:
+          GH_TOKEN: ${{ steps.bot-token.outputs.token || github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
