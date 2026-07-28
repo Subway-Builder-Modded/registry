@@ -122,6 +122,31 @@ jobs:
             git push
           fi
 
+      - name: Mark publish PR ready for review
+        # Publish PRs are created as drafts until data quality is confirmed
+        # (plan C1); a successful rescore_data is that confirmation.
+        if: steps.pr.outputs.cross != 'true' && steps.targets.outputs.ids != '' && steps.apply.outcome == 'success'
+        id: undraft
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            if (!pr.draft || !pr.head.ref.startsWith('publish/map/')) return;
+            await github.graphql(
+              `mutation($id: ID!) {
+                markPullRequestReadyForReview(input: { pullRequestId: $id }) {
+                  pullRequest { number }
+                }
+              }`,
+              { id: pr.node_id },
+            );
+            core.setOutput('undrafted', 'true');
+            console.log(`PR #${pr.number} marked ready for review.`);
+
       - name: Report result
         if: steps.pr.outputs.cross != 'true'
         uses: actions/github-script@v7
@@ -140,6 +165,9 @@ jobs:
               body = ok
                 ? `✅ \`rescore_data\` applied and self-verified (CI does not retrigger on this push):\n\n\`\`\`\n${output}\n\`\`\``
                 : `❌ \`rescore_data\` failed — nothing was pushed:\n\n\`\`\`\n${output}\n\`\`\``;
+              if ("${{ steps.undraft.outputs.undrafted }}" === "true") {
+                body += "\n\nData quality confirmed — this publish PR is now marked **ready for review** and can merge.";
+              }
             }
             await github.rest.issues.createComment({
               owner: context.repo.owner,

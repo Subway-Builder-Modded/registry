@@ -13,6 +13,9 @@ name: Check Data Quality
 
 on:
   pull_request:
+    # labeled/unlabeled: applying or removing dq-grandfathered must re-run the
+    # publish gate below.
+    types: [opened, synchronize, reopened, labeled, unlabeled]
     paths:
       - "maps/**"
       - "schemas/**"
@@ -34,6 +37,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find manifests added in this PR
+        # Publish gate (plan C1.3): maps newly added relative to the base must
+        # carry a confirmed (non-unknown) data_quality tier before merge. The
+        # dq-grandfathered label exempts the whole PR.
+        id: added
+        if: >-
+          github.event_name == 'pull_request' &&
+          !contains(github.event.pull_request.labels.*.name, 'dq-grandfathered')
+        run: |
+          set -euo pipefail
+          base="${{ github.event.pull_request.base.sha }}"
+          head="${{ github.event.pull_request.head.sha }}"
+          if ! git rev-parse --verify "${base}^{commit}" >/dev/null 2>&1; then
+            base="$(git rev-parse "${head}~1" 2>/dev/null || git rev-parse "${head}")"
+          fi
+          ids="$(git diff --name-only --diff-filter=A "$base" "$head" -- 'maps/*/manifest.json' \
+            | sed 's|maps/||; s|/manifest.json||' | tr '\n' ' ' | xargs || true)"
+          echo "ids=${ids}" >> "$GITHUB_OUTPUT"
 
       - uses: pnpm/action-setup@v4
         with:
@@ -49,7 +73,9 @@ jobs:
       - name: Check data-quality consistency
         # --require-presence: post-backfill, every map manifest must carry a
         # data_quality block (plan D5).
-        run: pnpm --dir scripts check-data-quality --require-presence
+        run: >-
+          pnpm --dir scripts check-data-quality --require-presence
+          ${{ steps.added.outputs.ids != '' && format('--require-scored {0}', steps.added.outputs.ids) || '' }}
 
   report:
     if: github.event_name == 'pull_request'

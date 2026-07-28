@@ -1,7 +1,12 @@
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { readJsonFile } from "./lib/json-utils.js";
-import { applyDataQualityAnswers } from "./lib/data-quality-apply.js";
+import {
+  applyDataQualityAnswers,
+  buildCountryFloorContext,
+  type CountryFloorPeer,
+  type ScoredDataQualityBlock,
+} from "./lib/data-quality-apply.js";
 import { checkMapDataQuality } from "./lib/data-quality-check.js";
 
 const REPO_ROOT = resolve(import.meta.dirname, "..");
@@ -28,6 +33,40 @@ function parseArgs(argv: string[]): CliArgs {
     }
   }
   return { ids, reviewer, date };
+}
+
+/** Same-country maps with a scored (non-unknown) manifest block, self excluded. */
+function collectCountryPeers(id: string, country: string): CountryFloorPeer[] {
+  if (!country) return [];
+  const peers: CountryFloorPeer[] = [];
+  for (const entry of readdirSync(MAPS_DIR, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name === id) continue;
+    const manifestPath = resolve(MAPS_DIR, entry.name, "manifest.json");
+    if (!existsSync(manifestPath)) continue;
+    try {
+      const manifest = readJsonFile<Record<string, unknown>>(manifestPath);
+      if (manifest.country !== country) continue;
+      const block = manifest.data_quality as
+        | Partial<ScoredDataQualityBlock>
+        | undefined;
+      if (
+        !block ||
+        block.tier === undefined ||
+        block.tier === ("unknown" as string) ||
+        typeof block.weighted_score !== "number"
+      ) {
+        continue;
+      }
+      peers.push({
+        id: entry.name,
+        tier: block.tier,
+        weightedScore: block.weighted_score,
+      });
+    } catch {
+      // Unreadable manifests never block a confirmation; skip.
+    }
+  }
+  return peers;
 }
 
 function main(): void {
@@ -82,6 +121,12 @@ function main(): void {
       console.log(
         `${id}: ${block.tier} (raw ${block.raw_score}, weighted ${block.weighted_score})${flipped}`,
       );
+      const country = String(manifest.country ?? "");
+      const context = buildCountryFloorContext(
+        { id, country, tier: block.tier },
+        collectCountryPeers(id, country),
+      );
+      for (const line of context.lines) console.log(line);
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       failures.push(message);

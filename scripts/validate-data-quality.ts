@@ -50,9 +50,14 @@ function main(): void {
   const { input, errors } = parseDataQualityIssue(data);
   if (!input) fail(errors);
 
+  // The workflow checks out the open publish/map/<id> branch first when the
+  // map is not yet on main, so an unmerged submission's manifest is present
+  // here too. Reaching this failure means neither exists.
   const manifestPath = resolve(MAPS_DIR, input.mapId, "manifest.json");
   if (!existsSync(manifestPath)) {
-    fail([`**map-id**: No map \`${input.mapId}\` exists in the registry.`]);
+    fail([
+      `**map-id**: No map \`${input.mapId}\` exists in the registry or in a pending publish submission. Submit the map first (**Publish New Map**) — the data-quality invite follows automatically.`,
+    ]);
   }
   const manifest = readJsonFile<Record<string, unknown>>(manifestPath);
   if (manifest.author !== issueAuthorLogin) {
