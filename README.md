@@ -180,7 +180,6 @@ The hourly workflow writes:
 
 - `history/railyard_app_downloads.json`
 - `analytics/railyard_app_downloads.json`
-- `analytics/railyard_app_downloads.csv`
 
 ## Website Analytics
 
@@ -213,13 +212,6 @@ Raw history and derived outputs:
   - `history/website_analytics.json`
 - Derived analytics exports:
   - `analytics/website_analytics.json`
-  - `analytics/website_analytics_by_day.csv`
-  - `analytics/website_analytics_by_hour.csv`
-  - `analytics/website_pages.csv`
-  - `analytics/website_countries.csv`
-  - `analytics/website_browsers.csv`
-  - `analytics/website_operating_systems.csv`
-  - `analytics/website_devices.csv`
 
 Automation:
 

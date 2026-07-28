@@ -11,7 +11,6 @@ import {
   type WebsiteAnalyticsSnapshot,
   type WebsiteAnalyticsMetricMap,
 } from "./lib/website-analytics.js";
-import { writeCsv } from "./lib/csv.js";
 import { resolveRepoRoot } from "./lib/script-runtime.js";
 import { sortObjectByKeys } from "./lib/json-utils.js";
 
@@ -72,23 +71,6 @@ function aggregateHourlyToDaily(hourlySnapshots: WebsiteAnalyticsSnapshot[]): Ag
   };
 }
 
-interface ByCsvRow {
-  date_or_hour: string;
-  metric: string;
-  visits: number;
-}
-
-interface ByCsvSummaryRow {
-  date_or_hour: string;
-  visits: number;
-}
-
-interface ByDayDetailedCsvRow {
-  date_or_hour: string;
-  dimension: string;
-  metric: string;
-  visits: number;
-}
 
 interface WebsiteAnalyticsExport {
   schema_version: 1;
@@ -184,184 +166,8 @@ function run(): void {
     "utf-8",
   );
 
-  // Generate CSV exports for each dimension
-  // By day CSV
-  const byDayRows: ByDayDetailedCsvRow[] = [];
-  for (const dateKey of dailyKeys) {
-    const snapshot = updatedHistory.daily_snapshots[dateKey];
-    if (!snapshot) continue;
-
-    byDayRows.push({
-      date_or_hour: dateKey,
-      dimension: "totals",
-      metric: "visits",
-      visits: snapshot.totals.visits,
-    });
-
-    for (const [page, visits] of Object.entries(snapshot.pages)) {
-      byDayRows.push({
-        date_or_hour: dateKey,
-        dimension: "pages",
-        metric: page,
-        visits,
-      });
-    }
-
-    for (const [country, visits] of Object.entries(snapshot.countries)) {
-      byDayRows.push({
-        date_or_hour: dateKey,
-        dimension: "countries",
-        metric: country,
-        visits,
-      });
-    }
-
-    for (const [browser, visits] of Object.entries(snapshot.browsers)) {
-      byDayRows.push({
-        date_or_hour: dateKey,
-        dimension: "browsers",
-        metric: browser,
-        visits,
-      });
-    }
-
-    for (const [os, visits] of Object.entries(snapshot.operating_systems)) {
-      byDayRows.push({
-        date_or_hour: dateKey,
-        dimension: "operating_systems",
-        metric: os,
-        visits,
-      });
-    }
-
-    for (const [device, visits] of Object.entries(snapshot.devices)) {
-      byDayRows.push({
-        date_or_hour: dateKey,
-        dimension: "devices",
-        metric: device,
-        visits,
-      });
-    }
-  }
-  writeCsv(
-    join(analyticsDir, "website_analytics_by_day.csv"),
-    ["date_or_hour", "dimension", "metric", "visits"],
-    byDayRows,
-  );
-
-  // By hour CSV (if we have hourly data)
-  const byHourRows: ByCsvSummaryRow[] = [];
-  for (const hourlyKey of hourlyKeys) {
-    const snapshot = history.hourly_snapshots[hourlyKey];
-    if (!snapshot) continue;
-    byHourRows.push({
-      date_or_hour: hourlyKey,
-      visits: snapshot.totals.visits,
-    });
-  }
-  writeCsv(
-    join(analyticsDir, "website_analytics_by_hour.csv"),
-    ["date_or_hour", "visits"],
-    byHourRows,
-  );
-
-  // Pages CSV
-  const pagesRows: ByCsvRow[] = [];
-  for (const dateKey of dailyKeys) {
-    const snapshot = updatedHistory.daily_snapshots[dateKey];
-    if (!snapshot) continue;
-    for (const [page, visits] of Object.entries(snapshot.pages)) {
-      pagesRows.push({
-        date_or_hour: dateKey,
-        metric: page,
-        visits,
-      });
-    }
-  }
-  writeCsv(
-    join(analyticsDir, "website_pages.csv"),
-    ["date_or_hour", "metric", "visits"],
-    pagesRows,
-  );
-
-  // Countries CSV
-  const countriesRows: ByCsvRow[] = [];
-  for (const dateKey of dailyKeys) {
-    const snapshot = updatedHistory.daily_snapshots[dateKey];
-    if (!snapshot) continue;
-    for (const [country, visits] of Object.entries(snapshot.countries)) {
-      countriesRows.push({
-        date_or_hour: dateKey,
-        metric: country,
-        visits,
-      });
-    }
-  }
-  writeCsv(
-    join(analyticsDir, "website_countries.csv"),
-    ["date_or_hour", "metric", "visits"],
-    countriesRows,
-  );
-
-  // Browsers CSV
-  const browsersRows: ByCsvRow[] = [];
-  for (const dateKey of dailyKeys) {
-    const snapshot = updatedHistory.daily_snapshots[dateKey];
-    if (!snapshot) continue;
-    for (const [browser, visits] of Object.entries(snapshot.browsers)) {
-      browsersRows.push({
-        date_or_hour: dateKey,
-        metric: browser,
-        visits,
-      });
-    }
-  }
-  writeCsv(
-    join(analyticsDir, "website_browsers.csv"),
-    ["date_or_hour", "metric", "visits"],
-    browsersRows,
-  );
-
-  // Operating Systems CSV
-  const osRows: ByCsvRow[] = [];
-  for (const dateKey of dailyKeys) {
-    const snapshot = updatedHistory.daily_snapshots[dateKey];
-    if (!snapshot) continue;
-    for (const [os, visits] of Object.entries(snapshot.operating_systems)) {
-      osRows.push({
-        date_or_hour: dateKey,
-        metric: os,
-        visits,
-      });
-    }
-  }
-  writeCsv(
-    join(analyticsDir, "website_operating_systems.csv"),
-    ["date_or_hour", "metric", "visits"],
-    osRows,
-  );
-
-  // Devices CSV
-  const devicesRows: ByCsvRow[] = [];
-  for (const dateKey of dailyKeys) {
-    const snapshot = updatedHistory.daily_snapshots[dateKey];
-    if (!snapshot) continue;
-    for (const [device, visits] of Object.entries(snapshot.devices)) {
-      devicesRows.push({
-        date_or_hour: dateKey,
-        metric: device,
-        visits,
-      });
-    }
-  }
-  writeCsv(
-    join(analyticsDir, "website_devices.csv"),
-    ["date_or_hour", "metric", "visits"],
-    devicesRows,
-  );
-
   console.log(
-    `Generated website analytics: ${dailyKeys.length} days, ${byHourRows.length} hours, ${pagesRows.length} page records`,
+    `Generated website analytics: ${dailyKeys.length} days, ${hourlyKeys.length} hours`,
   );
 }
 
