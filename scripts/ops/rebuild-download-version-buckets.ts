@@ -1,6 +1,6 @@
 import { pathToFileURL } from "node:url";
-import { rebuildDownloadVersionBucketsFromHistory } from "./lib/download-version-buckets-history.js";
-import { resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
+import { rebuildDownloadVersionBucketsFromHistory } from "../lib/download-version-buckets-history.js";
+import { resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
 async function run(): Promise<void> {
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);

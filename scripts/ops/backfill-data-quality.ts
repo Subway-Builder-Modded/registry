@@ -1,7 +1,7 @@
 import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { RUBRIC_VERSION } from "@subway-builder-modded/registry-schemas";
-import { readJsonFile } from "./lib/json-utils.js";
+import { readJsonFile } from "../lib/json-utils.js";
 import {
   OSM_PATCHER_ANSWERS,
   OSM_PATCHER_MAPS,
@@ -10,11 +10,11 @@ import {
   osmPatcherNotes,
   recomputeEncoding,
   type PipelineEncoding,
-} from "./lib/data-quality-backfill.js";
-import { checkMapDataQuality } from "./lib/data-quality-check.js";
-import { computeScores, roundScore } from "./lib/data-quality.js";
+} from "../lib/data-quality-backfill.js";
+import { checkMapDataQuality } from "../lib/data-quality-check.js";
+import { computeScores, roundScore } from "../lib/data-quality.js";
 
-const REPO_ROOT = resolve(import.meta.dirname, "..");
+const REPO_ROOT = resolve(import.meta.dirname, "..", "..");
 const MAPS_DIR = resolve(REPO_ROOT, "maps");
 
 interface MapEntry {

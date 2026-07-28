@@ -2,7 +2,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import sharp from "sharp";
 
-// Matches scripts/convert-galleries-to-webp.ts; visually lossless for screenshots.
+// Visually lossless for screenshots (same setting the one-time gallery
+// conversion used when existing listings were migrated to webp).
 const GALLERY_WEBP_QUALITY = 82;
 
 /**

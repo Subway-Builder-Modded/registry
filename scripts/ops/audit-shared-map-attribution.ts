@@ -57,7 +57,7 @@ interface CliOptions {
   repo?: string;
 }
 
-const FALLBACK_REPO_ROOT = resolve(import.meta.dirname, "..");
+const FALLBACK_REPO_ROOT = resolve(import.meta.dirname, "..", "..");
 const DEFAULT_AUDIT_DIR = "shared-map-attribution-audit";
 
 function parseCliOptions(argv: string[]): CliOptions {
