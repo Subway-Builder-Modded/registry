@@ -3,10 +3,10 @@ import { execFileSync } from "node:child_process";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import JSZip from "jszip";
-import { parseAttributionBackfillLogHits } from "./lib/download-attribution-backfill-core.js";
-import type { DownloadAttributionLedger } from "./lib/download-attribution.js";
-import type { IntegrityOutput } from "./lib/integrity.js";
-import { resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
+import { parseAttributionBackfillLogHits } from "../lib/download-attribution-backfill-core.js";
+import type { DownloadAttributionLedger } from "../lib/download-attribution.js";
+import type { IntegrityOutput } from "../lib/integrity.js";
+import { resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
 const TARGET_WORKFLOW_FILES = [
   "regenerate-registry-analytics.yml",

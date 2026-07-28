@@ -149,7 +149,7 @@ Backfill normalization uses a fixed historical attribution cutoff of `04:00:00 U
 Shared-pack attribution audit:
 
 - Export an attribution audit bundle under `tmp/shared-map-attribution-audit/`:
-  - `bash scripts/export-shared-map-attribution-audit.sh 2026_03_30`
+  - `bash scripts/ops/export-shared-map-attribution-audit.sh 2026_03_30`
 - Audit JP shared-pack listings by prefix:
   - `pnpm --dir scripts run audit-shared-map-attribution -- --snapshot-date 2026_03_30 --listing-prefix yukina-`
 - Audit a shared pack by exact source repo:

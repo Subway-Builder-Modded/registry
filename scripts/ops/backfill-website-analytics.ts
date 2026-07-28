@@ -12,14 +12,14 @@ import {
   sortMetricMap,
   type WebsiteAnalyticsSnapshot,
   type WebsiteAnalyticsMetricMap,
-} from "./lib/website-analytics.js";
+} from "../lib/website-analytics.js";
 import {
   fetchCloudflareWindowMetrics,
   resolveZoneTag,
   resolveApiToken,
   type CloudflareWebsiteAnalyticsQueryParams,
-} from "./lib/cloudflare-website-analytics.js";
-import { loadLocalDotEnv, resolveRepoRoot, runAndExitOnError } from "./lib/script-runtime.js";
+} from "../lib/cloudflare-website-analytics.js";
+import { loadLocalDotEnv, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
 interface CliArgs {
   repoRoot: string;
