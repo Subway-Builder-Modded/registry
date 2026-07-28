@@ -12,7 +12,6 @@ import {
 } from "@subway-builder-modded/registry-schemas";
 import {
   DEFAULT_MAP_DATA_SOURCE,
-  LEVEL_OF_DETAIL_VALUES,
   SPECIAL_DEMAND_TAGS,
 } from "./lib/map-constants.js";
 
@@ -257,7 +256,7 @@ function withTemplatePolicy(baseDoc: TemplateDoc, mode: TemplateMode): TemplateD
       field.attributes.value.startsWith("## Data Attestation")
     ) {
       field.attributes.value =
-        "## Data Attestation\n\nProvide details about your map's data source and level of detail. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/registry/docs/data-quality) guide for more information.\n\nUpdating metadata does not change your map's data-quality tier. If the underlying data changed, submit new answers via the [data-quality questions](https://subwaybuildermodded.com/registry/docs/data-quality/questions) form.";
+        "## Data Attestation\n\nProvide details about your map's data source. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/registry/docs/data-quality) guide for more information.\n\nUpdating metadata does not change your map's data-quality tier. If the underlying data changed, submit new answers via the [data-quality questions](https://subwaybuildermodded.com/registry/docs/data-quality/questions) form.";
     }
   }
 
@@ -303,20 +302,13 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
   spacer(),
   // ===== Data Validation ===== //
   markdown(
-    "## Data Attestation\n\nProvide details about your map's data source and level of detail. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/registry/docs/data-quality) guide for more information.\n\nAfter your submission is validated, you will be invited to answer the [data-quality questions](https://subwaybuildermodded.com/registry/docs/data-quality/questions) — a **required step**: your map cannot merge until a maintainer confirms your answers, and new submissions are subject to the [quality floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for countries with existing maps.",
+    "## Data Attestation\n\nProvide details about your map's data source. Be honest and transparent in your descriptions and please include the methodology you used to generate the map's data. See the [Data Quality](https://subwaybuildermodded.com/registry/docs/data-quality) guide for more information.\n\nAfter your submission is validated, you will be invited to answer the [data-quality questions](https://subwaybuildermodded.com/registry/docs/data-quality/questions) — a **required step**: your map cannot merge until a maintainer confirms your answers, and new submissions are subject to the [quality floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for countries with existing maps.",
   ),
   input(
     "data_source",
     "Data Source",
     "Enter the data source used to generate the demand data for your map. The source name should use common abbreviations like LODES/INSEE/ONS etc.",
     { placeholder: "LODES, etc.", value: DEFAULT_MAP_DATA_SOURCE, required: false },
-  ),
-  dropdown(
-    "level_of_detail",
-    "Level of Detail",
-    "Approximate level of detail of your map. Demand resolution at the level of census blocks is considered high-detail, while neighborhood/city resolutions are considered low-detail.",
-    LEVEL_OF_DETAIL_VALUES,
-    true,
   ),
   input(
     "methodology",
