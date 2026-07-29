@@ -68,5 +68,5 @@ function run(): void {
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
-  runAndExitOnError(() => run());
+  runAndExitOnError(async () => run());
 }
