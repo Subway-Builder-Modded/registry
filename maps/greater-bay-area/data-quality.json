@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "greater-bay-area",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "adm3",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Version 3 replaces the earlier synthetic 55% worker share with government controls. For the nine Guangdong municipalities, 2023 workplace totals are the secondary- and tertiary-industry legal-entity employee rows in table 7-2 of the Guangdong Fifth Economic Census bulletin. Hong Kong uses the Planning Department's 2021-based TPEDM place-of-job data for all 18 District Council districts; each official district polygon is a binding job total. Macao uses the Statistics and Census Service's 2023 employed-population control because an equivalent workplace matrix was not used.\n\nWithin each available official control area, regular jobs are distributed over OpenStreetMap buildings using workplace categories, footprint, and damped height. A 60% normalized building signal is blended with a 40% occupied-cell prior to limit bias from uneven OSM height and coverage. Airport and university attractions are carved out of each area's control rather than added to it. The 2024 official total-population table supplies the residential spatial baseline, but playable commuter residences are modeled to equal workplace capacity. Commute pairs are estimated with a reproducible gravity-style model, short-trip suppression, intercity exchange assumptions, and SAR border impedance; they are not observed OD flows.\n\nThe final build reconciles 48,744,750 residences and jobs exactly. Hong Kong's 18 published district controls reconcile row by row; 15 coastline/reclamation cells outside the 2021 polygons are snapped to the nearest district within a strict 0.03-degree limit and are recorded in the build audit.",
+  "sources": [
+    "https://stats.gd.gov.cn/attachment/0/576/576090/4680368.pdf",
+    "https://data.gov.hk/en-data/dataset/hk-pland-pland1-2021-based-tpedm/resource/942feb5c-b536-4c26-bf29-32acc70cefbc",
+    "https://www.dsec.gov.mo/getAttachment/f3de5afb-3587-4b4d-bc21-3aad531b7a85/E_SIED_PUB_2023_Y.aspx",
+    "https://investhere.ipim.gov.mo/en/gba/introduction/employedpopulation/",
+    "https://www.dsec.gov.mo/BayArea/en-US/?report=1",
+    "https://github.com/rexmhall09/GBA-Subway-Builder/blob/main/sources/README.md"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "rexmhall09",
+    "reviewed_by": null,
+    "date": "2026-07-29"
+  }
+}
