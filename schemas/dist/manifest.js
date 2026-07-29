@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { LocationTagSchema, LevelOfDetailSchema, SourceQualitySchema, SpecialDemandTagSchema, } from "./constants.js";
+import { DifficultySchema, LocationTagSchema, LevelOfDetailSchema, SourceQualitySchema, SpecialDemandTagSchema, } from "./constants.js";
 import { ManifestDataQualitySchema } from "./data-quality.js";
 // --- Grid statistics (from map-analytics-grid.ts / map-detail-metrics.ts / map-polycentrism.ts) ---
 const MetricSummarySchema = z.object({
@@ -116,6 +116,9 @@ export const MapManifestSchema = BaseManifestSchema.extend({
     // Machine-managed: derived from `country` via COUNTRY_TO_LOCATION at intake.
     location: LocationTagSchema,
     special_demand: z.array(SpecialDemandTagSchema).refine((a) => new Set(a).size === a.length, { message: "special_demand must be unique" }),
+    // Author-provided city-select difficulty badge; absent when the author has
+    // not rated the map.
+    difficulty: DifficultySchema.optional(),
     file_sizes: z.record(z.number().min(0)),
     // Author-provided list of major cities whose territory this map covers but
     // whose names are not reflected in the map name (e.g. a "Gdańsk" map that
