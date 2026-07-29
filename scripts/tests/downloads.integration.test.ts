@@ -1576,9 +1576,8 @@ test("full mode preserves previous integrity, cache, and downloads when a custom
       generated_at: "2026-03-31T00:00:00.000Z",
       listings: { "custom-429-mod": previousListingEntry },
     });
-    // Note: the seeded cache entry includes asset_updated_at, but
-    // loadIntegrityCache only round-trips fingerprint/last_checked_at/result,
-    // so the preserved cache output is expected in the three-field shape.
+    // The seeded cache entry includes asset_updated_at; loadIntegrityCache
+    // round-trips it, so the preserved cache output carries it too.
     writeJson(join(repoRoot, "mods", "integrity-cache.json"), {
       schema_version: 1,
       entries: {
@@ -1626,6 +1625,7 @@ test("full mode preserves previous integrity, cache, and downloads when a custom
         fingerprint: "fp-custom-429",
         last_checked_at: "2026-03-31T00:00:00.000Z",
         result: previousVersionEntry,
+        asset_updated_at: { "four29.zip": "2026-03-30T00:00:00Z" },
       },
     });
     assert.equal(result.stats.versions_checked, 0);
@@ -1878,17 +1878,12 @@ test("full mode grandfathers a previously-complete custom version when fresh ins
   });
 });
 
-test("full mode writes asset clobber metadata to the cache, but disk-loaded entries are reused even when updatedAt changes", async () => {
-  // Behavior lock, including a known load-layer gap: fresh inspections write
-  // asset_sizes/asset_updated_at into integrity-cache.json (downloads-full.ts),
-  // and a cached entry whose asset_updated_at/asset_sizes disagree with the
-  // release index would be re-checked ("zip asset replaced since last
-  // inspection; forcing re-check"). However, loadIntegrityCache
-  // (downloads-support.ts) only round-trips fingerprint/last_checked_at/result,
-  // so entries loaded from disk never carry the clobber metadata and the
-  // re-check cannot trigger across runs today. This test pins BOTH facts; if
-  // the loader is fixed to round-trip the metadata, the second half of this
-  // test should be updated to expect a re-fetch.
+test("full mode detects a same-size asset replacement across runs and forces a re-check", async () => {
+  // Fresh inspections write asset_sizes/asset_updated_at into
+  // integrity-cache.json (downloads-full.ts); loadIntegrityCache round-trips
+  // them so a cached entry whose asset_updated_at disagrees with the release
+  // index is re-checked across runs — the clobber-detection scenario (e.g. a
+  // config.json version bump replacing a ZIP without changing its size).
   await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
     writeIndex("mods", ["clobber-mod"]);
     writeIndex("maps", []);
@@ -1964,13 +1959,18 @@ test("full mode writes asset clobber metadata to the cache, but disk-loaded entr
       token: "test-token",
     });
 
-    // Current behavior: the loader drops asset_updated_at/asset_sizes, so the
-    // stale entry is reused and no re-check is forced.
-    assert.equal(second.stats.cache_hits, 1);
-    assert.equal(zipFetchCount, 1);
-    assert.ok(!second.warnings.some((warning) => (
+    // The stale entry's asset_updated_at disagrees with the release index, so
+    // the cache is bypassed and the ZIP is re-fetched and re-inspected.
+    assert.equal(second.stats.cache_hits, 0);
+    assert.equal(zipFetchCount, 2);
+    assert.ok(second.warnings.some((warning) => (
       warning.includes("zip asset replaced since last inspection; forcing re-check")
     )));
-    assert.deepEqual(second.downloads, { "clobber-mod": { "v1.0.0": 5 } });
+    // Raw count 5 minus this run's own registry-attributed ZIP fetch = 4
+    // (same adjustment every fetching run applies).
+    assert.deepEqual(second.downloads, { "clobber-mod": { "v1.0.0": 4 } });
+    const secondCacheEntry = second.integrityCache.entries["clobber-mod"]?.["v1.0.0"];
+    assert.deepEqual(secondCacheEntry?.asset_updated_at, { "clobber.zip": "2026-02-02T00:00:00Z" });
+    assert.equal(second.integrity.listings["clobber-mod"]?.versions["v1.0.0"]?.is_complete, true);
   });
 });
