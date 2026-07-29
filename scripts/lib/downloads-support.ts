@@ -112,6 +112,21 @@ function getEmptyCache(): IntegrityCache {
   };
 }
 
+function readStringKeyedRecord<T>(
+  value: unknown,
+  isValid: (entry: unknown) => entry is T,
+): Record<string, T> | undefined {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+  const record: Record<string, T> = {};
+  for (const [key, entry] of Object.entries(value)) {
+    if (!isValid(entry)) continue;
+    record[key] = entry;
+  }
+  return Object.keys(record).length > 0 ? record : undefined;
+}
+
 export function loadIntegrityCache(repoRoot: string, dir: ManifestDirectory): IntegrityCache {
   const cachePath = getCachePath(repoRoot, dir);
   if (!existsSync(cachePath)) {
@@ -152,10 +167,24 @@ export function loadIntegrityCache(repoRoot: string, dir: ManifestDirectory): In
         ) {
           continue;
         }
+        // Clobber-detection metadata must round-trip: dropping these fields on
+        // load would make same-size asset replacements undetectable across
+        // runs. Invalid shapes are omitted (lazy-migration semantics — the
+        // fields reappear on the next fresh inspection).
+        const assetSizes = readStringKeyedRecord(
+          (versionValue as { asset_sizes?: unknown }).asset_sizes,
+          (value): value is number => typeof value === "number" && Number.isFinite(value),
+        );
+        const assetUpdatedAt = readStringKeyedRecord(
+          (versionValue as { asset_updated_at?: unknown }).asset_updated_at,
+          (value): value is string => typeof value === "string" && value.trim() !== "",
+        );
         versionEntries[version] = {
           fingerprint,
           last_checked_at: lastCheckedAt,
           result: result as IntegrityVersionEntry,
+          ...(assetSizes ? { asset_sizes: assetSizes } : {}),
+          ...(assetUpdatedAt ? { asset_updated_at: assetUpdatedAt } : {}),
         };
       }
       entries[listingId] = versionEntries;
