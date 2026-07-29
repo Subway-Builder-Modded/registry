@@ -604,6 +604,16 @@
                   ]
                 }
               },
+              "difficulty": {
+                "type": "string",
+                "enum": [
+                  "very-easy",
+                  "easy",
+                  "medium",
+                  "hard",
+                  "very-hard"
+                ]
+              },
               "file_sizes": {
                 "type": "object",
                 "additionalProperties": {
@@ -1504,6 +1514,16 @@
                 "universities"
               ]
             }
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": [
+              "very-easy",
+              "easy",
+              "medium",
+              "hard",
+              "very-hard"
+            ]
           },
           "file_sizes": {
             "type": "object",

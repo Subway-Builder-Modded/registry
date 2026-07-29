@@ -1,5 +1,6 @@
 import { z } from "zod";
 import {
+  DifficultySchema,
   LocationTagSchema,
   LevelOfDetailSchema,
   SourceQualitySchema,
@@ -148,6 +149,9 @@ export const MapManifestSchema = BaseManifestSchema.extend({
     (a) => new Set(a).size === a.length,
     { message: "special_demand must be unique" },
   ),
+  // Author-provided city-select difficulty badge; absent when the author has
+  // not rated the map.
+  difficulty: DifficultySchema.optional(),
   file_sizes: z.record(z.number().min(0)),
   // Author-provided list of major cities whose territory this map covers but
   // whose names are not reflected in the map name (e.g. a "Gdańsk" map that

@@ -118,7 +118,7 @@ declare const PolycentrismVariantMetricsSchema: z.ZodObject<{
     largestCenterShare: number;
     bandwidthKm: number;
     reliabilityScore: number;
-    supportLevel: "high" | "medium" | "low";
+    supportLevel: "medium" | "high" | "low";
     usedFallback: boolean;
     topCenters: {
         longitude: number;
@@ -137,7 +137,7 @@ declare const PolycentrismVariantMetricsSchema: z.ZodObject<{
     largestCenterShare: number;
     bandwidthKm: number;
     reliabilityScore: number;
-    supportLevel: "high" | "medium" | "low";
+    supportLevel: "medium" | "high" | "low";
     usedFallback: boolean;
     topCenters: {
         longitude: number;
@@ -336,7 +336,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "high" | "medium" | "low";
+            supportLevel: "medium" | "high" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -355,7 +355,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "high" | "medium" | "low";
+            supportLevel: "medium" | "high" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -376,7 +376,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "high" | "medium" | "low";
+            supportLevel: "medium" | "high" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -397,7 +397,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "high" | "medium" | "low";
+            supportLevel: "medium" | "high" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -472,7 +472,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "high" | "medium" | "low";
+            supportLevel: "medium" | "high" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -547,7 +547,7 @@ export declare const GridStatisticsSchema: z.ZodObject<{
             largestCenterShare: number;
             bandwidthKm: number;
             reliabilityScore: number;
-            supportLevel: "high" | "medium" | "low";
+            supportLevel: "medium" | "high" | "low";
             usedFallback: boolean;
             topCenters: {
                 longitude: number;
@@ -926,7 +926,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -945,7 +945,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -966,7 +966,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -987,7 +987,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1062,7 +1062,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1137,7 +1137,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1184,6 +1184,7 @@ export declare const MapManifestSchema: z.ZodObject<{
     }>]>>;
     location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
+    difficulty: z.ZodOptional<z.ZodEnum<["very-easy", "easy", "medium", "hard", "very-hard"]>>;
     file_sizes: z.ZodRecord<z.ZodString, z.ZodNumber>;
     included_cities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strict", z.ZodTypeAny, {
@@ -1288,7 +1289,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1312,6 +1313,7 @@ export declare const MapManifestSchema: z.ZodObject<{
         raw_score?: number | undefined;
         weighted_score?: number | undefined;
     } | undefined;
+    difficulty?: "very-easy" | "easy" | "medium" | "hard" | "very-hard" | undefined;
     included_cities?: string[] | undefined;
 }, {
     schema_version: 1;
@@ -1415,7 +1417,7 @@ export declare const MapManifestSchema: z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1439,6 +1441,7 @@ export declare const MapManifestSchema: z.ZodObject<{
         raw_score?: number | undefined;
         weighted_score?: number | undefined;
     } | undefined;
+    difficulty?: "very-easy" | "easy" | "medium" | "hard" | "very-hard" | undefined;
     included_cities?: string[] | undefined;
 }>;
 export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
@@ -1687,7 +1690,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1706,7 +1709,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1727,7 +1730,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1748,7 +1751,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1823,7 +1826,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1898,7 +1901,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -1945,6 +1948,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
     }>]>>;
     location: z.ZodEnum<["caribbean", "central-america", "central-asia", "central-europe", "east-africa", "east-asia", "east-europe", "middle-east", "north-africa", "north-america", "north-europe", "oceania", "south-america", "south-asia", "south-europe", "southeast-asia", "southern-africa", "west-africa", "west-europe"]>;
     special_demand: z.ZodEffects<z.ZodArray<z.ZodEnum<["airports", "entertainment", "ferries", "hospitals", "parks", "schools", "universities"]>, "many">, ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[], ("airports" | "entertainment" | "ferries" | "hospitals" | "parks" | "schools" | "universities")[]>;
+    difficulty: z.ZodOptional<z.ZodEnum<["very-easy", "easy", "medium", "hard", "very-hard"]>>;
     file_sizes: z.ZodRecord<z.ZodString, z.ZodNumber>;
     included_cities: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strict", z.ZodTypeAny, {
@@ -2049,7 +2053,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -2073,6 +2077,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         raw_score?: number | undefined;
         weighted_score?: number | undefined;
     } | undefined;
+    difficulty?: "very-easy" | "easy" | "medium" | "hard" | "very-hard" | undefined;
     included_cities?: string[] | undefined;
 }, {
     schema_version: 1;
@@ -2176,7 +2181,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
                 largestCenterShare: number;
                 bandwidthKm: number;
                 reliabilityScore: number;
-                supportLevel: "high" | "medium" | "low";
+                supportLevel: "medium" | "high" | "low";
                 usedFallback: boolean;
                 topCenters: {
                     longitude: number;
@@ -2200,6 +2205,7 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         raw_score?: number | undefined;
         weighted_score?: number | undefined;
     } | undefined;
+    difficulty?: "very-easy" | "easy" | "medium" | "hard" | "very-hard" | undefined;
     included_cities?: string[] | undefined;
 }>, z.ZodObject<{
     schema_version: z.ZodLiteral<1>;

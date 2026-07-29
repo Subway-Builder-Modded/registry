@@ -44,10 +44,21 @@ export const SpecialDemandTagSchema = z.enum([
   "universities",
 ]);
 
+// Author-provided gameplay difficulty, ordered easiest to hardest. Rendered by
+// the game as a city-select badge (its API takes these values verbatim).
+export const DifficultySchema = z.enum([
+  "very-easy",
+  "easy",
+  "medium",
+  "hard",
+  "very-hard",
+]);
+
 export type LocationTag = z.infer<typeof LocationTagSchema>;
 export type SourceQuality = z.infer<typeof SourceQualitySchema>;
 export type LevelOfDetail = z.infer<typeof LevelOfDetailSchema>;
 export type SpecialDemandTag = z.infer<typeof SpecialDemandTagSchema>;
+export type Difficulty = z.infer<typeof DifficultySchema>;
 
 // Canonical ISO 3166-1 alpha-2 → location tag mapping. `location` is derived
 // from `country` at intake, so this is the single source of truth for how the
