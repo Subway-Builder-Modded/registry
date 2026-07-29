@@ -11,6 +11,15 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   (see README "Canonical consistency suite").
 - `spotcheck-attribution-logs.ts` — attribution log diagnostics.
 - `create-manual-download-attribution.ts` — the manual download-correction path.
+  Applied specs are committed under `history/manual-attribution-specs/`;
+  application is idempotent (`applied_delta_ids`), so **after any
+  attribution-ledger rebuild, re-apply every committed spec**.
+- `backfill-charleston-snapshot-clamp.ts` — one-shot snapshot re-interpolation
+  for the charleston-huntington-wv faulty-client inflation (KNOWN_INCIDENTS.md,
+  2026-07 entry). Retained because **any snapshot rebuild from git
+  (`rebuild-download-history-from-git.ts`) must be followed by re-running this
+  clamp** — pre-correction snapshot values would otherwise reseed an inflated
+  `history-max:` floor via `rebuild-download-version-buckets.ts`.
 - `audit-shared-map-attribution.ts` + `export-shared-map-attribution-audit.sh` —
   parameterized shared-pack attribution audits.
 - `backfill-website-analytics.ts` — refetch missed hourly Cloudflare snapshots
