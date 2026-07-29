@@ -34,7 +34,11 @@ import {
 import { compareStableSemverAsc, isStableSemverTag } from "../lib/semver.js";
 import { filterListingMessages, isTestListing } from "../lib/test-listings.js";
 import { loadAuthorAliasIndex } from "../lib/author-aliases.js";
-import { buildIntegrityAlertEmbed } from "../lib/downloads-full/integrity-alerts.js";
+import {
+  buildIntegrityAlertEmbed,
+  buildIntegrityAlertIssueBody,
+  buildIntegrityAlertIssueTitle,
+} from "../lib/downloads-full/integrity-alerts.js";
 import { sendDiscordPayload } from "../lib/discord-webhook.js";
 
 export function listZeroValidSemverListings(integrity: IntegrityOutput): string[] {
@@ -305,6 +309,71 @@ async function run(): Promise<void> {
           console.log(`[downloads][integrity-alert] Sent Discord alert for author=${authorId} (${authorAlerts.length} version(s))`);
         } catch (error) {
           console.warn(`[downloads][integrity-alert] Failed to send Discord alert for author=${authorId}: ${(error as Error).message}`);
+        }
+      }
+    }
+    // GitHub-issue notifications for authors with no Discord ID on file: the
+    // channel embed alone never reaches them, so an @mention issue triggers
+    // GitHub's native notification instead. Issue titles are the dedup key
+    // against open integrity-alert issues (alerts fire on state transitions,
+    // so this only guards reruns/backfills).
+    const githubToken = process.env.GITHUB_TOKEN?.trim() || undefined;
+    const githubRepository = process.env.GITHUB_REPOSITORY?.trim() || undefined;
+    if (githubToken && githubRepository && integrityAlerts.length > 0) {
+      const authorIndex = loadAuthorAliasIndex(repoRoot);
+      const githubOnlyAlerts = integrityAlerts.filter((alert) => {
+        const entry = authorIndex.authors.find((a) => a.author_id === alert.authorId);
+        return entry !== undefined && !entry.discord_id && entry.github_id !== undefined;
+      });
+      if (githubOnlyAlerts.length > 0) {
+        const apiHeaders = {
+          Authorization: `Bearer ${githubToken}`,
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          "Content-Type": "application/json",
+        };
+        let openAlertTitles = new Set<string>();
+        try {
+          const listResponse = await fetch(
+            `https://api.github.com/repos/${githubRepository}/issues?labels=integrity-alert&state=open&per_page=100`,
+            { headers: apiHeaders },
+          );
+          if (listResponse.ok) {
+            const openIssues = await listResponse.json() as Array<{ title?: string }>;
+            openAlertTitles = new Set(openIssues.map((issue) => issue.title ?? ""));
+          } else {
+            console.warn(`[downloads][integrity-alert] Failed to list open alert issues: HTTP ${listResponse.status}`);
+          }
+        } catch (error) {
+          console.warn(`[downloads][integrity-alert] Failed to list open alert issues: ${(error as Error).message}`);
+        }
+        for (const alert of githubOnlyAlerts) {
+          const title = buildIntegrityAlertIssueTitle(alert);
+          if (openAlertTitles.has(title)) {
+            console.log(`[downloads][integrity-alert] Open issue already exists for ${alert.listingId} ${alert.version}; skipping`);
+            continue;
+          }
+          try {
+            const createResponse = await fetch(
+              `https://api.github.com/repos/${githubRepository}/issues`,
+              {
+                method: "POST",
+                headers: apiHeaders,
+                body: JSON.stringify({
+                  title,
+                  body: buildIntegrityAlertIssueBody(alert),
+                  labels: ["integrity-alert"],
+                }),
+              },
+            );
+            if (createResponse.ok) {
+              console.log(`[downloads][integrity-alert] Opened GitHub issue for author=${alert.authorId} listing=${alert.listingId} version=${alert.version}`);
+            } else {
+              console.warn(`[downloads][integrity-alert] Failed to open GitHub issue for ${alert.listingId} ${alert.version}: HTTP ${createResponse.status}`);
+            }
+          } catch (error) {
+            console.warn(`[downloads][integrity-alert] Failed to open GitHub issue for ${alert.listingId} ${alert.version}: ${(error as Error).message}`);
+          }
         }
       }
     }
