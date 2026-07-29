@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-29T16:01:26.421Z",
+  "generated_at": "2026-07-29T20:01:14.322Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -21129,8 +21129,8 @@
     },
     "tri-cities": {
       "has_complete_version": true,
-      "latest_semver_version": "1.1.1",
-      "latest_semver_complete": true,
+      "latest_semver_version": "1.2.0",
+      "latest_semver_complete": false,
       "complete_versions": [
         "1.1.1",
         "1.1.0",
@@ -21138,7 +21138,9 @@
         "1.0.1",
         "1.0.0"
       ],
-      "incomplete_versions": [],
+      "incomplete_versions": [
+        "1.2.0"
+      ],
       "last_updated": 1785283200,
       "versions": {
         "1.0.0": {
@@ -21384,6 +21386,51 @@
           },
           "fingerprint": "rules:v6:sha256:8806f483204350a08327e7461348d8ca0382135f55abd6bcc0174704cd57de64",
           "checked_at": "2026-07-29T10:58:05.977Z",
+          "released_at": "2026-07-29T00:00:00.000Z"
+        },
+        "1.2.0": {
+          "is_complete": false,
+          "errors": [
+            "demand_data contains 9 of 336 points (2.7%) with neither residents nor jobs (e.g. merged_530719200003036, merged_530719200002015, merged_530210206082061)",
+            "demand_data resident totals mismatch (points=353965, pops=353565, delta=400)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": false,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PSC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 20.3,
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.2.0-psc",
+            "asset_name": "PSC.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.2.0-psc/PSC.zip"
+          },
+          "fingerprint": "rules:v6:sha256:4edb505a73966d62a64a6489ac89522b340129f4be7feb29b2ac45209a239567",
+          "checked_at": "2026-07-29T20:01:14.322Z",
           "released_at": "2026-07-29T00:00:00.000Z"
         }
       }
