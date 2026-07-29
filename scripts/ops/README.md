@@ -24,8 +24,6 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   parameterized shared-pack attribution audits.
 - `backfill-website-analytics.ts` — refetch missed hourly Cloudflare snapshots
   (worker/capture outage gap-filler).
-- `backfill-data-quality.ts` — seven-tier data-quality backfill; retained until the
-  migration is confirmed to need no reruns.
 
 One-time migrations that already ran are deleted rather than kept here — git
 history is the archive (see tmp/plans/registry-downsizing-audit.md for the list).
