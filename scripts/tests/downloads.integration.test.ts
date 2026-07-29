@@ -106,6 +106,32 @@ async function makeMapZip(cityCode: string, version = "1.0.0"): Promise<Buffer> 
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
+// Like makeMapZip, but adds one phantom demand point (neither residents nor jobs)
+// close to the populated point. This fails ONLY the grandfathered
+// demand_phantom_points check: spacing passes (points ~1.5km apart) and resident
+// totals still match (the phantom contributes 0 residents on both sides).
+async function makeMapZipWithPhantomPoint(cityCode: string, version = "1.0.0"): Promise<Buffer> {
+  const zip = new JSZip();
+  zip.file("config.json", JSON.stringify({ code: cityCode, version }));
+  zip.file("demand_data.json", JSON.stringify({
+    points: [
+      { id: "pt1", location: [0, 0], jobs: 1, residents: 1 },
+      { id: "pt-phantom", location: [0.01, 0.01], jobs: 0, residents: 0 },
+    ],
+    pops_map: [
+      { id: "pop1", size: 1 },
+    ],
+    pops: [
+      { residenceId: "pt1", jobId: "pt1", drivingDistance: 1 },
+    ],
+  }));
+  zip.file("buildings_index.json", "{}");
+  zip.file("roads.geojson", "{}");
+  zip.file("runways_taxiways.geojson", "{}");
+  zip.file(`${cityCode}.pmtiles`, "stub");
+  return zip.generateAsync({ type: "nodebuffer" });
+}
+
 async function makeMapZipWithPointLocations(
   cityCode: string,
   locations: Array<{ id: string; location: [number, number] }>,
@@ -1503,5 +1529,448 @@ test("mod security WARNING findings are recorded but do not block completeness",
       result.integrity.listings["warning-mod"]?.versions["v1.0.0"]?.security_issue?.findings[0]?.severity,
       "WARNING",
     );
+  });
+});
+
+// --- Behavior locks for the 429-cascade incident class ---------------------
+// These tests pin the exact preservation semantics of generateDownloadsDataFull
+// so that refactors cannot silently change them.
+
+test("full mode preserves previous integrity, cache, and downloads when a custom update JSON returns HTTP 429", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["custom-429-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "custom-429-mod", {
+      ...makeBaseModManifest("custom-429-mod"),
+      update: { type: "custom", url: "https://example.com/custom-429-update.json" },
+    });
+
+    const previousVersionEntry = {
+      is_complete: true,
+      errors: [],
+      required_checks: { release_manifest_asset: true, zip_manifest_json: true, security_scan_passed: true },
+      matched_files: { release_manifest_asset: "manifest.json", zip_manifest_json: "manifest.json", security_scan_passed: "passed" },
+      source: {
+        update_type: "custom",
+        repo: "owner/four29",
+        tag: "v1.0.0",
+        asset_name: "four29.zip",
+        download_url: "https://github.com/owner/four29/releases/download/v1.0.0/four29.zip",
+      },
+      fingerprint: "fp-custom-429",
+      checked_at: "2026-03-31T00:00:00.000Z",
+    };
+    const previousListingEntry = {
+      has_complete_version: true,
+      latest_semver_version: "1.0.0",
+      latest_semver_complete: true,
+      complete_versions: ["1.0.0"],
+      incomplete_versions: [],
+      versions: { "1.0.0": previousVersionEntry },
+    };
+    writeJson(join(repoRoot, "mods", "downloads.json"), {
+      "custom-429-mod": { "1.0.0": 42 },
+    });
+    writeJson(join(repoRoot, "mods", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-31T00:00:00.000Z",
+      listings: { "custom-429-mod": previousListingEntry },
+    });
+    // Note: the seeded cache entry includes asset_updated_at, but
+    // loadIntegrityCache only round-trips fingerprint/last_checked_at/result,
+    // so the preserved cache output is expected in the three-field shape.
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), {
+      schema_version: 1,
+      entries: {
+        "custom-429-mod": {
+          "1.0.0": {
+            fingerprint: "fp-custom-429",
+            last_checked_at: "2026-03-31T00:00:00.000Z",
+            result: previousVersionEntry,
+            asset_updated_at: { "four29.zip": "2026-03-30T00:00:00Z" },
+          },
+        },
+      },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://example.com/custom-429-update.json",
+        handle: () => new Response("rate limited", { status: 429 }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.ok(result.warnings.includes(
+      "listing=custom-429-mod: custom update JSON returned HTTP 429 (transient; previous counts preserved)",
+    ));
+    assert.ok(result.warnings.includes(
+      "listing=custom-429-mod: preserved previous custom-update downloads (transient fetch error)",
+    ));
+    assert.ok(result.warnings.includes(
+      "listing=custom-429-mod: preserved previous integrity state (transient custom-update fetch error)",
+    ));
+
+    assert.deepEqual(result.downloads, {
+      "custom-429-mod": { "1.0.0": 42 },
+    });
+    assert.deepEqual(result.integrity.listings["custom-429-mod"], previousListingEntry);
+    assert.deepEqual(result.integrityCache.entries["custom-429-mod"], {
+      "1.0.0": {
+        fingerprint: "fp-custom-429",
+        last_checked_at: "2026-03-31T00:00:00.000Z",
+        result: previousVersionEntry,
+      },
+    });
+    assert.equal(result.stats.versions_checked, 0);
+    assert.equal(result.stats.complete_versions, 1);
+    assert.equal(result.stats.incomplete_versions, 0);
+    assert.deepEqual(result.integrityAlerts, []);
+  });
+});
+
+test("full mode grandfathers a previously-complete github version when fresh inspection fails only grandfathered checks", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("maps", ["grandfather-map"]);
+    writeIndex("mods", []);
+    writeManifest("maps", "grandfather-map", {
+      ...makeBaseMapManifest("grandfather-map"),
+      update: { type: "github", repo: "owner/gfmap" },
+    });
+
+    const previousVersionEntry = {
+      is_complete: true,
+      errors: [],
+      required_checks: {
+        config_json: true,
+        demand_data: true,
+        buildings_index: true,
+        roads_geojson: true,
+        runways_taxiways_geojson: true,
+        city_pmtiles: true,
+        config_version_matches_tag: true,
+      },
+      matched_files: {},
+      source: { update_type: "github", repo: "owner/gfmap", tag: "v1.0.0" },
+      fingerprint: "fp-old",
+      checked_at: "2026-03-31T00:00:00.000Z",
+    };
+    writeJson(join(repoRoot, "maps", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-31T00:00:00.000Z",
+      listings: {
+        "grandfather-map": {
+          has_complete_version: true,
+          latest_semver_version: "v1.0.0",
+          latest_semver_complete: true,
+          complete_versions: ["v1.0.0"],
+          incomplete_versions: [],
+          versions: { "v1.0.0": previousVersionEntry },
+        },
+      },
+    });
+    // No integrity-cache.json: forces the fresh-inspection path.
+
+    const phantomZip = await makeMapZipWithPhantomPoint("ABC");
+    let zipFetchCount = 0;
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/gfmap.zip",
+        handle: () => {
+          zipFetchCount += 1;
+          return new Response(new Uint8Array(phantomZip));
+        },
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        {
+                          id: "asset-node-gfmap",
+                          name: "gfmap.zip",
+                          downloadCount: 9,
+                          downloadUrl: "https://downloads.example.com/gfmap.zip",
+                          size: 12345,
+                          updatedAt: "2026-04-01T00:00:00Z",
+                        },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "map",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.equal(zipFetchCount, 1);
+    assert.ok(result.warnings.includes(
+      "listing=grandfather-map version=v1.0.0: preserved previous is_complete=true (grandfathered checks: demand_phantom_points)",
+    ));
+
+    // The previous complete entry is preserved verbatim (never-downgrade guard).
+    assert.deepEqual(result.integrity.listings["grandfather-map"]?.versions["v1.0.0"], previousVersionEntry);
+    assert.equal(result.integrity.listings["grandfather-map"]?.has_complete_version, true);
+    assert.deepEqual(result.integrity.listings["grandfather-map"]?.complete_versions, ["v1.0.0"]);
+
+    // Downloads stay live: raw 9 minus the 1 registry-attributed inspection fetch.
+    assert.deepEqual(result.downloads, { "grandfather-map": { "v1.0.0": 8 } });
+
+    // The grandfathered cache entry carries the preserved result plus the
+    // current asset clobber metadata from the release index.
+    const cacheEntry = result.integrityCache.entries["grandfather-map"]?.["v1.0.0"];
+    assert.deepEqual(cacheEntry?.result, previousVersionEntry);
+    assert.deepEqual(cacheEntry?.asset_sizes, { "gfmap.zip": 12345 });
+    assert.deepEqual(cacheEntry?.asset_updated_at, { "gfmap.zip": "2026-04-01T00:00:00Z" });
+
+    assert.deepEqual(result.integrityAlerts, []);
+    assert.equal(result.stats.versions_checked, 1);
+    assert.equal(result.stats.cache_hits, 0);
+    assert.equal(result.stats.complete_versions, 1);
+    assert.equal(result.stats.incomplete_versions, 0);
+    assert.equal(result.stats.filtered_versions, 0);
+  });
+});
+
+test("full mode grandfathers a previously-complete custom version when fresh inspection fails only grandfathered checks", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("maps", ["grandfather-custom-map"]);
+    writeIndex("mods", []);
+    writeManifest("maps", "grandfather-custom-map", {
+      ...makeBaseMapManifest("grandfather-custom-map"),
+      update: { type: "custom", url: "https://example.com/grandfather-custom-update.json" },
+    });
+
+    const previousVersionEntry = {
+      is_complete: true,
+      errors: [],
+      required_checks: {
+        config_json: true,
+        demand_data: true,
+        buildings_index: true,
+        roads_geojson: true,
+        runways_taxiways_geojson: true,
+        city_pmtiles: true,
+        config_version_matches_tag: true,
+      },
+      matched_files: {},
+      source: {
+        update_type: "custom",
+        repo: "owner/gfcustom",
+        tag: "v1.0.0",
+        asset_name: "gfcustom.zip",
+        download_url: "https://github.com/Owner/GfCustom/releases/download/v1.0.0/gfcustom.zip",
+      },
+      fingerprint: "fp-old-custom",
+      checked_at: "2026-03-31T00:00:00.000Z",
+    };
+    writeJson(join(repoRoot, "maps", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-31T00:00:00.000Z",
+      listings: {
+        "grandfather-custom-map": {
+          has_complete_version: true,
+          latest_semver_version: "1.0.0",
+          latest_semver_complete: true,
+          complete_versions: ["1.0.0"],
+          incomplete_versions: [],
+          versions: { "1.0.0": previousVersionEntry },
+        },
+      },
+    });
+    // No integrity-cache.json: forces the fresh-inspection path.
+
+    const phantomZip = await makeMapZipWithPhantomPoint("ABC");
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://example.com/grandfather-custom-update.json",
+        handle: () => jsonResponse({
+          schema_version: 1,
+          versions: [
+            {
+              version: "1.0.0",
+              download: "https://github.com/Owner/GfCustom/releases/download/v1.0.0/gfcustom.zip",
+            },
+          ],
+        }),
+      },
+      {
+        match: (url) => url === "https://downloads.example.com/gfcustom.zip",
+        handle: () => new Response(new Uint8Array(phantomZip)),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "gfcustom.zip", downloadCount: 6, downloadUrl: "https://downloads.example.com/gfcustom.zip" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "map",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.ok(result.warnings.includes(
+      "listing=grandfather-custom-map version=1.0.0: preserved previous is_complete=true (grandfathered checks: demand_phantom_points)",
+    ));
+    assert.deepEqual(
+      result.integrity.listings["grandfather-custom-map"]?.versions["1.0.0"],
+      previousVersionEntry,
+    );
+    assert.equal(result.integrity.listings["grandfather-custom-map"]?.has_complete_version, true);
+
+    // Downloads stay live: raw 6 minus the 1 registry-attributed inspection fetch.
+    assert.deepEqual(result.downloads, { "grandfather-custom-map": { "1.0.0": 5 } });
+
+    const cacheEntry = result.integrityCache.entries["grandfather-custom-map"]?.["1.0.0"];
+    assert.deepEqual(cacheEntry?.result, previousVersionEntry);
+    // The custom grandfather site does not record asset clobber metadata.
+    assert.equal(cacheEntry?.asset_sizes, undefined);
+    assert.equal(cacheEntry?.asset_updated_at, undefined);
+
+    assert.deepEqual(result.integrityAlerts, []);
+    assert.equal(result.stats.complete_versions, 1);
+    assert.equal(result.stats.incomplete_versions, 0);
+    assert.equal(result.stats.cache_hits, 0);
+  });
+});
+
+test("full mode writes asset clobber metadata to the cache, but disk-loaded entries are reused even when updatedAt changes", async () => {
+  // Behavior lock, including a known load-layer gap: fresh inspections write
+  // asset_sizes/asset_updated_at into integrity-cache.json (downloads-full.ts),
+  // and a cached entry whose asset_updated_at/asset_sizes disagree with the
+  // release index would be re-checked ("zip asset replaced since last
+  // inspection; forcing re-check"). However, loadIntegrityCache
+  // (downloads-support.ts) only round-trips fingerprint/last_checked_at/result,
+  // so entries loaded from disk never carry the clobber metadata and the
+  // re-check cannot trigger across runs today. This test pins BOTH facts; if
+  // the loader is fixed to round-trip the metadata, the second half of this
+  // test should be updated to expect a re-fetch.
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["clobber-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "clobber-mod", {
+      ...makeBaseModManifest("clobber-mod"),
+      update: { type: "github", repo: "owner/clobber" },
+    });
+
+    const validZip = await makeModZip(true);
+    let zipFetchCount = 0;
+    let assetUpdatedAt = "2026-01-01T00:00:00Z";
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/clobber.zip",
+        handle: () => {
+          zipFetchCount += 1;
+          return new Response(new Uint8Array(validZip));
+        },
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        {
+                          id: "asset-node-clobber",
+                          name: "clobber.zip",
+                          downloadCount: 5,
+                          downloadUrl: "https://downloads.example.com/clobber.zip",
+                          size: 4096,
+                          updatedAt: assetUpdatedAt,
+                        },
+                        { name: "manifest.json", downloadCount: 5, downloadUrl: "https://downloads.example.com/clobber-manifest.json" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const first = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.equal(zipFetchCount, 1);
+    const firstCacheEntry = first.integrityCache.entries["clobber-mod"]?.["v1.0.0"];
+    assert.deepEqual(firstCacheEntry?.asset_sizes, { "clobber.zip": 4096 });
+    assert.deepEqual(firstCacheEntry?.asset_updated_at, { "clobber.zip": "2026-01-01T00:00:00Z" });
+
+    // Persist the cache exactly as produced (including clobber metadata), then
+    // simulate a same-size asset replacement by changing only updatedAt.
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), first.integrityCache);
+    assetUpdatedAt = "2026-02-02T00:00:00Z";
+
+    const second = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    // Current behavior: the loader drops asset_updated_at/asset_sizes, so the
+    // stale entry is reused and no re-check is forced.
+    assert.equal(second.stats.cache_hits, 1);
+    assert.equal(zipFetchCount, 1);
+    assert.ok(!second.warnings.some((warning) => (
+      warning.includes("zip asset replaced since last inspection; forcing re-check")
+    )));
+    assert.deepEqual(second.downloads, { "clobber-mod": { "v1.0.0": 5 } });
   });
 });
