@@ -68,3 +68,58 @@ export function buildIntegrityAlertEmbed(
     ...(noDiscordIdNote ? { footer: { text: noDiscordIdNote } } : {}),
   };
 }
+
+/**
+ * Deterministic issue title for an integrity alert — also the cross-run
+ * dedup key (an open issue with this exact title suppresses a duplicate).
+ */
+export function buildIntegrityAlertIssueTitle(alert: IntegrityAlert): string {
+  return `[Integrity] ${alert.listingId} ${alert.version}: failing checks`;
+}
+
+/**
+ * GitHub-issue body mirroring the Discord embed, for authors with no
+ * discord_id on file. The @mention triggers GitHub's native notification.
+ */
+export function buildIntegrityAlertIssueBody(alert: IntegrityAlert): string {
+  const typeLabel = alert.listingType === "map" ? "Map" : "Mod";
+  const regressionLabel = alert.isRegression
+    ? "a previously-passing version stopped passing"
+    : "a new version failed its first check";
+
+  const lines: string[] = [
+    `@${alert.authorId} — your ${typeLabel.toLowerCase()} **${alert.listingName}** \`${alert.version}\` is failing integrity checks (${regressionLabel}). Failing versions are excluded from downloads until fixed.`,
+    "",
+    "**Failing checks:**",
+    ...alert.failingChecks.map((key) => {
+      const hint = INTEGRITY_CHECK_FIX_HINTS[key] ?? "Fix the issue and publish a new release.";
+      return `- \`${key}\`: ${hint}`;
+    }),
+  ];
+
+  if (alert.errors.length > 0) {
+    lines.push("", "**Errors:**");
+    const maxErrors = 8;
+    for (const error of alert.errors.slice(0, maxErrors)) {
+      lines.push(`- ${error}`);
+    }
+    if (alert.errors.length > maxErrors) {
+      lines.push(`- ...and ${alert.errors.length - maxErrors} more`);
+    }
+  }
+
+  if (alert.sourceRepo && alert.sourceTag) {
+    lines.push("", `Source: \`${alert.sourceRepo}@${alert.sourceTag}\``);
+  }
+
+  lines.push(
+    "",
+    "Once a fixed release is published, the next full analytics run picks it up automatically and this issue can be closed.",
+    "",
+    "_Tip: add a Discord ID via the [Update Author Profile](https://github.com/Subway-Builder-Modded/registry/issues/new?template=update-author.yml) form to get pinged on Discord instead._",
+    "",
+    "_Automated integrity alert from the full analytics run._",
+  );
+
+  return lines.join("\n");
+}
