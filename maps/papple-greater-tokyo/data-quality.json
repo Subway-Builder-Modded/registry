@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "papple-greater-tokyo",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "admin_polygon",
+    "workplace_intensity": "uniform",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm4",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "marginal_od",
+    "od_granularity": "adm4"
+  },
+  "notes": "Demand points are the 2020 Census chōme centroids across Saitama, Chiba, Tōkyō and Kanagawa, matched to Economic Census workplace counts. Japan publishes no origin-destination commute matrix, so flows are synthesised with a doubly-constrained gravity model calibrated against the census's own municipality-level self-containment ratios, then routed with OSRM. Full method: [Methodology.md github](https://github.com/MasterPapple/subwaybuilder-greater-tokyo/blob/master/METHODOLOGY.md)",
+  "sources": [
+    "[Data Source Github](https://github.com/MasterPapple/subwaybuilder-greater-tokyo/blob/master/README.md#data-sources)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "MasterPapple",
+    "reviewed_by": null,
+    "date": "2026-07-30"
+  }
+}
