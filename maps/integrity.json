@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-31T04:00:53.013Z",
+  "generated_at": "2026-07-31T06:08:33.179Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -32196,14 +32196,15 @@
     },
     "yukina-nagoya": {
       "has_complete_version": true,
-      "latest_semver_version": "0.1.5",
+      "latest_semver_version": "0.2.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.2.0",
         "0.1.5",
         "0.1.4"
       ],
       "incomplete_versions": [],
-      "last_updated": 1775606400,
+      "last_updated": 1785456000,
       "versions": {
         "0.1.4": {
           "is_complete": true,
@@ -32299,6 +32300,60 @@
           "fingerprint": "rules:v6:sha256:0a5d1b221deb4038ab57961983c55df47bb6a1e80f6e64254bc4955679b7f8eb",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-04-08T00:00:00.000Z"
+        },
+        "0.2.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "NGO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 627.46,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 70.79,
+            ".railyard_map/special_demand_points.json": 1.04,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "NGO.pmtiles": 219.2,
+            "buildings_index.bin.gz": 272.41,
+            "config.json": 0.02,
+            "demand_data.json": 99.55,
+            "ocean_depth_index.json": 108.81,
+            "roads.geojson": 127.11,
+            "runways_taxiways.geojson": 1.11
+          },
+          "game_version": ">1.3.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-jp-maps",
+            "tag": "0.4.8",
+            "asset_name": "NGO.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.8/NGO.zip"
+          },
+          "fingerprint": "rules:v6:sha256:40ab6ec18f61868b2c505773516239df22cfbe7bc71571a341395ee9a88d22aa",
+          "checked_at": "2026-07-31T06:08:33.179Z",
+          "released_at": "2026-07-31T00:00:00.000Z"
         }
       }
     },
