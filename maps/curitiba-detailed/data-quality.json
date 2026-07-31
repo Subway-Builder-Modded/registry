@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "curitiba-detailed",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "adm5",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "structured_marginals",
+    "od_granularity": "adm3"
+  },
+  "notes": "All demand comes from Brazilian government data. No OSM population estimates anywhere.\n\nRESIDENTS\nIBGE Censo 2022, census tract level. 5,623 tracts and 3,271,037 people inside the bbox. Each tract's population is spread onto individual dwelling addresses from CNEFE, IBGE's national address register. One CNEFE row is one dwelling unit, not one building, so a tower appears as up to 540 rows on the same coordinate. Row counts per municipality match the census household count, so spreading a tract's people evenly across its rows reproduces the census mean household size. Placed 1,388,241 dwelling units against a census count of 1,389,625.\n\nJOBS\nCEMPRE 2024 municipal employment totals, spread across 148,690 CNEFE establishment addresses. Per-establishment weights come from keyword-matching CNEFE's free-text description field. Municipalities the bbox cuts through are prorated by how many of their establishments fall inside it.\n\nCOMMUTES\nDoubly-constrained gravity model with IPF. The deterrence function and the travel-time model are both fitted by grid search against Censo 2022 table 10330, crossed by mode so the target is car trips only. All-mode times are much slower and calibrating against them stretches every trip. chi2 0.0071. Modelled time bands 4.8/26.8/35.3/28.5/4.5% against observed 6.3/26.3/38.9/23.7/4.9%. Cross-municipal flows are capped using the same table's workplace-location split. 46,709 distinct pairs routed through a local OSRM instance, no failures.\n\nSCHOOLS\nINEP Censo Escolar 2024. Real per-school enrolment by level, 2,051 active schools, 680,403 enrolments. The dataset has no coordinates, so schools are geocoded by matching postcode to CNEFE, preferring addresses CNEFE already flags as schools. 79% matched that way. Travel fractions by level: infantil 0.20, anos iniciais 0.35, anos finais 0.60, medio 0.85.\n\nSPECIAL DEMAND\n57 places. Airport, 18 university campuses, 10 shopping centres, 10 hospitals, 7 parks, 4 stadiums, some cultural venues. No BRT terminals. A terminal is not a trip end. People pass through it and the trip is already counted at its home and workplace ends.\n\nTOTALS\n19,659 demand points, 64,354 pops, 2,037,039 trips. 64.6% commute, 20.0% special, 15.3% school.\n\nEFFECTIVE RESOLUTION\nWorth separating from the reporting granularity in the dropdowns above. The finished demand surface is address-level for both residents and jobs, because CNEFE places every dwelling and every establishment individually. What is coarse is the job control total: CEMPRE publishes one employment figure per municipality, and the census publishes commute-time and workplace-location marginals per municipality. Resident counts are census tract level, median 567 people per tract. So the totals are municipal for jobs and tract-level for residents, while the placement of both is per address.\n\nLIMITATIONS\n\nCNEFE and the tract mesh are different vintages. CNEFE 2022 uses the preliminary mesh, malha_com_atributos uses the corrected April 2025 one. The tract codes look joinable and are not. Strip CNEFE's suffix and 97% of codes match, but point-in-polygon puts 11% of addresses in a different tract. Assignment is spatial.\n\nOSM buildings are not usable in Brazil. 87,133 footprints in the bbox against Overture's 1,323,335, for 1,389,625 census households. Geometry comes from Overture. Only 0.1% of Overture's Brazilian footprints carry a height, so heights come from overlapping OSM buildings where they exist and a default otherwise.\n\nNo OD matrix is published at usable resolution. The matrix is synthetic, fitted to real marginals: per-municipality commute-time bands by mode, and workplace-location shares.\n\nTracts flagged as barracks, prisons or care institutions are dropped before pairing, so nobody commutes to work from a prison.\n\nAUGMENTATIONS\n\nCommercial and college district layers come from Curitiba's zoning law (IPPUC, LEI 15511/2019) rather than OSM landuse tags. Campuses are the exception. Curitiba's zona educacional is two polygons, so campus extents come from OSM.\n\nAll 75 official IPPUC bairros are labelled. Better coverage than OSM.\n\nWater depth from HydroLAKES (Messager et al. 2016, CC BY 4.0), 13 bodies in the bbox. No bathymetric survey exists for these reservoirs from IBGE, IPPUC or ANA, and GEBCO is ocean only. Max depth is derived from the mean assuming a parabolic basin. Each body is split into concentric bands so depth grades from bank to centre.\n\nESTIMATES\n\nSpecial demand visitor counts are class-based estimates and are marked as such in the source. Only stadium capacities are published figures. School travel fractions are assumptions. Water depth max and profile shape are models. Foundation depths come from height where known and footprint area otherwise. OSRM free-flow times run about 1.8x faster than the census-implied mean car commute, which biases mode choice against transit. Commute is a minority of real urban travel and no Brazilian trip-purpose survey was found to calibrate against, so at 64.6% commute this map is commute-heavy.",
+  "sources": [
+    "IBGE Censo 2022, Agregados por Setores Censitários:",
+    "https://ftp.ibge.gov.br/Censos/Censo_Demografico_2022/Agregados_por_Setores_Censitarios/",
+    "IBGE CNEFE 2022 (national address register):",
+    "https://ftp.ibge.gov.br/Cadastro_Nacional_de_Enderecos_para_Fins_Estatisticos/Censo_Demografico_2022/",
+    "IBGE CEMPRE 2024 (SIDRA table 9509, variable 707):",
+    "https://sidra.ibge.gov.br/tabela/9509",
+    "IBGE Censo 2022 commuting (SIDRA table 10330, variable 13376):",
+    "https://sidra.ibge.gov.br/tabela/10330",
+    "INEP Censo Escolar 2024:",
+    "https://www.gov.br/inep/pt-br/acesso-a-informacao/dados-abertos/microdados/censo-escolar",
+    "IPPUC geodata (zoning, neighbourhoods, parks, hydrography):",
+    "https://ippuc.org.br/geodownloads/geo.htm",
+    "Overture Maps 2026-07-22.0 (building footprints):",
+    "https://overturemaps.org/",
+    "OpenStreetMap (roads, aeroways, labels), © OpenStreetMap contributors, ODbL:",
+    "https://www.openstreetmap.org/copyright",
+    "HydroLAKES v1.0 (water depth), Messager et al. 2016, CC BY 4.0:",
+    "https://www.hydrosheds.org/products/hydrolakes"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "knoxio",
+    "reviewed_by": null,
+    "date": "2026-07-31"
+  }
+}
