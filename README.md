@@ -28,6 +28,23 @@ All submissions are handled through GitHub Issues. Pick a template to get starte
 
 `registry` stores metadata only - manifests, gallery images, and pointers to where your mod or map is actually hosted (GitHub Releases, CDNs, etc.). When you submit through an issue template, CI validates your submission and opens a PR automatically. Once merged, your listing goes live.
 
+## Issue Comment Commands
+
+Automation reacts to specific comments on submission issues and their automated
+PRs. Who can use each command is enforced by the workflows:
+
+| Command | Where | Who | Effect |
+| --- | --- | --- | --- |
+| `revalidate` | Any submission/update issue (publish-mod/map, update-mod/map, update-author, data-quality) | Issue author or org OWNER/MEMBER/COLLABORATOR | Re-runs validation after the issue was edited (e.g. after a `failed-validation` result). |
+| `rescore_data [flags]` | Automated data-quality / publish **PRs** | OWNER/MEMBER/COLLABORATOR | Confirms the submitter's data-quality answers, applies the tier, and marks the publish PR ready to merge. Optional flags on the same line are passed through (e.g. `--admin` to bypass-merge). |
+| `/admin-author` | Publish issues | OWNER/MEMBER only | Creates the listing with author `subway-builder-modded-admin`; the issue submitter is recorded as active **caretaker** (credited for downloads of versions released during their tenure) and added as a collaborator. Use for assets whose true author has no GitHub account. |
+| `/quality-exempt` | Publish-map issues | OWNER/MEMBER only | Waives the data-quality merge gate for this submission: the publish PR is created ready (non-draft) with the `dq-grandfathered` label and merges at `unknown-quality`. |
+
+`/admin-author` and `/quality-exempt` may be commented before or after
+validation runs — the workflow scans all issue comments, so follow up with
+`revalidate` (or comment the command itself, which also triggers a run) to
+apply them.
+
 ## Map Issue Templates
 
 `publish-map.yml` and `update-map.yml` are generated from a shared script:
