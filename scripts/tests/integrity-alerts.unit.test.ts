@@ -3,7 +3,9 @@ import assert from "node:assert/strict";
 import {
   buildIntegrityAlertIssueBody,
   buildIntegrityAlertIssueTitle,
+  resolveAlertNotifyTarget,
 } from "../lib/downloads-full/integrity-alerts.js";
+import type { AuthorAliasIndex } from "../lib/author-aliases.js";
 import type { IntegrityAlert } from "../lib/download-definitions.js";
 
 function makeAlert(overrides: Partial<IntegrityAlert> = {}): IntegrityAlert {
@@ -67,4 +69,77 @@ test("issue body caps errors at 8 with an overflow line", () => {
   assert.ok(body.includes("- error 8"));
   assert.ok(!body.includes("- error 9"));
   assert.ok(body.includes("...and 3 more"));
+});
+
+test("issue body mention login override renders the caretaker's @mention", () => {
+  const body = buildIntegrityAlertIssueBody(makeAlert(), "caretaker-login");
+  assert.ok(body.startsWith("@caretaker-login "));
+  assert.ok(!body.includes("@some-author"));
+  // Everything but the mention is unchanged.
+  assert.ok(body.includes("**Test Map** `v1.2.0`"));
+});
+
+// --- resolveAlertNotifyTarget ---
+
+function makeAuthorIndex(): AuthorAliasIndex {
+  return {
+    schema_version: 1,
+    authors: [
+      {
+        github_id: 1,
+        author_id: "some-author",
+        author_alias: "Some Author",
+        discord_id: "111",
+      },
+      {
+        github_id: 2,
+        author_id: "caretaker-login",
+        author_alias: "Care Taker",
+        discord_id: "222",
+      },
+      {
+        github_id: 3,
+        author_id: "gh-only-caretaker",
+      },
+    ],
+  };
+}
+
+test("notify target resolves the active caretaker's entry when set and resolvable", () => {
+  const target = resolveAlertNotifyTarget(makeAlert({ caretakerGithubId: 2 }), makeAuthorIndex());
+  assert.deepEqual(target, {
+    authorId: "caretaker-login",
+    alias: "Care Taker",
+    discordId: "222",
+    githubId: 2,
+  });
+});
+
+test("notify target falls back to alias/discord-less caretaker entries gracefully", () => {
+  const target = resolveAlertNotifyTarget(makeAlert({ caretakerGithubId: 3 }), makeAuthorIndex());
+  assert.deepEqual(target, { authorId: "gh-only-caretaker", alias: "gh-only-caretaker", githubId: 3 });
+});
+
+test("notify target falls back to the author when the caretaker id is unresolvable", () => {
+  const target = resolveAlertNotifyTarget(makeAlert({ caretakerGithubId: 999 }), makeAuthorIndex());
+  assert.deepEqual(target, {
+    authorId: "some-author",
+    alias: "Some Author",
+    discordId: "111",
+    githubId: 1,
+  });
+});
+
+test("notify target is the author when no caretaker is set", () => {
+  const target = resolveAlertNotifyTarget(makeAlert(), makeAuthorIndex());
+  assert.equal(target.authorId, "some-author");
+  assert.equal(target.discordId, "111");
+});
+
+test("notify target degrades to a bare fallback when neither resolves", () => {
+  const target = resolveAlertNotifyTarget(
+    makeAlert({ authorId: "unknown-author", caretakerGithubId: 999 }),
+    makeAuthorIndex(),
+  );
+  assert.deepEqual(target, { authorId: "unknown-author", alias: "unknown-author" });
 });

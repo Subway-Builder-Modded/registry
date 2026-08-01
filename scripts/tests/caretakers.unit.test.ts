@@ -2,11 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { ModManifestSchema } from "@subway-builder-modded/registry-schemas";
 import {
+  ADMIN_AUTHOR_GITHUB_ID,
+  ADMIN_AUTHOR_ID,
+  applyAdminAuthorOverride,
   applyCaretakerUpdate,
   getActiveCaretaker,
   parseCaretakerUpdate,
   parsePublishCaretaker,
   resolveCaretakerUpdate,
+  type ManifestWithAuthor,
   type ManifestWithCaretakers,
 } from "../lib/caretakers.js";
 
@@ -240,6 +244,59 @@ test("apply caretaker update does not duplicate an existing collaborator id", ()
   applyCaretakerUpdate(manifest, "200", NOW);
   assert.deepEqual(manifest.collaborators, [200, 300]);
   assert.deepEqual(manifest.caretakers, [{ github_id: 200, since: NOW }]);
+});
+
+// --- applyAdminAuthorOverride (/admin-author comment command) ---
+
+test("admin-author override swaps author identity and defaults the submitter as caretaker", () => {
+  const manifest: ManifestWithAuthor = { author: "submitter", github_id: 555 };
+  applyAdminAuthorOverride(manifest, 555, NOW);
+  assert.equal(manifest.author, ADMIN_AUTHOR_ID);
+  assert.equal(manifest.author, "subway-builder-modded-admin");
+  assert.equal(manifest.github_id, ADMIN_AUTHOR_GITHUB_ID);
+  assert.equal(manifest.github_id, 268817724);
+  assert.deepEqual(manifest.caretakers, [{ github_id: 555, since: NOW }]);
+  assert.deepEqual(manifest.collaborators, [555]);
+});
+
+test("admin-author override keeps a form-specified caretaker and still unions the submitter", () => {
+  const manifest: ManifestWithAuthor = {
+    author: "submitter",
+    github_id: 555,
+    collaborators: [700],
+    caretakers: [{ github_id: 700, since: "2026-07-01T00:00:00Z" }],
+  };
+  applyAdminAuthorOverride(manifest, 555, NOW);
+  assert.equal(manifest.author, ADMIN_AUTHOR_ID);
+  assert.equal(manifest.github_id, ADMIN_AUTHOR_GITHUB_ID);
+  // Form caretaker wins: no new caretaker window is opened.
+  assert.deepEqual(manifest.caretakers, [{ github_id: 700, since: "2026-07-01T00:00:00Z" }]);
+  // The submitter keeps edit rights via collaborators.
+  assert.deepEqual(manifest.collaborators, [700, 555]);
+});
+
+test("admin-author override is idempotent about collaborator membership", () => {
+  const manifest: ManifestWithAuthor = {
+    author: "submitter",
+    github_id: 555,
+    collaborators: [555, 700],
+  };
+  applyAdminAuthorOverride(manifest, 555, NOW);
+  assert.deepEqual(manifest.collaborators, [555, 700]);
+  assert.deepEqual(manifest.caretakers, [{ github_id: 555, since: NOW }]);
+});
+
+test("admin-author override with the submitter as form caretaker leaves a single window", () => {
+  const manifest: ManifestWithAuthor = {
+    author: "submitter",
+    github_id: 555,
+    collaborators: [555],
+    caretakers: [{ github_id: 555, since: "2026-07-01T00:00:00Z" }],
+  };
+  applyAdminAuthorOverride(manifest, 555, NOW);
+  assert.deepEqual(manifest.caretakers, [{ github_id: 555, since: "2026-07-01T00:00:00Z" }]);
+  assert.deepEqual(manifest.collaborators, [555]);
+  assert.equal(getActiveCaretaker(manifest)?.github_id, 555);
 });
 
 // --- Resolution (GitHub account existence, fetch mocked) ---

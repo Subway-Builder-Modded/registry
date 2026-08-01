@@ -1,3 +1,4 @@
+import type { AuthorAliasIndex } from "../author-aliases.js";
 import type { DiscordEmbed } from "../discord-webhook.js";
 import type { IntegrityAlert } from "../download-definitions.js";
 
@@ -21,6 +22,54 @@ export const INTEGRITY_CHECK_FIX_HINTS: Record<string, string> = {
   security_scan_passed: "Remove or fix the files flagged by the security scan (listed in the errors above), then publish a new release.",
   release_manifest_asset: "Publish a new release with `manifest.json` uploaded as a separate release asset alongside the ZIP (not only inside it).",
 };
+
+/** Who an integrity alert should notify (ping/mention) — not who authored it. */
+export interface AlertNotifyTarget {
+  authorId: string;
+  alias: string;
+  discordId?: string;
+  githubId?: number;
+}
+
+/**
+ * Resolves the person an alert's notifications route to, in priority order:
+ * 1. the listing's ACTIVE caretaker (alert.caretakerGithubId, looked up in the
+ *    author index by github_id) when set and resolvable — they own the release
+ *    pipeline for admin-authored/caretaken listings;
+ * 2. the listing author's index entry (by author_id);
+ * 3. a bare fallback carrying only the author id (no Discord/GitHub routing).
+ * The embed itself keeps showing the listing author; only the target changes.
+ */
+export function resolveAlertNotifyTarget(
+  alert: IntegrityAlert,
+  authorIndex: AuthorAliasIndex,
+): AlertNotifyTarget {
+  if (alert.caretakerGithubId !== undefined) {
+    const caretakerEntry = authorIndex.authors.find(
+      (entry) => entry.github_id === alert.caretakerGithubId,
+    );
+    if (caretakerEntry?.author_id) {
+      return {
+        authorId: caretakerEntry.author_id,
+        alias: caretakerEntry.author_alias ?? caretakerEntry.author_id,
+        ...(caretakerEntry.discord_id ? { discordId: caretakerEntry.discord_id } : {}),
+        ...(caretakerEntry.github_id !== undefined ? { githubId: caretakerEntry.github_id } : {}),
+      };
+    }
+  }
+  const authorEntry = authorIndex.authors.find(
+    (entry) => entry.author_id === alert.authorId,
+  );
+  if (authorEntry) {
+    return {
+      authorId: authorEntry.author_id ?? alert.authorId,
+      alias: authorEntry.author_alias ?? authorEntry.author_id ?? alert.authorId,
+      ...(authorEntry.discord_id ? { discordId: authorEntry.discord_id } : {}),
+      ...(authorEntry.github_id !== undefined ? { githubId: authorEntry.github_id } : {}),
+    };
+  }
+  return { authorId: alert.authorId, alias: alert.authorId };
+}
 
 export function buildIntegrityAlertEmbed(
   alert: IntegrityAlert,
@@ -78,17 +127,22 @@ export function buildIntegrityAlertIssueTitle(alert: IntegrityAlert): string {
 }
 
 /**
- * GitHub-issue body mirroring the Discord embed, for authors with no
+ * GitHub-issue body mirroring the Discord embed, for notify targets with no
  * discord_id on file. The @mention triggers GitHub's native notification.
+ * `mentionLogin` overrides who is @mentioned (e.g. the active caretaker);
+ * it defaults to the listing author.
  */
-export function buildIntegrityAlertIssueBody(alert: IntegrityAlert): string {
+export function buildIntegrityAlertIssueBody(
+  alert: IntegrityAlert,
+  mentionLogin: string = alert.authorId,
+): string {
   const typeLabel = alert.listingType === "map" ? "Map" : "Mod";
   const regressionLabel = alert.isRegression
     ? "a previously-passing version stopped passing"
     : "a new version failed its first check";
 
   const lines: string[] = [
-    `@${alert.authorId} — your ${typeLabel.toLowerCase()} **${alert.listingName}** \`${alert.version}\` is failing integrity checks (${regressionLabel}). Failing versions are excluded from downloads until fixed.`,
+    `@${mentionLogin} — your ${typeLabel.toLowerCase()} **${alert.listingName}** \`${alert.version}\` is failing integrity checks (${regressionLabel}). Failing versions are excluded from downloads until fixed.`,
     "",
     "**Failing checks:**",
     ...alert.failingChecks.map((key) => {
