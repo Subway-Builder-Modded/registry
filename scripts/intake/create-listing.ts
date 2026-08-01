@@ -22,6 +22,7 @@ import {
   ensureCollaboratorAuthorAliasPrefills,
   resolvePublishCollaborators,
 } from "../lib/collaborators.js";
+import { resolvePublishCaretaker } from "../lib/caretakers.js";
 import {
   type MapManifest,
   type ModManifest,
@@ -154,6 +155,16 @@ async function main() {
     throw new Error(`Invalid collaborators: ${collaboratorResult.errors.join("; ")}`);
   }
   const collaborators = collaboratorResult.collaborators;
+  const caretakerResult = await resolvePublishCaretaker(data.caretaker);
+  if (caretakerResult.errors.length > 0) {
+    throw new Error(`Invalid caretaker: ${caretakerResult.errors.join("; ")}`);
+  }
+  const caretakerGithubId = caretakerResult.githubId;
+  // Caretaker ⇒ collaborator: union the id so the existing
+  // author-or-collaborator ownership check covers the caretaker unchanged.
+  if (caretakerGithubId !== null && !collaborators.includes(caretakerGithubId)) {
+    collaborators.push(caretakerGithubId);
+  }
 
   if (!description) {
     throw new Error("description is required");
@@ -180,6 +191,9 @@ async function main() {
     author: issueAuthorLogin,
     github_id: issueAuthorGithubId,
     ...(collaborators.length > 0 ? { collaborators } : {}),
+    ...(caretakerGithubId !== null
+      ? { caretakers: [{ github_id: caretakerGithubId, since: new Date().toISOString() }] }
+      : {}),
     description,
     tags,
     gallery: galleryPaths,
@@ -203,6 +217,13 @@ async function main() {
   );
   if (createdCollaboratorAliases.length > 0) {
     console.log(`Updated authors/index.json with collaborator(s): ${createdCollaboratorAliases.join(", ")}`);
+  }
+  const createdCaretakerAliases = ensureCollaboratorAuthorAliasPrefills(
+    REPO_ROOT,
+    caretakerResult.users,
+  );
+  if (createdCaretakerAliases.length > 0) {
+    console.log(`Updated authors/index.json with caretaker: ${createdCaretakerAliases.join(", ")}`);
   }
 
   assertValidRegistryManifest(

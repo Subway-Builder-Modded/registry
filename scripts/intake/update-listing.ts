@@ -20,6 +20,11 @@ import {
   ensureCollaboratorAuthorAliasPrefills,
   resolveCollaboratorUpdate,
 } from "../lib/collaborators.js";
+import {
+  applyCaretakerUpdate,
+  getActiveCaretaker,
+  resolveCaretakerUpdate,
+} from "../lib/caretakers.js";
 import { applyMapManifestUpdates } from "../lib/map-update-logic.js";
 import { resolveDemandStatsForMapUpdate } from "../lib/map-demand-stats.js";
 import { assertValidRegistryManifest } from "../lib/registry-manifest.js";
@@ -107,6 +112,31 @@ async function main() {
     );
     if (createdCollaboratorAliases.length > 0) {
       console.log(`Updated authors/index.json with collaborator(s): ${createdCollaboratorAliases.join(", ")}`);
+    }
+  }
+  // Caretaker handling is listing-type-agnostic and runs AFTER the
+  // collaborators update so the caretaker ⇒ collaborator union survives a
+  // collaborator replacement submitted on the same form.
+  const activeCaretaker = getActiveCaretaker(manifest);
+  const caretakerResolution = await resolveCaretakerUpdate(
+    data.caretaker,
+    activeCaretaker?.github_id,
+  );
+  if (caretakerResolution.errors.length > 0) {
+    throw new Error(`Invalid caretaker: ${caretakerResolution.errors.join("; ")}`);
+  }
+  const caretakerUpdate = applyCaretakerUpdate(
+    manifest,
+    data.caretaker,
+    new Date().toISOString(),
+  );
+  if (caretakerUpdate.kind === "replace") {
+    const createdCaretakerAliases = ensureCollaboratorAuthorAliasPrefills(
+      REPO_ROOT,
+      caretakerResolution.users,
+    );
+    if (createdCaretakerAliases.length > 0) {
+      console.log(`Updated authors/index.json with caretaker: ${createdCaretakerAliases.join(", ")}`);
     }
   }
   if (typeof manifest.is_test !== "boolean") {
