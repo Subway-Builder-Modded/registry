@@ -96,3 +96,24 @@ export interface AssetByDayRow {
 
 export type DailySeriesRow = Record<string, string | number>;
 export type ListingKey = `${"maps" | "mods"}:${string}`;
+
+// One unit of download credit for the author aggregations: a listing's totals
+// credited to a single person. Listings without caretakers produce exactly one
+// entry (the author, listing-grain totals, today's behavior); listings whose
+// versions are credited to different persons produce one entry per person, with
+// totals rolled up from (listing, version) grain.
+export interface AuthorCreditEntry {
+  listingType: "maps" | "mods";
+  person: {
+    author: string;
+    author_alias: string;
+    attribution_link: string;
+  };
+  // Monotonic total at the latest snapshot.
+  currentTotal: number;
+  // Adjusted (raw snapshot) total at the latest snapshot.
+  currentAdjusted: number;
+  monotonicAt(snapshotFile: string): number;
+  adjustedAt(snapshotFile: string): number;
+  deltaAt(snapshotFile: string): number;
+}

@@ -105,6 +105,86 @@ export function buildListingVersionsBySnapshot(
   return bySnapshot;
 }
 
+// Per-(listing, version) totals for the given listing keys, keyed
+// `${listingKey}@@${version}`. Mirrors toListingTotals at version grain; used to
+// split a listing's downloads between credited persons (caretaker crediting).
+export function toListingVersionTotals(
+  snapshot: SnapshotData,
+  listingKeys: ReadonlySet<ListingKey>,
+): Map<string, number> {
+  const totals = new Map<string, number>();
+  for (const listingType of ["maps", "mods"] as const) {
+    const downloads = snapshot?.[listingType]?.downloads;
+    if (!downloads || typeof downloads !== "object") continue;
+    for (const [id, versions] of Object.entries(downloads)) {
+      const listingKey: ListingKey = `${listingType}:${id}`;
+      if (!listingKeys.has(listingKey)) continue;
+      if (!versions || typeof versions !== "object") continue;
+      for (const [version, count] of Object.entries(versions)) {
+        totals.set(`${listingKey}@@${version}`, isFiniteNumber(count) ? count : 0);
+      }
+    }
+  }
+  return totals;
+}
+
+export interface VersionGrainSnapshotTotals {
+  // Raw per-version counts straight from each snapshot (the "adjusted" series).
+  adjustedBySnapshot: Map<string, Map<string, number>>;
+  // Running-max per version key; same clamping rule as buildMonotonicSnapshotTotals.
+  monotonicBySnapshot: Map<string, Map<string, number>>;
+  // Clamped day-over-day deltas of the monotonic series; same rule as
+  // buildDailyDeltaSnapshotTotals.
+  dailyDeltasBySnapshot: Map<string, Map<string, number>>;
+}
+
+// Applies the listing-grain monotonic/delta machinery at (listing, version)
+// grain, but only for the given listing keys (those whose versions are credited
+// to different persons). Skipped entirely when no listing has caretakers.
+export function buildVersionGrainSnapshotTotals(
+  snapshots: SnapshotEntry[],
+  historyDir: string,
+  listingKeys: ReadonlySet<ListingKey>,
+): VersionGrainSnapshotTotals {
+  const adjustedBySnapshot = new Map<string, Map<string, number>>();
+  const monotonicBySnapshot = new Map<string, Map<string, number>>();
+  const dailyDeltasBySnapshot = new Map<string, Map<string, number>>();
+  const runningMax = new Map<string, number>();
+  let previousMonotonic = new Map<string, number>();
+
+  for (const snapshot of snapshots) {
+    const snapshotData = readJsonFile<SnapshotData>(join(historyDir, snapshot.file));
+    const adjustedTotals = toListingVersionTotals(snapshotData, listingKeys);
+    adjustedBySnapshot.set(snapshot.file, adjustedTotals);
+
+    const snapshotMonotonic = new Map<string, number>();
+    const keys = new Set<string>([...runningMax.keys(), ...adjustedTotals.keys()]);
+    for (const key of keys) {
+      const previousMax = runningMax.get(key) ?? 0;
+      const adjustedTotal = adjustedTotals.get(key) ?? 0;
+      const nextMax = Math.max(previousMax, adjustedTotal);
+      if (nextMax > 0 || adjustedTotals.has(key) || runningMax.has(key)) {
+        runningMax.set(key, nextMax);
+        snapshotMonotonic.set(key, nextMax);
+      }
+    }
+    monotonicBySnapshot.set(snapshot.file, snapshotMonotonic);
+
+    const deltaKeys = new Set<string>([...previousMonotonic.keys(), ...snapshotMonotonic.keys()]);
+    const deltaTotals = new Map<string, number>();
+    for (const key of deltaKeys) {
+      const delta = Math.max(0, (snapshotMonotonic.get(key) ?? 0) - (previousMonotonic.get(key) ?? 0));
+      if (delta > 0 || snapshotMonotonic.has(key) || previousMonotonic.has(key)) {
+        deltaTotals.set(key, delta);
+      }
+    }
+    dailyDeltasBySnapshot.set(snapshot.file, deltaTotals);
+    previousMonotonic = snapshotMonotonic;
+  }
+
+  return { adjustedBySnapshot, monotonicBySnapshot, dailyDeltasBySnapshot };
+}
+
 export function buildMonotonicSnapshotTotals(
   snapshots: SnapshotEntry[],
   historyDir: string,
