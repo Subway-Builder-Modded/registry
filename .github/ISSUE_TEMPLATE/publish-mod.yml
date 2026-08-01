@@ -122,6 +122,16 @@ body:
         Optional comma-separated collaborator GitHub user IDs. Each ID must belong to an existing GitHub account.
       placeholder: 123456789, 987654321
 
+  - type: input
+    id: caretaker
+    attributes:
+      label: Caretaker (GitHub user ID)
+      description: >
+        Optional. Numeric GitHub user ID of the person who maintains this listing going forward; downloads of
+        versions they publish are credited to them; the author never changes. The caretaker is also added as a
+        collaborator.
+      placeholder: "123456789"
+
   - type: checkboxes
     id: terms
     attributes:

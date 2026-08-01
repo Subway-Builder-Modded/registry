@@ -71,6 +71,55 @@ export const InitialViewStateSchema = z.object({
     pitch: z.number().optional(),
     bearing: z.number(),
 });
+// A caretaker window: the period during which a caretaker (a time-locked
+// collaborator) maintained the listing. The active caretaker is the entry
+// without `until`; downloads of versions released inside a window are
+// credited to that caretaker (crediting is applied at the analytics layer).
+export const CaretakerWindowSchema = z.object({
+    github_id: z.number().int().min(1),
+    since: z.string().datetime(),
+    until: z.string().datetime().optional(),
+});
+const CaretakersSchema = z
+    .array(CaretakerWindowSchema)
+    .superRefine((entries, ctx) => {
+    let activeIndex = null;
+    for (let index = 0; index < entries.length; index++) {
+        const entry = entries[index];
+        if (entry.until === undefined) {
+            if (activeIndex !== null) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: [index],
+                    message: "at most one caretaker entry may be active (missing until)",
+                });
+            }
+            activeIndex = index;
+        }
+        else if (Date.parse(entry.until) <= Date.parse(entry.since)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: [index, "until"],
+                message: "caretaker until must be after since",
+            });
+        }
+        if (index > 0
+            && Date.parse(entries[index - 1].since) > Date.parse(entry.since)) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: [index, "since"],
+                message: "caretaker entries must be in ascending since order",
+            });
+        }
+    }
+    if (activeIndex !== null && activeIndex !== entries.length - 1) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: [activeIndex],
+            message: "the active caretaker entry (missing until) must be the last entry",
+        });
+    }
+});
 const BaseManifestSchema = z.object({
     schema_version: z.literal(1),
     id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
@@ -78,6 +127,10 @@ const BaseManifestSchema = z.object({
     author: z.string().min(1),
     github_id: z.number().int().min(1),
     collaborators: z.array(z.number().int().min(1)).refine((a) => new Set(a).size === a.length, { message: "collaborators must be unique" }).optional(),
+    // Caretaker history (ascending by since). Invariants enforced above: closed
+    // windows have until > since, and at most one entry is active (no until),
+    // which must be the last entry. Every caretaker is also a collaborator.
+    caretakers: CaretakersSchema.optional(),
     description: z.string().min(1),
     tags: z.array(z.string().min(1)).refine((a) => new Set(a).size === a.length, { message: "tags must be unique" }),
     gallery: z.array(z.string().min(1)),

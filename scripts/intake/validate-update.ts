@@ -10,6 +10,7 @@ import {
   resolveManifestType as resolveManifestType,
 } from "../lib/manifests.js";
 import { resolveCollaboratorUpdate } from "../lib/collaborators.js";
+import { getActiveCaretaker, resolveCaretakerUpdate } from "../lib/caretakers.js";
 import { VANILLA_CITY_CODE_SET } from "../lib/map-constants.js";
 import { isPresentIssueValue } from "../lib/map-field-utils.js";
 import { validateMapUpdateFields } from "../lib/map-update-logic.js";
@@ -153,6 +154,16 @@ async function main() {
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     errors.push(`**collaborators**: ${message}`);
+  }
+  try {
+    const activeCaretakerId = existingManifest
+      ? getActiveCaretaker(existingManifest)?.github_id
+      : undefined;
+    const caretakerResult = await resolveCaretakerUpdate(data.caretaker, activeCaretakerId);
+    errors.push(...caretakerResult.errors.map((message) => `**caretaker**: ${message}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`**caretaker**: ${message}`);
   }
 
   if (errors.length > 0) {

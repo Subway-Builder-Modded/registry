@@ -241,6 +241,11 @@ function withTemplatePolicy(baseDoc: TemplateDoc, mode: TemplateMode): TemplateD
         "Leave blank to keep current collaborators. Enter `None` to clear. Otherwise, enter comma-separated GitHub user IDs to replace current collaborators.";
     }
 
+    if (mode === "update" && id === "caretaker" && field.attributes) {
+      field.attributes.description =
+        "Leave blank to keep the current caretaker. Enter `None` to end the current caretakership. Otherwise, enter a single GitHub user ID to hand over caretakership; the previous caretaker's window is closed and the new caretaker is added as a collaborator.";
+    }
+
     if (mode === "update" && id === "included-cities" && field.attributes) {
       field.attributes.description =
         "Leave blank to keep current additional cities. Enter `None` to clear. Otherwise, enter a comma-separated list to replace (e.g. `Gdynia, Sopot`).";
@@ -376,6 +381,12 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
     "Collaborators",
     "Optional comma-separated collaborator GitHub user IDs. Each ID must belong to an existing GitHub account.",
     { placeholder: "123456789, 987654321", required: false },
+  ),
+  input(
+    "caretaker",
+    "Caretaker (GitHub user ID)",
+    "Optional. Numeric GitHub user ID of the person who maintains this listing going forward; downloads of versions they publish are credited to them; the author never changes. The caretaker is also added as a collaborator.",
+    { placeholder: "123456789", required: false },
   ),
   spacer(),
   // ===== Authorization ===== //

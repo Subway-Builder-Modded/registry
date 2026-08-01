@@ -227,6 +227,16 @@
         enter comma-separated GitHub user IDs to replace current collaborators."
     "validations":
       "required": false
+  - "type": "input"
+    "id": "caretaker"
+    "attributes":
+      "label": "Caretaker (GitHub user ID)"
+      "description": "Leave blank to keep the current caretaker. Enter `None` to end the current
+        caretakership. Otherwise, enter a single GitHub user ID to hand over caretakership;
+        the previous caretaker's window is closed and the new caretaker is added as a
+        collaborator."
+    "validations":
+      "required": false
   - "type": "markdown"
     "attributes":
       "value": "<br>"

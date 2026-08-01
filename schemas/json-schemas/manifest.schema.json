@@ -33,6 +33,31 @@
                 "minimum": 1
               }
             },
+            "caretakers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "github_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "since": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "until": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "github_id",
+                  "since"
+                ],
+                "additionalProperties": false
+              }
+            },
             "description": {
               "type": "string",
               "minLength": 1
@@ -684,6 +709,31 @@
               "items": {
                 "type": "integer",
                 "minimum": 1
+              }
+            },
+            "caretakers": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "github_id": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "since": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "until": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                },
+                "required": [
+                  "github_id",
+                  "since"
+                ],
+                "additionalProperties": false
               }
             },
             "description": {

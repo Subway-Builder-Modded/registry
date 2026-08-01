@@ -6,6 +6,7 @@ import { validateCustomUpdateUrl } from "../lib/custom-url.js";
 import { validateGitHubRepo } from "../lib/github.js";
 import { parseGalleryImages } from "../lib/gallery.js";
 import { resolvePublishCollaborators } from "../lib/collaborators.js";
+import { resolvePublishCaretaker } from "../lib/caretakers.js";
 import {
   COUNTRY_TO_LOCATION,
   DEFAULT_MAP_DATA_SOURCE,
@@ -34,6 +35,7 @@ const PublishModInput = z.object({
   description: z.string().min(1, "Description is required"),
   source: z.string().url("Source must be a valid URL"),
   collaborators: z.string().optional(),
+  caretaker: z.string().optional(),
   "update-type": z.enum(["GitHub Releases", "Custom URL"]),
   "github-repo": z.string().optional(),
   "custom-update-url": z.string().optional(),
@@ -89,6 +91,13 @@ async function validateMod(data: Record<string, string>): Promise<ValidationResu
     const message = error instanceof Error ? error.message : String(error);
     errors.push(`**collaborators**: ${message}`);
   }
+  try {
+    const caretakerResult = await resolvePublishCaretaker(parsed.data.caretaker);
+    errors.push(...caretakerResult.errors.map((message) => `**caretaker**: ${message}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`**caretaker**: ${message}`);
+  }
 
   if (parsed.data["update-type"] === "GitHub Releases") {
     if (!parsed.data["github-repo"] || !/^[^/]+\/[^/]+$/.test(parsed.data["github-repo"])) {
@@ -142,6 +151,13 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     errors.push(`**collaborators**: ${message}`);
+  }
+  try {
+    const caretakerResult = await resolvePublishCaretaker(parsed.data.caretaker);
+    errors.push(...caretakerResult.errors.map((message) => `**caretaker**: ${message}`));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    errors.push(`**caretaker**: ${message}`);
   }
 
   if (!COUNTRY_TO_LOCATION[parsed.data.country]) {
