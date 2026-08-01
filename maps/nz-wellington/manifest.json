@@ -44,7 +44,17 @@
     "airports",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "WEL.pmtiles": 21.06,
+    "WEL_foundations.pmtiles": 11.86,
+    "buildings_index.bin.gz": 10.22,
+    "buildings_index.json.gz": 7.68,
+    "config.json": 0,
+    "demand_data.json": 0.36,
+    "ocean_depth_index.json.gz": 4.15,
+    "roads.geojson": 6.25,
+    "runways_taxiways.geojson": 0.15
+  },
   "collaborators": [
     102868699
   ],
@@ -53,5 +63,91 @@
       "github_id": 102868699,
       "since": "2026-08-01T03:14:35.733Z"
     }
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.245912187984404,
+      "p25": 0.2653688584853173,
+      "p50": 0.2943427741408929,
+      "p75": 0.32934318176892124,
+      "p90": 0.36370133954553885,
+      "mean": 0.3119279322261273
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.22413216256802393,
+      "p25": 0.2543519261111563,
+      "p50": 0.30506367636750037,
+      "p75": 0.3345173456337484,
+      "p90": 0.5580795541771679,
+      "mean": 0.33828292336732807
+    },
+    "commuteDistanceKm": {
+      "p10": 1978,
+      "p25": 4156,
+      "p50": 9072,
+      "p75": 19734,
+      "p90": 29740,
+      "mean": 13396.05852059925
+    },
+    "residentCellDensity": {
+      "p10": 81,
+      "p25": 173,
+      "p50": 431,
+      "p75": 851,
+      "p90": 1248,
+      "mean": 569.8424657534247
+    },
+    "workerCellDensity": {
+      "p10": 92,
+      "p25": 133,
+      "p50": 243,
+      "p75": 552,
+      "p90": 2795,
+      "mean": 1104.7929515418502
+    },
+    "detail": {
+      "radiusKm": 0.29965528327000945,
+      "expectedPointSpacingKm": 0.5404136712877763,
+      "normalizedRadius": 0.5544924179211589,
+      "activityPerPoint": 163.48631029986961,
+      "playableAreaKm2": 624,
+      "playableAreaPerPointKm2": 0.4067796610169492,
+      "playableCatchmentRadiusKm": 0.35983605655935325,
+      "localityScore": 0.51282299440821,
+      "deaggregationScore": 1,
+      "score": 0.7161166067116514
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.998466450078682,
+        "continuousScore": 0.8332104410491873,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9969375965060012,
+        "largestCenterShare": 0.5195802829481474,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 174.92816213254324,
+            "latitude": -41.134623229435704,
+            "massShare": 0.5195802829481474,
+            "assignedMass": 260609,
+            "assignedPointCount": 1067,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 174.78230914938564,
+            "latitude": -41.28785148132313,
+            "massShare": 0.48041971705185255,
+            "assignedMass": 240967,
+            "assignedPointCount": 467,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1785283200
 }

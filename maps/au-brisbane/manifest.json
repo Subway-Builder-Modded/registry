@@ -45,7 +45,17 @@
     "airports",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "BNE.pmtiles": 125.98,
+    "BNE_foundations.pmtiles": 66.09,
+    "buildings_index.bin.gz": 60.43,
+    "buildings_index.json.gz": 44.33,
+    "config.json": 0,
+    "demand_data.json": 1.86,
+    "ocean_depth_index.json.gz": 11.98,
+    "roads.geojson": 50.97,
+    "runways_taxiways.geojson": 0.9
+  },
   "included_cities": [
     "Gold Coast"
   ],
@@ -57,5 +67,91 @@
       "github_id": 102868699,
       "since": "2026-08-01T03:13:15.710Z"
     }
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.2798566749001673,
+      "p25": 0.3131955844915193,
+      "p50": 0.3646964041743665,
+      "p75": 0.4447244502556071,
+      "p90": 0.621720465766035,
+      "mean": 0.4450160637138373
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.2902397981149549,
+      "p25": 0.3293648070618639,
+      "p50": 0.4001152541268749,
+      "p75": 0.589333925237536,
+      "p90": 0.9393478425314343,
+      "mean": 0.5544628028695264
+    },
+    "commuteDistanceKm": {
+      "p10": 3429,
+      "p25": 6603,
+      "p50": 13112,
+      "p75": 23629,
+      "p90": 37771,
+      "mean": 18282.3180008471
+    },
+    "residentCellDensity": {
+      "p10": 139,
+      "p25": 228,
+      "p50": 454,
+      "p75": 855,
+      "p90": 1244,
+      "mean": 618.3435430463576
+    },
+    "workerCellDensity": {
+      "p10": 118,
+      "p25": 196,
+      "p50": 388,
+      "p75": 770,
+      "p90": 1473,
+      "mean": 882.9520710059171
+    },
+    "detail": {
+      "radiusKm": 0.3819955424286835,
+      "expectedPointSpacingKm": 0.6235408630525832,
+      "normalizedRadius": 0.6126231095081732,
+      "activityPerPoint": 230.60888340530536,
+      "playableAreaKm2": 4116,
+      "playableAreaPerPointKm2": 0.634793337446021,
+      "playableCatchmentRadiusKm": 0.4495119520020258,
+      "localityScore": 0.4072636117617685,
+      "deaggregationScore": 1,
+      "score": 0.6381720863229358
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.6688603536431104,
+        "continuousScore": 0.9023560888323225,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.5024719648863822,
+        "largestCenterShare": 0.7877236722781468,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 153.03294736971682,
+            "latitude": -27.476893256402743,
+            "massShare": 0.7877236722781468,
+            "assignedMass": 2355716,
+            "assignedPointCount": 4986,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 153.37968967849125,
+            "latitude": -27.992862327746447,
+            "massShare": 0.2122763277218532,
+            "assignedMass": 634820,
+            "assignedPointCount": 1498,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1785283200
 }
