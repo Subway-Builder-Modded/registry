@@ -23,8 +23,8 @@ jobs:
           github.event.comment.author_association == 'OWNER' ||
           github.event.comment.author_association == 'COLLABORATOR')) ||
         (github.event_name == 'issue_comment' &&
-         (contains(github.event.comment.body, '/admin-author') ||
-          contains(github.event.comment.body, '/quality-exempt')) &&
+         (contains(github.event.comment.body, 'admin_author') ||
+          contains(github.event.comment.body, 'data_quality_exempt')) &&
          (github.event.comment.author_association == 'MEMBER' ||
           github.event.comment.author_association == 'OWNER'))
       )
@@ -136,8 +136,8 @@ jobs:
               }
               return false;
             };
-            const adminAuthor = await hasCommand('/admin-author');
-            const qualityExempt = await hasCommand('/quality-exempt');
+            const adminAuthor = await hasCommand('admin_author');
+            const qualityExempt = await hasCommand('data_quality_exempt');
             core.setOutput('admin_author', adminAuthor ? 'true' : 'false');
             core.setOutput('quality_exempt', qualityExempt ? 'true' : 'false');
             console.log(`Maintainer overrides: admin_author=${adminAuthor} quality_exempt=${qualityExempt}`);
@@ -279,8 +279,8 @@ jobs:
           github.event.comment.author_association == 'OWNER' ||
           github.event.comment.author_association == 'COLLABORATOR')) ||
         (github.event_name == 'issue_comment' &&
-         (contains(github.event.comment.body, '/admin-author') ||
-          contains(github.event.comment.body, '/quality-exempt')) &&
+         (contains(github.event.comment.body, 'admin_author') ||
+          contains(github.event.comment.body, 'data_quality_exempt')) &&
          (github.event.comment.author_association == 'MEMBER' ||
           github.event.comment.author_association == 'OWNER'))
       )
@@ -387,8 +387,8 @@ jobs:
               }
               return false;
             };
-            const adminAuthor = await hasCommand('/admin-author');
-            const qualityExempt = await hasCommand('/quality-exempt');
+            const adminAuthor = await hasCommand('admin_author');
+            const qualityExempt = await hasCommand('data_quality_exempt');
             core.setOutput('admin_author', adminAuthor ? 'true' : 'false');
             core.setOutput('quality_exempt', qualityExempt ? 'true' : 'false');
             console.log(`Maintainer overrides: admin_author=${adminAuthor} quality_exempt=${qualityExempt}`);
@@ -458,7 +458,7 @@ jobs:
             // marks it ready after confirming the answers; a maintainer can
             // mark it ready manually to grandfather (add dq-grandfathered so
             // CI's publish gate is exempted too), or waive the gate up front
-            // by commenting /quality-exempt on the submission issue â€” then
+            // by commenting data_quality_exempt on the submission issue â€” then
             // the PR is created (or, if it already exists, updated) ready
             // with dq-grandfathered applied.
             const qualityExempt = '${{ steps.overrides.outputs.quality_exempt }}' === 'true';
@@ -477,7 +477,7 @@ jobs:
                     `mutation($id: ID!) { markPullRequestReadyForReview(input: { pullRequestId: $id }) { pullRequest { number } } }`,
                     { id: existingPr.node_id }
                   );
-                  console.log(`PR #${existingPr.number} marked ready (quality-exempt)`);
+                  console.log(`PR #${existingPr.number} marked ready (data_quality_exempt)`);
                 }
                 await github.rest.issues.addLabels({
                   owner: context.repo.owner,
@@ -500,7 +500,7 @@ jobs:
                 'Submitted by @${{ github.event.issue.user.login }}',
                 '',
                 qualityExempt
-                  ? '**Data-quality requirement exempted by a maintainer** (`/quality-exempt` on the submission issue) â€” this PR is ready to merge at unconfirmed quality.'
+                  ? '**Data-quality requirement exempted by a maintainer** (`data_quality_exempt` on the submission issue) â€” this PR is ready to merge at unconfirmed quality.'
                   : '**Draft until data quality is confirmed** â€” the author answers the data-quality questions (invite on the submission issue), then a maintainer reviews and comments `rescore_data` here, which marks this PR ready to merge.'
               ].join('\n'),
               head: branch,
@@ -572,12 +572,12 @@ jobs:
               ? `\n\nIf this map was generated with the same methodology as your other scored ${country} maps (${sampleIds.map((id) => `[\`${id}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/main/maps/${id})`).join(', ')}), select **Yes** on the first question to inherit their answers automatically.`
               : '';
 
-            // /quality-exempt flips the required-next-step wording: the PR is
+            // data_quality_exempt flips the required-next-step wording: the PR is
             // created ready to merge, so the comment must not claim the
             // submission is blocked on data-quality confirmation.
             const qualityExempt = '${{ steps.overrides.outputs.quality_exempt }}' === 'true';
             const dataQualityNote = qualityExempt
-              ? `**Data quality:** the data-quality requirement was exempted by a maintainer (\`/quality-exempt\`), so the publish PR is ready to merge without a confirmed tier. You can still [answer the data-quality questions](${inviteUrl}) at any time to earn a tier â€” the [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) explains every question in plain language.`
+              ? `**Data quality:** the data-quality requirement was exempted by a maintainer (\`data_quality_exempt\`), so the publish PR is ready to merge without a confirmed tier. You can still [answer the data-quality questions](${inviteUrl}) at any time to earn a tier â€” the [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) explains every question in plain language.`
               : `**Required next step â€” data quality:** [answer the data-quality questions](${inviteUrl}) so your map can receive its data-quality tier. **Your submission cannot merge until a maintainer confirms your answers**; the publish PR stays in draft until then. The [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) explains every question in plain language, and new submissions are subject to the [quality floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for countries with existing maps.`;
 
             await github.rest.issues.createComment({

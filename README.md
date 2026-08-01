@@ -37,10 +37,10 @@ PRs. Who can use each command is enforced by the workflows:
 | --- | --- | --- | --- |
 | `revalidate` | Any submission/update issue (publish-mod/map, update-mod/map, update-author, data-quality) | Issue author or org OWNER/MEMBER/COLLABORATOR | Re-runs validation after the issue was edited (e.g. after a `failed-validation` result). |
 | `rescore_data [flags]` | Automated data-quality / publish **PRs** | OWNER/MEMBER/COLLABORATOR | Confirms the submitter's data-quality answers, applies the tier, and marks the publish PR ready to merge. Optional flags on the same line are passed through (e.g. `--admin` to bypass-merge). |
-| `/admin-author` | Publish issues | OWNER/MEMBER only | Creates the listing with author `subway-builder-modded-admin`; the issue submitter is recorded as active **caretaker** (credited for downloads of versions released during their tenure) and added as a collaborator. Use for assets whose true author has no GitHub account. |
-| `/quality-exempt` | Publish-map issues | OWNER/MEMBER only | Waives the data-quality merge gate for this submission: the publish PR is created ready (non-draft) with the `dq-grandfathered` label and merges at `unknown-quality`. |
+| `admin_author` | Publish issues | Repo admin/maintain | Creates the listing with author `subway-builder-modded-admin`; the issue submitter is recorded as active **caretaker** (credited for downloads of versions released during their tenure) and added as a collaborator. Use for assets whose true author has no GitHub account. |
+| `data_quality_exempt` | Publish-map issues | Repo admin/maintain | Waives the data-quality merge gate for this submission: the publish PR is created (or updated) ready with the `dq-grandfathered` label and merges at `unknown-quality`. |
 
-`/admin-author` and `/quality-exempt` may be commented before or after
+`admin_author` and `data_quality_exempt` may be commented before or after
 validation runs — the workflow scans all issue comments, so follow up with
 `revalidate` (or comment the command itself, which also triggers a run) to
 apply them.
