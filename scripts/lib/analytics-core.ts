@@ -1,4 +1,4 @@
-import { mkdirSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { loadAuthorAliasIndex } from "./author-aliases.js";
@@ -6,6 +6,12 @@ import { getFlagValue } from "./cli.js";
 import { writeCsv } from "./csv.js";
 import { readJsonFile } from "./json-utils.js";
 import { resolveRepoRoot } from "./script-runtime.js";
+import { compareStableSemverAsc } from "./semver.js";
+import { isTestListing } from "./test-listings.js";
+import {
+  buildVersionCreditResolver,
+  type CreditedPersonPresentation,
+} from "./analytics/credited-person.js";
 import {
   buildAssetsByDayRows,
   buildAuthorByDayRows,
@@ -26,12 +32,14 @@ import {
   buildListingIdsBySnapshot,
   buildListingVersionsBySnapshot,
   buildMonotonicSnapshotTotals,
+  buildVersionGrainSnapshotTotals,
   listSnapshots,
   resolveBaselineSnapshot,
   toListingTotals,
 } from "./analytics/snapshots.js";
 import type {
   AssetByDayRow,
+  AuthorCreditEntry,
   DailySeriesRow,
   ListingKey,
   ListingMeta,
@@ -113,6 +121,16 @@ interface AuthorAssetCountRow {
   mod_count: number;
   total_downloads: number;
   adjusted_total_downloads: number;
+  // Number of listings where this person is the ACTIVE caretaker (no `until`).
+  // Appended last so existing positional consumers keep working.
+  caretaken_asset_count: number;
+}
+
+interface ListingVersionCreditRow {
+  listing_type: "map" | "mod";
+  listing_id: string;
+  version: string;
+  credited_author_id: string;
 }
 
 interface AuthorTotalDownloadsRow {
@@ -262,6 +280,118 @@ export function runGenerateAnalyticsCli(
   for (const key of latestAdjustedTotals.keys()) {
     const [listingType, id] = key.split(":") as ["maps" | "mods", string];
     listingMeta.set(key, loadManifestMeta(resolvedRepoRoot, listingType, id, authorAliases));
+  }
+
+  // --- Caretaker download crediting (author aggregations only) ---
+  // Each listing is partitioned into "credit units": groups of versions credited
+  // to the same person per the [since, until)/released_at rule. Listings whose
+  // versions all credit one person (every listing without caretakers, and
+  // caretaker-since-epoch listings) keep listing-grain totals; only listings
+  // split between persons use (listing, version)-grain monotonic/delta math.
+  const creditResolver = buildVersionCreditResolver({
+    repoRoot: resolvedRepoRoot,
+    authorAliases,
+  });
+  const UNKNOWN_PERSON: CreditedPersonPresentation = {
+    author: "UNKNOWN",
+    author_alias: "UNKNOWN",
+    attribution_link: "https://github.com/UNKNOWN",
+  };
+
+  // Union of versions per listing across all history snapshots.
+  const historyVersionsByListing = new Map<ListingKey, Set<string>>();
+  for (const versionSets of listingVersionsBySnapshot.values()) {
+    for (const listingType of ["maps", "mods"] as const) {
+      for (const versionKey of versionSets[listingType]) {
+        const separatorIndex = versionKey.indexOf("@@");
+        if (separatorIndex === -1) continue;
+        const key: ListingKey = `${listingType}:${versionKey.slice(0, separatorIndex)}`;
+        let versions = historyVersionsByListing.get(key);
+        if (!versions) {
+          versions = new Set<string>();
+          historyVersionsByListing.set(key, versions);
+        }
+        versions.add(versionKey.slice(separatorIndex + 2));
+      }
+    }
+  }
+
+  interface ListingCreditUnit {
+    person: CreditedPersonPresentation;
+    // null = all of the listing's versions (use listing-grain totals unchanged).
+    versions: Set<string> | null;
+  }
+  const creditUnitsByListing = new Map<ListingKey, ListingCreditUnit[]>();
+  const splitListingKeys = new Set<ListingKey>();
+  for (const key of latestTotals.keys()) {
+    const [listingType, id] = key.split(":") as ["maps" | "mods", string];
+    const meta = listingMeta.get(key);
+    const authorPerson: CreditedPersonPresentation = meta
+      ? { author: meta.author, author_alias: meta.author_alias, attribution_link: meta.attribution_link }
+      : UNKNOWN_PERSON;
+    let units: ListingCreditUnit[] = [{ person: authorPerson, versions: null }];
+    if (creditResolver.hasCaretakers(listingType, id)) {
+      const versions = [...(historyVersionsByListing.get(key) ?? new Set<string>())]
+        .sort(compareStableSemverAsc);
+      const groups = new Map<string, { person: CreditedPersonPresentation; versions: Set<string> }>();
+      for (const version of versions) {
+        const person = creditResolver.resolvePresentation(listingType, id, version, authorPerson);
+        const group = groups.get(person.author) ?? { person, versions: new Set<string>() };
+        group.versions.add(version);
+        groups.set(person.author, group);
+      }
+      if (groups.size === 1) {
+        units = [{ person: [...groups.values()][0]!.person, versions: null }];
+      } else if (groups.size > 1) {
+        units = [...groups.values()].map((group) => ({ person: group.person, versions: group.versions }));
+        splitListingKeys.add(key);
+      }
+    }
+    creditUnitsByListing.set(key, units);
+  }
+
+  const versionGrain = splitListingKeys.size > 0
+    ? buildVersionGrainSnapshotTotals(snapshots, historyDir, splitListingKeys)
+    : null;
+  const sumOverVersionKeys = (
+    totals: Map<string, number> | undefined,
+    versionKeys: readonly string[],
+  ): number => {
+    if (!totals) return 0;
+    let total = 0;
+    for (const versionKey of versionKeys) {
+      total += totals.get(versionKey) ?? 0;
+    }
+    return total;
+  };
+
+  const authorCreditEntries: AuthorCreditEntry[] = [];
+  for (const [key, currentTotal] of latestTotals.entries()) {
+    const [listingType] = key.split(":") as ["maps" | "mods", string];
+    for (const unit of creditUnitsByListing.get(key) ?? []) {
+      if (unit.versions === null) {
+        authorCreditEntries.push({
+          listingType,
+          person: unit.person,
+          currentTotal,
+          currentAdjusted: latestAdjustedTotals.get(key) ?? 0,
+          monotonicAt: (file) => monotonicTotalsBySnapshot.get(file)?.get(key) ?? 0,
+          adjustedAt: (file) => getAdjustedTotalsForSnapshot(file).get(key) ?? 0,
+          deltaAt: (file) => filteredDailyDeltasBySnapshot.get(file)?.get(key) ?? 0,
+        });
+      } else {
+        const versionKeys = [...unit.versions].map((version) => `${key}@@${version}`);
+        authorCreditEntries.push({
+          listingType,
+          person: unit.person,
+          currentTotal: sumOverVersionKeys(versionGrain?.monotonicBySnapshot.get(latest.file), versionKeys),
+          currentAdjusted: sumOverVersionKeys(versionGrain?.adjustedBySnapshot.get(latest.file), versionKeys),
+          monotonicAt: (file) => sumOverVersionKeys(versionGrain?.monotonicBySnapshot.get(file), versionKeys),
+          adjustedAt: (file) => sumOverVersionKeys(versionGrain?.adjustedBySnapshot.get(file), versionKeys),
+          deltaAt: (file) => sumOverVersionKeys(versionGrain?.dailyDeltasBySnapshot.get(file), versionKeys),
+        });
+      }
+    }
   }
 
   const listingProjectRows: ListingProjectRow[] = [...latestAdjustedTotals.keys()]
@@ -481,6 +611,8 @@ export function runGenerateAnalyticsCli(
     }));
   })();
 
+  // authors_by_asset_count stays AUTHORSHIP-based (assets owned); caretaker
+  // crediting only adds the caretaken_asset_count column.
   const authorStats = new Map<string, Omit<AuthorAssetCountRow, "rank">>();
   for (const [key, total] of latestTotals.entries()) {
     const [listingType] = key.split(":") as ["maps" | "mods", string];
@@ -500,6 +632,7 @@ export function runGenerateAnalyticsCli(
       mod_count: 0,
       total_downloads: 0,
       adjusted_total_downloads: 0,
+      caretaken_asset_count: 0,
     };
     previous.asset_count += 1;
     if (listingType === "maps") previous.map_count += 1;
@@ -509,31 +642,66 @@ export function runGenerateAnalyticsCli(
     authorStats.set(meta.author, previous);
   }
 
+  // caretaken_asset_count: listings whose manifest declares this person as the
+  // ACTIVE caretaker (entry without `until`). Persons who caretake but author
+  // nothing still get a row (zeros in the authorship columns).
+  for (const key of latestTotals.keys()) {
+    const [listingType, id] = key.split(":") as ["maps" | "mods", string];
+    const active = creditResolver.activeCaretaker(listingType, id);
+    if (!active) continue;
+    const existing = authorStats.get(active.author) ?? {
+      author: active.author,
+      author_alias: active.author_alias,
+      attribution_link: active.attribution_link,
+      asset_count: 0,
+      map_count: 0,
+      mod_count: 0,
+      total_downloads: 0,
+      adjusted_total_downloads: 0,
+      caretaken_asset_count: 0,
+    };
+    existing.caretaken_asset_count += 1;
+    authorStats.set(active.author, existing);
+  }
+
+  // authors_by_total_downloads aggregates per CREDITED person (caretaker
+  // crediting); identical to authorStats whenever no listing splits credit.
+  const creditedAuthorStats = new Map<string, Omit<AuthorTotalDownloadsRow, "rank">>();
+  for (const entry of authorCreditEntries) {
+    const previous = creditedAuthorStats.get(entry.person.author) ?? {
+      author: entry.person.author,
+      author_alias: entry.person.author_alias,
+      attribution_link: entry.person.attribution_link,
+      total_downloads: 0,
+      adjusted_total_downloads: 0,
+      asset_count: 0,
+      map_count: 0,
+      mod_count: 0,
+    };
+    previous.asset_count += 1;
+    if (entry.listingType === "maps") previous.map_count += 1;
+    if (entry.listingType === "mods") previous.mod_count += 1;
+    previous.total_downloads += entry.currentTotal;
+    previous.adjusted_total_downloads += entry.currentAdjusted;
+    creditedAuthorStats.set(entry.person.author, previous);
+  }
+
+  // Author windows aggregate per CREDITED person (caretaker crediting) at
+  // credit-unit grain; identical to the old listing-author rollup whenever no
+  // listing splits credit between persons.
   const authorRowsForWindow = (days: number): AuthorWindowRow[] => {
     const baseline = resolveBaselineSnapshot(snapshots, latest.date, days);
-    const baselineAdjustedTotals = getAdjustedTotalsForSnapshot(baseline.file);
-    const baselineTotals = filterOutTestListingTotals(
-      resolvedRepoRoot,
-      monotonicTotalsBySnapshot.get(baseline.file) ?? new Map<ListingKey, number>(),
-    );
     const authorWindowStats = new Map<string, Omit<AuthorWindowRow, "rank">>();
 
-    for (const [key, currentTotal] of latestTotals.entries()) {
-      const [listingType] = key.split(":") as ["maps" | "mods", string];
-      const meta = listingMeta.get(key) ?? {
-        name: "",
-        author: "UNKNOWN",
-        author_alias: "UNKNOWN",
-        attribution_link: "https://github.com/UNKNOWN",
-        github_id: null,
-      };
-      const baselineTotal = baselineTotals.get(key) ?? 0;
-      const currentAdjustedTotal = latestAdjustedTotals.get(key) ?? 0;
-      const baselineAdjustedTotal = baselineAdjustedTotals.get(key) ?? 0;
-      const existing = authorWindowStats.get(meta.author) ?? {
-        author: meta.author,
-        author_alias: meta.author_alias,
-        attribution_link: meta.attribution_link,
+    for (const entry of authorCreditEntries) {
+      const currentTotal = entry.currentTotal;
+      const baselineTotal = entry.monotonicAt(baseline.file);
+      const currentAdjustedTotal = entry.currentAdjusted;
+      const baselineAdjustedTotal = entry.adjustedAt(baseline.file);
+      const existing = authorWindowStats.get(entry.person.author) ?? {
+        author: entry.person.author,
+        author_alias: entry.person.author_alias,
+        attribution_link: entry.person.attribution_link,
         asset_count: 0,
         map_count: 0,
         mod_count: 0,
@@ -547,15 +715,15 @@ export function runGenerateAnalyticsCli(
         baseline_snapshot: baseline.file,
       };
       existing.asset_count += 1;
-      if (listingType === "maps") existing.map_count += 1;
-      if (listingType === "mods") existing.mod_count += 1;
+      if (entry.listingType === "maps") existing.map_count += 1;
+      if (entry.listingType === "mods") existing.mod_count += 1;
       existing.download_change += currentTotal - baselineTotal;
       existing.adjusted_download_change += currentAdjustedTotal - baselineAdjustedTotal;
       existing.current_total += currentTotal;
       existing.adjusted_current_total += currentAdjustedTotal;
       existing.baseline_total += baselineTotal;
       existing.adjusted_baseline_total += baselineAdjustedTotal;
-      authorWindowStats.set(meta.author, existing);
+      authorWindowStats.set(entry.person.author, existing);
     }
 
     const rows = [...authorWindowStats.values()]
@@ -577,12 +745,12 @@ export function runGenerateAnalyticsCli(
     .slice(0, topAuthors ?? authorStats.size)
     .map((row, index) => ({ rank: index + 1, ...row }));
 
-  const authorRowsByTotalDownloads: AuthorTotalDownloadsRow[] = [...authorStats.values()]
+  const authorRowsByTotalDownloads: AuthorTotalDownloadsRow[] = [...creditedAuthorStats.values()]
     .sort((a, b) =>
       b.total_downloads - a.total_downloads
       || b.asset_count - a.asset_count
       || a.author.localeCompare(b.author))
-    .slice(0, topAuthors ?? authorStats.size)
+    .slice(0, topAuthors ?? creditedAuthorStats.size)
     .map((row, index) => ({
       rank: index + 1,
       author: row.author,
@@ -609,12 +777,42 @@ export function runGenerateAnalyticsCli(
     listingMeta,
     listingProjectByKey,
   );
-  const authorByDayRows = buildAuthorByDayRows(
-    snapshotDates,
-    latestTotals,
-    filteredDailyDeltasBySnapshot,
-    listingMeta,
-  );
+  const authorByDayRows = buildAuthorByDayRows(snapshotDates, authorCreditEntries);
+
+  // Per-version credited person for every version in the current downloads.json
+  // data (test listings excluded, like every other analytics artifact). Lets
+  // consumers (website author pages) derive credited per-author totals without
+  // recomputing caretaker windows.
+  const listingVersionCreditRows: ListingVersionCreditRow[] = [];
+  for (const listingType of ["maps", "mods"] as const) {
+    const downloadsPath = join(resolvedRepoRoot, listingType, "downloads.json");
+    if (!existsSync(downloadsPath)) continue;
+    let downloadsByListing: Record<string, Record<string, unknown>>;
+    try {
+      downloadsByListing = readJsonFile<Record<string, Record<string, unknown>>>(downloadsPath);
+    } catch {
+      continue;
+    }
+    for (const [id, versions] of Object.entries(downloadsByListing)) {
+      if (!versions || typeof versions !== "object") continue;
+      if (isTestListing(resolvedRepoRoot, listingType, id)) continue;
+      const key: ListingKey = `${listingType}:${id}`;
+      const authorId = (listingMeta.get(key)
+        ?? loadManifestMeta(resolvedRepoRoot, listingType, id, authorAliases)).author;
+      for (const version of Object.keys(versions)) {
+        listingVersionCreditRows.push({
+          listing_type: toListingLabel(listingType),
+          listing_id: id,
+          version,
+          credited_author_id: creditResolver.resolveAuthorId(listingType, id, version, authorId),
+        });
+      }
+    }
+  }
+  listingVersionCreditRows.sort((a, b) =>
+    a.listing_type.localeCompare(b.listing_type)
+    || a.listing_id.localeCompare(b.listing_id)
+    || compareStableSemverAsc(a.version, b.version));
   const assetsByDayRows = buildAssetsByDayRows(
     snapshotDates,
     filteredDailyDeltasBySnapshot,
@@ -745,6 +943,7 @@ export function runGenerateAnalyticsCli(
       "mod_count",
       "total_downloads",
       "adjusted_total_downloads",
+      "caretaken_asset_count",
     ],
     authorRowsByAssetCount,
   );
@@ -816,6 +1015,17 @@ export function runGenerateAnalyticsCli(
       "project_name",
     ],
     listingProjectRows,
+  );
+
+  writeCsv<ListingVersionCreditRow>(
+    join(analyticsDir, "listing_version_credits.csv"),
+    [
+      "listing_type",
+      "listing_id",
+      "version",
+      "credited_author_id",
+    ],
+    listingVersionCreditRows,
   );
 
   writeCsv<DailySeriesRow>(

@@ -1,6 +1,7 @@
 import { toListingLabel } from "./listing-meta.js";
 import type {
   AssetByDayRow,
+  AuthorCreditEntry,
   DailySeriesRow,
   ListingKey,
   ListingMeta,
@@ -160,41 +161,34 @@ export function buildProjectByDayRows(
     || String(a.project_key).localeCompare(String(b.project_key)));
 }
 
+// Author-by-day rolls up per CREDITED person (caretaker crediting): each credit
+// entry contributes its totals/deltas to the person it is credited to. For
+// listings without caretakers this is exactly the old listing-author rollup.
 export function buildAuthorByDayRows(
   snapshotDates: string[],
-  latestTotals: ListingTotals,
-  dailyDeltasBySnapshot: Map<string, ListingTotals>,
-  listingMeta: Map<ListingKey, ListingMeta>,
+  creditEntries: readonly AuthorCreditEntry[],
 ): DailySeriesRow[] {
   const authorRows = new Map<string, DailySeriesRow>();
 
-  for (const [key, totalDownloads] of latestTotals.entries()) {
-    const [listingType] = key.split(":") as ["maps" | "mods", string];
-    const meta = listingMeta.get(key) ?? {
-      name: "",
-      author: "UNKNOWN",
-      author_alias: "UNKNOWN",
-      attribution_link: "https://github.com/UNKNOWN",
-      github_id: null,
-    };
-    const existing = authorRows.get(meta.author) ?? {
-      author: meta.author,
-      author_alias: meta.author_alias,
-      attribution_link: meta.attribution_link,
+  for (const entry of creditEntries) {
+    const existing = authorRows.get(entry.person.author) ?? {
+      author: entry.person.author,
+      author_alias: entry.person.author_alias,
+      attribution_link: entry.person.attribution_link,
       asset_count: 0,
       map_count: 0,
       mod_count: 0,
       total_downloads: 0,
     };
     existing.asset_count = Number(existing.asset_count) + 1;
-    if (listingType === "maps") existing.map_count = Number(existing.map_count) + 1;
-    if (listingType === "mods") existing.mod_count = Number(existing.mod_count) + 1;
-    existing.total_downloads = Number(existing.total_downloads) + totalDownloads;
+    if (entry.listingType === "maps") existing.map_count = Number(existing.map_count) + 1;
+    if (entry.listingType === "mods") existing.mod_count = Number(existing.mod_count) + 1;
+    existing.total_downloads = Number(existing.total_downloads) + entry.currentTotal;
     for (const snapshotDate of snapshotDates) {
       existing[snapshotDate] = Number(existing[snapshotDate] ?? 0)
-        + (dailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)?.get(key) ?? 0);
+        + entry.deltaAt(`snapshot_${snapshotDate}.json`);
     }
-    authorRows.set(meta.author, existing);
+    authorRows.set(entry.person.author, existing);
   }
 
   return [...authorRows.values()].sort((a, b) =>
