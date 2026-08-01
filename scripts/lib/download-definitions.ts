@@ -130,6 +130,10 @@ export interface IntegrityAlert {
   listingName: string;
   listingType: "map" | "mod";
   authorId: string;
+  // GitHub ID of the listing's ACTIVE caretaker, when one exists — alert
+  // notifications route to them instead of the author (who may be the org
+  // admin account for admin-authored/caretaken listings).
+  caretakerGithubId?: number;
   version: string;
   isRegression: boolean;
   failingChecks: string[];

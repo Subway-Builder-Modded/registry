@@ -22,7 +22,11 @@ import {
   ensureCollaboratorAuthorAliasPrefills,
   resolvePublishCollaborators,
 } from "../lib/collaborators.js";
-import { resolvePublishCaretaker } from "../lib/caretakers.js";
+import {
+  ADMIN_AUTHOR_ID,
+  applyAdminAuthorOverride,
+  resolvePublishCaretaker,
+} from "../lib/caretakers.js";
 import {
   type MapManifest,
   type ModManifest,
@@ -202,6 +206,20 @@ async function main() {
     update: buildUpdate(data),
     ...(mapData ? mapData.mapFields : {}),
   };
+
+  // /admin-author maintainer override (publish-issue comment command): the
+  // listing is authored by the org admin account; the submitter stays on as
+  // collaborator and — unless the form named a caretaker — active caretaker,
+  // so they keep edit rights and download credit from v1.
+  if (process.env.ADMIN_AUTHOR_OVERRIDE === "true") {
+    applyAdminAuthorOverride(manifest, issueAuthorGithubId, new Date().toISOString());
+    console.log(
+      `[create-listing] /admin-author override: author=${ADMIN_AUTHOR_ID}; `
+      + `submitter '${issueAuthorLogin}' recorded as ${
+        caretakerGithubId !== null ? "collaborator (form caretaker kept)" : "active caretaker"
+      }`,
+    );
+  }
 
   const authorPrefillResult = ensureAuthorAliasPrefill(
     REPO_ROOT,

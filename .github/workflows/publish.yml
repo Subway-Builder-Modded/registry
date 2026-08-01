@@ -21,7 +21,12 @@ jobs:
          (github.event.comment.user.id == github.event.issue.user.id ||
           github.event.comment.author_association == 'MEMBER' ||
           github.event.comment.author_association == 'OWNER' ||
-          github.event.comment.author_association == 'COLLABORATOR'))
+          github.event.comment.author_association == 'COLLABORATOR')) ||
+        (github.event_name == 'issue_comment' &&
+         (contains(github.event.comment.body, '/admin-author') ||
+          contains(github.event.comment.body, '/quality-exempt')) &&
+         (github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'OWNER'))
       )
     runs-on: ubuntu-latest
     steps:
@@ -82,6 +87,36 @@ jobs:
               content: 'eyes'
             });
 
+      - name: Detect maintainer overrides
+        id: overrides
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Maintainer comment commands persist across revalidations: scan
+            // ALL comments on the issue, honoring a command only when its
+            // author's association is OWNER or MEMBER. A command matches when
+            // the trimmed comment body equals it, or starts with it followed
+            // by whitespace.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100
+            });
+            const hasCommand = (command) => comments.some((comment) => {
+              if (comment.author_association !== 'OWNER' && comment.author_association !== 'MEMBER') {
+                return false;
+              }
+              const body = (comment.body ?? '').trim();
+              if (body === command) return true;
+              return body.startsWith(command) && /\s/.test(body.charAt(command.length));
+            });
+            const adminAuthor = hasCommand('/admin-author');
+            const qualityExempt = hasCommand('/quality-exempt');
+            core.setOutput('admin_author', adminAuthor ? 'true' : 'false');
+            core.setOutput('quality_exempt', qualityExempt ? 'true' : 'false');
+            console.log(`Maintainer overrides: admin_author=${adminAuthor} quality_exempt=${qualityExempt}`);
+
       - name: Parse issue body
         id: parser
         uses: stefanbuck/github-issue-parser@v3
@@ -104,6 +139,7 @@ jobs:
           ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
           ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ADMIN_AUTHOR_OVERRIDE: ${{ steps.overrides.outputs.admin_author }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
@@ -216,7 +252,12 @@ jobs:
          (github.event.comment.user.id == github.event.issue.user.id ||
           github.event.comment.author_association == 'MEMBER' ||
           github.event.comment.author_association == 'OWNER' ||
-          github.event.comment.author_association == 'COLLABORATOR'))
+          github.event.comment.author_association == 'COLLABORATOR')) ||
+        (github.event_name == 'issue_comment' &&
+         (contains(github.event.comment.body, '/admin-author') ||
+          contains(github.event.comment.body, '/quality-exempt')) &&
+         (github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'OWNER'))
       )
     runs-on: ubuntu-latest
     steps:
@@ -272,6 +313,36 @@ jobs:
               content: 'eyes'
             });
 
+      - name: Detect maintainer overrides
+        id: overrides
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Maintainer comment commands persist across revalidations: scan
+            // ALL comments on the issue, honoring a command only when its
+            // author's association is OWNER or MEMBER. A command matches when
+            // the trimmed comment body equals it, or starts with it followed
+            // by whitespace.
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100
+            });
+            const hasCommand = (command) => comments.some((comment) => {
+              if (comment.author_association !== 'OWNER' && comment.author_association !== 'MEMBER') {
+                return false;
+              }
+              const body = (comment.body ?? '').trim();
+              if (body === command) return true;
+              return body.startsWith(command) && /\s/.test(body.charAt(command.length));
+            });
+            const adminAuthor = hasCommand('/admin-author');
+            const qualityExempt = hasCommand('/quality-exempt');
+            core.setOutput('admin_author', adminAuthor ? 'true' : 'false');
+            core.setOutput('quality_exempt', qualityExempt ? 'true' : 'false');
+            console.log(`Maintainer overrides: admin_author=${adminAuthor} quality_exempt=${qualityExempt}`);
+
       - name: Parse issue body
         id: parser
         uses: stefanbuck/github-issue-parser@v3
@@ -294,6 +365,7 @@ jobs:
           ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
           ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ADMIN_AUTHOR_OVERRIDE: ${{ steps.overrides.outputs.admin_author }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm --dir scripts run create-listing
 
@@ -345,7 +417,10 @@ jobs:
             // merge a draft, which is the hard publish gate. rescore_data
             // marks it ready after confirming the answers; a maintainer can
             // mark it ready manually to grandfather (add dq-grandfathered so
-            // CI's publish gate is exempted too).
+            // CI's publish gate is exempted too), or waive the gate up front
+            // by commenting /quality-exempt on the submission issue — then
+            // the PR is created ready with dq-grandfathered already applied.
+            const qualityExempt = '${{ steps.overrides.outputs.quality_exempt }}' === 'true';
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -357,17 +432,19 @@ jobs:
                 '',
                 'Submitted by @${{ github.event.issue.user.login }}',
                 '',
-                '**Draft until data quality is confirmed** — the author answers the data-quality questions (invite on the submission issue), then a maintainer reviews and comments `rescore_data` here, which marks this PR ready to merge.'
+                qualityExempt
+                  ? '**Data-quality requirement exempted by a maintainer** (`/quality-exempt` on the submission issue) — this PR is ready to merge at unconfirmed quality.'
+                  : '**Draft until data quality is confirmed** — the author answers the data-quality questions (invite on the submission issue), then a maintainer reviews and comments `rescore_data` here, which marks this PR ready to merge.'
               ].join('\n'),
               head: branch,
               base: 'main',
-              draft: true
+              draft: !qualityExempt
             });
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
-              labels: ['automated-pr']
+              labels: qualityExempt ? ['automated-pr', 'dq-grandfathered'] : ['automated-pr']
             });
 
       - name: Handle success
@@ -428,12 +505,20 @@ jobs:
               ? `\n\nIf this map was generated with the same methodology as your other scored ${country} maps (${sampleIds.map((id) => `[\`${id}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/tree/main/maps/${id})`).join(', ')}), select **Yes** on the first question to inherit their answers automatically.`
               : '';
 
+            // /quality-exempt flips the required-next-step wording: the PR is
+            // created ready to merge, so the comment must not claim the
+            // submission is blocked on data-quality confirmation.
+            const qualityExempt = '${{ steps.overrides.outputs.quality_exempt }}' === 'true';
+            const dataQualityNote = qualityExempt
+              ? `**Data quality:** the data-quality requirement was exempted by a maintainer (\`/quality-exempt\`), so the publish PR is ready to merge without a confirmed tier. You can still [answer the data-quality questions](${inviteUrl}) at any time to earn a tier — the [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) explains every question in plain language.`
+              : `**Required next step — data quality:** [answer the data-quality questions](${inviteUrl}) so your map can receive its data-quality tier. **Your submission cannot merge until a maintainer confirms your answers**; the publish PR stays in draft until then. The [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) explains every question in plain language, and new submissions are subject to the [quality floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for countries with existing maps.`;
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body: 'A pull request has been created for your map submission. A maintainer will review it shortly.\n\n' +
-                `**Required next step — data quality:** [answer the data-quality questions](${inviteUrl}) so your map can receive its data-quality tier. **Your submission cannot merge until a maintainer confirms your answers**; the publish PR stays in draft until then. The [Submission Questions guide](https://subwaybuildermodded.com/registry/docs/data-quality/questions) explains every question in plain language, and new submissions are subject to the [quality floor](https://subwaybuildermodded.com/registry/docs/data-quality/quality-floor) for countries with existing maps.` +
+                dataQualityNote +
                 sampleNote
             });
 

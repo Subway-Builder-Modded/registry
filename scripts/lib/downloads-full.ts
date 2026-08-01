@@ -59,6 +59,15 @@ import {
   type DownloadAttributionLedger,
 } from "./download-attribution.js";
 import { toDownloadAssetBucketKey } from "./download-version-buckets.js";
+import { getActiveCaretaker } from "./caretakers.js";
+
+// Per-listing display/routing metadata carried from the manifest into
+// integrity-alert assembly.
+interface ListingMetaEntry {
+  listingName: string;
+  authorId: string;
+  caretakerGithubId?: number;
+}
 
 interface AdjustedVersionCount {
   adjustedCount: number;
@@ -284,7 +293,7 @@ interface FullRunContext {
   versionBucketInputs: D.VersionBucketInputsByListing;
   integrityListings: Record<string, ListingIntegrityEntry>;
   integrityAlerts: D.IntegrityAlert[];
-  listingMeta: Map<string, { listingName: string; authorId: string }>;
+  listingMeta: Map<string, ListingMetaEntry>;
   transientErrorListings: Set<string>;
   repoIndexes: Map<string, D.RepoReleaseIndex>;
   unavailableRepos: Set<string>;
@@ -316,7 +325,7 @@ async function resolveListingContexts(params: {
   previousDownloads: D.DownloadsByListing;
   downloadsByListing: D.DownloadsByListing;
   listingContexts: Map<string, ListingContext>;
-  listingMeta: Map<string, { listingName: string; authorId: string }>;
+  listingMeta: Map<string, ListingMetaEntry>;
   repoSet: Set<string>;
   transientErrorListings: Set<string>;
 }): Promise<void> {
@@ -350,7 +359,11 @@ async function resolveListingContexts(params: {
       continue;
     }
 
-    listingMeta.set(id, { listingName: manifest.name, authorId: manifest.author });
+    listingMeta.set(id, {
+      listingName: manifest.name,
+      authorId: manifest.author,
+      caretakerGithubId: getActiveCaretaker(manifest)?.github_id,
+    });
 
     if (manifest.update.type === "github") {
       const repo = manifest.update.repo.toLowerCase();
@@ -1197,6 +1210,9 @@ function finalizeListingEntries(
           listingName: meta?.listingName ?? id,
           listingType: ctx.listingType,
           authorId: meta?.authorId ?? "",
+          ...(meta?.caretakerGithubId !== undefined
+            ? { caretakerGithubId: meta.caretakerGithubId }
+            : {}),
           version,
           isRegression: prevEntry?.is_complete === true,
           failingChecks: Object.entries(entry.required_checks)
@@ -1292,7 +1308,7 @@ export async function generateDownloadsDataFull(
 
   const downloadsByListing: D.DownloadsByListing = {};
   const listingContexts = new Map<string, ListingContext>();
-  const listingMeta = new Map<string, { listingName: string; authorId: string }>();
+  const listingMeta = new Map<string, ListingMetaEntry>();
   const repoSet = new Set<string>();
   const transientErrorListings = new Set<string>();
 

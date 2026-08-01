@@ -4,11 +4,20 @@ import { fetchGitHubUserById, type GitHubUser } from "./github.js";
 const EMPTY_UPDATE_VALUES = new Set(["", "_No response_", "No change"]);
 const CLEAR_CARETAKER_VALUE = "None";
 
+/** Listing author identity used by the /admin-author maintainer override. */
+export const ADMIN_AUTHOR_ID = "subway-builder-modded-admin";
+export const ADMIN_AUTHOR_GITHUB_ID = 268817724;
+
 export type { CaretakerWindow };
 
 export type ManifestWithCaretakers = {
   collaborators?: number[];
   caretakers?: CaretakerWindow[];
+};
+
+export type ManifestWithAuthor = ManifestWithCaretakers & {
+  author: string;
+  github_id: number;
 };
 
 export type CaretakerUpdate =
@@ -107,6 +116,30 @@ export function applyCaretakerUpdate(
   manifest.caretakers = caretakers;
   unionCollaborator(manifest, update.githubId);
   return update;
+}
+
+/**
+ * Applies the /admin-author maintainer override to a freshly built publish
+ * manifest: the listing's author becomes the org admin account, and the issue
+ * submitter keeps edit rights and download credit —
+ * - `author`/`github_id` → `subway-builder-modded-admin` / its GitHub ID;
+ * - the submitter is unioned into `collaborators` unconditionally;
+ * - unless the form already specified an (active) caretaker — the form value
+ *   wins — the submitter becomes the active caretaker since `nowIso` (which
+ *   also unions them into `collaborators`, already done above).
+ */
+export function applyAdminAuthorOverride(
+  manifest: ManifestWithAuthor,
+  submitterGithubId: number,
+  nowIso: string,
+): void {
+  manifest.author = ADMIN_AUTHOR_ID;
+  manifest.github_id = ADMIN_AUTHOR_GITHUB_ID;
+  unionCollaborator(manifest, submitterGithubId);
+  if (getActiveCaretaker(manifest) !== undefined) return;
+  const caretakers = Array.isArray(manifest.caretakers) ? manifest.caretakers : [];
+  caretakers.push({ github_id: submitterGithubId, since: nowIso });
+  manifest.caretakers = caretakers;
 }
 
 async function validateCaretakerGithubId(

@@ -38,6 +38,8 @@ import {
   buildIntegrityAlertEmbed,
   buildIntegrityAlertIssueBody,
   buildIntegrityAlertIssueTitle,
+  resolveAlertNotifyTarget,
+  type AlertNotifyTarget,
 } from "../lib/downloads-full/integrity-alerts.js";
 import { sendDiscordPayload } from "../lib/discord-webhook.js";
 
@@ -288,43 +290,50 @@ async function run(): Promise<void> {
     );
     if (discordIntegrityWebhookUrl && integrityAlerts.length > 0) {
       const authorIndex = loadAuthorAliasIndex(repoRoot);
-      const alertsByAuthorId = new Map<string, typeof integrityAlerts>();
+      // Group by notify TARGET (active caretaker when set, else the author):
+      // for admin-authored/caretaken listings the caretaker owns the release
+      // pipeline, so the ping routes to them. The embed keeps showing the
+      // listing author's alias — only the mention target changes.
+      const alertsByTarget = new Map<string, { target: AlertNotifyTarget; alerts: typeof integrityAlerts }>();
       for (const alert of integrityAlerts) {
-        if (!alertsByAuthorId.has(alert.authorId)) {
-          alertsByAuthorId.set(alert.authorId, []);
+        const target = resolveAlertNotifyTarget(alert, authorIndex);
+        const group = alertsByTarget.get(target.authorId);
+        if (group) {
+          group.alerts.push(alert);
+        } else {
+          alertsByTarget.set(target.authorId, { target, alerts: [alert] });
         }
-        alertsByAuthorId.get(alert.authorId)!.push(alert);
       }
-      for (const [authorId, authorAlerts] of alertsByAuthorId) {
-        const authorEntry = authorIndex.authors.find((a) => a.author_id === authorId);
-        const discordId = authorEntry?.discord_id;
-        const authorAlias = authorEntry?.author_alias ?? authorEntry?.author_id ?? authorId;
+      for (const { target, alerts: targetAlerts } of alertsByTarget.values()) {
+        const discordId = target.discordId;
         const content = discordId ? `<@${discordId}>` : undefined;
-        const noDiscordIdNote = discordId ? undefined : `No Discord ID on file for ${authorAlias}`;
-        const embeds = authorAlerts.slice(0, 10).map((alert) =>
-          buildIntegrityAlertEmbed(alert, authorAlias, noDiscordIdNote),
-        );
+        const noDiscordIdNote = discordId ? undefined : `No Discord ID on file for ${target.alias}`;
+        const embeds = targetAlerts.slice(0, 10).map((alert) => {
+          const authorEntry = authorIndex.authors.find((a) => a.author_id === alert.authorId);
+          const authorAlias = authorEntry?.author_alias ?? authorEntry?.author_id ?? alert.authorId;
+          return buildIntegrityAlertEmbed(alert, authorAlias, noDiscordIdNote);
+        });
         try {
           await sendDiscordPayload(discordIntegrityWebhookUrl, content, embeds);
-          console.log(`[downloads][integrity-alert] Sent Discord alert for author=${authorId} (${authorAlerts.length} version(s))`);
+          console.log(`[downloads][integrity-alert] Sent Discord alert for target=${target.authorId} (${targetAlerts.length} version(s))`);
         } catch (error) {
-          console.warn(`[downloads][integrity-alert] Failed to send Discord alert for author=${authorId}: ${(error as Error).message}`);
+          console.warn(`[downloads][integrity-alert] Failed to send Discord alert for target=${target.authorId}: ${(error as Error).message}`);
         }
       }
     }
-    // GitHub-issue notifications for authors with no Discord ID on file: the
-    // channel embed alone never reaches them, so an @mention issue triggers
-    // GitHub's native notification instead. Issue titles are the dedup key
-    // against open integrity-alert issues (alerts fire on state transitions,
-    // so this only guards reruns/backfills).
+    // GitHub-issue notifications for notify targets (caretaker when set, else
+    // author) with no Discord ID on file: the channel embed alone never
+    // reaches them, so an @mention issue triggers GitHub's native
+    // notification instead. Issue titles are the dedup key against open
+    // integrity-alert issues (alerts fire on state transitions, so this only
+    // guards reruns/backfills).
     const githubToken = process.env.GITHUB_TOKEN?.trim() || undefined;
     const githubRepository = process.env.GITHUB_REPOSITORY?.trim() || undefined;
     if (githubToken && githubRepository && integrityAlerts.length > 0) {
       const authorIndex = loadAuthorAliasIndex(repoRoot);
-      const githubOnlyAlerts = integrityAlerts.filter((alert) => {
-        const entry = authorIndex.authors.find((a) => a.author_id === alert.authorId);
-        return entry !== undefined && !entry.discord_id && entry.github_id !== undefined;
-      });
+      const githubOnlyAlerts = integrityAlerts
+        .map((alert) => ({ alert, target: resolveAlertNotifyTarget(alert, authorIndex) }))
+        .filter(({ target }) => !target.discordId && target.githubId !== undefined);
       if (githubOnlyAlerts.length > 0) {
         const apiHeaders = {
           Authorization: `Bearer ${githubToken}`,
@@ -347,7 +356,7 @@ async function run(): Promise<void> {
         } catch (error) {
           console.warn(`[downloads][integrity-alert] Failed to list open alert issues: ${(error as Error).message}`);
         }
-        for (const alert of githubOnlyAlerts) {
+        for (const { alert, target } of githubOnlyAlerts) {
           const title = buildIntegrityAlertIssueTitle(alert);
           if (openAlertTitles.has(title)) {
             console.log(`[downloads][integrity-alert] Open issue already exists for ${alert.listingId} ${alert.version}; skipping`);
@@ -361,13 +370,13 @@ async function run(): Promise<void> {
                 headers: apiHeaders,
                 body: JSON.stringify({
                   title,
-                  body: buildIntegrityAlertIssueBody(alert),
+                  body: buildIntegrityAlertIssueBody(alert, target.authorId),
                   labels: ["integrity-alert"],
                 }),
               },
             );
             if (createResponse.ok) {
-              console.log(`[downloads][integrity-alert] Opened GitHub issue for author=${alert.authorId} listing=${alert.listingId} version=${alert.version}`);
+              console.log(`[downloads][integrity-alert] Opened GitHub issue for target=${target.authorId} listing=${alert.listingId} version=${alert.version}`);
             } else {
               console.warn(`[downloads][integrity-alert] Failed to open GitHub issue for ${alert.listingId} ${alert.version}: HTTP ${createResponse.status}`);
             }
