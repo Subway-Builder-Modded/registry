@@ -403,6 +403,15 @@ jobs:
           github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
             const branch = 'publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
+            // Draft until data quality is confirmed (plan C1): GitHub cannot
+            // merge a draft, which is the hard publish gate. rescore_data
+            // marks it ready after confirming the answers; a maintainer can
+            // mark it ready manually to grandfather (add dq-grandfathered so
+            // CI's publish gate is exempted too), or waive the gate up front
+            // by commenting /quality-exempt on the submission issue — then
+            // the PR is created (or, if it already exists, updated) ready
+            // with dq-grandfathered applied.
+            const qualityExempt = '${{ steps.overrides.outputs.quality_exempt }}' === 'true';
             const { data: existing } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -410,17 +419,25 @@ jobs:
               state: 'open'
             });
             if (existing.length > 0) {
-              console.log(`PR #${existing[0].number} already exists — updated via force push`);
+              const existingPr = existing[0];
+              console.log(`PR #${existingPr.number} already exists — updated via force push`);
+              if (qualityExempt) {
+                if (existingPr.draft) {
+                  await github.graphql(
+                    `mutation($id: ID!) { markPullRequestReadyForReview(input: { pullRequestId: $id }) { pullRequest { number } } }`,
+                    { id: existingPr.node_id }
+                  );
+                  console.log(`PR #${existingPr.number} marked ready (quality-exempt)`);
+                }
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: existingPr.number,
+                  labels: ['dq-grandfathered']
+                });
+              }
               return;
             }
-            // Draft until data quality is confirmed (plan C1): GitHub cannot
-            // merge a draft, which is the hard publish gate. rescore_data
-            // marks it ready after confirming the answers; a maintainer can
-            // mark it ready manually to grandfather (add dq-grandfathered so
-            // CI's publish gate is exempted too), or waive the gate up front
-            // by commenting /quality-exempt on the submission issue — then
-            // the PR is created ready with dq-grandfathered already applied.
-            const qualityExempt = '${{ steps.overrides.outputs.quality_exempt }}' === 'true';
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
