@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-02T00:00:49.342Z",
+  "generated_at": "2026-08-02T03:30:28.169Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -13092,6 +13092,68 @@
           "fingerprint": "rules:v6:sha256:bff060f6687ebfd8a9b808cb3d510a13f851c258e2348984219d246c31db7f0b",
           "checked_at": "2026-07-18T22:48:21.603Z",
           "released_at": "2026-07-18T00:00:00.000Z"
+        }
+      }
+    },
+    "mississippi": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.1.1",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.1.1"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1785542400,
+      "versions": {
+        "1.1.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "MS.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 415.97,
+          "file_sizes": {
+            "MS.pmtiles": 268.96,
+            "buildings_index.bin.gz": 137.68,
+            "config.json": 0,
+            "demand_data.json": 39.76,
+            "roads.geojson": 92.39,
+            "runways_taxiways.geojson": 1.26
+          },
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "jaytotheay/subwaybuilder-map",
+            "tag": "v1.1.1",
+            "asset_name": "MS.zip",
+            "download_url": "https://github.com/JayToTheAy/subwaybuilder-map/releases/download/v1.1.1/MS.zip"
+          },
+          "fingerprint": "rules:v6:sha256:be0abc0789973d6aa27b03434cba5252fd94f480004a22261b77f0a22981bab1",
+          "checked_at": "2026-08-02T03:30:28.169Z",
+          "released_at": "2026-08-01T00:00:00.000Z"
         }
       }
     },
