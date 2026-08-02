@@ -50,10 +50,95 @@
     "entertainment",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "MS.pmtiles": 268.96,
+    "buildings_index.bin.gz": 137.68,
+    "config.json": 0,
+    "demand_data.json": 39.76,
+    "roads.geojson": 92.39,
+    "runways_taxiways.geojson": 1.26
+  },
   "included_cities": [
     "Jackson",
     "Natchez",
     "Vicksburg"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.4477813625445295,
+      "p25": 0.632671532064279,
+      "p50": 1.039269842114529,
+      "p75": 1.6290170138737932,
+      "p90": 1.9121055476337705,
+      "mean": 1.1369955824425755
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.31451073894103365,
+      "p25": 0.42246231856516037,
+      "p50": 0.61907489580785,
+      "p75": 0.9815090674854112,
+      "p90": 1.5900719705092605,
+      "mean": 0.7796271249756177
+    },
+    "commuteDistanceKm": {
+      "p10": 14620,
+      "p25": 33407,
+      "p50": 78667,
+      "p75": 168498,
+      "p90": 282187,
+      "mean": 117764.58736097498
+    },
+    "residentCellDensity": {
+      "p10": 2,
+      "p25": 5,
+      "p50": 15,
+      "p75": 45,
+      "p90": 130,
+      "mean": 57.869913077834845
+    },
+    "workerCellDensity": {
+      "p10": 2,
+      "p25": 4,
+      "p50": 16,
+      "p75": 108,
+      "p90": 353,
+      "mean": 147.27857683573052
+    },
+    "detail": {
+      "radiusKm": 0.8021133767886512,
+      "expectedPointSpacingKm": 0.981541260113061,
+      "normalizedRadius": 0.8171978187613408,
+      "activityPerPoint": 55.17031492727016,
+      "playableAreaKm2": 104764,
+      "playableAreaPerPointKm2": 4.931695146636539,
+      "playableCatchmentRadiusKm": 1.2529195188913889,
+      "localityScore": 0.10218898115320228,
+      "deaggregationScore": 0,
+      "score": 0
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 1,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -89.54900607225908,
+            "latitude": 32.560190930510586,
+            "massShare": 1,
+            "assignedMass": 2343966,
+            "assignedPointCount": 21243,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1785542400
 }
