@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "mississippi",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm5",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm5",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm5"
+  },
+  "notes": "Used rslurry's US Demand Data tool with 2022 LODES data and some manual research into daily passengers at JAN, as well as attendance at several major Mississippi universities.\n\nDEMAND_FACTOR determined by comparing FRED data for employed persons in Mississippi to the outcome of US Demand Data when demand_factor was one, and increasing the factor to meet the difference.",
+  "sources": [
+    "JMAA statistics: https://jmaa.com/wp-content/uploads/2026/04/PAX-stats-2024-12-and-CY2024-for-2025-01-Bd.-Mtg.pdf",
+    "FRED: https://fred.stlouisfed.org/series/LASST280000000000005"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "JayToTheAy",
+    "reviewed_by": null,
+    "date": "2026-08-02"
+  }
+}
