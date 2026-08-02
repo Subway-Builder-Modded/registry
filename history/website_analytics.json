@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "updated_at": "2026-08-02T22:00:41.405Z",
+  "updated_at": "2026-08-02T22:35:40.593Z",
   "valid_paths": [
     "/",
     "/community",
@@ -643,6 +643,7 @@
     "/railyard/updates/v0.2.2",
     "/railyard/updates/v0.2.3",
     "/railyard/updates/v0.2.4",
+    "/railyard/updates/v0.2.4/rc.1",
     "/railyard/updates/v0.2.4/rc.2",
     "/railyard/updates/v0.2.4/rc.3",
     "/railyard/updates/v0.2.5",
@@ -1378,6 +1379,7 @@
     "/registry/mods/orbital-surveyor/versions/v1.2.2",
     "/registry/mods/pause-on-start",
     "/registry/mods/pause-on-start/versions/1.0.0",
+    "/registry/mods/prospector-ghebeek",
     "/registry/mods/resizable-ui",
     "/registry/mods/satellite-overlay",
     "/registry/mods/satellite-overlay/analytics",
@@ -58729,17 +58731,45 @@
       }
     },
     "2026-08-02T22:00:00.000Z": {
-      "captured_at": "2026-08-02T22:00:41.405Z",
+      "captured_at": "2026-08-02T22:35:40.593Z",
       "window_start": "2026-08-02T22:00:00.000Z",
       "window_end": "2026-08-02T23:00:00.000Z",
       "totals": {
-        "visits": 0
+        "visits": 11
       },
-      "pages": {},
-      "countries": {},
-      "browsers": {},
-      "operating_systems": {},
-      "devices": {}
+      "pages": {
+        "/": 2,
+        "/railyard": 2,
+        "/railyard/updates/v0.2.2": 1,
+        "/railyard/updates/v0.2.4/rc.1": 1,
+        "/registry": 1,
+        "/registry/maps/yukina-cz-praha/versions/0.3.0": 1,
+        "/registry/mods/prospector-ghebeek": 1,
+        "/registry/mods/subwaybuilder-regions/versions": 1,
+        "/template-mod/docs/v1.0/debugging": 1
+      },
+      "countries": {
+        "CA": 1,
+        "IT": 1,
+        "PL": 1,
+        "SE": 1,
+        "US": 7
+      },
+      "browsers": {
+        "Chrome": 4,
+        "GoogleBot": 3,
+        "Unknown": 4
+      },
+      "operating_systems": {
+        "Android": 3,
+        "MacOSX": 1,
+        "Unknown": 4,
+        "Windows": 3
+      },
+      "devices": {
+        "desktop": 8,
+        "mobile": 3
+      }
     }
   },
   "daily_snapshots": {
@@ -74139,20 +74169,20 @@
       }
     },
     "2026-08-02": {
-      "captured_at": "2026-08-02T22:00:41.405Z",
+      "captured_at": "2026-08-02T22:35:40.593Z",
       "window_start": "2026-08-02T00:00:00.000Z",
       "window_end": "2026-08-02T23:00:00.000Z",
       "totals": {
-        "visits": 334
+        "visits": 345
       },
       "pages": {
-        "/": 84,
+        "/": 86,
         "/community": 2,
         "/contribute": 2,
         "/depot": 6,
         "/depot/updates/v1.2.4": 1,
         "/license": 1,
-        "/railyard": 73,
+        "/railyard": 75,
         "/railyard/docs": 11,
         "/railyard/docs/latest/installing-railyard": 1,
         "/railyard/docs/v0.2/game-version-incompatibility": 1,
@@ -74162,8 +74192,10 @@
         "/railyard/docs/v0.2/installing-railyard/windows": 2,
         "/railyard/updates/v0.1.0": 1,
         "/railyard/updates/v0.2.0": 2,
+        "/railyard/updates/v0.2.2": 1,
         "/railyard/updates/v0.2.4": 1,
-        "/registry": 2,
+        "/railyard/updates/v0.2.4/rc.1": 1,
+        "/registry": 3,
         "/registry/authors/Gio1112": 1,
         "/registry/authors/ahkimn": 4,
         "/registry/authors/kaicardenas0618": 1,
@@ -74211,6 +74243,7 @@
         "/registry/maps/yukina-cz-hradec-pardubice/versions/0.2.1": 1,
         "/registry/maps/yukina-cz-jihlava": 1,
         "/registry/maps/yukina-cz-ostrava": 1,
+        "/registry/maps/yukina-cz-praha/versions/0.3.0": 1,
         "/registry/maps/yukina-ee-ida-viru": 1,
         "/registry/maps/yukina-nagoya/versions": 1,
         "/registry/maps/yukina-pl-kielce/versions/0.2.0": 1,
@@ -74233,10 +74266,12 @@
         "/registry/mods/orbital-surveyor": 3,
         "/registry/mods/orbital-surveyor/versions/v1.2.0": 1,
         "/registry/mods/orbital-surveyor/versions/v1.2.2": 1,
+        "/registry/mods/prospector-ghebeek": 1,
         "/registry/mods/resizable-ui": 1,
         "/registry/mods/satellite-overlay": 1,
         "/registry/mods/station-dots": 1,
         "/registry/mods/subwaybuilder-regions": 1,
+        "/registry/mods/subwaybuilder-regions/versions": 1,
         "/registry/mods/tathan-casino/versions/v0.1.7": 1,
         "/registry/mods/tod/versions/v0.2.1": 1,
         "/registry/mods/track-anarchy/versions/v1.0.0": 2,
@@ -74247,6 +74282,7 @@
         "/registry/world-map": 1,
         "/template-mod": 3,
         "/template-mod/docs": 2,
+        "/template-mod/docs/v1.0/debugging": 1,
         "/template-mod/updates/v1.0.0": 1,
         "/terms-of-service": 6
       },
@@ -74258,7 +74294,7 @@
         "BE": 25,
         "BO": 1,
         "BR": 7,
-        "CA": 4,
+        "CA": 5,
         "CH": 6,
         "CL": 3,
         "CN": 28,
@@ -74277,7 +74313,7 @@
         "IL": 2,
         "IN": 1,
         "IR": 1,
-        "IT": 1,
+        "IT": 2,
         "JO": 1,
         "JP": 1,
         "KR": 1,
@@ -74287,41 +74323,42 @@
         "NL": 1,
         "NO": 4,
         "PH": 2,
-        "PL": 14,
+        "PL": 15,
         "PT": 1,
         "RU": 3,
+        "SE": 1,
         "SG": 3,
         "TR": 4,
         "TW": 6,
-        "US": 103,
+        "US": 110,
         "VE": 2,
         "VN": 2,
         "ZA": 5
       },
       "browsers": {
         "BingBot": 10,
-        "Chrome": 64,
+        "Chrome": 68,
         "ChromeMobile": 6,
         "Edge": 60,
         "Firefox": 11,
-        "GoogleBot": 28,
+        "GoogleBot": 31,
         "MobileSafari": 13,
         "Opera": 18,
         "Safari": 17,
         "SamsungInternet": 28,
-        "Unknown": 77,
+        "Unknown": 81,
         "YandexBot": 2
       },
       "operating_systems": {
-        "Android": 61,
-        "MacOSX": 44,
-        "Unknown": 89,
-        "Windows": 126,
+        "Android": 64,
+        "MacOSX": 45,
+        "Unknown": 93,
+        "Windows": 129,
         "iOS": 14
       },
       "devices": {
-        "desktop": 254,
-        "mobile": 80
+        "desktop": 262,
+        "mobile": 83
       }
     }
   }
