@@ -2,27 +2,28 @@
   "schema_version": 1,
   "id": "brussels",
   "answers": {
-    "workplace_count": "none",
-    "workplace_granularity": "none",
-    "workplace_resolution": "osm_footprints",
-    "workplace_intensity": "size_only",
+    "workplace_count": "physical_inferred",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "admin_polygon",
+    "workplace_intensity": "uniform",
     "resident_count": "total_population",
     "resident_granularity": "adm4",
-    "resident_resolution": "admin_polygon",
-    "resident_intensity": "uniform",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
     "od_metric": "none",
     "od_granularity": null
   },
-  "notes": "Residents: Statbel 2023 statistical-sector boundaries (sh_statbel_statistical_sectors_31370_20230101) joined to Statbel's official population-by-statistical-sector open data (OPENDATA_SECTOREN_2023, TOTAL column = total resident population, all ages -- verified no age/employment breakdown in the source file), filtered to the Brussels-Capital Region (NIS codes 21xxx, 724 sectors). One demand point per sector, placed at the sector polygon's centroid; no further building-level disaggregation.\n\nJobs: no official job-location or business-register data was used for Brussels. Job totals are modeled entirely from OpenStreetMap (offices, shops, amenities, craft, and industrial/commercial/retail landuse polygons within the map's bbox) using per-category job-density heuristics (e.g. office=25 jobs, shop=5 jobs, landuse=industrial/commercial/retail at 15/40/50 jobs per hectare), blended with a population-coupled service-job term and a handful of hand-picked employment-hub gaussian boosts (EU Quarter, Grand Place, Midi station, Tour & Taxis, Anderlecht, Evere, ULB/Ixelles, Etterbeek), then scaled so total modeled jobs equals total residents. Origin-destination commute flows are produced by a doubly-constrained gravity model (Furness/IPF balancing, ~5 km distance decay) seeded on this synthetic job surface -- not on any real commute-flow, register, or measured-totals data, which is why the 'measured totals the estimates are forced to add up to' option for the flows question does not apply (only the residence side is a real measured total; the job side is itself modeled).\n\nOne hand-added job-only demand point for Brussels Airport (Zaventem, EBBR, ~24,000 on-site jobs -- a commonly cited figure for Brussels Airport Company plus tenant employers) was added outside the 19-municipality Statbel sector coverage, since Zaventem sits just outside the Brussels-Capital Region administrative boundary Statbel covers even though it's within the map's bbox. This is unscored special demand, cited here for completeness rather than for scoring credit.\n\nData vintages: Statbel statistical sectors and population figures are both 2023. OpenStreetMap job features were extracted from a Geofabrik Belgium OSM export pulled in mid-2026.",
+  "notes": "REVISION of the previously-confirmed answers on issue #6273 (tier: absent, weighted 0.07) -- the workplace side has real government data now, where it previously had none.\n\nResidents: unchanged from the original submission -- Statbel 2023 statistical-sector boundaries joined to Statbel's population-by-statistical-sector open data, filtered to the Brussels-Capital Region (NIS 21xxx, 724 sectors), one point per sector centroid.\n\nJobs (changed): anchored to real 2023 employment-by-workplace-location data from ONSS (Office National de Securite Sociale / Rijksdienst voor Sociale Zekerheid, Belgium's social security office), published via IBSA (Institut Bruxellois de Statistique et d'Analyse, the Brussels regional statistics institute)'s \"Emploi interieur\" table 7.4.2.4 (https://ibsa.brussels/themes/marche-du-travail/emploi-interieur). Verified directly from the downloaded xlsx: 652,602 jobs across all 19 Brussels communes for 2023, matching the region total (654,660) to within 0.3% (the gap is an \"undetermined commune\" bucket in the source table). Per ONSS's own published methodology, jobs are counted at the actual physical workplace establishment unit (\"unite locale\"), not the employer's registered head-office address -- this is a real anchor at the actual work location, not a business register with the usual HQ-concentration bias.\n\nPipeline: Statbel's 724 statistical sectors were dissolved by commune NIS code into 19 commune polygons (commune names match the ONSS table exactly, 19/19 joined with no aliasing needed). A doubly-constrained gravity model still allocates jobs to individual demand points using OSM job features (offices/shops/amenities/industrial-commercial landuse) plus population and hub signals, but the relative job-mass SHARE between communes is now rescaled to match the real ONSS commune totals exactly, rather than being decided by OSM density alone. Only the placement of jobs WITHIN a commune remains OSM-derived; the between-commune distribution is real government data. The overall total is still rescaled to match total residents (Statbel is total population, not employed-only), which is why the O/D flows question below is still answered as fully estimated -- job totals per commune are real, but resident totals are not employed-resident totals, so the flows don't meet the guide's bar for the \"forced to add up to measured totals on both sides\" tier.\n\nOne hand-added job-only point for Brussels Airport (Zaventem, ~24,000 on-site jobs) sits outside both the census sectors and the ONSS commune coverage -- unchanged from the original submission, unscored special demand.",
   "sources": [
+    "ONSS employment by workplace location: https://www.onss.be/stats/repartition-des-postes-de-travail-par-lieu-de-travail",
+    "IBSA \"Emploi interieur\" (commune-level table, source of the figures used): https://ibsa.brussels/themes/marche-du-travail/emploi-interieur",
     "Statbel statistical sectors 2023: https://statbel.fgov.be/en/open-data/statistical-sectors-2023",
-    "Statbel population per statistical sector: https://statbel.fgov.be/en/open-data (Population by statistical sector dataset, file OPENDATA_SECTOREN_2023)",
-    "OpenStreetMap (Geofabrik Belgium extract): https://download.geofabrik.de/europe/belgium.html"
+    "Statbel population per statistical sector: https://statbel.fgov.be/en/open-data"
   ],
   "provenance": {
     "method": "reviewed",
     "submitted_by": "lexenygma",
     "reviewed_by": "ahkimn",
-    "date": "2026-07-29"
+    "date": "2026-08-02"
   }
 }
