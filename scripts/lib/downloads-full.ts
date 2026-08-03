@@ -334,6 +334,12 @@ async function resolveListingContexts(params: {
   listingContexts: Map<string, ListingContext>;
   listingMeta: Map<string, ListingMetaEntry>;
   repoSet: Set<string>;
+  // repo -> whether ANY non-deprecated, non-test listing references it. Repos
+  // referenced only by deprecated/test listings get their repo-level fetch
+  // warnings suppressed (a deprecated listing whose repo was deleted must not
+  // warn every run; the repo-scoped GraphQL messages carry no listing id so
+  // the outbound listing-message filters cannot catch them).
+  repoActiveUse: Map<string, boolean>;
   transientErrorListings: Set<string>;
 }): Promise<void> {
   const {
@@ -348,8 +354,14 @@ async function resolveListingContexts(params: {
     listingContexts,
     listingMeta,
     repoSet,
+    repoActiveUse,
     transientErrorListings,
   } = params;
+
+  const markRepoUse = (repo: string, manifest: { is_test?: boolean; deprecation?: unknown }) => {
+    const isActive = !isManifestDeprecated(manifest) && manifest.is_test !== true;
+    repoActiveUse.set(repo, (repoActiveUse.get(repo) ?? false) || isActive);
+  };
 
   // Pace unauthenticated raw.githubusercontent.com custom-update fetches to
   // avoid GitHub secondary rate limits (429s). 200ms between each fetch.
@@ -376,6 +388,7 @@ async function resolveListingContexts(params: {
     if (manifest.update.type === "github") {
       const repo = manifest.update.repo.toLowerCase();
       repoSet.add(repo);
+      markRepoUse(repo, manifest);
       listingContexts.set(id, {
         id,
         listingType,
@@ -399,6 +412,7 @@ async function resolveListingContexts(params: {
     for (const version of customFetch.versions) {
       if (version.parsed) {
         repoSet.add(version.parsed.repo);
+        markRepoUse(version.parsed.repo, manifest);
       }
     }
     listingContexts.set(id, {
@@ -1347,6 +1361,7 @@ export async function generateDownloadsDataFull(
   const listingContexts = new Map<string, ListingContext>();
   const listingMeta = new Map<string, ListingMetaEntry>();
   const repoSet = new Set<string>();
+  const repoActiveUse = new Map<string, boolean>();
   const transientErrorListings = new Set<string>();
 
   await resolveListingContexts({
@@ -1361,15 +1376,20 @@ export async function generateDownloadsDataFull(
     listingContexts,
     listingMeta,
     repoSet,
+    repoActiveUse,
     transientErrorListings,
   });
 
+  const suppressWarningRepos = new Set(
+    [...repoActiveUse].filter(([, hasActiveUse]) => !hasActiveUse).map(([repo]) => repo),
+  );
   const usageState = createGraphqlUsageState();
   const { repoIndexes, unavailableRepos } = await fetchRepoReleaseIndexes(repoSet, {
     fetchImpl,
     token,
     warnings,
     usageState,
+    suppressWarningRepos,
   });
 
   const ctx: FullRunContext = {

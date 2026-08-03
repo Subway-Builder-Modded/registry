@@ -2175,3 +2175,53 @@ test("manifest.json asset replacement is auto-detected via updatedAt tracking; l
     assert.equal(afterBackfill.integrity.listings["auto-gv-mod"]?.versions["v1.0.0"]?.game_version, ">=1.0.0 <=1.2.0");
   });
 });
+
+test("repo-level fetch warnings are suppressed for repos referenced only by deprecated listings", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["dead-deprecated-mod", "dead-active-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "dead-deprecated-mod", {
+      ...makeBaseModManifest("dead-deprecated-mod"),
+      update: { type: "github", repo: "Gone/DeprecatedRepo" },
+      deprecation: { since: "2026-08-01T00:00:00Z", by_github_id: 1 },
+    });
+    writeManifest("mods", "dead-active-mod", {
+      ...makeBaseModManifest("dead-active-mod"),
+      update: { type: "github", repo: "Gone/ActiveRepo" },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: async (_input, init) => {
+          const body = String(init?.body ?? "");
+          const repoName = body.includes("DeprecatedRepo") ? "Gone/DeprecatedRepo" : "Gone/ActiveRepo";
+          return jsonResponse({
+            errors: [
+              { message: `Could not resolve to a Repository with the name '${repoName}'.` },
+            ],
+          });
+        },
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    const repoWarnings = result.warnings.filter((w) => w.includes("Could not resolve to a Repository"));
+    assert.equal(
+      repoWarnings.some((w) => w.includes("Gone/ActiveRepo".toLowerCase()) || w.includes("gone/activerepo")),
+      true,
+      `expected active-repo warning, got: ${JSON.stringify(result.warnings)}`,
+    );
+    assert.equal(
+      repoWarnings.some((w) => w.toLowerCase().includes("gone/deprecatedrepo")),
+      false,
+      `deprecated-only repo warning leaked: ${JSON.stringify(result.warnings)}`,
+    );
+  });
+});
