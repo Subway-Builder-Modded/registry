@@ -33,6 +33,7 @@ import {
 } from "../lib/script-runtime.js";
 import { compareStableSemverAsc, isStableSemverTag } from "../lib/semver.js";
 import { filterListingMessages, isTestListing } from "../lib/test-listings.js";
+import { isDeprecatedListing } from "../lib/downloads-full/deprecation.js";
 import { loadAuthorAliasIndex } from "../lib/author-aliases.js";
 import {
   buildIntegrityAlertEmbed,
@@ -445,17 +446,22 @@ async function run(): Promise<void> {
     ...warnings,
     ...buildZeroValidSemverWarnings(integrity),
   ];
+  // Test listings and deprecated listings are both suppressed from outbound
+  // warning/alert channels — a deprecated listing whose upstream repo later
+  // vanishes must not nag maintainers or authors every run.
+  const isSuppressedListing = (dir: "maps" | "mods", listingId: string): boolean =>
+    isTestListing(repoRoot, dir, listingId) || isDeprecatedListing(repoRoot, dir, listingId);
   const warningsForGitHub = filterListingMessages(
     filterWarningsForGitHub(warningsForOutput, integrity, downloads),
-    (listingId) => isTestListing(repoRoot, listingType === "map" ? "maps" : "mods", listingId),
+    (listingId) => isSuppressedListing(listingType === "map" ? "maps" : "mods", listingId),
   );
   const securityErrorsForOutput = filterListingMessages(
     securityAlerts.errors,
-    (listingId) => isTestListing(repoRoot, "mods", listingId),
+    (listingId) => isSuppressedListing("mods", listingId),
   );
   const securityWarningsForOutput = filterListingMessages(
     securityAlerts.warnings,
-    (listingId) => isTestListing(repoRoot, "mods", listingId),
+    (listingId) => isSuppressedListing("mods", listingId),
   );
   const suppressedWarnings = warningsForOutput.length - warningsForGitHub.length;
   if (suppressedWarnings > 0) {

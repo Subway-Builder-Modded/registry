@@ -60,6 +60,11 @@ import {
 } from "./download-attribution.js";
 import { toDownloadAssetBucketKey } from "./download-version-buckets.js";
 import { getActiveCaretaker } from "./caretakers.js";
+import {
+  applyDeprecationOverlay,
+  filterDeprecatedIntegrityAlerts,
+  isManifestDeprecated,
+} from "./downloads-full/deprecation.js";
 
 // Per-listing display/routing metadata carried from the manifest into
 // integrity-alert assembly.
@@ -67,6 +72,7 @@ interface ListingMetaEntry {
   listingName: string;
   authorId: string;
   caretakerGithubId?: number;
+  deprecated?: boolean;
 }
 
 interface AdjustedVersionCount {
@@ -363,6 +369,7 @@ async function resolveListingContexts(params: {
       listingName: manifest.name,
       authorId: manifest.author,
       caretakerGithubId: getActiveCaretaker(manifest)?.github_id,
+      deprecated: isManifestDeprecated(manifest),
     });
 
     if (manifest.update.type === "github") {
@@ -1385,6 +1392,17 @@ export async function generateDownloadsDataFull(
     sortedDownloads[id] = sortObjectByKeys(downloadsByListing[id] ?? {});
   }
 
+  // Deprecation output overlay (see downloads-full/deprecation.ts): the
+  // published integrity view reports deprecated listings with zero installable
+  // versions while downloads, buckets, and the integrity cache above keep the
+  // true evaluated state. Applied centrally so preserved/unavailable listing
+  // paths are covered too; alerts for deprecated listings are dropped.
+  const isDeprecatedId = (id: string): boolean => listingMeta.get(id)?.deprecated === true;
+  const overlaidIds = applyDeprecationOverlay(ctx.integrityListings, isDeprecatedId);
+  if (overlaidIds.length > 0) {
+    console.log(`[downloads] Deprecation overlay applied to: ${overlaidIds.join(", ")}`);
+  }
+
   return {
     downloads: sortedDownloads,
     versionBucketInputs: ctx.versionBucketInputs,
@@ -1397,7 +1415,7 @@ export async function generateDownloadsDataFull(
       schema_version: 1,
       entries: sortObjectByKeys(nextCache.entries),
     },
-    integrityAlerts: ctx.integrityAlerts,
+    integrityAlerts: filterDeprecatedIntegrityAlerts(ctx.integrityAlerts, isDeprecatedId),
     stats: {
       listings: ids.length,
       versions_checked: ctx.stats.versionsChecked,
