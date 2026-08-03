@@ -1,0 +1,44 @@
+name: Check Registry Invariants
+
+# Standing structural invariants over the listing collections. Currently:
+# - listing IDs must be unique across maps/ and mods/ combined, so a bare ID
+#   always resolves to at most one listing (resolveListingById). Publish-time
+#   validation prevents new collisions; this guards hand-edited PRs and drift.
+
+on:
+  pull_request:
+    paths:
+      - "maps/**"
+      - "mods/**"
+      - "scripts/**"
+      - ".github/workflows/check-registry-invariants.yml"
+  push:
+    branches: [main]
+    paths:
+      - "maps/**"
+      - "mods/**"
+      - "scripts/**"
+      - ".github/workflows/check-registry-invariants.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: "10.19.0"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Check cross-collection listing ID uniqueness
+        run: pnpm --dir scripts check-id-uniqueness

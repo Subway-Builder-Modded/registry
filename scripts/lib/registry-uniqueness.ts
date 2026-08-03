@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ManifestType } from "./manifests.js";
 import { GRANDFATHERED_CITY_CODE_DUPLICATES } from "./map-constants.js";
@@ -59,6 +59,26 @@ export function checkCityCodeUniqueness(params: {
   return [
     `**city-code**: \`${cityCode}\` is already used by map \`${conflictingIds[0]}\`. City codes must be unique.`,
   ];
+}
+
+function listListingDirs(repoRoot: string, dir: "maps" | "mods"): string[] {
+  const fullPath = resolve(repoRoot, dir);
+  if (!existsSync(fullPath)) return [];
+  return readdirSync(fullPath, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && existsSync(resolve(fullPath, entry.name, "manifest.json")))
+    .map((entry) => entry.name);
+}
+
+/**
+ * Repo-wide invariant: listing IDs are unique across maps/ and mods/ combined.
+ * Publish-time validation (checkCrossTypeIdUniqueness) prevents new collisions;
+ * this scan keeps the invariant explicit so bare-ID resolution
+ * (resolveListingById) can never be ambiguous. Scans directories containing a
+ * manifest.json — the same ground truth regenerate-indexes uses.
+ */
+export function findCrossTypeIdCollisions(repoRoot: string): string[] {
+  const mapIds = new Set(listListingDirs(repoRoot, "maps"));
+  return listListingDirs(repoRoot, "mods").filter((id) => mapIds.has(id)).sort();
 }
 
 export function checkCrossTypeIdUniqueness(params: {

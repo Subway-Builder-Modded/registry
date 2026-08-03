@@ -58,6 +58,28 @@
                 "additionalProperties": false
               }
             },
+            "deprecation": {
+              "type": "object",
+              "properties": {
+                "since": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "by_github_id": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "since",
+                "by_github_id"
+              ],
+              "additionalProperties": false
+            },
             "description": {
               "type": "string",
               "minLength": 1
@@ -735,6 +757,28 @@
                 ],
                 "additionalProperties": false
               }
+            },
+            "deprecation": {
+              "type": "object",
+              "properties": {
+                "since": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "by_github_id": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "since",
+                "by_github_id"
+              ],
+              "additionalProperties": false
             },
             "description": {
               "type": "string",

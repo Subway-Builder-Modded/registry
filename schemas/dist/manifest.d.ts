@@ -617,6 +617,19 @@ export declare const CaretakerWindowSchema: z.ZodObject<{
     since: string;
     until?: string | undefined;
 }>;
+export declare const DeprecationSchema: z.ZodObject<{
+    since: z.ZodString;
+    by_github_id: z.ZodNumber;
+    reason: z.ZodOptional<z.ZodString>;
+}, "strip", z.ZodTypeAny, {
+    since: string;
+    by_github_id: number;
+    reason?: string | undefined;
+}, {
+    since: string;
+    by_github_id: number;
+    reason?: string | undefined;
+}>;
 export declare const ModManifestSchema: z.ZodObject<{
     schema_version: z.ZodLiteral<1>;
     id: z.ZodString;
@@ -645,6 +658,19 @@ export declare const ModManifestSchema: z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[]>>;
+    deprecation: z.ZodOptional<z.ZodObject<{
+        since: z.ZodString;
+        by_github_id: z.ZodNumber;
+        reason: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    }, {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    }>>;
     description: z.ZodString;
     tags: z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>;
     gallery: z.ZodArray<z.ZodString, "many">;
@@ -695,6 +721,11 @@ export declare const ModManifestSchema: z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[] | undefined;
+    deprecation?: {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    } | undefined;
     last_updated?: number | undefined;
     search_aliases?: string[] | undefined;
 }, {
@@ -721,6 +752,11 @@ export declare const ModManifestSchema: z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[] | undefined;
+    deprecation?: {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    } | undefined;
     last_updated?: number | undefined;
     search_aliases?: string[] | undefined;
 }>;
@@ -752,6 +788,19 @@ export declare const MapManifestSchema: z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[]>>;
+    deprecation: z.ZodOptional<z.ZodObject<{
+        since: z.ZodString;
+        by_github_id: z.ZodNumber;
+        reason: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    }, {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    }>>;
     description: z.ZodString;
     tags: z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>;
     is_test: z.ZodBoolean;
@@ -1295,6 +1344,11 @@ export declare const MapManifestSchema: z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[] | undefined;
+    deprecation?: {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    } | undefined;
     last_updated?: number | undefined;
     search_aliases?: string[] | undefined;
     grid_statistics?: {
@@ -1428,6 +1482,11 @@ export declare const MapManifestSchema: z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[] | undefined;
+    deprecation?: {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    } | undefined;
     last_updated?: number | undefined;
     search_aliases?: string[] | undefined;
     grid_statistics?: {
@@ -1547,6 +1606,19 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[]>>;
+    deprecation: z.ZodOptional<z.ZodObject<{
+        since: z.ZodString;
+        by_github_id: z.ZodNumber;
+        reason: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    }, {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    }>>;
     description: z.ZodString;
     tags: z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>;
     is_test: z.ZodBoolean;
@@ -2090,6 +2162,11 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[] | undefined;
+    deprecation?: {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    } | undefined;
     last_updated?: number | undefined;
     search_aliases?: string[] | undefined;
     grid_statistics?: {
@@ -2223,6 +2300,11 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[] | undefined;
+    deprecation?: {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    } | undefined;
     last_updated?: number | undefined;
     search_aliases?: string[] | undefined;
     grid_statistics?: {
@@ -2341,6 +2423,19 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[]>>;
+    deprecation: z.ZodOptional<z.ZodObject<{
+        since: z.ZodString;
+        by_github_id: z.ZodNumber;
+        reason: z.ZodOptional<z.ZodString>;
+    }, "strip", z.ZodTypeAny, {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    }, {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    }>>;
     description: z.ZodString;
     tags: z.ZodEffects<z.ZodArray<z.ZodString, "many">, string[], string[]>;
     gallery: z.ZodArray<z.ZodString, "many">;
@@ -2391,6 +2486,11 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[] | undefined;
+    deprecation?: {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    } | undefined;
     last_updated?: number | undefined;
     search_aliases?: string[] | undefined;
 }, {
@@ -2417,10 +2517,16 @@ export declare const ListingManifestSchema: z.ZodUnion<[z.ZodObject<{
         since: string;
         until?: string | undefined;
     }[] | undefined;
+    deprecation?: {
+        since: string;
+        by_github_id: number;
+        reason?: string | undefined;
+    } | undefined;
     last_updated?: number | undefined;
     search_aliases?: string[] | undefined;
 }>]>;
 export type CaretakerWindow = z.infer<typeof CaretakerWindowSchema>;
+export type Deprecation = z.infer<typeof DeprecationSchema>;
 export type UpdateConfig = z.infer<typeof UpdateConfigSchema>;
 export type InitialViewState = z.infer<typeof InitialViewStateSchema>;
 export type ModManifest = z.infer<typeof ModManifestSchema>;

@@ -145,6 +145,19 @@ const CaretakersSchema = z
     }
   });
 
+// A deprecation record: presence marks the listing as deprecated (there is no
+// separate status enum — consumers derive the Deprecated status from this
+// field, the same way incompatibility is derived from integrity data).
+// Deprecation is requested by the listing's author or active caretaker only,
+// never by ordinary collaborators. The listing's manifest, gallery, and
+// download attribution are retained; deprecation is not removal.
+export const DeprecationSchema = z.object({
+  since: z.string().datetime(),
+  by_github_id: z.number().int().min(1),
+  // Author-supplied, rendered publicly on listing detail pages.
+  reason: z.string().min(1).optional(),
+});
+
 const BaseManifestSchema = z.object({
   schema_version: z.literal(1),
   id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
@@ -159,6 +172,8 @@ const BaseManifestSchema = z.object({
   // windows have until > since, and at most one entry is active (no until),
   // which must be the last entry. Every caretaker is also a collaborator.
   caretakers: CaretakersSchema.optional(),
+  // Present iff the listing is deprecated (see DeprecationSchema above).
+  deprecation: DeprecationSchema.optional(),
   description: z.string().min(1),
   tags: z.array(z.string().min(1)).refine(
     (a) => new Set(a).size === a.length,
@@ -219,6 +234,7 @@ export const MapManifestSchema = BaseManifestSchema.extend({
 export const ListingManifestSchema = z.union([MapManifestSchema, ModManifestSchema]);
 
 export type CaretakerWindow = z.infer<typeof CaretakerWindowSchema>;
+export type Deprecation = z.infer<typeof DeprecationSchema>;
 export type UpdateConfig = z.infer<typeof UpdateConfigSchema>;
 export type InitialViewState = z.infer<typeof InitialViewStateSchema>;
 export type ModManifest = z.infer<typeof ModManifestSchema>;
