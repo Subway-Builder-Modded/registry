@@ -17,6 +17,7 @@ jobs:
       !contains(github.event.issue.labels.*.name, 'update-author') &&
       !contains(github.event.issue.labels.*.name, 'data-quality') &&
       !contains(github.event.issue.labels.*.name, 'report') &&
+      !contains(github.event.issue.labels.*.name, 'deprecate-asset') &&
       !contains(github.event.issue.labels.*.name, 'integrity-alert') &&
       github.event.issue.author_association != 'MEMBER' &&
       github.event.issue.author_association != 'OWNER' &&
@@ -42,6 +43,7 @@ jobs:
                 '- **[Update Author Profile](../../issues/new?template=update-author.yml)** - Update your author alias, attribution, or profile metadata',
                 '- **[Map Data Quality](../../issues/new?template=data-quality.yml)** - Answer the data-quality questions for a map you own',
                 '- **[Report a Mod or Map](../../issues/new?template=report.yml)** - Report an issue with a listing',
+                '- **[Deprecate an Asset](../../issues/new?template=deprecate-asset.yml)** - Deprecate a mod or map you author or caretake',
               ].join('\n')
             });
 
