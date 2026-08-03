@@ -24,11 +24,13 @@ All submissions are handled through GitHub Issues. Pick a template to get starte
 - [Update Your Author Profile](https://github.com/Subway-Builder-Modded/registry/issues/new?template=update-author.yml)
 - [Report an Issue](https://github.com/Subway-Builder-Modded/registry/issues/new?template=report.yml)
 - [Deprecate an Asset](https://github.com/Subway-Builder-Modded/registry/issues/new?template=deprecate-asset.yml)
+- [Remove Asset Deprecation](https://github.com/Subway-Builder-Modded/registry/issues/new?template=undeprecate-asset.yml)
 
 Deprecation is asset-type agnostic (mods and maps share one form) and is restricted to the
 listing's original publisher or its **active caretaker** — collaborators cannot deprecate.
 A deprecated listing stops being downloadable and drops out of search, but the listing itself,
-its download history, and its author attribution are kept permanently.
+its download history, and its author attribution are kept permanently. Deprecation is fully
+reversible via the Remove Asset Deprecation form (same authorization rule).
 
 ## How It Works
 
@@ -41,7 +43,7 @@ PRs. Who can use each command is enforced by the workflows:
 
 | Command | Where | Who | Effect |
 | --- | --- | --- | --- |
-| `revalidate` | Any submission/update issue (publish-mod/map, update-mod/map, update-author, data-quality, deprecate-asset) | Issue author or org OWNER/MEMBER/COLLABORATOR | Re-runs validation after the issue was edited (e.g. after a `failed-validation` result). |
+| `revalidate` | Any submission/update issue (publish-mod/map, update-mod/map, update-author, data-quality, deprecate-asset, undeprecate-asset) | Issue author or org OWNER/MEMBER/COLLABORATOR | Re-runs validation after the issue was edited (e.g. after a `failed-validation` result). |
 | `rescore_data [flags]` | Automated data-quality / publish **PRs** | OWNER/MEMBER/COLLABORATOR | Confirms the submitter's data-quality answers, applies the tier, and marks the publish PR ready to merge. Optional flags on the same line are passed through (e.g. `--admin` to bypass-merge). |
 | `admin_author` | Publish issues | Repo admin/maintain | Creates the listing with author `subway-builder-modded-admin`; the issue submitter is recorded as active **caretaker** (credited for downloads of versions released during their tenure) and added as a collaborator. Use for assets whose true author has no GitHub account. |
 | `data_quality_exempt` | Publish-map issues | Repo admin/maintain | Waives the data-quality merge gate for this submission: the publish PR is created (or updated) ready with the `dq-grandfathered` label and merges at `unknown-quality`. |

@@ -1,0 +1,36 @@
+name: Remove Asset Deprecation
+description: Restore a deprecated mod or map you author or caretake in The Railyard registry.
+title: "[Un-deprecate]: "
+labels: ["undeprecate-asset"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Remove Asset Deprecation
+
+        This restores a previously deprecated asset: once a maintainer merges the resulting pull
+        request, the next registry pipeline run makes it downloadable and searchable again.
+
+        Only the asset's **original publisher or its active caretaker** can remove a deprecation.
+        Collaborators cannot. This form works for both mods and maps — just enter the asset ID.
+
+        If validation fails, you can edit this issue and comment **revalidate** to retry.
+
+  - type: input
+    id: asset-id
+    attributes:
+      label: Asset ID
+      description: The ID of the deprecated mod or map you want to restore.
+      placeholder: better-trains
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: >
+            I am the original publisher or active caretaker of this asset and want it restored to
+            the registry as downloadable and searchable.
+          required: true
