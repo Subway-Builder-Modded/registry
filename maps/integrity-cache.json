@@ -7726,6 +7726,59 @@
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-03-14T06:09:06.000Z"
         }
+      },
+      "v2.0.0": {
+        "fingerprint": "rules:v6:github:danield1909/improvedtwincities:v2.0.0:KMSP.zip",
+        "last_checked_at": "2026-08-03T15:20:31.536Z",
+        "result": {
+          "is_complete": false,
+          "errors": [
+            "asset 'KMSP.zip': demand_data contains 1 of 5808 points (0.0%) with neither residents nor jobs (e.g. UNI_RLNC)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": false,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json.gz",
+            "buildings_index_json": "buildings_index.json.gz",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "KMSP.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 402.83,
+          "source": {
+            "update_type": "github",
+            "repo": "danield1909/improvedtwincities",
+            "tag": "v2.0.0",
+            "asset_name": "KMSP.zip",
+            "download_url": "https://github.com/DanielD1909/improvedTwinCities/releases/download/v2.0.0/KMSP.zip"
+          },
+          "fingerprint": "rules:v6:github:danield1909/improvedtwincities:v2.0.0:KMSP.zip",
+          "checked_at": "2026-08-03T15:20:31.536Z",
+          "released_at": "2026-08-03T12:52:04.000Z"
+        },
+        "asset_sizes": {
+          "KMSP.zip": 422402629
+        },
+        "asset_updated_at": {
+          "KMSP.zip": "2026-08-03T12:51:38Z"
+        }
       }
     },
     "guadalajara": {
