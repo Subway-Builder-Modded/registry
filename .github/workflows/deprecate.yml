@@ -1,0 +1,190 @@
+name: Deprecate Asset
+
+# Author/caretaker-initiated deprecation (asset-type agnostic — the form takes
+# a bare asset ID; listing IDs are unique across maps and mods). Validation is
+# deliberately stricter than metadata updates: only the original publisher or
+# the ACTIVE caretaker may deprecate, never ordinary collaborators. The
+# resulting PR is merged by a maintainer — deprecation never lands unreviewed.
+
+on:
+  issues:
+    types: [opened, reopened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  deprecate-asset:
+    if: >-
+      contains(github.event.issue.labels.*.name, 'deprecate-asset') && (
+        github.event_name == 'issues' ||
+        (github.event_name == 'issue_comment' &&
+         contains(github.event.comment.body, 'revalidate') &&
+         (github.event.comment.user.id == github.event.issue.user.id ||
+          github.event.comment.author_association == 'MEMBER' ||
+          github.event.comment.author_association == 'OWNER' ||
+          github.event.comment.author_association == 'COLLABORATOR'))
+      )
+    runs-on: ubuntu-latest
+    steps:
+      # Optional CI-triggering bot identity — see publish.yml.
+      - name: Mint bot token
+        id: bot-token
+        if: vars.REGISTRY_BOT_APP_ID != ''
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.bot-token.outputs.token || github.token }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Acknowledge revalidation
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+
+      - name: Parse issue body
+        id: parser
+        uses: stefanbuck/github-issue-parser@v3
+        with:
+          template-path: .github/ISSUE_TEMPLATE/deprecate-asset.yml
+          issue-body: ${{ github.event.issue.body }}
+
+      - name: Validate deprecation request
+        env:
+          ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
+          ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
+        run: pnpm --dir scripts run validate-deprecate
+
+      - name: Deprecate listing
+        env:
+          ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
+          ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
+        run: pnpm --dir scripts run deprecate-listing
+
+      - name: Commit and push changes
+        env:
+          GH_TOKEN: ${{ steps.bot-token.outputs.token || github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "deprecate/${{ fromJson(steps.parser.outputs.jsonString).asset-id }}"
+          git add -A
+          git commit -m "chore: deprecate ${{ fromJson(steps.parser.outputs.jsonString).asset-id }}"
+          gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/deprecate" 2>/dev/null || true
+          git push --force origin "deprecate/${{ fromJson(steps.parser.outputs.jsonString).asset-id }}"
+
+      - name: Create or update pull request
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ steps.bot-token.outputs.token || github.token }}
+          script: |
+            const branch = 'deprecate/${{ fromJson(steps.parser.outputs.jsonString).asset-id }}';
+            const { data: existing } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${branch}`,
+              state: 'open'
+            });
+            if (existing.length > 0) {
+              console.log(`PR #${existing[0].number} already exists — updated via force push`);
+              return;
+            }
+            const { data: pr } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'chore: deprecate `${{ fromJson(steps.parser.outputs.jsonString).asset-id }}`',
+              body: [
+                'Fixes #${{ github.event.issue.number }}',
+                '',
+                'Automated PR to deprecate `${{ fromJson(steps.parser.outputs.jsonString).asset-id }}`.',
+                'On merge, the next pipeline run removes it from installable versions and search;',
+                'the listing, download history, and author attribution are retained.',
+                '',
+                'Requested by @${{ github.event.issue.user.login }} (verified author or active caretaker).'
+              ].join('\n'),
+              head: branch,
+              base: 'main'
+            });
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              labels: ['automated-pr']
+            });
+
+      - name: Handle success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                name: 'failed-validation'
+              });
+            } catch {}
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: 'A pull request has been created for your deprecation request. A maintainer will review and merge it shortly — the deprecation takes effect once merged.'
+            });
+
+      - name: Handle failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let errorMsg;
+            try {
+              errorMsg = fs.readFileSync('scripts/validation-error.md', 'utf-8');
+            } catch {
+              errorMsg = 'Something went wrong while processing your deprecation request. Please check the [workflow logs](' +
+                `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`;
+            }
+
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              labels: ['failed-validation']
+            });
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: errorMsg + '\n\n---\nEdit your issue to fix the problems above, then comment **revalidate** to try again.'
+            });

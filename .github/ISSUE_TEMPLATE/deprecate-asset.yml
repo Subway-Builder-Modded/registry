@@ -1,0 +1,47 @@
+name: Deprecate an Asset
+description: Permanently deprecate a mod or map you author or caretake in The Railyard registry.
+title: "[Deprecate]: "
+labels: ["deprecate-asset"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Deprecate an Asset
+
+        Deprecating an asset removes it from downloads and search across the Railyard app and
+        website. Your listing, download history, and author attribution are **kept** — deprecation
+        is not deletion, and your download counts remain credited to you permanently.
+
+        Only the asset's **original publisher or its active caretaker** can deprecate it.
+        Collaborators cannot. This form works for both mods and maps — just enter the asset ID.
+
+        A maintainer reviews and merges the resulting pull request before the deprecation takes
+        effect. If validation fails, you can edit this issue and comment **revalidate** to retry.
+
+  - type: input
+    id: asset-id
+    attributes:
+      label: Asset ID
+      description: The ID of the mod or map you want to deprecate. Must already exist in the registry.
+      placeholder: better-trains
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason (optional)
+      description: >
+        Shown publicly on the listing's detail page — e.g. "Superseded by better-trains-2".
+        Leave blank to omit.
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: >
+            I understand this asset will no longer be downloadable or appear in search once a
+            maintainer merges the deprecation, and that undoing this requires contacting a
+            maintainer.
+          required: true
