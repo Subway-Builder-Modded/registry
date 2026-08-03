@@ -17,6 +17,7 @@ jobs:
       !contains(github.event.issue.labels.*.name, 'update-author') &&
       !contains(github.event.issue.labels.*.name, 'data-quality') &&
       !contains(github.event.issue.labels.*.name, 'report') &&
+      !contains(github.event.issue.labels.*.name, 'integrity-alert') &&
       github.event.issue.author_association != 'MEMBER' &&
       github.event.issue.author_association != 'OWNER' &&
       github.event.issue.author_association != 'COLLABORATOR'
