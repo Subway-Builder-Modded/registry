@@ -1974,3 +1974,100 @@ test("full mode detects a same-size asset replacement across runs and forces a r
     assert.equal(second.integrity.listings["clobber-mod"]?.versions["v1.0.0"]?.is_complete, true);
   });
 });
+
+test("forceRecheckListings bypasses the cache for only the named listing and picks up a replaced release manifest", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["gv-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "gv-mod", {
+      ...makeBaseModManifest("gv-mod"),
+      update: { type: "github", repo: "Owner/GvMod" },
+    });
+
+    const validZip = await makeModZip(true);
+    // The release's bundled manifest.json is mutable: retroactive game_version
+    // edits replace this asset in place, which the zip-only fingerprint and
+    // clobber detection cannot see.
+    let releaseManifestGameRange = ">=1.0.0";
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/gv-mod.zip",
+        handle: () => new Response(new Uint8Array(validZip)),
+      },
+      {
+        match: (url) => url === "https://downloads.example.com/gv-manifest.json",
+        handle: () => jsonResponse({
+          dependencies: { "subway-builder": releaseManifestGameRange },
+        }),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        { name: "mod.zip", downloadCount: 3, downloadUrl: "https://downloads.example.com/gv-mod.zip" },
+                        { name: "manifest.json", downloadCount: 0, downloadUrl: "https://downloads.example.com/gv-manifest.json" },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const first = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.equal(first.integrity.listings["gv-mod"]?.versions["v1.0.0"]?.game_version, ">=1.0.0");
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), first.integrityCache);
+
+    // The author replaces the release's manifest.json (zip untouched): an
+    // ordinary run reuses the cache and the old game_version sticks.
+    releaseManifestGameRange = "<=1.3.0";
+    const second = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+    assert.equal(second.stats.cache_hits, 1);
+    assert.equal(second.integrity.listings["gv-mod"]?.versions["v1.0.0"]?.game_version, ">=1.0.0");
+
+    // Forcing a recheck for an UNRELATED listing still reuses the cache.
+    const untargeted = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+      forceRecheckListings: ["some-other-mod"],
+    });
+    assert.equal(untargeted.stats.cache_hits, 1);
+    assert.equal(untargeted.integrity.listings["gv-mod"]?.versions["v1.0.0"]?.game_version, ">=1.0.0");
+
+    // Targeting the listing bypasses its cache and re-parses game_version.
+    const forced = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+      forceRecheckListings: ["gv-mod"],
+    });
+    assert.equal(forced.stats.cache_hits, 0);
+    assert.equal(forced.integrity.listings["gv-mod"]?.versions["v1.0.0"]?.game_version, "<=1.3.0");
+    assert.equal(forced.integrity.listings["gv-mod"]?.versions["v1.0.0"]?.is_complete, true);
+  });
+});

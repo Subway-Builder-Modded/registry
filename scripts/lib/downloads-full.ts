@@ -288,6 +288,7 @@ interface FullRunContext {
   stats: FullRunStats;
   strictFingerprintCacheForMods: boolean;
   forceIntegrityRecheck: boolean;
+  forceRecheckListings: ReadonlySet<string>;
   modSecurityRules: LoadedSecurityRules | null;
   attributionLedger: DownloadAttributionLedger;
   attributionDelta: DownloadAttributionDelta;
@@ -446,6 +447,7 @@ function shouldReuseGithubCacheEntry(
 ): boolean {
   let shouldReuseCached = (
     !ctx.forceIntegrityRecheck
+    && !ctx.forceRecheckListings.has(listingId)
     && shouldUseCachedIntegrity(
       cached,
       fingerprint,
@@ -1083,6 +1085,7 @@ async function evaluateCustomListing(
     const cached = state.listingCacheEntries[versionKey];
     const shouldReuseCached = (
       !ctx.forceIntegrityRecheck
+      && !ctx.forceRecheckListings.has(id)
       && shouldUseCachedIntegrity(
         cached,
         fingerprint,
@@ -1291,6 +1294,9 @@ export async function generateDownloadsDataFull(
   const token = options.token;
   const strictFingerprintCache = options.strictFingerprintCache === true;
   const forceIntegrityRecheck = options.forceIntegrityRecheck === true;
+  const forceRecheckListings: ReadonlySet<string> = new Set(
+    (options.forceRecheckListings ?? []).map((id) => id.trim()).filter(Boolean),
+  );
   const strictFingerprintCacheForMods = getStrictFingerprintCacheForListingType(
     listingType,
     strictFingerprintCache,
@@ -1359,6 +1365,7 @@ export async function generateDownloadsDataFull(
     },
     strictFingerprintCacheForMods,
     forceIntegrityRecheck,
+    forceRecheckListings,
     modSecurityRules,
     attributionLedger,
     attributionDelta,
