@@ -338,6 +338,10 @@ export async function fetchRepoReleaseIndexes(
     token?: string;
     warnings: string[];
     usageState?: D.GraphqlUsageState;
+    // Repos referenced only by deprecated/test listings: fetch failures are
+    // expected (deleted/private/nonexistent upstreams) and logged to the
+    // console instead of the outbound warnings channel.
+    suppressWarningRepos?: ReadonlySet<string>;
   },
 ): Promise<{
   repoIndexes: Map<string, D.RepoReleaseIndex>;
@@ -355,14 +359,28 @@ export async function fetchRepoReleaseIndexes(
     .sort();
 
   for (const repo of repoList) {
+    const suppressWarnings = options.suppressWarningRepos?.has(repo) === true;
+    const warningsSink = suppressWarnings ? [] : options.warnings;
     const result = await fetchGraphqlReleaseIndexForRepo(
       repo,
       fetchImpl,
       options.token,
-      options.warnings,
+      warningsSink,
       rateLimitWarningState,
       usageState,
     );
+    if (suppressWarnings && warningsSink.length > 0) {
+      for (const message of warningsSink) {
+        // Only this repo's own messages are suppressed; anything else routed
+        // through the sink (e.g. the shared rate-limit warning) still reaches
+        // the outbound warnings channel.
+        if (message.includes(`repo=${repo}`)) {
+          console.log(`[downloads] suppressed repo warning (deprecated/test-only repo): ${message}`);
+        } else {
+          options.warnings.push(message);
+        }
+      }
+    }
     if (result.index) {
       repoIndexes.set(repo, result.index);
     } else if (result.unavailable) {
