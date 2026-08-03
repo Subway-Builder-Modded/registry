@@ -17,6 +17,7 @@ import {
   buildAuthorByDayRows,
   buildDailyDeltaSnapshotTotals,
   buildListingByDayRows,
+  buildListingVersionByDayRows,
   buildProjectByDayRows,
   buildSignedDailyDeltaSnapshotTotals,
   toSnapshotDateLabel,
@@ -322,7 +323,6 @@ export function runGenerateAnalyticsCli(
     versions: Set<string> | null;
   }
   const creditUnitsByListing = new Map<ListingKey, ListingCreditUnit[]>();
-  const splitListingKeys = new Set<ListingKey>();
   for (const key of latestTotals.keys()) {
     const [listingType, id] = key.split(":") as ["maps" | "mods", string];
     const meta = listingMeta.get(key);
@@ -344,15 +344,20 @@ export function runGenerateAnalyticsCli(
         units = [{ person: [...groups.values()][0]!.person, versions: null }];
       } else if (groups.size > 1) {
         units = [...groups.values()].map((group) => ({ person: group.person, versions: group.versions }));
-        splitListingKeys.add(key);
       }
     }
     creditUnitsByListing.set(key, units);
   }
 
-  const versionGrain = splitListingKeys.size > 0
-    ? buildVersionGrainSnapshotTotals(snapshots, historyDir, splitListingKeys)
-    : null;
+  // Version grain across every listing: feeds asset_versions_by_day.csv, and
+  // the caretaker credit split below sums the same totals for its split
+  // listings (per-key math is independent, so widening the key set does not
+  // change the split listings' values).
+  const versionGrain = buildVersionGrainSnapshotTotals(
+    snapshots,
+    historyDir,
+    new Set(latestTotals.keys()),
+  );
   const sumOverVersionKeys = (
     totals: Map<string, number> | undefined,
     versionKeys: readonly string[],
@@ -384,11 +389,11 @@ export function runGenerateAnalyticsCli(
         authorCreditEntries.push({
           listingType,
           person: unit.person,
-          currentTotal: sumOverVersionKeys(versionGrain?.monotonicBySnapshot.get(latest.file), versionKeys),
-          currentAdjusted: sumOverVersionKeys(versionGrain?.adjustedBySnapshot.get(latest.file), versionKeys),
-          monotonicAt: (file) => sumOverVersionKeys(versionGrain?.monotonicBySnapshot.get(file), versionKeys),
-          adjustedAt: (file) => sumOverVersionKeys(versionGrain?.adjustedBySnapshot.get(file), versionKeys),
-          deltaAt: (file) => sumOverVersionKeys(versionGrain?.dailyDeltasBySnapshot.get(file), versionKeys),
+          currentTotal: sumOverVersionKeys(versionGrain.monotonicBySnapshot.get(latest.file), versionKeys),
+          currentAdjusted: sumOverVersionKeys(versionGrain.adjustedBySnapshot.get(latest.file), versionKeys),
+          monotonicAt: (file) => sumOverVersionKeys(versionGrain.monotonicBySnapshot.get(file), versionKeys),
+          adjustedAt: (file) => sumOverVersionKeys(versionGrain.adjustedBySnapshot.get(file), versionKeys),
+          deltaAt: (file) => sumOverVersionKeys(versionGrain.dailyDeltasBySnapshot.get(file), versionKeys),
         });
       }
     }
@@ -813,6 +818,13 @@ export function runGenerateAnalyticsCli(
     a.listing_type.localeCompare(b.listing_type)
     || a.listing_id.localeCompare(b.listing_id)
     || compareStableSemverAsc(a.version, b.version));
+  const listingVersionByDayRows = buildListingVersionByDayRows(
+    snapshotDates,
+    latestTotals,
+    historyVersionsByListing,
+    versionGrain,
+    latest.file,
+  );
   const assetsByDayRows = buildAssetsByDayRows(
     snapshotDates,
     filteredDailyDeltasBySnapshot,
@@ -1026,6 +1038,18 @@ export function runGenerateAnalyticsCli(
       "credited_author_id",
     ],
     listingVersionCreditRows,
+  );
+
+  writeCsv<DailySeriesRow>(
+    join(analyticsDir, "asset_versions_by_day.csv"),
+    [
+      "listing_type",
+      "id",
+      "version",
+      "total_downloads",
+      ...snapshotDates,
+    ],
+    listingVersionByDayRows,
   );
 
   writeCsv<DailySeriesRow>(
