@@ -107,6 +107,13 @@ export interface GenerateDownloadsOptions {
   mode?: "full" | "download-only";
   strictFingerprintCache?: boolean;
   forceIntegrityRecheck?: boolean;
+  // Per-listing forced recheck: bypasses the integrity cache for ONLY these
+  // listing ids. The safe alternative to a global forced recheck (which
+  // re-inspects every release and risks rate-limit cascades) when a listing's
+  // release assets were edited in place — e.g. a retroactive game_version
+  // change via a replaced manifest.json asset, which the zip-only
+  // fingerprint/clobber detection cannot see.
+  forceRecheckListings?: string[];
   attribution?: {
     ledger: DownloadAttributionLedger;
     delta: DownloadAttributionDelta;

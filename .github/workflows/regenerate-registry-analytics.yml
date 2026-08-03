@@ -20,6 +20,15 @@ on:
         required: false
         type: boolean
         default: false
+      force_recheck_listings:
+        description: >-
+          Comma-separated listing ids whose integrity cache should be bypassed
+          this run (targeted alternative to force_integrity_recheck — use when
+          a listing's release assets were edited in place, e.g. a retroactive
+          game_version change via a replaced manifest.json asset).
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -130,6 +139,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          FORCE_INTEGRITY_RECHECK_LISTINGS: ${{ github.event_name == 'workflow_dispatch' && inputs.force_recheck_listings || '' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_integrity_recheck }}" = "true" ]; then
             pnpm --dir scripts run generate-registry-analytics:maps -- --strict-fingerprint-cache --force-integrity
@@ -199,6 +209,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          FORCE_INTEGRITY_RECHECK_LISTINGS: ${{ github.event_name == 'workflow_dispatch' && inputs.force_recheck_listings || '' }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.force_integrity_recheck }}" = "true" ]; then
             pnpm --dir scripts run generate-registry-analytics:mods -- --strict-fingerprint-cache --force-integrity

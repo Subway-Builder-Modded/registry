@@ -200,6 +200,19 @@ async function run(): Promise<void> {
     || hasFlag(argv, "force-integrity")
     || isTruthyEnv(process.env.FORCE_INTEGRITY_RECHECK)
   );
+  // Comma-separated listing ids whose integrity cache should be bypassed this
+  // run — the targeted alternative to a global forced recheck (see
+  // GenerateDownloadsOptions.forceRecheckListings). Ids not in this run's
+  // listing type are simply never matched, so one value can be passed to both
+  // the map and mod invocations.
+  const forceRecheckListings = (
+    getFlagValue(argv, "force-recheck-listings")
+    ?? process.env.FORCE_INTEGRITY_RECHECK_LISTINGS
+    ?? ""
+  )
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
   const runId = getNonEmptyEnv("GITHUB_RUN_ID") ?? "local";
   const jobId = getNonEmptyEnv("GITHUB_JOB") ?? "manual";
@@ -249,6 +262,7 @@ async function run(): Promise<void> {
     mode,
     strictFingerprintCache,
     forceIntegrityRecheck,
+    forceRecheckListings,
     token,
     attribution: {
       ledger: attributionLedger,
@@ -416,6 +430,11 @@ async function run(): Promise<void> {
   );
   if (forceIntegrityRecheck) {
     console.log("[downloads] Force integrity recheck: enabled");
+  }
+  if (forceRecheckListings.length > 0) {
+    console.log(
+      `[downloads] Forced recheck listings: ${forceRecheckListings.join(", ")}`,
+    );
   }
   console.log(
     `[downloads] GraphQL usage: queries=${rateLimit.queries}, totalCost=${rateLimit.totalCost}, firstRemaining=${rateLimit.firstRemaining ?? "n/a"}, lastRemaining=${rateLimit.lastRemaining ?? "n/a"}, estimatedConsumed=${rateLimit.estimatedConsumed ?? "n/a"}, resetAt=${rateLimit.resetAt ?? "n/a"}`,
