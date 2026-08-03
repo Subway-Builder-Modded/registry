@@ -179,12 +179,19 @@ export function loadIntegrityCache(repoRoot: string, dir: ManifestDirectory): In
           (versionValue as { asset_updated_at?: unknown }).asset_updated_at,
           (value): value is string => typeof value === "string" && value.trim() !== "",
         );
+        const manifestAssetUpdatedAt = (versionValue as { manifest_asset_updated_at?: unknown }).manifest_asset_updated_at;
         versionEntries[version] = {
           fingerprint,
           last_checked_at: lastCheckedAt,
           result: result as IntegrityVersionEntry,
           ...(assetSizes ? { asset_sizes: assetSizes } : {}),
           ...(assetUpdatedAt ? { asset_updated_at: assetUpdatedAt } : {}),
+          // null is meaningful (inspected, no manifest asset present) and must
+          // round-trip distinctly from absent (legacy entry, pending backfill).
+          ...(manifestAssetUpdatedAt === null
+            || (typeof manifestAssetUpdatedAt === "string" && manifestAssetUpdatedAt.trim() !== "")
+            ? { manifest_asset_updated_at: manifestAssetUpdatedAt as string | null }
+            : {}),
         };
       }
       entries[listingId] = versionEntries;

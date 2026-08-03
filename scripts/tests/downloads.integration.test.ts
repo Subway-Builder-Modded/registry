@@ -2071,3 +2071,107 @@ test("forceRecheckListings bypasses the cache for only the named listing and pic
     assert.equal(forced.integrity.listings["gv-mod"]?.versions["v1.0.0"]?.is_complete, true);
   });
 });
+
+test("manifest.json asset replacement is auto-detected via updatedAt tracking; legacy entries backfill without invalidation", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["auto-gv-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "auto-gv-mod", {
+      ...makeBaseModManifest("auto-gv-mod"),
+      update: { type: "github", repo: "Owner/AutoGvMod" },
+    });
+
+    const validZip = await makeModZip(true);
+    let releaseManifestGameRange = ">=1.0.0";
+    let manifestAssetUpdatedAt = "2026-01-01T00:00:00Z";
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/auto-gv-mod.zip",
+        handle: () => new Response(new Uint8Array(validZip)),
+      },
+      {
+        match: (url) => url === "https://downloads.example.com/auto-gv-manifest.json",
+        handle: () => jsonResponse({
+          dependencies: { "subway-builder": releaseManifestGameRange },
+        }),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: {
+                      nodes: [
+                        {
+                          name: "mod.zip",
+                          downloadCount: 3,
+                          downloadUrl: "https://downloads.example.com/auto-gv-mod.zip",
+                          updatedAt: "2026-01-01T00:00:00Z",
+                        },
+                        {
+                          name: "manifest.json",
+                          downloadCount: 0,
+                          downloadUrl: "https://downloads.example.com/auto-gv-manifest.json",
+                          updatedAt: manifestAssetUpdatedAt,
+                        },
+                      ],
+                      pageInfo: { hasNextPage: false, endCursor: null },
+                    },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const run = () => generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    const first = await run();
+    assert.equal(first.integrity.listings["auto-gv-mod"]?.versions["v1.0.0"]?.game_version, ">=1.0.0");
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), first.integrityCache);
+
+    const second = await run();
+    assert.equal(second.stats.cache_hits, 1);
+
+    // Author replaces manifest.json (new updatedAt, new range): the regular
+    // run detects it and re-parses game_version — no manual force needed.
+    releaseManifestGameRange = "<=1.3.0";
+    manifestAssetUpdatedAt = "2026-08-04T00:00:00Z";
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), second.integrityCache);
+    const third = await run();
+    assert.equal(third.stats.cache_hits, 0);
+    assert.equal(third.integrity.listings["auto-gv-mod"]?.versions["v1.0.0"]?.game_version, "<=1.3.0");
+
+    // Legacy entry (no manifest tracking recorded): a manifest change is NOT
+    // detected — the entry is backfilled silently instead of invalidated...
+    const legacyCache = JSON.parse(JSON.stringify(third.integrityCache)) as {
+      entries: Record<string, Record<string, { manifest_asset_updated_at?: string | null }>>;
+    };
+    delete legacyCache.entries["auto-gv-mod"]["v1.0.0"].manifest_asset_updated_at;
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), legacyCache);
+    releaseManifestGameRange = ">=1.0.0 <=1.2.0";
+    manifestAssetUpdatedAt = "2026-08-05T00:00:00Z";
+    const backfillRun = await run();
+    assert.equal(backfillRun.stats.cache_hits, 1);
+    assert.equal(backfillRun.integrity.listings["auto-gv-mod"]?.versions["v1.0.0"]?.game_version, "<=1.3.0");
+
+    // ...and once backfilled, the NEXT change is detected normally.
+    writeJson(join(repoRoot, "mods", "integrity-cache.json"), backfillRun.integrityCache);
+    manifestAssetUpdatedAt = "2026-08-06T00:00:00Z";
+    const afterBackfill = await run();
+    assert.equal(afterBackfill.stats.cache_hits, 0);
+    assert.equal(afterBackfill.integrity.listings["auto-gv-mod"]?.versions["v1.0.0"]?.game_version, ">=1.0.0 <=1.2.0");
+  });
+});

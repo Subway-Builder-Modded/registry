@@ -111,6 +111,12 @@ export interface IntegrityCacheEntry {
   // GitHub `updatedAt` timestamps of ZIP assets at inspection time. Preferred over asset_sizes for clobber
   // detection since version-string-only changes (e.g. "0.2.0"→"0.3.0") produce same-size ZIPs.
   asset_updated_at?: Record<string, string>;
+  // GitHub `updatedAt` of the release's manifest.json asset (the game_version
+  // source) at inspection time; null = inspected and no manifest asset was
+  // present; absent = legacy entry (backfilled silently on next cache hit).
+  // A change (replace, add, or remove) forces a re-check so retroactive
+  // game_version edits propagate without a manual forced recheck.
+  manifest_asset_updated_at?: string | null;
 }
 
 export interface IntegrityCache {

@@ -444,6 +444,7 @@ function shouldReuseGithubCacheEntry(
   fingerprint: string,
   currentZipSizes: Record<string, number>,
   currentZipUpdatedAt: Record<string, string>,
+  currentManifestUpdatedAt: string | null,
 ): boolean {
   let shouldReuseCached = (
     !ctx.forceIntegrityRecheck
@@ -472,6 +473,18 @@ function shouldReuseGithubCacheEntry(
     );
     if (updatedAtMismatch || sizeMismatch) {
       warnListing(ctx.warnings, listingId, "zip asset replaced since last inspection; forcing re-check", tag);
+      shouldReuseCached = false;
+    }
+    // The release's manifest.json asset (the game_version source) is not part
+    // of the fingerprint or the zip maps above, so retroactive edits to it are
+    // tracked separately. Legacy entries (field absent) are backfilled on
+    // reuse rather than invalidated.
+    if (
+      shouldReuseCached
+      && cached.manifest_asset_updated_at !== undefined
+      && cached.manifest_asset_updated_at !== currentManifestUpdatedAt
+    ) {
+      warnListing(ctx.warnings, listingId, "release manifest.json asset changed since last inspection; forcing re-check", tag);
       shouldReuseCached = false;
     }
   }
@@ -579,6 +592,7 @@ function storeGithubInspectionResult(
   fingerprint: string,
   currentZipSizes: Record<string, number>,
   currentZipUpdatedAt: Record<string, string>,
+  currentManifestUpdatedAt: string | null,
 ): void {
   const previousVersionEntry = ctx.previousIntegrity?.listings[listingId]?.versions?.[tag];
   const zipSizesEntry = Object.keys(currentZipSizes).length > 0 ? currentZipSizes : undefined;
@@ -591,6 +605,7 @@ function storeGithubInspectionResult(
       result: previousVersionEntry!,
       asset_sizes: zipSizesEntry,
       asset_updated_at: zipUpdatedAtEntry,
+      manifest_asset_updated_at: currentManifestUpdatedAt,
     };
     const failingKeys = Object.entries(result.required_checks)
       .filter(([, v]) => !v).map(([k]) => k).join(", ");
@@ -603,6 +618,7 @@ function storeGithubInspectionResult(
       result,
       asset_sizes: zipSizesEntry,
       asset_updated_at: zipUpdatedAtEntry,
+      manifest_asset_updated_at: currentManifestUpdatedAt,
     };
   }
 }
@@ -712,6 +728,7 @@ async function evaluateGithubListing(
     const currentZipUpdatedAt: Record<string, string> = Object.fromEntries(
       zipAssets.flatMap(([name, a]) => a.assetUpdatedAt != null ? [[name, a.assetUpdatedAt]] : []),
     );
+    const currentManifestUpdatedAt = releaseData.assets.get("manifest.json")?.assetUpdatedAt ?? null;
     const shouldReuseCached = shouldReuseGithubCacheEntry(
       ctx,
       id,
@@ -720,6 +737,7 @@ async function evaluateGithubListing(
       fingerprint,
       currentZipSizes,
       currentZipUpdatedAt,
+      currentManifestUpdatedAt,
     );
 
     if (shouldReuseCached) {
@@ -741,6 +759,11 @@ async function evaluateGithubListing(
       state.nextListingCacheEntries[tag] = {
         ...cached,
         result,
+        // Backfill manifest tracking on legacy entries so future retroactive
+        // manifest.json edits are detected from this point on.
+        manifest_asset_updated_at: cached.manifest_asset_updated_at !== undefined
+          ? cached.manifest_asset_updated_at
+          : currentManifestUpdatedAt,
       };
     } else if (!isSupportedReleaseTag(tag)) {
       const result = buildIncompleteVersionEntry(
@@ -789,6 +812,7 @@ async function evaluateGithubListing(
         fingerprint,
         currentZipSizes,
         currentZipUpdatedAt,
+        currentManifestUpdatedAt,
       );
     }
 
