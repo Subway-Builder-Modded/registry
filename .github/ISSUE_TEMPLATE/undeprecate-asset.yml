@@ -9,7 +9,8 @@ body:
         ## Remove Asset Deprecation
 
         This restores a previously deprecated asset: once a maintainer merges the resulting pull
-        request, the next registry pipeline run makes it downloadable and searchable again.
+        request, the next registry pipeline run makes it downloadable and visible in browse by
+        default again.
 
         Only the asset's **original publisher or its active caretaker** can remove a deprecation.
         Collaborators cannot. This form works for both mods and maps — just enter the asset ID.
@@ -32,5 +33,5 @@ body:
       options:
         - label: >
             I am the original publisher or active caretaker of this asset and want it restored to
-            the registry as downloadable and searchable.
+            the registry as downloadable and visible in browse by default.
           required: true

@@ -28,9 +28,10 @@ All submissions are handled through GitHub Issues. Pick a template to get starte
 
 Deprecation is asset-type agnostic (mods and maps share one form) and is restricted to the
 listing's original publisher or its **active caretaker** — collaborators cannot deprecate.
-A deprecated listing stops being downloadable and drops out of search, but the listing itself,
-its download history, and its author attribution are kept permanently. Deprecation is fully
-reversible via the Remove Asset Deprecation form (same authorization rule).
+A deprecated listing stops being downloadable and is hidden from browse and search results by
+default (it remains viewable behind the Deprecated filter on the app and website), and the
+listing itself, its download history, and its author attribution are kept permanently.
+Deprecation is fully reversible via the Remove Asset Deprecation form (same authorization rule).
 
 ## How It Works
 
