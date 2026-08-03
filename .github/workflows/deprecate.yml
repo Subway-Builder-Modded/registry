@@ -126,8 +126,9 @@ jobs:
                 'Fixes #${{ github.event.issue.number }}',
                 '',
                 'Automated PR to deprecate `${{ fromJson(steps.parser.outputs.jsonString).asset-id }}`.',
-                'On merge, the next pipeline run removes it from installable versions and search;',
-                'the listing, download history, and author attribution are retained.',
+                'On merge, the next pipeline run removes its installable versions; the listing is',
+                'hidden from browse by default (still viewable behind the Deprecated filter), and',
+                'its download history and author attribution are retained.',
                 '',
                 'Requested by @${{ github.event.issue.user.login }} (verified author or active caretaker).'
               ].join('\n'),
@@ -296,8 +297,8 @@ jobs:
                 'Fixes #${{ github.event.issue.number }}',
                 '',
                 'Automated PR to remove the deprecation from `${{ fromJson(steps.parser.outputs.jsonString).asset-id }}`.',
-                'On merge, the next pipeline run restores it as downloadable and searchable',
-                '(the integrity cache retained its true state throughout the deprecation).',
+                'On merge, the next pipeline run restores it as downloadable and visible in browse',
+                'by default (the integrity cache retained its true state throughout the deprecation).',
                 '',
                 'Requested by @${{ github.event.issue.user.login }} (verified author or active caretaker).'
               ].join('\n'),

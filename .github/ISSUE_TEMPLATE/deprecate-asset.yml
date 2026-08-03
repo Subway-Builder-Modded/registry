@@ -8,9 +8,11 @@ body:
       value: |
         ## Deprecate an Asset
 
-        Deprecating an asset removes it from downloads and search across the Railyard app and
-        website. Your listing, download history, and author attribution are **kept** — deprecation
-        is not deletion, and your download counts remain credited to you permanently.
+        Deprecating an asset makes it no longer downloadable and hides it from browse and
+        search results by default across the Railyard app and website (it stays viewable behind
+        the Deprecated filter). Your listing, download history, and author attribution are
+        **kept** — deprecation is not deletion, and your download counts remain credited to you
+        permanently.
 
         Only the asset's **original publisher or its active caretaker** can deprecate it.
         Collaborators cannot. This form works for both mods and maps — just enter the asset ID.
@@ -41,7 +43,7 @@ body:
       label: Confirmation
       options:
         - label: >
-            I understand this asset will no longer be downloadable or appear in search once a
-            maintainer merges the deprecation, and that undoing this requires contacting a
-            maintainer.
+            I understand this asset will no longer be downloadable and will be hidden from
+            browse by default once a maintainer merges the deprecation, and that it can be
+            restored via the Remove Asset Deprecation form.
           required: true
