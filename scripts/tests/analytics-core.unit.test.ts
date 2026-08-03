@@ -104,6 +104,98 @@ test("runGenerateAnalyticsCli writes assets_by_day.csv grouped by listing type",
   }
 });
 
+test("runGenerateAnalyticsCli writes asset_versions_by_day.csv with clamped per-version deltas", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-version-by-day-"));
+  mkdirSync(join(repoRoot, "history"), { recursive: true });
+  mkdirSync(join(repoRoot, "maps", "sample-map"), { recursive: true });
+  mkdirSync(join(repoRoot, "mods", "sample-mod"), { recursive: true });
+
+  try {
+    writeJson(join(repoRoot, "maps", "index.json"), {
+      schema_version: 1,
+      maps: ["sample-map"],
+    });
+    writeJson(join(repoRoot, "maps", "sample-map", "manifest.json"), {
+      schema_version: 1,
+      id: "sample-map",
+      name: "Sample Map",
+      author: "mapmaker",
+      github_id: 1,
+      source: "https://github.com/example/sample-map",
+      city_code: "ABC",
+      country: "US",
+      population: 0,
+      population_count: 0,
+      points_count: 0,
+    });
+    writeJson(join(repoRoot, "mods", "sample-mod", "manifest.json"), {
+      schema_version: 1,
+      id: "sample-mod",
+      name: "Sample Mod",
+      author: "modder",
+      github_id: 2,
+      source: "https://github.com/example/sample-mod",
+    });
+    writeJson(join(repoRoot, "history", "snapshot_2026_03_30.json"), {
+      schema_version: 2,
+      snapshot_date: "2026_03_30",
+      generated_at: "2026-03-30T00:00:00.000Z",
+      maps: {
+        downloads: {
+          "sample-map": {
+            "1.0.0": 10,
+          },
+        },
+      },
+      mods: {
+        downloads: {
+          "sample-mod": {
+            "1.0.0": 5,
+          },
+        },
+      },
+    });
+    writeJson(join(repoRoot, "history", "snapshot_2026_03_31.json"), {
+      schema_version: 2,
+      snapshot_date: "2026_03_31",
+      generated_at: "2026-03-31T00:00:00.000Z",
+      maps: {
+        downloads: {
+          "sample-map": {
+            "1.0.0": 12,
+            "1.1.0": 4,
+          },
+        },
+      },
+      mods: {
+        downloads: {
+          "sample-mod": {
+            // Dips below the previous snapshot (e.g. asset re-upload): the
+            // monotonic series holds 5, so the day's delta clamps to 0.
+            "1.0.0": 3,
+          },
+        },
+      },
+    });
+
+    runGenerateAnalyticsCli([], repoRoot);
+
+    const versionByDayCsv = readFileSync(join(repoRoot, "analytics", "asset_versions_by_day.csv"), "utf-8");
+    assert.equal(
+      versionByDayCsv,
+      [
+        "listing_type,id,version,total_downloads,2026_03_30,2026_03_31",
+        "map,sample-map,1.0.0,12,10,2",
+        "map,sample-map,1.1.0,4,0,4",
+        "mod,sample-mod,1.0.0,5,5,0",
+        "",
+      ].join("\n"),
+    );
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
 test("runGenerateAnalyticsCli writes maps_statistics.csv from grid.geojson and removes legacy maps_by_population.csv", () => {
   const repoRoot = mkdtempSync(join(tmpdir(), "railyard-map-statistics-"));
   mkdirSync(join(repoRoot, "analytics"), { recursive: true });

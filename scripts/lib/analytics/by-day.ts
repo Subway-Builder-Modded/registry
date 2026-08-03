@@ -1,4 +1,6 @@
+import { compareStableSemverAsc } from "../semver.js";
 import { toListingLabel } from "./listing-meta.js";
+import type { VersionGrainSnapshotTotals } from "./snapshots.js";
 import type {
   AssetByDayRow,
   AuthorCreditEntry,
@@ -107,6 +109,47 @@ export function buildListingByDayRows(
   rows.sort((a, b) =>
     Number(b.total_downloads) - Number(a.total_downloads)
     || String(a.id).localeCompare(String(b.id)));
+  return rows;
+}
+
+// Per-(listing, version) daily deltas from the version-grain snapshot series.
+// Version sets come from the full snapshot history, so versions that later
+// disappeared from downloads.json keep their historical rows. Rows are grouped
+// by listing with versions in stable-semver order, so consumers can slice a
+// listing's block without re-sorting.
+export function buildListingVersionByDayRows(
+  snapshotDates: string[],
+  latestTotals: ListingTotals,
+  historyVersionsByListing: Map<ListingKey, Set<string>>,
+  versionGrain: VersionGrainSnapshotTotals,
+  latestSnapshotFile: string,
+): DailySeriesRow[] {
+  const latestMonotonic = versionGrain.monotonicBySnapshot.get(latestSnapshotFile);
+  const rows: DailySeriesRow[] = [];
+  for (const key of latestTotals.keys()) {
+    const [listingType, id] = key.split(":") as ["maps" | "mods", string];
+    const versions = [...(historyVersionsByListing.get(key) ?? new Set<string>())]
+      .sort(compareStableSemverAsc);
+    for (const version of versions) {
+      const versionKey = `${key}@@${version}`;
+      const row: DailySeriesRow = {
+        listing_type: toListingLabel(listingType),
+        id,
+        version,
+        total_downloads: latestMonotonic?.get(versionKey) ?? 0,
+      };
+      for (const snapshotDate of snapshotDates) {
+        row[snapshotDate] =
+          versionGrain.dailyDeltasBySnapshot.get(`snapshot_${snapshotDate}.json`)?.get(versionKey) ?? 0;
+      }
+      rows.push(row);
+    }
+  }
+
+  rows.sort((a, b) =>
+    String(a.listing_type).localeCompare(String(b.listing_type))
+    || String(a.id).localeCompare(String(b.id))
+    || compareStableSemverAsc(String(a.version), String(b.version)));
   return rows;
 }
 
