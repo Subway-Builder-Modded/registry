@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-04T00:00:48.637Z",
+  "generated_at": "2026-08-04T03:42:36.309Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -7819,12 +7819,12 @@
     "greatertwincities": {
       "has_complete_version": true,
       "latest_semver_version": "v2.0.1",
-      "latest_semver_complete": false,
+      "latest_semver_complete": true,
       "complete_versions": [
+        "v2.0.1",
         "v1.0.0"
       ],
       "incomplete_versions": [
-        "v2.0.1",
         "v2.0.0"
       ],
       "last_updated": 1785798829,
@@ -7918,10 +7918,8 @@
           "released_at": "2026-08-03T12:52:04.000Z"
         },
         "v2.0.1": {
-          "is_complete": false,
-          "errors": [
-            "no game_version found (declare a \"subway-builder\" dependency range in the release manifest.json)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -7932,8 +7930,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": true,
-            "game_version_valid": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -7961,6 +7958,7 @@
             "roads.geojson": 61.72,
             "runways_taxiways.geojson": 1.38
           },
+          "game_version": ">=1.4.21",
           "source": {
             "update_type": "github",
             "repo": "danield1909/improvedtwincities",
@@ -7969,7 +7967,7 @@
             "download_url": "https://github.com/DanielD1909/improvedTwinCities/releases/download/v2.0.1/KMSP.zip"
           },
           "fingerprint": "rules:v6:github:danield1909/improvedtwincities:v2.0.1:KMSP.zip",
-          "checked_at": "2026-08-04T00:00:48.637Z",
+          "checked_at": "2026-08-04T03:42:36.309Z",
           "released_at": "2026-08-03T23:13:49.000Z"
         }
       }
