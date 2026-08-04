@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-03T21:42:39.357Z",
+  "generated_at": "2026-08-04T00:00:48.637Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -7818,15 +7818,16 @@
     },
     "greatertwincities": {
       "has_complete_version": true,
-      "latest_semver_version": "v2.0.0",
+      "latest_semver_version": "v2.0.1",
       "latest_semver_complete": false,
       "complete_versions": [
         "v1.0.0"
       ],
       "incomplete_versions": [
+        "v2.0.1",
         "v2.0.0"
       ],
-      "last_updated": 1785761524,
+      "last_updated": 1785798829,
       "versions": {
         "v1.0.0": {
           "is_complete": true,
@@ -7915,6 +7916,61 @@
           "fingerprint": "rules:v6:github:danield1909/improvedtwincities:v2.0.0:KMSP.zip",
           "checked_at": "2026-08-03T15:20:31.536Z",
           "released_at": "2026-08-03T12:52:04.000Z"
+        },
+        "v2.0.1": {
+          "is_complete": false,
+          "errors": [
+            "no game_version found (declare a \"subway-builder\" dependency range in the release manifest.json)"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true,
+            "game_version_valid": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json.gz",
+            "buildings_index_json": "buildings_index.json.gz",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "KMSP.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 402.83,
+          "file_sizes": {
+            "KMSP.pmtiles": 172.18,
+            "KMSP_foundations.pmtiles": 82.65,
+            "buildings_index.bin.gz": 72.65,
+            "buildings_index.json.gz": 51.47,
+            "config.json": 0,
+            "demand_data.json": 13.27,
+            "ocean_depth_index.json.gz": 17.82,
+            "roads.geojson": 61.72,
+            "runways_taxiways.geojson": 1.38
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "danield1909/improvedtwincities",
+            "tag": "v2.0.1",
+            "asset_name": "KMSP.zip",
+            "download_url": "https://github.com/DanielD1909/improvedTwinCities/releases/download/v2.0.1/KMSP.zip"
+          },
+          "fingerprint": "rules:v6:github:danield1909/improvedtwincities:v2.0.1:KMSP.zip",
+          "checked_at": "2026-08-04T00:00:48.637Z",
+          "released_at": "2026-08-03T23:13:49.000Z"
         }
       }
     },
