@@ -1,8 +1,10 @@
 # Data Quality Questions — Guide for Creators
 
-When you publish or update a map, the submission form now asks a short set of **optional** questions
-about the source data you used to create it. This guide explains what each question means, how to answer it, and what
-your answers will be used for.
+When you publish or update a map, the submission form asks a short set of questions about the
+source data you used to create it — answering them is a **required step** of publishing: a new map
+stays at `unknown-quality` and its publish PR cannot merge until a reviewer confirms a score (see the
+[Publishing Content guide](https://subwaybuildermodded.com/registry/docs/publishing-content)). This
+guide explains what each question means, how to answer it, and what your answers will be used for.
 
 Every question has plain-language options, and **"Not sure" is always a safe answer**. Clarifying questions are welcome on the submission issue or in the community [Discord Server](https://discord.gg/syG9YHMyeG).
 
