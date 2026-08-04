@@ -1,0 +1,57 @@
+name: Prune Integrity Alert Issues
+
+# Daily lifecycle pass over creator-facing integrity-alert issues:
+# - closes alerts whose failing version now passes integrity (or disappeared,
+#   or whose listing was deprecated/removed) as resolved;
+# - closes alerts with no comment activity for two weeks where the creator
+#   never had the last word (stale) — a recurrence re-fires a fresh alert on
+#   the next integrity state transition;
+# - escalates alerts where the CREATOR's comment has been waiting on a
+#   maintainer for two weeks: labels needs-maintainer and pings maintainers.
+#   Escalated issues are exempt from stale pruning.
+
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Log intended actions without closing/labeling anything
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: prune-integrity-alerts
+  cancel-in-progress: false
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Prune integrity-alert issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MAINTAINER_MENTIONS: ${{ vars.MAINTAINER_MENTIONS || '@ahkimn' }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '' }}
+        run: pnpm --dir scripts run prune-integrity-alerts
