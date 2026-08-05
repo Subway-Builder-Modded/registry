@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "ile-de-france",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm3"
+  },
+  "notes": "Demand generated from French national census sources (INSEE). Residence population: INSEE Filosofi 2021, a 200 m population grid (published at 200 m). Jobs and commute flows: INSEE MOBPRO 2020, the national home-work mobility survey giving municipality-to-municipality (commune) employed-worker flows measured at place of work. Jobs per municipality = sum of inbound MOBPRO flows; spread within each municipality to 200 m cells weighted by OpenStreetMap tertiary building floor area (offices x levels > retail > industry). Commute OD flows (commune to commune) are disaggregated to 200 m residence/work cell pairs (residence weighted by Filosofi population, work by the job weights). Driving times/distances computed with OSRM on the Ile-de-France OSM extract. Special demand (airports, universities, landmarks, stadiums, malls, parks) added with distance-decay. Map tiles and foundations built with Depot from OpenStreetMap + Overture.\n\nRe-submitted after a `revalidate` on the publish issue (#6920) for release v1.0.1, which reset the data-quality answers. The census sources, disaggregation and routing described above are unchanged. The only demand change is the review fix requested in #6920: a hard cap of 200 people per pop (`enforce_max_pop_size(200)` after the commute merge, plus a guard in the OD disaggregation so the cell-pair cap can never produce an oversized pop), which took the map from 198,001 to 202,085 pops for the same 7,019,451 total daily trips. Previously scored medium (raw 0.37 / weighted 0.57) and confirmed by @ahkimn in #6925.",
+  "sources": [
+    "https://www.insee.fr/fr/statistiques/8735162 (INSEE Filosofi 2021, 200 m population grid)",
+    "https://www.insee.fr/fr/statistiques/7630376 (INSEE MOBPRO 2020, home-work commuter flows)",
+    "https://download.geofabrik.de/europe/france/ile-de-france.html (OpenStreetMap extract)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "JcPires",
+    "reviewed_by": null,
+    "date": "2026-08-05"
+  }
+}
