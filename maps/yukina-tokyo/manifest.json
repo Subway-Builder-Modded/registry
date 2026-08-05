@@ -56,7 +56,18 @@
     "schools",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 144.07,
+    ".railyard_map/special_demand_points.json": 2.79,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "HND.pmtiles": 440.91,
+    "buildings_index.bin.gz": 423.7,
+    "config.json": 0.01,
+    "demand_data.json": 51.33,
+    "ocean_depth_index.json": 154.38,
+    "roads.geojson": 201.43,
+    "runways_taxiways.geojson": 6.86
+  },
   "included_cities": [
     "Kawasaki",
     "Yokohama",
@@ -71,5 +82,83 @@
     "Narita",
     "Hachiōji",
     "Kawaguchi"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.17102085849121562,
+      "p25": 0.18661955697546637,
+      "p50": 0.20301977587729728,
+      "p75": 0.2364195907873513,
+      "p90": 0.2814255048634899,
+      "mean": 0.21720107029292451
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.15978062646528718,
+      "p25": 0.18198071131141763,
+      "p50": 0.20359467958780167,
+      "p75": 0.2454122900701696,
+      "p90": 0.3010414842520912,
+      "mean": 0.2189875826640278
+    },
+    "commuteDistanceKm": {
+      "p10": 1045,
+      "p25": 3341,
+      "p50": 10445,
+      "p75": 30038,
+      "p90": 63368,
+      "mean": 22502.60182782569
+    },
+    "residentCellDensity": {
+      "p10": 53,
+      "p25": 110,
+      "p50": 327,
+      "p75": 2088,
+      "p90": 5362,
+      "mean": 1665.3303170594838
+    },
+    "workerCellDensity": {
+      "p10": 48,
+      "p25": 112,
+      "p50": 426,
+      "p75": 1710,
+      "p90": 3880,
+      "mean": 1752.3630794213168
+    },
+    "detail": {
+      "radiusKm": 0.20330702452135205,
+      "expectedPointSpacingKm": 0.4299028908256862,
+      "normalizedRadius": 0.4729138344030988,
+      "activityPerPoint": 285.77525668957713,
+      "playableAreaKm2": 15964,
+      "playableAreaPerPointKm2": 0.19215908133418394,
+      "playableCatchmentRadiusKm": 0.24731788311536607,
+      "localityScore": 0.6813210337874525,
+      "deaggregationScore": 1,
+      "score": 0.8254217308669869
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.8047277170814023,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 139.70281424782337,
+            "latitude": 35.69045019063586,
+            "massShare": 1,
+            "assignedMass": 47482702,
+            "assignedPointCount": 83077,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1785888000
 }
