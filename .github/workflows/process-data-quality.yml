@@ -167,6 +167,20 @@ jobs:
               return;
             }
             core.setOutput('number', prs[0].number);
+            // Link this data-quality issue to the publish PR with a closing
+            // keyword so merging the map also closes the issue (the comment
+            // below alone would not — closing keywords only work in the PR
+            // body). Idempotent across revalidations.
+            const closingLine = 'Fixes #${{ github.event.issue.number }}';
+            const prBody = prs[0].body ?? '';
+            if (!prBody.includes(closingLine)) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: prs[0].number,
+                body: prBody === '' ? closingLine : prBody + '\n\n' + closingLine
+              });
+            }
             let report = '';
             try {
               report = fs.readFileSync('dq-validation-report.md', 'utf-8');
