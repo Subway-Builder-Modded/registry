@@ -92,6 +92,7 @@ jobs:
           path: |
             maps/downloads.json
             maps/download-version-buckets.json
+            maps/repo-liveness.json
           if-no-files-found: error
 
   generate-mods:
@@ -141,6 +142,7 @@ jobs:
           path: |
             mods/downloads.json
             mods/download-version-buckets.json
+            mods/repo-liveness.json
           if-no-files-found: error
 
   commit:
@@ -199,6 +201,8 @@ jobs:
           MOD_ARTIFACT_FILE="$(find /tmp/download-artifacts/mods -type f -name downloads.json | head -n 1 || true)"
           MAP_BUCKETS_FILE="$(find /tmp/download-artifacts/maps -type f -name download-version-buckets.json | head -n 1 || true)"
           MOD_BUCKETS_FILE="$(find /tmp/download-artifacts/mods -type f -name download-version-buckets.json | head -n 1 || true)"
+          MAP_LIVENESS_FILE="$(find /tmp/download-artifacts/maps -type f -name repo-liveness.json | head -n 1 || true)"
+          MOD_LIVENESS_FILE="$(find /tmp/download-artifacts/mods -type f -name repo-liveness.json | head -n 1 || true)"
 
           if [ -z "${MAP_ARTIFACT_FILE}" ]; then
             echo "Failed to locate map downloads.json in downloaded artifact."
@@ -221,6 +225,12 @@ jobs:
           cp "${MOD_ARTIFACT_FILE}" mods/downloads.json
           cp "${MAP_BUCKETS_FILE}" maps/download-version-buckets.json
           cp "${MOD_BUCKETS_FILE}" mods/download-version-buckets.json
+          if [ -n "${MAP_LIVENESS_FILE}" ]; then
+            cp "${MAP_LIVENESS_FILE}" maps/repo-liveness.json
+          fi
+          if [ -n "${MOD_LIVENESS_FILE}" ]; then
+            cp "${MOD_LIVENESS_FILE}" mods/repo-liveness.json
+          fi
 
       - name: Mint bot token
         id: bot-token
@@ -353,7 +363,7 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json history/railyard_app_downloads.json analytics/railyard_app_downloads.json 2>/dev/null || true
+          git add maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json maps/repo-liveness.json mods/repo-liveness.json history/railyard_app_downloads.json analytics/railyard_app_downloads.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No download changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"

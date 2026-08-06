@@ -1,5 +1,6 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { freezeListingDownloads } from "../lib/grandfathered-downloads.js";
 import { resolveListingById } from "../lib/manifests.js";
 import { getOptionalIssueValue } from "../lib/map-field-utils.js";
 import { assertValidRegistryManifest } from "../lib/registry-manifest.js";
@@ -43,6 +44,18 @@ function main() {
 
   writeFileSync(resolved.manifestPath, JSON.stringify(resolved.manifest, null, 2) + "\n");
   console.log(`Deprecated ${resolved.dir}/${id}/manifest.json`);
+
+  // Freeze last-known download counts so they survive the deprecation
+  // overlay, which removes the listing from pipeline output every run.
+  const frozen = freezeListingDownloads(REPO_ROOT, resolved.type, id);
+  if (frozen) {
+    const total = Object.values(frozen).reduce((sum, n) => sum + n, 0);
+    console.log(
+      `Froze ${total} downloads across ${Object.keys(frozen).length} version(s) into ${resolved.dir}/grandfathered-downloads.json`,
+    );
+  } else {
+    console.log(`No download counts to freeze for ${id}`);
+  }
 }
 
 main();

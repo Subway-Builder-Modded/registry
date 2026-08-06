@@ -1,6 +1,7 @@
 import type { ManifestDirectory, MapManifest } from "./manifests.js";
 import * as D from "./download-definitions.js";
 import { createGraphqlUsageState, fetchRepoReleaseIndexes, isSupportedReleaseTag, graphqlUsageSnapshot } from "./release-resolution.js";
+import { updateRepoLiveness } from "./repo-liveness.js";
 import type {
   IntegrityCache,
   IntegrityCacheEntry,
@@ -340,6 +341,8 @@ async function resolveListingContexts(params: {
   // warn every run; the repo-scoped GraphQL messages carry no listing id so
   // the outbound listing-message filters cannot catch them).
   repoActiveUse: Map<string, boolean>;
+  // repo -> non-deprecated, non-test listing ids referencing it (liveness tracking).
+  repoEligibleListings: Map<string, Set<string>>;
   transientErrorListings: Set<string>;
 }): Promise<void> {
   const {
@@ -355,12 +358,21 @@ async function resolveListingContexts(params: {
     listingMeta,
     repoSet,
     repoActiveUse,
+    repoEligibleListings,
     transientErrorListings,
   } = params;
 
-  const markRepoUse = (repo: string, manifest: { is_test?: boolean; deprecation?: unknown }) => {
+  const markRepoUse = (repo: string, id: string, manifest: { is_test?: boolean; deprecation?: unknown }) => {
     const isActive = !isManifestDeprecated(manifest) && manifest.is_test !== true;
     repoActiveUse.set(repo, (repoActiveUse.get(repo) ?? false) || isActive);
+    if (isActive) {
+      let listings = repoEligibleListings.get(repo);
+      if (!listings) {
+        listings = new Set();
+        repoEligibleListings.set(repo, listings);
+      }
+      listings.add(id);
+    }
   };
 
   // Pace unauthenticated raw.githubusercontent.com custom-update fetches to
@@ -388,7 +400,7 @@ async function resolveListingContexts(params: {
     if (manifest.update.type === "github") {
       const repo = manifest.update.repo.toLowerCase();
       repoSet.add(repo);
-      markRepoUse(repo, manifest);
+      markRepoUse(repo, id, manifest);
       listingContexts.set(id, {
         id,
         listingType,
@@ -412,7 +424,7 @@ async function resolveListingContexts(params: {
     for (const version of customFetch.versions) {
       if (version.parsed) {
         repoSet.add(version.parsed.repo);
-        markRepoUse(version.parsed.repo, manifest);
+        markRepoUse(version.parsed.repo, id, manifest);
       }
     }
     listingContexts.set(id, {
@@ -1385,6 +1397,7 @@ export async function generateDownloadsDataFull(
   const listingMeta = new Map<string, ListingMetaEntry>();
   const repoSet = new Set<string>();
   const repoActiveUse = new Map<string, boolean>();
+  const repoEligibleListings = new Map<string, Set<string>>();
   const transientErrorListings = new Set<string>();
 
   await resolveListingContexts({
@@ -1400,6 +1413,7 @@ export async function generateDownloadsDataFull(
     listingMeta,
     repoSet,
     repoActiveUse,
+    repoEligibleListings,
     transientErrorListings,
   });
 
@@ -1414,6 +1428,19 @@ export async function generateDownloadsDataFull(
     usageState,
     suppressWarningRepos,
   });
+
+  {
+    const notFound: Record<string, string[]> = {};
+    for (const repo of repoSet) {
+      if (repoIndexes.has(repo) || unavailableRepos.has(repo)) continue;
+      notFound[repo] = [...(repoEligibleListings.get(repo) ?? [])];
+    }
+    updateRepoLiveness(repoRoot, dir, {
+      reachable: repoIndexes.keys(),
+      transient: unavailableRepos,
+      notFound,
+    }, nowIso);
+  }
 
   const ctx: FullRunContext = {
     listingType,

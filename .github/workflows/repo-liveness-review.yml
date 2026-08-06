@@ -1,0 +1,58 @@
+name: Repo Liveness Review
+
+# Daily review pass over source repos that the download generators have
+# recorded as definitively unreachable (deleted, renamed without redirect, or
+# made private) in maps/mods repo-liveness.json. Once a repo has been
+# unreachable past the threshold (default 72h), opens one maintainer review
+# issue per repo (label: repo-unreachable); when a repo recovers or stops
+# being referenced by active listings, closes its issue automatically.
+# Transient failures (429/5xx) never start the clock — see
+# scripts/lib/repo-liveness.ts. Deprecation remains a human decision through
+# the deprecate-asset flow; download counts are preserved automatically the
+# whole time, so this is hygiene, not data-loss triage.
+
+on:
+  schedule:
+    - cron: "41 6 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Log intended actions without opening/closing any issues
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: repo-liveness-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Review unreachable source repos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_LIVENESS_THRESHOLD_HOURS: ${{ vars.REPO_LIVENESS_THRESHOLD_HOURS || '72' }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '' }}
+        run: pnpm --dir scripts run check-repo-liveness

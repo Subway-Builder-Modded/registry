@@ -9,6 +9,8 @@ import {
   toDownloadAttributionAssetKey,
 } from "./download-attribution.js";
 import { toDownloadAssetBucketKey } from "./download-version-buckets.js";
+import { isManifestDeprecated } from "./downloads-full/deprecation.js";
+import { updateRepoLiveness } from "./repo-liveness.js";
 import {
   type ListingContext,
   emptyIntegrity,
@@ -46,6 +48,17 @@ export async function generateDownloadsDataDownloadOnly(
   const versionBucketInputs: D.VersionBucketInputsByListing = {};
   const listingContexts = new Map<string, ListingContext>();
   const repoSet = new Set<string>();
+  // Repo -> non-deprecated, non-test listings referencing it, for liveness tracking.
+  const repoEligibleListings = new Map<string, Set<string>>();
+  const trackRepoListing = (repo: string, id: string, manifest: { is_test?: boolean; deprecation?: unknown }) => {
+    if (manifest.is_test || isManifestDeprecated(manifest)) return;
+    let listings = repoEligibleListings.get(repo);
+    if (!listings) {
+      listings = new Set();
+      repoEligibleListings.set(repo, listings);
+    }
+    listings.add(id);
+  };
 
   for (const id of ids) {
     downloadsByListing[id] = {};
@@ -61,6 +74,7 @@ export async function generateDownloadsDataDownloadOnly(
     if (manifest.update.type === "github") {
       const repo = manifest.update.repo.toLowerCase();
       repoSet.add(repo);
+      trackRepoListing(repo, id, manifest);
       listingContexts.set(id, {
         id,
         listingType,
@@ -79,6 +93,7 @@ export async function generateDownloadsDataDownloadOnly(
     for (const version of customFetch.versions) {
       if (version.parsed) {
         repoSet.add(version.parsed.repo);
+        trackRepoListing(version.parsed.repo, id, manifest);
       }
     }
     listingContexts.set(id, {
@@ -100,6 +115,19 @@ export async function generateDownloadsDataDownloadOnly(
     warnings,
     usageState,
   });
+
+  {
+    const notFound: Record<string, string[]> = {};
+    for (const repo of repoSet) {
+      if (repoIndexes.has(repo) || unavailableRepos.has(repo)) continue;
+      notFound[repo] = [...(repoEligibleListings.get(repo) ?? [])];
+    }
+    updateRepoLiveness(repoRoot, dir, {
+      reachable: repoIndexes.keys(),
+      transient: unavailableRepos,
+      notFound,
+    }, nowIso);
+  }
 
   let versionsChecked = 0;
   let adjustedDeltaTotal = 0;
