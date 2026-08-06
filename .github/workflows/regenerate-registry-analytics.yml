@@ -158,6 +158,7 @@ jobs:
             maps/integrity-cache.json
             maps/download-attribution-delta.json
             maps/pending-announcements.json
+            maps/repo-liveness.json
           if-no-files-found: error
 
   generate-mods:
@@ -228,6 +229,7 @@ jobs:
             mods/integrity-cache.json
             mods/download-attribution-delta.json
             mods/pending-announcements.json
+            mods/repo-liveness.json
           if-no-files-found: error
 
   generate-map-demand-stats:
@@ -423,6 +425,8 @@ jobs:
           MOD_ATTR_DELTA_FILE="$(find /tmp/download-artifacts/mods -type f -name download-attribution-delta.json | head -n 1 || true)"
           MAP_PENDING_ANNOUNCEMENTS_FILE="$(find /tmp/download-artifacts/maps -type f -name pending-announcements.json | head -n 1 || true)"
           MOD_PENDING_ANNOUNCEMENTS_FILE="$(find /tmp/download-artifacts/mods -type f -name pending-announcements.json | head -n 1 || true)"
+          MAP_LIVENESS_FILE="$(find /tmp/download-artifacts/maps -type f -name repo-liveness.json | head -n 1 || true)"
+          MOD_LIVENESS_FILE="$(find /tmp/download-artifacts/mods -type f -name repo-liveness.json | head -n 1 || true)"
           DEMAND_ARTIFACT_FILE="$(find /tmp/download-artifacts/demand -type f -name maps-demand-stats.tar | head -n 1 || true)"
 
           if [ -z "${MAP_ARTIFACT_FILE}" ]; then
@@ -481,6 +485,12 @@ jobs:
           fi
           if [ -n "${MOD_PENDING_ANNOUNCEMENTS_FILE}" ]; then
             cp "${MOD_PENDING_ANNOUNCEMENTS_FILE}" /tmp/pending-announcements/mods-pending-announcements.json
+          fi
+          if [ -n "${MAP_LIVENESS_FILE}" ]; then
+            cp "${MAP_LIVENESS_FILE}" maps/repo-liveness.json
+          fi
+          if [ -n "${MOD_LIVENESS_FILE}" ]; then
+            cp "${MOD_LIVENESS_FILE}" mods/repo-liveness.json
           fi
           tar -xf "${DEMAND_ARTIFACT_FILE}" -C .
 
@@ -632,7 +642,7 @@ jobs:
           # downloads.json and download-version-buckets.json are owned by the hourly workflow. This
           # run commits only the attribution ledger; the next hourly run reconciles it into
           # downloads.json. Excluding them here stops this PR from racing the hourly workflow.
-          git add maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json mods/*/manifest.json maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
+          git add maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/repo-liveness.json mods/repo-liveness.json maps/*/manifest.json mods/*/manifest.json maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"

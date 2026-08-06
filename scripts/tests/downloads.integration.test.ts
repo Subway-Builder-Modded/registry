@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 import JSZip from "jszip";
@@ -485,6 +485,10 @@ test("download-only mode preserves previous downloads when a GitHub repo is temp
     assert.ok(
       warnings.some((warning) => warning.includes("preserved previous github-release downloads (repo unavailable)")),
     );
+    const liveness = JSON.parse(
+      readFileSync(join(repoRoot, "mods", "repo-liveness.json"), "utf-8"),
+    ) as { repos: Record<string, unknown> };
+    assert.deepEqual(liveness.repos, {});
   });
 });
 
@@ -637,6 +641,10 @@ test("download-only mode preserves previous downloads when a GitHub repo is priv
     assert.ok(
       warnings.some((warning) => warning.includes("preserved previous github-release downloads (repository not found or inaccessible)")),
     );
+    const liveness = JSON.parse(
+      readFileSync(join(repoRoot, "mods", "repo-liveness.json"), "utf-8"),
+    ) as { repos: Record<string, { listings: string[] }> };
+    assert.deepEqual(liveness.repos["owner/gone"]?.listings, ["github-mod"]);
   });
 });
 
