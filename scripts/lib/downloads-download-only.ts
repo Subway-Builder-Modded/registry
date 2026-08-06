@@ -118,7 +118,8 @@ export async function generateDownloadsDataDownloadOnly(
       }
       const repoIndex = repoIndexes.get(context.update.repo);
       if (!repoIndex) {
-        warnListing(warnings, id, "skipped all github-release versions (repository not found or inaccessible)");
+        downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
+        warnListing(warnings, id, "preserved previous github-release downloads (repository not found or inaccessible)");
         continue;
       }
 
@@ -205,7 +206,18 @@ export async function generateDownloadsDataDownloadOnly(
         continue;
       }
       if (!repoIndex) {
-        warnListing(warnings, id, "skipped (repository not found or inaccessible)", candidate.version);
+        const previousCount = previousDownloads[id]?.[candidate.version];
+        if (typeof previousCount === "number") {
+          downloadsByListing[id][candidate.version] = previousCount;
+          warnListing(
+            warnings,
+            id,
+            "preserved previous GitHub release download count (repository not found or inaccessible)",
+            candidate.version,
+          );
+        } else {
+          warnListing(warnings, id, "skipped (repository not found or inaccessible, no previous count to preserve)", candidate.version);
+        }
         continue;
       }
       const release = repoIndex.byTag.get(candidate.parsed.tag);

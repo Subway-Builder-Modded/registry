@@ -700,9 +700,14 @@ async function evaluateGithubListing(
   }
   const repoIndex = ctx.repoIndexes.get(repo);
   if (!repoIndex) {
-    warnListing(ctx.warnings, id, "skipped all github-release versions (repository not found or inaccessible)");
-    ctx.integrityListings[id] = createListingIntegrityEntry(state.versionEntries);
-    ctx.nextCache.entries[id] = state.nextListingCacheEntries;
+    const preservedListing = ctx.previousIntegrity?.listings[id];
+    ctx.downloadsByListing[id] = sortObjectByKeys(ctx.previousDownloads[id] ?? {});
+    ctx.integrityListings[id] = preservedListing ?? createListingIntegrityEntry({});
+    ctx.nextCache.entries[id] = sortObjectByKeys(state.listingCacheEntries);
+    const preservedCounts = countIntegrityVersions(preservedListing);
+    ctx.stats.completeVersions += preservedCounts.complete;
+    ctx.stats.incompleteVersions += preservedCounts.incomplete;
+    warnListing(ctx.warnings, id, "preserved previous integrity and download state (repository not found or inaccessible)");
     return { handled: true };
   }
   const lastUpdated = maxReleaseEpoch(
@@ -882,18 +887,31 @@ async function evaluateCustomParsedZipVersion(
       };
     }
   } else if (!repoIndex) {
-    const result = buildIncompleteVersionEntry(
-      sourceBase,
-      fingerprint,
-      ctx.nowIso,
-      ["repository is unavailable via GitHub GraphQL"],
-    );
-    state.versionEntries[versionKey] = result;
-    state.nextListingCacheEntries[versionKey] = {
-      fingerprint,
-      last_checked_at: ctx.nowIso,
-      result,
-    };
+    if (previousVersionEntry) {
+      state.versionEntries[versionKey] = previousVersionEntry;
+      if (cached) {
+        state.nextListingCacheEntries[versionKey] = cached;
+      }
+      warnListing(
+        ctx.warnings,
+        listingId,
+        "preserved previous integrity state (repository not found or inaccessible)",
+        versionKey,
+      );
+    } else {
+      const result = buildIncompleteVersionEntry(
+        sourceBase,
+        fingerprint,
+        ctx.nowIso,
+        ["repository is unavailable via GitHub GraphQL"],
+      );
+      state.versionEntries[versionKey] = result;
+      state.nextListingCacheEntries[versionKey] = {
+        fingerprint,
+        last_checked_at: ctx.nowIso,
+        result,
+      };
+    }
   } else {
     const release = repoIndex.byTag.get(parsed.tag);
     if (!release) {
@@ -1021,14 +1039,19 @@ function applyCustomDownloadCount(
   const result = state.versionEntries[versionKey];
   let downloadCount: number | undefined;
   let versionBucketsForVersion: D.DownloadVersionBucketInput[] = [];
-  if (candidate.parsed && ctx.unavailableRepos.has(candidate.parsed.repo)) {
+  if (
+    candidate.parsed &&
+    (ctx.unavailableRepos.has(candidate.parsed.repo) || !ctx.repoIndexes.has(candidate.parsed.repo))
+  ) {
     const previousCount = ctx.previousDownloads[listingId]?.[versionKey];
     if (typeof previousCount === "number") {
       downloadCount = previousCount;
       warnListing(
         ctx.warnings,
         listingId,
-        "preserved previous GitHub release download count (repo unavailable)",
+        ctx.unavailableRepos.has(candidate.parsed.repo)
+          ? "preserved previous GitHub release download count (repo unavailable)"
+          : "preserved previous GitHub release download count (repository not found or inaccessible)",
         versionKey,
       );
     }

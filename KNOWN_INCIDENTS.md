@@ -6,6 +6,84 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 ---
 
+## 2026-08-04 → 2026-08-05 — Private-repo wipe of three mod listings (fully recovered, listings deprecated)
+
+**What happened:** two authors made their source repos private, and the
+download pipeline treated "repository not found" as *fresh emptiness* rather
+than *unknown state*. GitHub's GraphQL reports a private/deleted repo as a
+non-transient "Could not resolve to a Repository" error, which landed the
+repo in **neither** `repoIndexes` **nor** `unavailableRepos` — so the
+preserve-previous-counts fallback (which only fires for `unavailableRepos`,
+i.e. transient 429/5xx errors) was never reached, and the freshly-initialized
+`{}` was written out. Affected listings and losses:
+
+- `danield1909-dantrains` (repo private ~Aug 4 20:30–21:05 UTC): hourly run
+  `c592e548d` (#6961) wiped 12 versions, 2,300 → 57 (the 57 survived only via
+  a pre-existing `mods/grandfathered-downloads.json` entry).
+- `imb11-moveit` (1,255) and `imb11-subwaycine` (33) (repos private Aug 5
+  ~21:03–22:07 UTC): hourly run `4df45a6e2` (#7048) wiped both to `{}`.
+
+The wipes surfaced as **negative net-delta** figures in the hourly Discord
+report (e.g. `mods.net_downloads: -1158` in `snapshot_2026_08_05.json`).
+
+**Why the two authors' listings diverged:** the same gap existed in **full**
+mode (`regenerate-registry-analytics`, 4-hourly), where the `!repoIndex`
+branch additionally clobbered the listing's integrity entry with a fresh
+empty one. dantrains went private ~4 hours before a full run, so the Aug 5
+00:15 full run (`97705a745`) collapsed its integrity
+(`has_complete_version: false`) — which the Railyard app treats as
+purge-on-launch. The imb11 repos went private ~90 minutes *after* the Aug 5
+20:29 full run (`a90d48590`), and only hourly download-only runs (which never
+write integrity) saw the 404 — so their integrity entries remained intact.
+Pure cadence timing, not different handling.
+
+**Fix:** the `!repoIndex` (repository-not-found) branches now preserve
+previous state exactly like the `unavailableRepos` (transient) branches, in
+all four sites: listing-level and per-version paths in both
+`scripts/lib/downloads-download-only.ts` and `scripts/lib/downloads-full.ts`
+(full mode preserves integrity + cache + downloads together). Regression
+tests cover the private/deleted-repo case in both modes
+(`downloads.integration.test.ts`).
+
+**Recovery:** last-known per-version counts were intact in
+`mods/download-version-buckets.json` (monotonic ledger; the wipe couldn't
+touch it because `applyVersionBucketMonotonicCounts` only iterates versions
+present in the fresh result). All three listings' counts were restored from
+the ledger into `mods/downloads.json` **and** frozen into
+`mods/grandfathered-downloads.json` (dantrains 2,433 / moveit 1,255 /
+subwaycine 33 — bucket maxes, slightly above the last snapshot values by
+design). **No lasting data loss.**
+
+**Snapshot correction:** `history/snapshot_2026_08_05.json` (generated 04:01,
+between the two wipes) had recorded dantrains post-wipe (57) and
+`mods.net_downloads: -1158`. Corrected to the exact last observation before
+the repo vanished (21:05 Aug 4 run, `c592e548d^`): adjusted 2,300 per-version,
+raw = adjusted + the per-version attribution map (275, static since Aug 1),
+`mods.net_downloads: +1085`. This is a reconstruction from committed data,
+not an estimate — the repo was unreachable for the entire window between the
+last observation and the snapshot, so no downloads could have been recorded.
+The imb11 wipe (22:07 Aug 5) never reached a daily snapshot; Aug 1–4
+snapshots are clean.
+
+**Deprecation:** all three listings were deprecated in the same change
+(maintainer-initiated, `by_github_id: 268817724`) since no installable
+versions remain. The grandfathered entries are what keep their download
+totals visible: the deprecation overlay wipes deprecated listings from the
+pipeline's own output, and the grandfathered merge re-fills every version
+afterwards. The app-side purge of installed copies on deprecation is a known,
+accepted side effect (revisit possibly in 0.2.10); dantrains installs had
+already been purging since Aug 5 00:15 via the integrity collapse.
+
+**Detection playbook for recurrence:** a listing dropping non-zero → `{}` in
+`downloads.json` alongside a "skipped all github-release versions
+(repository not found or inaccessible)" warning means the repo vanished
+upstream. With the fix, counts and integrity are preserved automatically and
+the warning reads "preserved previous … (repository not found or
+inaccessible)" instead; the remaining action is deciding whether to
+deprecate the listing (grandfather its counts first if so).
+
+---
+
 ## 2026-04 → 2026-07 — charleston-huntington-wv faulty-client inflation (corrected 2026-07-29)
 
 **What happened:** an automated client repeatedly re-downloaded the map's
