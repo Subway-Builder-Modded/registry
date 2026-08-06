@@ -59,7 +59,10 @@
       "type": "ast",
       "pattern": {
         "kind": "call-in-while",
-        "callees": ["openModsFolder", "openSavesFolder"],
+        "callees": [
+          "openModsFolder",
+          "openSavesFolder"
+        ],
         "allow_aliases": true
       },
       "description": "Repeated folder-opening calls in while loops can crash file explorer.",
