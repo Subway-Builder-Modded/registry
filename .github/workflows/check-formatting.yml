@@ -3,8 +3,8 @@ name: Check Formatting
 # Formatting invariants over tracked text files (see
 # scripts/quality/check-formatting.ts):
 # - valid UTF-8, no BOM, no CP-1252 mojibake (an editor round-trip through
-#   Windows-1252 shipped "â€”" in publish.yml's user-facing bot comments for
-#   five days — diffs make this near-invisible to reviewers, CI does not);
+#   Windows-1252 shipped a corrupted em dash in publish.yml's user-facing
+#   bot comments for five days — near-invisible in diffs, trivial for CI);
 # - registry data JSON in canonical style: JSON.stringify(parsed, null, 2)
 #   plus trailing newline — byte-identical to what writeJsonFile and every
 #   generator emit, so hand-edits and bot output never fight.
@@ -13,6 +13,10 @@ name: Check Formatting
 # pushed to the PR branch (BOM removal, mojibake repair, JSON
 # canonicalization). Fork PRs and pushes to main only report — the failure
 # message points at `pnpm --dir scripts run fix-formatting`.
+#
+# Files under .github/workflows/ are checked but never auto-edited: the bot
+# token lacks the `workflows` permission, and CI must not modify CI. Problems
+# there always require a manual fix.
 
 on:
   pull_request:

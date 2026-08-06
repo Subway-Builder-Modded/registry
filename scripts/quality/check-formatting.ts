@@ -16,8 +16,8 @@ import {
 //
 // Checks:
 // 1. Every tracked text file: valid UTF-8, no BOM, no CP-1252 mojibake
-//    (see lib/formatting.ts — motivated by publish.yml shipping "â€”" in
-//    user-facing bot comments for five days, KNOWN_INCIDENTS-adjacent).
+//    (see lib/formatting.ts — motivated by publish.yml shipping a corrupted
+//    em dash in user-facing bot comments for five days, invisible in diffs).
 // 2. Registry data JSON (maps/, mods/, authors/, analytics/, history/ and
 //    root-level *.json): canonical style, i.e. byte-identical to
 //    JSON.stringify(parsed, null, 2) + "\n" — exactly what writeJsonFile and
@@ -46,6 +46,13 @@ function isCanonicalJsonTarget(path: string): boolean {
   if (!path.endsWith(".json")) return false;
   if (basename(path).startsWith("tsconfig")) return false;
   return JSON_CANONICAL_DIRS.some((dir) => path.startsWith(dir)) || !path.includes("/");
+}
+
+// Workflow definitions are checked but never auto-edited: pushing a change to
+// .github/workflows/ requires the `workflows` token permission the bot does
+// not hold, and CI definitions should not be modified by CI regardless.
+function isAutoFixExcluded(path: string): boolean {
+  return path.startsWith(".github/workflows/");
 }
 
 function listTrackedFiles(): string[] {
@@ -77,6 +84,7 @@ function main(): void {
       continue; // tracked but locally deleted
     }
 
+    const autoFixable = !isAutoFixExcluded(path);
     const bom = hasUtf8Bom(buffer);
     const content = decodeStrictUtf8(bom ? buffer.subarray(3) : buffer);
     if (content === null) {
@@ -84,7 +92,7 @@ function main(): void {
       continue;
     }
     if (bom) {
-      problems.push({ path, kind: "bom", detail: "file starts with a UTF-8 BOM", fixable: true });
+      problems.push({ path, kind: "bom", detail: "file starts with a UTF-8 BOM", fixable: autoFixable });
     }
 
     const mojibake = findMojibake(content);
@@ -98,7 +106,7 @@ function main(): void {
         path,
         kind: "mojibake",
         detail: `${mojibake.length} mojibake sequence(s): ${preview}${mojibake.length > 3 ? ", ..." : ""}`,
-        fixable: true,
+        fixable: autoFixable,
       });
       fixedContent = fixMojibake(content).text;
     }
@@ -108,12 +116,12 @@ function main(): void {
       if (canonical === null) {
         problems.push({ path, kind: "json-parse", detail: "file is not parseable JSON", fixable: false });
       } else if (canonical !== fixedContent) {
-        problems.push({ path, kind: "json-style", detail: "not in canonical JSON style (stringify indent-2 + trailing newline)", fixable: true });
+        problems.push({ path, kind: "json-style", detail: "not in canonical JSON style (stringify indent-2 + trailing newline)", fixable: autoFixable });
         fixedContent = canonical;
       }
     }
 
-    if (fixMode && (bom || fixedContent !== content)) {
+    if (fixMode && autoFixable && (bom || fixedContent !== content)) {
       writeFileSync(absolute, fixedContent, "utf-8");
       fixedFiles += 1;
     }

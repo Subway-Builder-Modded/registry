@@ -3,11 +3,14 @@
 //
 // Mojibake background: an editor that decodes UTF-8 bytes as Windows-1252 and
 // re-saves as UTF-8 turns every multi-byte character into a distinctive
-// sequence (— becomes â€”, é becomes Ã©). The repair is the exact reverse:
-// map each character of the sequence back to the CP-1252 byte it was decoded
-// from, then decode those bytes as UTF-8. A candidate is only replaced when
-// that strict decode succeeds, which is what keeps legitimate text (SÃO, café)
-// untouched — real prose never forms a byte-valid UTF-8 sequence by accident.
+// sequence (an em dash becomes the three-character a-circumflex / euro /
+// right-double-quote run; e-acute becomes A-tilde-capital / copyright). The
+// repair is the exact reverse: map each character of the sequence back to the
+// CP-1252 byte it was decoded from, then decode those bytes as UTF-8. A
+// candidate is only replaced when that strict decode succeeds AND the result
+// is a plausible character — see PLAUSIBLE_REPLACEMENT_RANGES below.
+// (This file deliberately contains no literal mojibake examples: it must stay
+// clean under its own check. The unit tests build fixtures from \u escapes.)
 
 // CP-1252 bytes 0x80–0x9F map to these codepoints (the range where CP-1252
 // differs from Latin-1); bytes 0xA0–0xFF map to the identical codepoints.
@@ -42,10 +45,10 @@ const strictUtf8 = new TextDecoder("utf-8", { fatal: true });
 // A candidate repair is only accepted when the decoded character is one that
 // plausibly appears in registry prose. This guards against real-text
 // collisions: Czech "Úžice" reverse-decodes to a byte-valid Arabic letter
-// (Ú=0xDA lead + ž=0x9E continuation), so strict UTF-8 validity alone is not
-// sufficient evidence of mojibake. Genuine mojibake of Czech text is still
-// repaired — ž corrupts to "Å¾", whose repair decodes back into Latin
-// Extended-A, inside this allowlist.
+// (U-acute = 0xDA lead + z-caron = 0x9E continuation), so strict UTF-8
+// validity alone is not sufficient evidence of mojibake. Genuine mojibake of
+// Czech text is still repaired — corrupted z-caron reverse-decodes back into
+// Latin Extended-A, inside this allowlist.
 const PLAUSIBLE_REPLACEMENT_RANGES: Array<[number, number]> = [
   [0x00a0, 0x024f], // Latin-1 supplement, Latin Extended-A/B
   [0x0370, 0x04ff], // Greek, Cyrillic
