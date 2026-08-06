@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-06T00:01:12.994Z",
+  "generated_at": "2026-08-06T06:13:54.598Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -7107,13 +7107,12 @@
     "greater-kuala-lumpur": {
       "has_complete_version": true,
       "latest_semver_version": "v1.1.0",
-      "latest_semver_complete": false,
+      "latest_semver_complete": true,
       "complete_versions": [
+        "v1.1.0",
         "v1.0.0"
       ],
-      "incomplete_versions": [
-        "v1.1.0"
-      ],
+      "incomplete_versions": [],
       "last_updated": 1785778842,
       "versions": {
         "v1.0.0": {
@@ -7164,10 +7163,8 @@
           "released_at": "2026-03-17T14:39:45.000Z"
         },
         "v1.1.0": {
-          "is_complete": false,
-          "errors": [
-            "no game_version found (declare a \"subway-builder\" dependency range in the release manifest.json)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -7178,8 +7175,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": true,
-            "game_version_valid": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -7214,6 +7210,7 @@
             "roads.geojson": 44.45,
             "runways_taxiways.geojson": 1.46
           },
+          "game_version": ">=1.0.0",
           "source": {
             "update_type": "github",
             "repo": "nzh0172/sb-malaysia-map-pack",
@@ -7222,7 +7219,7 @@
             "download_url": "https://github.com/nzh0172/sb-malaysia-map-pack/releases/download/v1.1.0/KUL.zip"
           },
           "fingerprint": "rules:v6:github:nzh0172/sb-malaysia-map-pack:v1.1.0:KUL.zip",
-          "checked_at": "2026-08-03T18:11:24.426Z",
+          "checked_at": "2026-08-06T06:13:54.598Z",
           "released_at": "2026-08-03T17:40:42.000Z"
         }
       }
