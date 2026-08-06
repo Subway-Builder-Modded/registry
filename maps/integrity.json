@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-06T10:57:02.937Z",
+  "generated_at": "2026-08-06T14:25:47.396Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -9251,6 +9251,109 @@
           "fingerprint": "rules:v6:sha256:3e75637c34097afa09b52ab06a16958ecd25268740605df7e702ea848eb528c0",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-06-01T00:00:00.000Z"
+        }
+      }
+    },
+    "ile-de-france": {
+      "has_complete_version": false,
+      "latest_semver_version": "1.0.1",
+      "latest_semver_complete": false,
+      "complete_versions": [],
+      "incomplete_versions": [
+        "1.0.1",
+        "1.0.0"
+      ],
+      "last_updated": 1785956393,
+      "versions": {
+        "1.0.0": {
+          "is_complete": false,
+          "errors": [
+            "asset 'ile-de-france.zip': missing top-level IDF.pmtiles (config code 'IDF', registry city_code 'IDF')",
+            "asset 'ile-de-france.zip': config.json version '0.1.0' does not match release tag '1.0.0' (expected '1.0.0')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": false,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": null,
+            "config_version_matches_tag": null
+          },
+          "release_size": 638.94,
+          "game_version": ">=1.5.0",
+          "source": {
+            "update_type": "github",
+            "repo": "jcpires/subway-builder-idf",
+            "tag": "1.0.0",
+            "asset_name": "ile-de-france.zip",
+            "download_url": "https://github.com/JcPires/subway-builder-idf/releases/download/1.0.0/ile-de-france.zip"
+          },
+          "fingerprint": "rules:v6:github:jcpires/subway-builder-idf:1.0.0:ile-de-france.zip",
+          "checked_at": "2026-08-06T14:25:47.396Z",
+          "released_at": "2026-08-04T10:23:20.000Z"
+        },
+        "1.0.1": {
+          "is_complete": false,
+          "errors": [
+            "asset 'ile-de-france.zip': missing top-level IDF.pmtiles (config code 'IDF', registry city_code 'IDF')",
+            "asset 'ile-de-france.zip': config.json version '0.1.0' does not match release tag '1.0.1' (expected '1.0.1')"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": false,
+            "config_version_matches_tag": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": null,
+            "config_version_matches_tag": null
+          },
+          "release_size": 650.44,
+          "game_version": ">=1.5.0",
+          "source": {
+            "update_type": "github",
+            "repo": "jcpires/subway-builder-idf",
+            "tag": "1.0.1",
+            "asset_name": "ile-de-france.zip",
+            "download_url": "https://github.com/JcPires/subway-builder-idf/releases/download/1.0.1/ile-de-france.zip"
+          },
+          "fingerprint": "rules:v6:github:jcpires/subway-builder-idf:1.0.1:ile-de-france.zip",
+          "checked_at": "2026-08-06T14:25:47.396Z",
+          "released_at": "2026-08-05T18:59:53.000Z"
         }
       }
     },
