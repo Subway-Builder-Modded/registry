@@ -1,0 +1,107 @@
+name: Check Formatting
+
+# Formatting invariants over tracked text files (see
+# scripts/quality/check-formatting.ts):
+# - valid UTF-8, no BOM, no CP-1252 mojibake (an editor round-trip through
+#   Windows-1252 shipped "â€”" in publish.yml's user-facing bot comments for
+#   five days — diffs make this near-invisible to reviewers, CI does not);
+# - registry data JSON in canonical style: JSON.stringify(parsed, null, 2)
+#   plus trailing newline — byte-identical to what writeJsonFile and every
+#   generator emit, so hand-edits and bot output never fight.
+#
+# On same-repo pull requests, a failed check triggers an auto-fix commit
+# pushed to the PR branch (BOM removal, mojibake repair, JSON
+# canonicalization). Fork PRs and pushes to main only report — the failure
+# message points at `pnpm --dir scripts run fix-formatting`.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-formatting-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Check formatting
+        run: pnpm --dir scripts run check-formatting
+
+  autofix:
+    needs: [check]
+    if: >-
+      failure() &&
+      github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # First checkout only provides the local mint-bot-token action; the
+      # second checks out the PR head with the bot token so the fix commit
+      # retriggers CI (pushes made with the default GITHUB_TOKEN do not
+      # start new workflow runs).
+      - uses: actions/checkout@v4
+
+      - name: Mint bot token
+        id: bot-token
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          token: ${{ steps.bot-token.outputs.token || github.token }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Apply formatting fixes
+        run: pnpm --dir scripts run fix-formatting
+
+      - name: Commit and push fixes
+        run: |
+          if git diff --quiet; then
+            echo "Nothing to fix — check failure was not auto-fixable (see check job log)."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "style: auto-fix formatting (encoding + JSON canonicalization)"
+          git push
