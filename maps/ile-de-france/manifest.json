@@ -59,7 +59,18 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "IDF.pmtiles": 252.93,
+    "IDF_foundations.pmtiles": 189.35,
+    "IDF_ocean_foundations.pmtiles": 9.35,
+    "buildings_index.bin.gz": 167.94,
+    "config.json": 0,
+    "demand_data.json.gz": 5.54,
+    "ocean_depth_index.json.gz": 7.52,
+    "roads.geojson.gz": 16.84,
+    "runways_taxiways.geojson.gz": 0.83,
+    "thumbnail.png": 0.13
+  },
   "included_cities": [
     "Paris",
     "Versailles",
@@ -67,5 +78,91 @@
     "Nanterre",
     "Créteil",
     "Boulogne-Billancourt"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1994921456427961,
+      "p25": 0.19950922565462623,
+      "p50": 0.1995316663035733,
+      "p75": 0.19955521861331305,
+      "p90": 0.19958588460415416,
+      "mean": 0.20356983356473626
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.19949966862507548,
+      "p25": 0.19952087307484778,
+      "p50": 0.199551227853266,
+      "p75": 0.25991633761666,
+      "p90": 0.4185736356989235,
+      "mean": 0.3085149161182065
+    },
+    "commuteDistanceKm": {
+      "p10": 4053,
+      "p25": 10086,
+      "p50": 21450,
+      "p75": 37539,
+      "p90": 55557,
+      "mean": 26474.174898947582
+    },
+    "residentCellDensity": {
+      "p10": 5,
+      "p25": 20,
+      "p50": 85,
+      "p75": 410,
+      "p90": 1651,
+      "mean": 644.4705016106765
+    },
+    "workerCellDensity": {
+      "p10": 5,
+      "p25": 12,
+      "p50": 59,
+      "p75": 316,
+      "p90": 1404,
+      "mean": 859.8949950932287
+    },
+    "detail": {
+      "radiusKm": 0.19954144683871117,
+      "expectedPointSpacingKm": 0.4627922109716199,
+      "normalizedRadius": 0.4311685506110382,
+      "activityPerPoint": 130.73064029500503,
+      "playableAreaKm2": 19104,
+      "playableAreaPerPointKm2": 0.35579394345736953,
+      "playableCatchmentRadiusKm": 0.33653042900575475,
+      "localityScore": 0.7791695015195654,
+      "deaggregationScore": 1,
+      "score": 0.8827057842336626
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8445328496318538,
+        "continuousScore": 0.7880018280176401,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.7309016525158463,
+        "largestCenterShare": 0.6971466144574554,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 2.431467581308,
+            "latitude": 48.809571441647435,
+            "massShare": 0.6971466144574554,
+            "assignedMass": 9787173,
+            "assignedPointCount": 35427,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 2.1635568058157064,
+            "latitude": 48.90406406417581,
+            "massShare": 0.30285338554254454,
+            "assignedMass": 4251729,
+            "assignedPointCount": 18267,
+            "prominenceRatio": 0.9999999999026793
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1786037780
 }
