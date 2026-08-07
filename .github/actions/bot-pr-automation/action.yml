@@ -58,6 +58,13 @@ outputs:
   pr_head_sha:
     description: Resolved PR head SHA.
     value: ${{ steps.run.outputs.pr_head_sha }}
+  merged:
+    description: >-
+      "true" when the PR is confirmed merged by the end of this action, "false"
+      otherwise (e.g. parked on the auto-merge fallback awaiting approval).
+      Callers gating side effects on the committed state actually reaching the
+      base branch must check this, not mere PR existence.
+    value: ${{ steps.run.outputs.merged }}
 
 runs:
   using: composite
@@ -181,6 +188,22 @@ runs:
             merged_directly=true
             echo "Merged PR #${PR_NUMBER} directly with the bot app identity."
           else
+            # A stale mergeability verdict or a behind branch can fail the direct
+            # merge; syncing the branch with base gives one more shot. A genuine
+            # content conflict makes update-branch itself fail (422) and we fall
+            # through to the auto-merge fallback.
+            echo "Direct app merge failed; updating branch from base and retrying." >&2
+            if retry_run 2 gh api --method PUT "repos/${REPO}/pulls/${PR_NUMBER}/update-branch"; then
+              sleep 10
+              if retry_run 2 env GH_TOKEN="${INPUT_MERGE_TOKEN}" gh pr merge "${PR_NUMBER}" --repo "${REPO}" --squash --admin; then
+                merged_directly=true
+                echo "Merged PR #${PR_NUMBER} directly after branch update."
+              fi
+            else
+              echo "Branch update failed (likely a content conflict with base)." >&2
+            fi
+          fi
+          if [ "${merged_directly}" != "true" ]; then
             echo "Direct app merge failed; enabling auto-merge (needs a manual approval)." >&2
           fi
         fi
@@ -188,6 +211,17 @@ runs:
         if [ "${merged_directly}" != "true" ] && bool_true "${INPUT_ENABLE_AUTO_MERGE}"; then
           retry_run "${MAX_ATTEMPTS}" gh pr merge "${PR_NUMBER}" --repo "${REPO}" --auto --squash \
             || echo "Could not enable auto-merge after retries (auto-merge may be disabled or blocked by branch rules)."
+        fi
+
+        # Confirm against the API rather than trusting merged_directly: the
+        # auto-merge fallback can also complete immediately when the PR is
+        # already approved and mergeable.
+        MERGED_STATE="$(retry_cmd "${MAX_ATTEMPTS}" gh pr view "${PR_NUMBER}" --repo "${REPO}" --json state --jq .state || echo "UNKNOWN")"
+        if [ "${MERGED_STATE}" = "MERGED" ]; then
+          echo "merged=true" >> "$GITHUB_OUTPUT"
+        else
+          echo "merged=false" >> "$GITHUB_OUTPUT"
+          echo "PR #${PR_NUMBER} is not merged (state: ${MERGED_STATE})." >&2
         fi
 
         echo "pr_number=${PR_NUMBER}" >> "$GITHUB_OUTPUT"

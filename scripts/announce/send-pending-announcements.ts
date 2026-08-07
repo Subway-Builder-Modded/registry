@@ -14,8 +14,11 @@ import { resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 async function run(): Promise<void> {
   const files = parsePendingAnnouncementFileArgs(process.argv.slice(2));
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
-  // Load the ledger at send time (commit job checks out latest main, so this
-  // reflects any announcements already sent by a concurrent or preceding run).
+  // Load the ledger at send time. The checkout is pinned to the workflow's
+  // trigger SHA, so the workflow refreshes history/content-announcements.json
+  // from origin/main (pre-merge) before this runs — entries present there were
+  // announced by earlier runs and are skipped; this run's own recorded entries
+  // land with its bot PR and must not appear here.
   const ledger = loadContentAnnouncementLedger(repoRoot);
   let sent = 0;
   let skipped = 0;

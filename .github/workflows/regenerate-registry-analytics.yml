@@ -639,10 +639,14 @@ jobs:
       - name: Stage changes
         id: stage_changes
         run: |
-          # downloads.json and download-version-buckets.json are owned by the hourly workflow. This
-          # run commits only the attribution ledger; the next hourly run reconciles it into
-          # downloads.json. Excluding them here stops this PR from racing the hourly workflow.
-          git add maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/repo-liveness.json mods/repo-liveness.json maps/*/manifest.json mods/*/manifest.json maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
+          # downloads.json, download-version-buckets.json, and repo-liveness.json are owned by
+          # the hourly workflow. This run commits only the attribution ledger; the next hourly
+          # run reconciles it into downloads.json. Excluding hourly-owned files here stops this
+          # PR from racing the hourly workflow: repo-liveness.json in particular carries an
+          # updated_at stamp both workflows rewrite, and staging it dragged it into the bot PR
+          # (create-pull-request commits pre-staged files even outside add-paths), which is
+          # what kept the bot PR unmergeable for hours at a time.
+          git add maps/integrity.json mods/integrity.json maps/integrity-cache.json mods/integrity-cache.json maps/*/manifest.json mods/*/manifest.json maps/basemap-completeness.json maps/demand-stats-cache.json history/registry-download-attribution.json history/content-announcements.json 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "No registry analytics changes detected; skipping PR update."
             echo "has_changes=false" >> "$GITHUB_OUTPUT"
@@ -678,6 +682,19 @@ jobs:
             history/registry-download-attribution.json
             history/content-announcements.json
 
+      # The send-time dedup must reflect what has ACTUALLY landed on main, not this
+      # run's checkout (pinned to the trigger SHA) or its own freshly recorded ledger.
+      # Snapshot main's ledger BEFORE the merge below: entries present now were
+      # announced by earlier runs (skip them); our own entry lands with the merge and
+      # must not suppress this run's send.
+      - name: Refresh announcement ledger from main
+        if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
+        continue-on-error: true
+        run: |
+          git fetch --depth 1 origin main
+          git checkout FETCH_HEAD -- history/content-announcements.json
+          echo "Announcement ledger refreshed from origin/main."
+
       - name: Finalize bot PR automation
         id: bot_pr
         if: ${{ steps.stage_changes.outputs.has_changes == 'true' }}
@@ -712,8 +729,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh workflow run regenerate-downloads-hourly.yml --ref main
 
+      # Gated on the bot PR actually MERGING, not merely existing: while the PR is
+      # unmerged, the integrity snapshot + announcement ledger have not landed on
+      # main, so the next run re-detects the same "newly complete" transitions and
+      # would re-send. Only the run that lands the state announces it. Trade-off:
+      # if a stuck PR later merges via the auto-merge fallback (outside any run),
+      # its announcements are recorded-but-unsent — the unmerged-PR Discord warning
+      # below exists so a human notices before that happens.
       - name: Send new content announcements
-        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        if: ${{ steps.bot_pr.outputs.merged == 'true' }}
         env:
           DISCORD_ANNOUNCEMENT_WEBHOOK_URL: ${{ secrets.DISCORD_ANNOUNCEMENT_WEBHOOK_URL }}
         run: |
@@ -723,6 +747,31 @@ jobs:
           fi
 
           pnpm --dir scripts run send-pending-announcements -- --file /tmp/pending-announcements/maps-pending-announcements.json --file /tmp/pending-announcements/mods-pending-announcements.json
+
+      - name: Notify Discord (Bot PR Unmerged)
+        if: ${{ always() && steps.stage_changes.outputs.has_changes == 'true' && steps.bot_pr.outputs.merged != 'true' }}
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_TITLE: ⚠️ Registry Analytics Bot PR Failed to Merge
+          DISCORD_STATUS: failure
+          DISCORD_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_URL: ${{ steps.bot_pr.outputs.pr_url }}
+        run: |
+          if [ -z "${DISCORD_WEBHOOK_URL}" ]; then
+            echo "DISCORD_WEBHOOK_URL not set; skipping Discord notification."
+            exit 0
+          fi
+
+          export DISCORD_LINES_JSON="$(jq -nc \
+            --arg pr_url "${PR_URL:-unknown}" \
+            '[
+              "- **Bot PR:** \($pr_url)",
+              "- Integrity + announcement state is parked off-main until this PR merges.",
+              "- Until then every 4-hour run re-detects the same transitions (duplicate integrity alerts; content announcements are held back).",
+              "- Merge or close the PR, or investigate the conflict."
+            ]')"
+
+          pnpm --dir scripts run notify-discord
 
       - name: Notify Discord (Downloads + Integrity)
         if: always()
