@@ -21,6 +21,15 @@ function main() {
   const id = typeof rawId === "string" ? rawId.trim() : "";
   const errors: string[] = [];
 
+  // The permanence acknowledgement is the form's required checkbox; verify it
+  // server-side too so a hand-edited issue body cannot skip it.
+  const confirmation = data["confirmation"];
+  const acknowledged = typeof confirmation === "string" && confirmation.trim().length > 0
+    && !/^_?no response_?$/i.test(confirmation.trim());
+  if (!acknowledged) {
+    errors.push("**Confirmation**: You must acknowledge that deletion is permanent.");
+  }
+
   if (!id) {
     errors.push("**asset-id**: Must provide an asset ID.");
   } else {
@@ -30,18 +39,21 @@ function main() {
     } else {
       const manifest = resolved.manifest;
 
-      if (manifest.deprecation === undefined) {
-        errors.push(`**asset-id**: The ${resolved.type} \`${id}\` is not deprecated.`);
-      } else if ((manifest.deprecation as Record<string, unknown>).deleted === true) {
+      // Escalating a deprecated asset to deleted is allowed; re-deleting is not.
+      if (manifest.deprecation !== undefined
+        && (manifest.deprecation as Record<string, unknown>).deleted === true) {
+        errors.push(`**asset-id**: The ${resolved.type} \`${id}\` is already deleted.`);
+      }
+
+      if (manifest.is_test === true) {
         errors.push(
-          `**asset-id**: The ${resolved.type} \`${id}\` was permanently deleted, not deprecated. `
-          + `Deleted assets cannot be restored — returning it to the registry requires publishing `
-          + `a new listing.`,
+          `**asset-id**: \`${id}\` is a test listing. Test listings are removed outright rather `
+          + `than deleted — please contact a maintainer.`,
         );
       }
 
-      // Same authorization rule as deprecation itself: only the original
-      // publisher or the ACTIVE caretaker, never ordinary collaborators.
+      // Same authorization rule as deprecation: only the original publisher
+      // or the ACTIVE caretaker, never ordinary collaborators.
       const requesterId = String(issueAuthorId);
       const ownerId = String(manifest.github_id);
       const activeCaretaker = getActiveCaretaker(manifest as unknown as ManifestWithCaretakers);
@@ -50,7 +62,7 @@ function main() {
       if (requesterId !== ownerId && requesterId !== caretakerId) {
         errors.push(
           `**Ownership check failed**: Only the original publisher or the active caretaker of `
-          + `\`${id}\` can remove its deprecation. Collaborators cannot.`,
+          + `\`${id}\` can delete it. Collaborators cannot delete a listing.`,
         );
       }
     }
@@ -58,7 +70,7 @@ function main() {
 
   if (errors.length > 0) {
     const errorMessage = [
-      "Un-deprecation validation failed:\n",
+      "Deletion validation failed:\n",
       ...errors.map((e) => `- ${e}`),
       "\nIf you believe this is an error, please contact a maintainer.",
     ].join("\n");
@@ -68,7 +80,7 @@ function main() {
     process.exit(1);
   }
 
-  console.log("Un-deprecation validation passed.");
+  console.log("Deletion validation passed.");
 }
 
 main();
