@@ -1,8 +1,10 @@
 import type { IntegrityOutput } from "@subway-builder-modded/registry-schemas";
+import { compareStableSemverAsc, isStableSemverTag } from "./semver.js";
 
 // Lifecycle automation for creator-facing integrity-alert issues:
-// - RESOLVED alerts (the failing version now passes integrity, disappeared, or
-//   the listing was deprecated) are closed as completed.
+// - RESOLVED alerts (the failing version now passes integrity, disappeared,
+//   was superseded by a newer complete version, or the listing was
+//   deprecated) are closed as completed.
 // - STALE alerts (no comment activity for two weeks where the creator never
 //   responded — the last word is the bot's alert or a maintainer's) are closed
 //   as not_planned; a genuine recurrence re-fires a fresh alert on the next
@@ -28,7 +30,12 @@ export function parseAlertIssueTitle(title: string): AlertIssueRef | null {
 }
 
 export type AlertResolution =
-  | { resolved: true; reason: "version_complete" | "version_removed" | "listing_removed" | "listing_deprecated" }
+  | {
+    resolved: true;
+    reason: "version_complete" | "version_removed" | "listing_removed" | "listing_deprecated" | "version_superseded";
+    /** Set for version_superseded: the newer complete version that moots the alert. */
+    supersededBy?: string;
+  }
   | { resolved: false };
 
 /**
@@ -55,6 +62,19 @@ export function resolveAlertAgainstIntegrity(
   }
   if (version.errors.includes("listing_deprecated")) {
     return { resolved: true, reason: "listing_deprecated" };
+  }
+  // A newer complete version moots the alert: creators fix forward, and old
+  // release tags are never rewritten retroactively (e.g. a config.json version
+  // baked into an old tag's zip). Strict semver comparison on both sides so a
+  // REGRESSION of the latest version — or any non-semver tag — never matches.
+  if (
+    listing.latest_semver_complete === true
+    && typeof listing.latest_semver_version === "string"
+    && isStableSemverTag(listing.latest_semver_version)
+    && isStableSemverTag(ref.version)
+    && compareStableSemverAsc(ref.version, listing.latest_semver_version) < 0
+  ) {
+    return { resolved: true, reason: "version_superseded", supersededBy: listing.latest_semver_version };
   }
   return { resolved: false };
 }
@@ -110,10 +130,17 @@ export function decideAlertIssueAction(
 export function buildResolvedCloseComment(
   ref: AlertIssueRef,
   reason: Extract<AlertResolution, { resolved: true }>["reason"],
+  supersededBy?: string,
 ): string {
   switch (reason) {
     case "version_complete":
       return `\`${ref.listingId}\` \`${ref.version}\` now passes its integrity checks — closing this alert as resolved. Thanks for fixing it!`;
+    case "version_superseded":
+      return (
+        `\`${ref.listingId}\` \`${ref.version}\` still fails its integrity checks, but the newer version `
+        + `\`${supersededBy ?? "(latest)"}\` passes and is what users install — closing this alert as superseded. `
+        + `Old release tags don't need retroactive fixes.`
+      );
     case "version_removed":
       return `\`${ref.version}\` is no longer part of \`${ref.listingId}\`'s published releases, so this alert no longer applies — closing as resolved.`;
     case "listing_removed":
