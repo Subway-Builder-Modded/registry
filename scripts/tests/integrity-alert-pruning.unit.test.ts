@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import type { IntegrityOutput } from "@subway-builder-modded/registry-schemas";
 import {
   NEEDS_MAINTAINER_LABEL,
+  buildResolvedCloseComment,
   decideAlertIssueAction,
   parseAlertIssueTitle,
   resolveAlertAgainstIntegrity,
@@ -25,7 +26,11 @@ function versionEntry(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function integrityWith(listingId: string, versions: Record<string, ReturnType<typeof versionEntry>>): IntegrityOutput {
+function integrityWith(
+  listingId: string,
+  versions: Record<string, ReturnType<typeof versionEntry>>,
+  listingOverrides: Record<string, unknown> = {},
+): IntegrityOutput {
   return {
     schema_version: 1,
     generated_at: "2026-08-20T00:00:00Z",
@@ -37,6 +42,7 @@ function integrityWith(listingId: string, versions: Record<string, ReturnType<ty
         complete_versions: [],
         incomplete_versions: Object.keys(versions),
         versions,
+        ...listingOverrides,
       },
     },
   };
@@ -90,6 +96,80 @@ test("resolution: version removed / listing removed / deprecated", () => {
   );
 });
 
+test("resolution: superseded by a newer complete version", () => {
+  const integrity = integrityWith(
+    "my-map",
+    {
+      "1.0.1": versionEntry(),
+      "1.0.2": versionEntry({ is_complete: true, errors: [] }),
+    },
+    { latest_semver_version: "1.0.2", latest_semver_complete: true, complete_versions: ["1.0.2"] },
+  );
+  assert.deepEqual(
+    resolveAlertAgainstIntegrity({ listingId: "my-map", version: "1.0.1" }, { maps: integrity, mods: null }),
+    { resolved: true, reason: "version_superseded", supersededBy: "1.0.2" },
+  );
+});
+
+test("resolution: superseded handles v-prefix mismatch between alert and latest", () => {
+  const integrity = integrityWith(
+    "my-map",
+    {
+      "v1.0.0": versionEntry(),
+      "1.0.2": versionEntry({ is_complete: true, errors: [] }),
+    },
+    { latest_semver_version: "1.0.2", latest_semver_complete: true, complete_versions: ["1.0.2"] },
+  );
+  assert.deepEqual(
+    resolveAlertAgainstIntegrity({ listingId: "my-map", version: "v1.0.0" }, { maps: integrity, mods: null }),
+    { resolved: true, reason: "version_superseded", supersededBy: "1.0.2" },
+  );
+});
+
+test("resolution: not superseded when the latest version is not complete", () => {
+  const integrity = integrityWith(
+    "my-map",
+    {
+      "1.0.1": versionEntry(),
+      "1.0.2": versionEntry(),
+    },
+    { latest_semver_version: "1.0.2", latest_semver_complete: false },
+  );
+  assert.deepEqual(
+    resolveAlertAgainstIntegrity({ listingId: "my-map", version: "1.0.1" }, { maps: integrity, mods: null }),
+    { resolved: false },
+  );
+});
+
+test("resolution: not superseded for non-semver alert versions", () => {
+  const integrity = integrityWith(
+    "my-map",
+    {
+      "nightly": versionEntry(),
+      "1.0.2": versionEntry({ is_complete: true, errors: [] }),
+    },
+    { latest_semver_version: "1.0.2", latest_semver_complete: true, complete_versions: ["1.0.2"] },
+  );
+  assert.deepEqual(
+    resolveAlertAgainstIntegrity({ listingId: "my-map", version: "nightly" }, { maps: integrity, mods: null }),
+    { resolved: false },
+  );
+});
+
+test("resolution: a regression of the latest version itself is never superseded", () => {
+  // latest_semver_complete reflects the stale pre-regression snapshot here;
+  // the alert version equals latest, so the semver comparison must not match.
+  const integrity = integrityWith(
+    "my-map",
+    { "1.0.2": versionEntry() },
+    { latest_semver_version: "1.0.2", latest_semver_complete: true },
+  );
+  assert.deepEqual(
+    resolveAlertAgainstIntegrity({ listingId: "my-map", version: "1.0.2" }, { maps: integrity, mods: null }),
+    { resolved: false },
+  );
+});
+
 test("resolution: mods integrity is consulted when maps misses", () => {
   const mods = integrityWith("some-mod", { "v1.0.0": versionEntry({ is_complete: true }) });
   const maps = integrityWith("other-map", { "v9.0.0": versionEntry() });
@@ -97,6 +177,17 @@ test("resolution: mods integrity is consulted when maps misses", () => {
     resolveAlertAgainstIntegrity({ listingId: "some-mod", version: "v1.0.0" }, { maps, mods }),
     { resolved: true, reason: "version_complete" },
   );
+});
+
+test("superseded close comment names the newer version", () => {
+  const message = buildResolvedCloseComment(
+    { listingId: "my-map", version: "1.0.1" },
+    "version_superseded",
+    "1.0.2",
+  );
+  assert.match(message, /`my-map` `1\.0\.1`/);
+  assert.match(message, /`1\.0\.2`/);
+  assert.match(message, /superseded/);
 });
 
 // --- decision logic ---

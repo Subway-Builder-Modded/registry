@@ -164,7 +164,8 @@ async function main(): Promise<void> {
     }
 
     if (decision.action === "close_resolved") {
-      await comment(issue.number, buildResolvedCloseComment(ref, decision.reason));
+      const supersededBy = resolution.resolved ? resolution.supersededBy : undefined;
+      await comment(issue.number, buildResolvedCloseComment(ref, decision.reason, supersededBy));
       await closeIssue(issue.number, "completed");
       console.log(`[prune-alerts] ${describe}: closed as resolved (${decision.reason})`);
       summary.closed_resolved += 1;
