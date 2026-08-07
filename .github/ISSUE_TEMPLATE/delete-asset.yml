@@ -1,0 +1,55 @@
+name: Delete an Asset
+description: Permanently delete a mod or map you author or caretake in The Railyard registry.
+title: "[Delete]: "
+labels: ["delete-asset"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Delete an Asset
+
+        Deleting an asset **permanently** withdraws it from the registry: it is no longer
+        downloadable and is hidden from browse and search by default across the Railyard app
+        and website (it stays viewable behind the Deleted filter). Your listing metadata,
+        download history, and author attribution are **kept** and remain credited to you.
+
+        **Deletion cannot be undone.** Unlike deprecation, there is no restoration flow —
+        if you change your mind later, you must publish a new listing. If you only want to
+        retire the asset while keeping the option to bring it back, use the
+        **Deprecate an Asset** form instead.
+
+        Deleting an already-deprecated asset is allowed (this makes the deprecation permanent).
+
+        Only the asset's **original publisher or its active caretaker** can delete it.
+        Collaborators cannot. This form works for both mods and maps — just enter the asset ID.
+
+        A maintainer reviews and merges the resulting pull request before the deletion takes
+        effect. If validation fails, you can edit this issue and comment **revalidate** to retry.
+
+  - type: input
+    id: asset-id
+    attributes:
+      label: Asset ID
+      description: The ID of the mod or map you want to permanently delete. Must already exist in the registry.
+      placeholder: better-trains
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason (optional)
+      description: >
+        Shown publicly on the listing's detail page — e.g. "Source repository removed".
+        Leave blank to omit (an existing deprecation reason is kept unless replaced here).
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: >
+            I understand deletion is **permanent and cannot be undone**: this asset can never
+            be restored, and returning it to the registry would require publishing a new
+            listing. Its download history and my author attribution are retained.
+          required: true

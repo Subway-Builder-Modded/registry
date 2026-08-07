@@ -156,6 +156,9 @@ export const DeprecationSchema = z.object({
   by_github_id: z.number().int().min(1),
   // Author-supplied, rendered publicly on listing detail pages.
   reason: z.string().min(1).optional(),
+  // Present-and-true = permanently deleted (not restorable), vs. absent =
+  // reversible deprecation. Deleted implies deprecated for older consumers.
+  deleted: z.literal(true).optional(),
 });
 
 const BaseManifestSchema = z.object({

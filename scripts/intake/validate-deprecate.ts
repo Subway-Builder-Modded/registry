@@ -31,7 +31,13 @@ function main() {
       const manifest = resolved.manifest;
 
       if (manifest.deprecation !== undefined) {
-        errors.push(`**asset-id**: The ${resolved.type} \`${id}\` is already deprecated.`);
+        const alreadyDeleted = (manifest.deprecation as Record<string, unknown>).deleted === true;
+        errors.push(
+          alreadyDeleted
+            ? `**asset-id**: The ${resolved.type} \`${id}\` is already permanently deleted.`
+            : `**asset-id**: The ${resolved.type} \`${id}\` is already deprecated. To make the `
+              + `deprecation permanent, use the **Delete an Asset** form instead.`,
+        );
       }
 
       if (manifest.is_test === true) {
