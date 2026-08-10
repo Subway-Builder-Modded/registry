@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "seoul",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "mesh_250",
+    "workplace_resolution": "mesh_250",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm4",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "fine_types_calibrated",
+    "od_metric": "structured_marginals",
+    "od_granularity": "adm4"
+  },
+  "notes": "This map models employed residents and workplace demand, rather than total population. Workplace totals come from SGIS 100 m employee grids, based on the National Business Survey/Economic Census. Employed-resident demand is constrained by the origin totals in the observed representative-weekday Seoul Capital Area commuting O/D data; SGIS 100 m population grids are used to distribute those employed-resident totals spatially.\n\nFor each 100 m grid cell, resident and workplace totals are allocated to OpenStreetMap building footprints. Allocation uses footprint area, building-use suitability, and local activity mix; a nearest-building fallback is used where no suitable building is available. The resulting building demand is aggregated into representative 200 m demand nodes.\n\nCommute flows use the observed administrative origin–destination matrix for ten representative weekdays in the Seoul Capital Area. The matrix is reconciled with IPF/RAS so origin totals, destination totals, and administrative-zone flows remain consistent, then disaggregated to the demand nodes. O/D zones are primarily dong-level within Seoul; some outer-capital-area zones are necessarily coarser (si/gun/gu or provincial level).\n\nAirport, university, and hospital demand are added separately as special trip generators. They do not replace or alter the census-based workplace, employed-resident, or administrative commuting inputs. Route geometries are calculated with OSRM.",
+  "sources": [
+    "https://download.geofabrik.de/asia/south-korea.html",
+    "https://sgis.kostat.go.kr/view/pss/openDataIntrcn",
+    "https://data.seoul.go.kr/dataVisual/seoul/capitalRegionLivingMigration.do",
+    "https://www.airport.kr/co_ko/651/subview.do",
+    "https://www.airport.co.kr/www/cms/frCon/index.do?MENU_ID=1250",
+    "https://academyinfo.go.kr/",
+    "https://www.data.go.kr/data/15001698/openapi.do"
+  ],
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "cromstar",
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-09"
+  }
+}
