@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "springfield-il",
+  "answers": {
+    "workplace_count": "physical_inferred",
+    "workplace_granularity": "adm5",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm5",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm5"
+  },
+  "notes": "Built with depot 1.2.7 for tiles, buildings, roads and runways. Demand generated from LODES 2023 with rslurry's subwaybuilder-US-demand-data and routed via a local OSRM server (MLD, car profile); 99.5% of pops routed, median commute 19.6 min/17.4 km. Special-demand coordinates verified individually against OpenStreetMap and primary sources. Demand points carrying neither residents nor jobs were stripped before packaging.",
+  "derived_from": "greater-chicagoland",
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "NerdieSanders",
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-10"
+  }
+}
