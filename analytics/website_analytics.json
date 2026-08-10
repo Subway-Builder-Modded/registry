@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-08-10T10:01:24.296Z",
+  "generated_at": "2026-08-10T10:46:30.383Z",
   "valid_paths": [
     "/",
     "/community",
@@ -1012,6 +1012,7 @@
     "/registry/maps/montreal",
     "/registry/maps/montreal/versions",
     "/registry/maps/montreal/versions/1.0.1",
+    "/registry/maps/montreal/versions/2.0.1",
     "/registry/maps/naples",
     "/registry/maps/naples/details",
     "/registry/maps/nashville",
@@ -1574,8 +1575,8 @@
     "latest_hour": "2026-08-10T10:00:00.000Z",
     "total_days": 116,
     "total_hours": 1755,
-    "latest_day_visits": 79,
-    "latest_hour_visits": 0
+    "latest_day_visits": 115,
+    "latest_hour_visits": 36
   },
   "time_series": {
     "by_day": [
@@ -2041,7 +2042,7 @@
       },
       {
         "date": "2026-08-10",
-        "visits": 79
+        "visits": 115
       }
     ],
     "by_hour": [
@@ -9063,7 +9064,7 @@
       },
       {
         "hour": "2026-08-10T10:00:00.000Z",
-        "visits": 0
+        "visits": 36
       }
     ]
   },
@@ -25632,32 +25633,38 @@
       }
     },
     "2026-08-10": {
-      "captured_at": "2026-08-10T10:01:22.366Z",
+      "captured_at": "2026-08-10T10:46:28.323Z",
       "window_start": "2026-08-10T00:00:00.000Z",
       "window_end": "2026-08-10T11:00:00.000Z",
       "totals": {
-        "visits": 79
+        "visits": 115
       },
       "pages": {
-        "/": 14,
+        "/": 31,
         "/depot": 1,
-        "/railyard": 10,
-        "/railyard/docs/v0.2/github-token": 1,
+        "/depot/updates": 1,
+        "/railyard": 15,
+        "/railyard/docs": 2,
+        "/railyard/docs/v0.2/github-token": 2,
         "/railyard/docs/v0.2/installing-railyard": 2,
         "/railyard/docs/v0.2/installing-railyard/linux": 1,
         "/railyard/updates": 2,
         "/railyard/updates/v0.2.4/rc.5": 1,
-        "/registry": 1,
+        "/registry": 2,
         "/registry/authors/Maximilian284/subwaybuilder-it-maps": 1,
+        "/registry/authors/subway-builder-modded-admin": 1,
+        "/registry/docs": 1,
         "/registry/maps": 1,
         "/registry/maps/amsterdam": 1,
         "/registry/maps/bangkok": 1,
         "/registry/maps/barcelona/versions": 1,
         "/registry/maps/berlin-val": 1,
+        "/registry/maps/cape-town": 1,
         "/registry/maps/ciudad-de-mexico/versions": 2,
         "/registry/maps/daegu-3/versions/0.1.1": 1,
         "/registry/maps/dublin": 1,
-        "/registry/maps/greater-kuala-lumpur": 1,
+        "/registry/maps/glasgow-edinburgh": 1,
+        "/registry/maps/greater-kuala-lumpur": 2,
         "/registry/maps/greater-kuala-lumpur/details": 1,
         "/registry/maps/greater-kuala-lumpur/map": 1,
         "/registry/maps/greater-los-angeles": 1,
@@ -25668,15 +25675,19 @@
         "/registry/maps/madrid/versions/1.0.0": 1,
         "/registry/maps/mfn-hong-kong": 1,
         "/registry/maps/mfn-madisonwi/versions": 1,
+        "/registry/maps/montreal": 1,
+        "/registry/maps/montreal/versions/2.0.1": 1,
         "/registry/maps/orange-county": 1,
         "/registry/maps/orlando": 1,
         "/registry/maps/piedmont-triad": 1,
         "/registry/maps/shanghai": 1,
+        "/registry/maps/tel-aviv": 1,
         "/registry/maps/ulsan-4/versions": 1,
         "/registry/maps/vancouver": 1,
         "/registry/maps/yukina-cz-olomouc/versions/0.1.0": 1,
         "/registry/maps/yukina-ee-parnu/versions/0.2.1": 1,
         "/registry/maps/yukina-kitakyushu-shimonoseki/versions/0.2.0": 1,
+        "/registry/maps/yukina-tw-hsinchu": 1,
         "/registry/mods": 1,
         "/registry/mods/any-money": 2,
         "/registry/mods/chinese-trains/versions/v1.0.6": 1,
@@ -25694,42 +25705,51 @@
         "/website/updates/v1.0.1": 1
       },
       "countries": {
-        "AU": 1,
+        "AU": 2,
+        "BE": 2,
         "CA": 2,
         "CH": 2,
-        "CN": 2,
+        "CN": 6,
+        "CZ": 1,
+        "DE": 2,
         "EG": 1,
-        "ES": 2,
+        "ES": 6,
         "FR": 2,
+        "GB": 6,
         "HK": 1,
+        "IE": 1,
+        "IN": 1,
         "IT": 1,
-        "JP": 2,
-        "KR": 2,
+        "JP": 3,
+        "KR": 3,
         "MY": 5,
-        "TW": 2,
-        "US": 54
+        "PL": 2,
+        "PT": 1,
+        "TR": 1,
+        "TW": 3,
+        "US": 61
       },
       "browsers": {
-        "BingBot": 3,
-        "Chrome": 17,
-        "ChromeMobile": 1,
+        "BingBot": 9,
+        "Chrome": 33,
+        "ChromeMobile": 6,
         "Edge": 1,
-        "GoogleBot": 35,
-        "MobileSafari": 1,
-        "Safari": 5,
-        "Unknown": 17
+        "GoogleBot": 36,
+        "MobileSafari": 3,
+        "Safari": 7,
+        "Unknown": 21
       },
       "operating_systems": {
-        "Android": 36,
+        "Android": 42,
         "Linux": 1,
-        "MacOSX": 11,
-        "Unknown": 20,
-        "Windows": 11,
-        "iOS": 1
+        "MacOSX": 15,
+        "Unknown": 30,
+        "Windows": 25,
+        "iOS": 3
       },
       "devices": {
-        "desktop": 43,
-        "mobile": 37
+        "desktop": 71,
+        "mobile": 45
       }
     }
   }
