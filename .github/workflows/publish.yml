@@ -441,6 +441,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B "publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+          # A re-run regenerates this branch from main and force-pushes, which
+          # would clobber the data-quality answers the questionnaire flow may
+          # have committed to the previous branch head (then rescore_data finds
+          # nothing and the merge gate never opens). Carry the answers file
+          # forward into the regenerated commit.
+          if git fetch origin "publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"; then
+            git checkout FETCH_HEAD -- "maps/${{ fromJson(steps.parser.outputs.jsonString).map-id }}/data-quality.json" 2>/dev/null \
+              || echo "no prior data-quality answers to preserve"
+          fi
           git add -A
           git commit -m "feat(map): add ${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
           gh api -X DELETE "repos/${{ github.repository }}/git/refs/heads/publish" 2>/dev/null || true
