@@ -54,10 +54,127 @@
     "schools",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 24.68,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ooaza.geojson.gz": 4.64,
+    ".railyard_map/regions/shichouson.geojson.gz": 0.81,
+    ".railyard_map/special_demand_points.json": 0.2,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "QUT.pmtiles": 101.33,
+    "buildings_index.bin.gz": 72.99,
+    "buildings_index.json": 203.32,
+    "config.json": 0.01,
+    "demand_data.json": 6.68,
+    "driving_paths.json.gz": 16.05,
+    "roads.geojson": 34.84,
+    "runways_taxiways.geojson": 0.08
+  },
   "included_cities": [
     "Oyama",
     "Tochigi",
     "Nasushiobara"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1515569754538693,
+      "p25": 0.1603881660498904,
+      "p50": 0.17490224477856517,
+      "p75": 0.21047785283643777,
+      "p90": 0.27362886987462914,
+      "mean": 0.20223133175294952
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1479573606141567,
+      "p25": 0.15952230704186857,
+      "p50": 0.1747214759686582,
+      "p75": 0.21180754360647078,
+      "p90": 0.28094651792936376,
+      "mean": 0.20045709867524278
+    },
+    "commuteDistanceKm": {
+      "p10": 976,
+      "p25": 2979,
+      "p50": 7934,
+      "p75": 16306,
+      "p90": 27961,
+      "mean": 11998.146792044603
+    },
+    "residentCellDensity": {
+      "p10": 23,
+      "p25": 42,
+      "p50": 89,
+      "p75": 215,
+      "p90": 695,
+      "mean": 272.93115364167994
+    },
+    "workerCellDensity": {
+      "p10": 20,
+      "p25": 36,
+      "p50": 96,
+      "p75": 328,
+      "p90": 977,
+      "mean": 351.4522423827456
+    },
+    "detail": {
+      "radiusKm": 0.17481183700751632,
+      "expectedPointSpacingKm": 0.4587980576458884,
+      "normalizedRadius": 0.3810213101260346,
+      "activityPerPoint": 54.37963355221351,
+      "playableAreaKm2": 4624,
+      "playableAreaPerPointKm2": 0.24486337640330438,
+      "playableCatchmentRadiusKm": 0.27918172123818297,
+      "localityScore": 0.9100840623128595,
+      "deaggregationScore": 1,
+      "score": 0.9539832610234099
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8772348628229665,
+        "continuousScore": 0.9068270176958654,
+        "detectedCenterCount": 4,
+        "effectiveCenterCount": 2.923345329006157,
+        "largestCenterShare": 0.4980163695765431,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 139.87454212763961,
+            "latitude": 36.58428163053581,
+            "massShare": 0.4980163695765431,
+            "assignedMass": 1022831,
+            "assignedPointCount": 7908,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 139.78745741692703,
+            "latitude": 36.33486159027349,
+            "massShare": 0.24505139229042608,
+            "assignedMass": 503289,
+            "assignedPointCount": 4213,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 140.01426460667474,
+            "latitude": 36.8969175515162,
+            "massShare": 0.15078512618012377,
+            "assignedMass": 309684,
+            "assignedPointCount": 4046,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 139.9976307083965,
+            "latitude": 36.457256587297174,
+            "massShare": 0.10614711195290703,
+            "assignedMass": 218006,
+            "assignedPointCount": 2717,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1786320000
 }
