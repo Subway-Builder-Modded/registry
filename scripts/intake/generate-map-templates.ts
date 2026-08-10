@@ -401,7 +401,7 @@ const SHARED_FIELDS_AFTER_MAP_ID = [
       options: [
         {
           label:
-            "I attest that I am the author or this map or have been granted permission by the author to publish this map to Railyard.",
+            "I attest that I am the author of this map or have been granted permission by the author to publish this map to Railyard.",
           required: true,
         },
         {
