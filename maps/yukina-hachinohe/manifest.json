@@ -54,9 +54,103 @@
     "schools",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 16.82,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ooaza.geojson.gz": 4.39,
+    ".railyard_map/regions/shichouson.geojson.gz": 1.6,
+    ".railyard_map/special_demand_points.json": 0.1,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "HHE.pmtiles": 58.32,
+    "buildings_index.bin.gz": 34.1,
+    "buildings_index.json": 95.02,
+    "config.json": 0.01,
+    "demand_data.json": 3.44,
+    "driving_paths.json.gz": 8.63,
+    "ocean_depth_index.json": 46.09,
+    "roads.geojson": 16.65,
+    "runways_taxiways.geojson": 0.5
+  },
   "included_cities": [
     "Towada",
     "Misawa"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.11194609777340345,
+      "p25": 0.11953859510941266,
+      "p50": 0.13818546816596913,
+      "p75": 0.18278365696121873,
+      "p90": 0.2291207699668844,
+      "mean": 0.17173548465409566
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.10684110831364788,
+      "p25": 0.11656047176170002,
+      "p50": 0.1332278113471473,
+      "p75": 0.17902073391178616,
+      "p90": 0.23056304370252412,
+      "mean": 0.16649069092185667
+    },
+    "commuteDistanceKm": {
+      "p10": 784,
+      "p25": 2476,
+      "p50": 6545,
+      "p75": 15203,
+      "p90": 30361,
+      "mean": 12129.084776216923
+    },
+    "residentCellDensity": {
+      "p10": 13,
+      "p25": 22,
+      "p50": 47,
+      "p75": 121,
+      "p90": 378,
+      "mean": 165.6084452975048
+    },
+    "workerCellDensity": {
+      "p10": 12,
+      "p25": 24,
+      "p50": 58,
+      "p75": 204,
+      "p90": 609,
+      "mean": 239.25277777777777
+    },
+    "detail": {
+      "radiusKm": 0.13568399862818373,
+      "expectedPointSpacingKm": 0.4811772350512143,
+      "normalizedRadius": 0.28198341223217294,
+      "activityPerPoint": 34.56766766766767,
+      "playableAreaKm2": 3872,
+      "playableAreaPerPointKm2": 0.3875875875875876,
+      "playableCatchmentRadiusKm": 0.35124487311739516,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.945822569264768,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 141.4134846739065,
+            "latitude": 40.53642478027852,
+            "massShare": 1,
+            "assignedMass": 690662,
+            "assignedPointCount": 9990,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1786320000
 }

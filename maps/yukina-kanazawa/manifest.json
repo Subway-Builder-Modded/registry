@@ -58,9 +58,103 @@
     "schools",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 8,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ooaza.geojson.gz": 4.26,
+    ".railyard_map/regions/shichouson.geojson.gz": 0.84,
+    ".railyard_map/special_demand_points.json": 0.13,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "KMQ.pmtiles": 66.22,
+    "buildings_index.bin.gz": 43.53,
+    "buildings_index.json": 124.97,
+    "config.json": 0.01,
+    "demand_data.json": 3.62,
+    "driving_paths.json.gz": 6.69,
+    "ocean_depth_index.json": 37.45,
+    "roads.geojson": 20.68,
+    "runways_taxiways.geojson": 0.05
+  },
   "included_cities": [
     "Hakusan",
     "Komatsu"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1465315211105579,
+      "p25": 0.15623159234311393,
+      "p50": 0.1631714201397757,
+      "p75": 0.18219239449014762,
+      "p90": 0.2145916301398161,
+      "mean": 0.17709615725129826
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.13449339431133672,
+      "p25": 0.15394152318102558,
+      "p50": 0.16671946247394753,
+      "p75": 0.19038847637391954,
+      "p90": 0.24062294236660098,
+      "mean": 0.1814347010585946
+    },
+    "commuteDistanceKm": {
+      "p10": 694,
+      "p25": 2408,
+      "p50": 5980,
+      "p75": 11592,
+      "p90": 22046,
+      "mean": 9611.326197757391
+    },
+    "residentCellDensity": {
+      "p10": 18,
+      "p25": 39,
+      "p50": 132,
+      "p75": 508,
+      "p90": 1529,
+      "mean": 488.78596008258774
+    },
+    "workerCellDensity": {
+      "p10": 15,
+      "p25": 34,
+      "p50": 140,
+      "p75": 528,
+      "p90": 1523,
+      "mean": 526.4103703703704
+    },
+    "detail": {
+      "radiusKm": 0.1649359010549676,
+      "expectedPointSpacingKm": 0.41881509412851753,
+      "normalizedRadius": 0.3938155605355413,
+      "activityPerPoint": 77.4970020712962,
+      "playableAreaKm2": 2360,
+      "playableAreaPerPointKm2": 0.25727679058105307,
+      "playableCatchmentRadiusKm": 0.2861708334676788,
+      "localityScore": 0.8751145375951559,
+      "deaggregationScore": 1,
+      "score": 0.9354755676099488
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.9259713390371651,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 136.61926777665707,
+            "latitude": 36.57410960571768,
+            "massShare": 1,
+            "assignedMass": 1421760,
+            "assignedPointCount": 9173,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1786320000
 }

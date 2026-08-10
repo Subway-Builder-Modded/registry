@@ -56,10 +56,112 @@
     "schools",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 9.68,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ooaza.geojson.gz": 3.87,
+    ".railyard_map/regions/shichouson.geojson.gz": 0.7,
+    ".railyard_map/special_demand_points.json": 0.13,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "QIS.pmtiles": 67.78,
+    "buildings_index.bin.gz": 47.95,
+    "buildings_index.json": 133.13,
+    "config.json": 0.01,
+    "demand_data.json": 4.02,
+    "driving_paths.json.gz": 10.35,
+    "ocean_depth_index.json": 32.69,
+    "roads.geojson": 22.49,
+    "runways_taxiways.geojson": 0.01
+  },
   "included_cities": [
     "Mito",
     "HItachi",
     "Hitachinaka"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.15115572878162328,
+      "p25": 0.16042950403525738,
+      "p50": 0.17478309969158914,
+      "p75": 0.2109332043537657,
+      "p90": 0.2647956454110612,
+      "mean": 0.20195467340337458
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.14859019721836483,
+      "p25": 0.15938691476556038,
+      "p50": 0.17410689640996185,
+      "p75": 0.2067435203126428,
+      "p90": 0.2578370776306823,
+      "mean": 0.19560815370425302
+    },
+    "commuteDistanceKm": {
+      "p10": 986,
+      "p25": 2866,
+      "p50": 7243,
+      "p75": 15582,
+      "p90": 26757,
+      "mean": 11560.015153602424
+    },
+    "residentCellDensity": {
+      "p10": 23,
+      "p25": 41,
+      "p50": 96,
+      "p75": 236,
+      "p90": 871,
+      "mean": 288.1775743707094
+    },
+    "workerCellDensity": {
+      "p10": 21,
+      "p25": 38,
+      "p50": 93,
+      "p75": 310,
+      "p90": 995,
+      "mean": 356.18947963800906
+    },
+    "detail": {
+      "radiusKm": 0.1744446704035854,
+      "expectedPointSpacingKm": 0.45285855629683286,
+      "normalizedRadius": 0.3852078490689774,
+      "activityPerPoint": 55.36954992967651,
+      "playableAreaKm2": 3112,
+      "playableAreaPerPointKm2": 0.27355836849507736,
+      "playableCatchmentRadiusKm": 0.29508699249592746,
+      "localityScore": 0.8985137130587579,
+      "deaggregationScore": 1,
+      "score": 0.9478996323761065
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8397949442170975,
+        "continuousScore": 0.8209588997811379,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.7238332052004435,
+        "largestCenterShare": 0.7001281188282287,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 140.46465417494719,
+            "latitude": 36.37369167765882,
+            "massShare": 0.7001281188282287,
+            "assignedMass": 881999,
+            "assignedPointCount": 7593,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 140.61139961971944,
+            "latitude": 36.635773006044104,
+            "massShare": 0.2998718811717713,
+            "assignedMass": 377769,
+            "assignedPointCount": 3783,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1786320000
 }
