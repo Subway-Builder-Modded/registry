@@ -1,7 +1,7 @@
 {
   "incident": "french-city-code-loop-2026-08",
   "source": "manual-correction/french-city-code-loop",
-  "note": "Railyard app bootstrap re-download loop: after lyon/marseille/paris-ile-de-france re-released under new city codes (LYS->LSY, MRS->MAR, PAR->PRS, registry PRs #7142/#7144/#7146) to avoid colliding with the base game's new vanilla French cities, installed clients whose pinned old version wrote disk under the old code were silently dropped at startup and re-downloaded the pinned version on every launch (monorepo PR #615 has the fix). Old-version counters inflated from 2026-08-07. Allowance model: before each target's superseded_start (old version still latest) the baseline-window rate applies (window 2026-07-24 -> 2026-08-06, after the 07-20/21 release burst); from superseded_start on, organic old-version demand collapses to the superseded-peer rate, pooled from the yukina JP maps whose old versions were superseded the same week (all show ~0-2/day regardless of install base; the known-good reference). incident_end stays null until the app release containing PR #615 has saturated.",
+  "note": "Railyard app bootstrap re-download loop: after lyon/marseille/paris-ile-de-france re-released under new city codes (LYS->LSY, MRS->MAR, PAR->PRS, registry PRs #7142/#7144/#7146) to avoid colliding with the base game's new vanilla French cities, installed clients whose pinned old version wrote disk under the old code were silently dropped at startup and re-downloaded the pinned version on every launch (monorepo PR #615 has the fix). Old-version counters inflated from 2026-08-07. Allowance model: before each target's superseded_start (old version still latest) the baseline-window rate applies (window 2026-07-24 -> 2026-08-06, after the 07-20/21 release burst); from superseded_start on, organic old-version demand collapses to the superseded-peer rate, pooled from the yukina JP maps whose old versions were superseded the same week (all show ~0-2/day regardless of install base; the known-good reference). NEW-version traffic for lyon/marseille v1.0.2 is also loop-inflated (early updaters whose clients still held pre-merge manifests with the old code looped on the new asset; client manifest-cache staleness smeared this past the 2026-08-09 merge): adoption_targets attribute the excess over the peer-adoption curve (max per-day fraction of install base across adoption_peers, the same-week yukina updates). paris v1.0.5 sits inside the peer adoption envelope (0.31x base over 5 days, curve matching yukina-sendai) and is deliberately NOT targeted. incident_end stays null until the app release containing PR #615 has saturated.",
   "targets": [
     {
       "listing_type": "map",
@@ -23,6 +23,48 @@
       "version": "v1.0.0",
       "superseded_start": "2026-08-08",
       "note": "v1.0.2 first counted in the 2026-08-08 snapshot"
+    }
+  ],
+  "adoption_targets": [
+    {
+      "listing_type": "map",
+      "listing_id": "lyon",
+      "version": "v1.0.2",
+      "release_start": "2026-08-08",
+      "note": "5-day downloads = 0.74x install base vs 0.10-0.35x across peers; early updaters looped on the new asset while clients held pre-merge manifests advertising the old code"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "marseille",
+      "version": "v1.0.2",
+      "release_start": "2026-08-08",
+      "note": "5-day downloads = 1.28x install base (more copies than installs); clearly loop-dominated"
+    }
+  ],
+  "adoption_peers": [
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-osaka",
+      "version": "0.3.1",
+      "release_start": "2026-08-05"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-sapporo-chitose",
+      "version": "0.6.2",
+      "release_start": "2026-08-06"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-sendai",
+      "version": "0.5.2",
+      "release_start": "2026-08-06"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-yamagata",
+      "version": "0.5.2",
+      "release_start": "2026-08-06"
     }
   ],
   "peers": [

@@ -41,11 +41,24 @@ charleston clamp — prevents `history-max:` reseeding), lowers the version-buck
 ceilings, and lowers `downloads.json` (self-heals upward on the next hourly
 reconcile for downloads that arrived after the last snapshot).
 
-**Applied 2026-08-13** (peer-based estimate, superseding an initial 427-fetch
-baseline-only estimate that was reverted before publication): 595 fetches
-attributed (paris-ile-de-france v1.0.0: 568, lyon v1.0.0: 14, marseille v1.0.0:
-13, days 2026-08-07 → 2026-08-12), 6 snapshots clamped, paris v1.0.0 display
-count 1434 → 866.
+**NEW-version traffic is also affected for lyon/marseille:** early updaters whose
+clients still held a pre-merge manifest (old city code) looped on the *new* asset,
+and client manifest-cache staleness smeared this past the 2026-08-09 merge —
+lyon v1.0.2 pulled 0.74× its install base in 5 days and marseille v1.0.2 1.28×
+(more copies than installs), against a 0.10–0.35× organic envelope measured across
+peer updates. These are corrected via `adoption_targets` in the same spec: the
+allowance is the **peer-adoption curve** — for each day since release, the most
+generous per-day adoption fraction of install base observed across the same-week
+yukina updates (`adoption_peers`), scaled to the target's cumulative pre-release
+base and rounded UP. paris v1.0.5 sits inside the peer envelope (0.31×, curve
+matching yukina-sendai) and is deliberately NOT targeted.
+
+**Applied 2026-08-13** (peer-based estimates, superseding an initial 427-fetch
+baseline-only estimate that was reverted before publication): **820 fetches**
+attributed for days 2026-08-07 → 2026-08-12 — old versions 595
+(paris-ile-de-france v1.0.0: 568 → display 1434 → 866; lyon v1.0.0: 14;
+marseille v1.0.0: 13) and new versions 225 (lyon v1.0.2: 83 → display 127 → 44;
+marseille v1.0.2: 142 → display 177 → 35), 6 snapshots clamped.
 
 **While the incident is open:** re-run the repair (preview first, then `--apply`)
 every day or two to attribute new loop days — the app-side fix (PR #615) has to

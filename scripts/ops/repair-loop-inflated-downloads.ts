@@ -15,13 +15,17 @@ import {
   writeDownloadVersionBucketLedger,
 } from "../lib/download-version-buckets.js";
 import {
+  computeAdoptionDaySpuriousEstimates,
+  computeAdoptionFractionCurve,
   computeBaselineDailyRate,
+  computeCumulativeListingRawBefore,
   computeDaySpuriousEstimates,
   computePeerSupersededRate,
   computeSnapshotClampPlan,
   extractTargetSeries,
   loopRepairDeltaId,
   normalizeLoopRepairSpec,
+  type DaySpuriousEstimate,
   type LoopRepairSpec,
   type LoopRepairTarget,
   type SnapshotFileLike,
@@ -206,8 +210,30 @@ async function run(): Promise<void> {
   const nowIso = new Date().toISOString();
 
   const newDeltas: DownloadAttributionDelta[] = [];
-  const clampPlans = new Map<LoopRepairTarget, ReturnType<typeof computeSnapshotClampPlan>>();
+  interface WorkItem {
+    target: LoopRepairTarget;
+    clampPlan: ReturnType<typeof computeSnapshotClampPlan>;
+  }
+  const workItems: WorkItem[] = [];
   let totalNewSpurious = 0;
+
+  const collectDays = (target: LoopRepairTarget, days: DaySpuriousEstimate[]): void => {
+    const assetKey = resolveAssetKey(target);
+    for (const day of days) {
+      const deltaId = loopRepairDeltaId(spec.incident, target, day.dateKey);
+      const alreadyApplied = Boolean(attributionLedger.applied_delta_ids?.[deltaId]);
+      const status = alreadyApplied ? "already-applied" : day.spurious > 0 ? "new" : "no-excess";
+      console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} allowance=${day.organicAllowance} spurious=${day.spurious} (${status})`);
+      if (alreadyApplied || day.spurious === 0) continue;
+
+      const delta = createDownloadAttributionDelta(spec.source, deltaId, `${day.dateKey}T12:00:00.000Z`);
+      for (let i = 0; i < day.spurious; i += 1) {
+        recordDownloadAttributionFetchByAssetKey(delta, assetKey);
+      }
+      newDeltas.push(delta);
+      totalNewSpurious += day.spurious;
+    }
+  };
 
   const peerRate = computePeerSupersededRate(snapshots, spec);
   if ((spec.peers?.length ?? 0) > 0 && peerRate === null) {
@@ -230,25 +256,61 @@ async function run(): Promise<void> {
       baselineDailyRate: baseline,
       peerSupersededRate: peerRate,
     });
-    clampPlans.set(target, computeSnapshotClampPlan(series, spec, days));
+    workItems.push({
+      target,
+      clampPlan: computeSnapshotClampPlan(
+        series,
+        { start: spec.incident_start, end: spec.incident_end ?? null },
+        days,
+      ),
+    });
 
     console.log(
       `[loop-repair] ${label} baseline=${baseline.toFixed(2)}/day superseded_start=${target.superseded_start ?? spec.incident_start}`,
     );
-    const assetKey = resolveAssetKey(target);
-    for (const day of days) {
-      const deltaId = loopRepairDeltaId(spec.incident, target, day.dateKey);
-      const alreadyApplied = Boolean(attributionLedger.applied_delta_ids?.[deltaId]);
-      const status = alreadyApplied ? "already-applied" : day.spurious > 0 ? "new" : "no-excess";
-      console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} allowance=${day.organicAllowance} spurious=${day.spurious} (${status})`);
-      if (alreadyApplied || day.spurious === 0) continue;
+    collectDays(target, days);
+  }
 
-      const delta = createDownloadAttributionDelta(spec.source, deltaId, `${day.dateKey}T12:00:00.000Z`);
-      for (let i = 0; i < day.spurious; i += 1) {
-        recordDownloadAttributionFetchByAssetKey(delta, assetKey);
+  // New-version (adoption) targets: allowance is the peer-adoption curve scaled to
+  // the target's install base.
+  const adoptionTargets = spec.adoption_targets ?? [];
+  if (adoptionTargets.length > 0) {
+    const curve = computeAdoptionFractionCurve(snapshots, spec.adoption_peers ?? []);
+    if (curve.length === 0) {
+      throw new Error("spec.adoption_peers yielded no adoption curve; check peer versions and release_start dates.");
+    }
+    console.log(
+      `[loop-repair] adoption curve (max across ${spec.adoption_peers!.length} peers): ${curve.slice(0, 10).map((f) => `${(100 * f).toFixed(1)}%`).join(" ")}`,
+    );
+    for (const adoption of adoptionTargets) {
+      const target: LoopRepairTarget = {
+        listing_type: adoption.listing_type,
+        listing_id: adoption.listing_id,
+        version: adoption.version,
+      };
+      const label = `${target.listing_type}:${target.listing_id}@${target.version}`;
+      const base = computeCumulativeListingRawBefore(
+        snapshots,
+        adoption.listing_type,
+        adoption.listing_id,
+        adoption.release_start,
+      );
+      if (base === null || base <= 0) {
+        throw new Error(`No install base measurable for adoption target ${label} before ${adoption.release_start}.`);
       }
-      newDeltas.push(delta);
-      totalNewSpurious += day.spurious;
+      const series = extractTargetSeries(snapshots, target);
+      const days = computeAdoptionDaySpuriousEstimates(series, adoption, curve, base, spec.incident_end);
+      workItems.push({
+        target,
+        clampPlan: computeSnapshotClampPlan(
+          series,
+          { start: adoption.release_start, end: spec.incident_end ?? null, missingAnchorValue: 0 },
+          days,
+        ),
+      });
+
+      console.log(`[loop-repair] ${label} adoption target base=${base} release_start=${adoption.release_start}`);
+      collectDays(target, days);
     }
   }
 
@@ -269,8 +331,7 @@ async function run(): Promise<void> {
   const modBuckets = loadDownloadVersionBucketLedger(args.repoRoot, "mod");
   let bucketsChanged = { map: false, mod: false };
 
-  for (const target of spec.targets) {
-    const plan = clampPlans.get(target) ?? [];
+  for (const { target, clampPlan: plan } of workItems) {
     const planByDate = new Map(plan.map((entry) => [entry.dateKey, entry.correctedValue]));
     for (const snapshot of snapshots) {
       const correctedValue = planByDate.get(snapshot.dateKey);

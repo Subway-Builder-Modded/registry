@@ -39,6 +39,17 @@ export interface LoopRepairPeer {
   superseded_start: string;
 }
 
+// A NEW version whose download traffic is loop-inflated (adoption_targets), or a
+// known-good comparable release used to model organic update adoption
+// (adoption_peers). release_start is the first snapshot day the version was counted.
+export interface LoopRepairAdoptionEntry {
+  listing_type: LoopRepairListingType;
+  listing_id: string;
+  version: string;
+  release_start: string;
+  note?: string;
+}
+
 export interface LoopRepairSpec {
   // Short slug identifying the incident; embedded in every delta id.
   incident: string;
@@ -55,6 +66,12 @@ export interface LoopRepairSpec {
   // allowance for incident days ON/AFTER a target's superseded_start. When empty,
   // the baseline-window rate applies to all days (the pre-revision behavior).
   peers?: LoopRepairPeer[];
+  // NEW versions whose traffic is loop-inflated. Their organic allowance is the
+  // peer-adoption model: for each day since release, the MOST generous per-day
+  // adoption fraction observed across adoption_peers, scaled to the target's
+  // install base. Requires adoption_peers when non-empty.
+  adoption_targets?: LoopRepairAdoptionEntry[];
+  adoption_peers?: LoopRepairAdoptionEntry[];
   // Set once the causing bug is fixed to stop attributing new days (inclusive).
   incident_end?: string | null;
   note?: string;
@@ -139,6 +156,32 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
       };
     });
 
+  const normalizeAdoptionEntry = (entry: unknown, label: string): LoopRepairAdoptionEntry => {
+    if (!isObject(entry)) {
+      throw new Error(`Expected ${label} to be an object.`);
+    }
+    const listingType = requireNonEmptyString(entry.listing_type, `${label}.listing_type`);
+    if (listingType !== "map" && listingType !== "mod") {
+      throw new Error(`Expected ${label}.listing_type to be 'map' or 'mod'.`);
+    }
+    return {
+      listing_type: listingType,
+      listing_id: requireNonEmptyString(entry.listing_id, `${label}.listing_id`),
+      version: requireNonEmptyString(entry.version, `${label}.version`),
+      release_start: requireDateKey(entry.release_start, `${label}.release_start`),
+      note: typeof entry.note === "string" && entry.note.trim() !== "" ? entry.note.trim() : undefined,
+    };
+  };
+  const adoptionTargets: LoopRepairAdoptionEntry[] = !Array.isArray(value.adoption_targets)
+    ? []
+    : value.adoption_targets.map((entry, index) => normalizeAdoptionEntry(entry, `adoption_targets[${index}]`));
+  const adoptionPeers: LoopRepairAdoptionEntry[] = !Array.isArray(value.adoption_peers)
+    ? []
+    : value.adoption_peers.map((entry, index) => normalizeAdoptionEntry(entry, `adoption_peers[${index}]`));
+  if (adoptionTargets.length > 0 && adoptionPeers.length === 0) {
+    throw new Error("spec.adoption_targets requires spec.adoption_peers.");
+  }
+
   const spec: LoopRepairSpec = {
     incident: requireNonEmptyString(value.incident, "spec.incident"),
     source: requireNonEmptyString(value.source, "spec.source"),
@@ -147,6 +190,8 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
     baseline_start: requireDateKey(value.baseline_start, "spec.baseline_start"),
     baseline_end: requireDateKey(value.baseline_end, "spec.baseline_end"),
     peers,
+    adoption_targets: adoptionTargets,
+    adoption_peers: adoptionPeers,
     incident_end: value.incident_end == null
       ? null
       : requireDateKey(value.incident_end, "spec.incident_end"),
@@ -309,6 +354,100 @@ export function computeDaySpuriousEstimates(
     });
 }
 
+// computeAdoptionDayDeltas is computeRawDayDeltas anchored at a release: days
+// before release_start (where the version is absent from snapshots) count as a
+// zero baseline, so the release day's full delta is the first entry. A missing
+// mid-series raw value carries the previous counter forward (delta 0 that day).
+function computeAdoptionDayDeltas(series: SnapshotDayValue[], releaseStart: string): DayDelta[] {
+  let previousRaw = 0;
+  const deltas: DayDelta[] = [];
+  for (const day of series) {
+    if (day.dateKey < releaseStart) {
+      if (day.raw !== null) previousRaw = day.raw;
+      continue;
+    }
+    const raw = day.raw ?? previousRaw;
+    deltas.push({ dateKey: day.dateKey, rawDelta: Math.max(0, raw - previousRaw) });
+    previousRaw = raw;
+  }
+  return deltas;
+}
+
+// computeCumulativeListingRawBefore measures a listing's install base as the sum of
+// every version's raw counter at the last snapshot before dateKey.
+export function computeCumulativeListingRawBefore(
+  snapshots: Array<{ dateKey: string; data: SnapshotFileLike }>,
+  listingType: LoopRepairListingType,
+  listingId: string,
+  dateKey: string,
+): number | null {
+  const snapshot = [...snapshots].reverse().find((entry) => entry.dateKey < dateKey);
+  if (!snapshot) return null;
+  const section = listingType === "map" ? snapshot.data.maps : snapshot.data.mods;
+  const byVersion = (section?.raw_downloads ?? section?.downloads)?.[listingId];
+  if (!isObject(byVersion)) return null;
+  let total = 0;
+  for (const value of Object.values(byVersion)) {
+    const count = toFiniteNonNegativeNumber(value);
+    if (count !== null) total += count;
+  }
+  return total;
+}
+
+// computeAdoptionFractionCurve pools the adoption peers into a per-day-since-release
+// curve of organic update-adoption fractions. Day k takes the MOST generous (max)
+// fraction across peers that have a day k — small maps adopt a larger share of their
+// base per day, so the max errs toward attributing less for every target size.
+export function computeAdoptionFractionCurve(
+  snapshots: Array<{ dateKey: string; data: SnapshotFileLike }>,
+  peers: LoopRepairAdoptionEntry[],
+): number[] {
+  const curve: number[] = [];
+  for (const peer of peers) {
+    const base = computeCumulativeListingRawBefore(snapshots, peer.listing_type, peer.listing_id, peer.release_start);
+    if (base === null || base <= 0) continue;
+    const series = extractTargetSeries(snapshots, {
+      listing_type: peer.listing_type,
+      listing_id: peer.listing_id,
+      version: peer.version,
+    });
+    const deltas = computeAdoptionDayDeltas(series, peer.release_start);
+    deltas.forEach((delta, index) => {
+      const fraction = delta.rawDelta / base;
+      curve[index] = Math.max(curve[index] ?? 0, fraction);
+    });
+  }
+  return curve;
+}
+
+// computeAdoptionDaySpuriousEstimates estimates a new version's daily excess over
+// the peer-adoption allowance: curve[day-since-release] × the target's install base,
+// rounded UP. Days beyond the curve reuse its last fraction (peer releases predate
+// the targets', so this only matters if peer data runs out).
+export function computeAdoptionDaySpuriousEstimates(
+  series: SnapshotDayValue[],
+  target: LoopRepairAdoptionEntry,
+  curve: number[],
+  targetBase: number,
+  incidentEnd: string | null | undefined,
+): DaySpuriousEstimate[] {
+  if (curve.length === 0) {
+    throw new Error("Adoption fraction curve is empty; check spec.adoption_peers.");
+  }
+  return computeAdoptionDayDeltas(series, target.release_start)
+    .filter((delta) => !incidentEnd || delta.dateKey <= incidentEnd)
+    .map((delta, index) => {
+      const fraction = curve[Math.min(index, curve.length - 1)]!;
+      const organicAllowance = Math.ceil(fraction * targetBase);
+      return {
+        dateKey: delta.dateKey,
+        rawDelta: delta.rawDelta,
+        organicAllowance,
+        spurious: Math.max(0, delta.rawDelta - organicAllowance),
+      };
+    });
+}
+
 // loopRepairDeltaId is stable per (incident, target, day) so the ledger's
 // applied_delta_ids makes re-runs idempotent: an already-attributed day is
 // skipped, a newly observed day is applied.
@@ -320,21 +459,34 @@ export function loopRepairDeltaId(
   return `manual-loop-repair:${incident}:${target.listing_id}@${target.version}:${dateKey}`;
 }
 
-// computeSnapshotClampPlan rewrites the incident-window snapshot trajectory to the
-// organic estimate: anchored at the last pre-incident adjusted value, growing by
+export interface SnapshotClampWindow {
+  // First snapshot day being corrected (incident_start for superseded targets,
+  // release_start for adoption targets).
+  start: string;
+  // incident_end when set; growth after it resumes at the full raw rate.
+  end: string | null;
+  // Anchor when no pre-start adjusted value exists. Adoption targets pass 0 (the
+  // version did not exist before release); superseded targets omit it so a target
+  // with no pre-incident history is skipped rather than clamped to nothing.
+  missingAnchorValue?: number;
+}
+
+// computeSnapshotClampPlan rewrites the window's snapshot trajectory to the
+// organic estimate: anchored at the last pre-window adjusted value, growing by
 // min(rawDelta, organicAllowance) per day. Values are corrected with
 // min(recorded, corrected), so the plan is idempotent and never raises history.
 // Mirrors ops/backfill-charleston-snapshot-clamp.ts; without it a bucket rebuild
 // from history would resurrect the inflated count as a `history-max:` floor.
 export function computeSnapshotClampPlan(
   series: SnapshotDayValue[],
-  spec: LoopRepairSpec,
+  window: SnapshotClampWindow,
   days: DaySpuriousEstimate[],
 ): SnapshotClampEntry[] {
   const anchorDay = [...series]
     .reverse()
-    .find((day) => day.dateKey < spec.incident_start && day.adjusted !== null);
-  if (!anchorDay || anchorDay.adjusted === null) return [];
+    .find((day) => day.dateKey < window.start && day.adjusted !== null);
+  const anchorValue = anchorDay?.adjusted ?? window.missingAnchorValue;
+  if (anchorValue === undefined) return [];
 
   const organicByDate = new Map<string, number>();
   for (const day of days) {
@@ -346,13 +498,13 @@ export function computeSnapshotClampPlan(
   }
 
   const plan: SnapshotClampEntry[] = [];
-  let corrected = anchorDay.adjusted;
+  let corrected = anchorValue;
   for (const day of series) {
-    if (day.dateKey < spec.incident_start) continue;
-    // Inside the incident window growth is capped at the organic allowance; after a
-    // closed window (incident_end set) full raw growth resumes, but the accumulated
+    if (day.dateKey < window.start) continue;
+    // Inside the window growth is capped at the organic allowance; after a closed
+    // window (incident_end set) full raw growth resumes, but the accumulated
     // reduction still carries forward so post-incident history stays corrected.
-    if (spec.incident_end && day.dateKey > spec.incident_end) {
+    if (window.end && day.dateKey > window.end) {
       corrected += rawDeltaByDate.get(day.dateKey) ?? 0;
     } else {
       corrected += organicByDate.get(day.dateKey) ?? 0;
