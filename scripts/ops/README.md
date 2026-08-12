@@ -30,6 +30,10 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   parameterized shared-pack attribution audits.
 - `backfill-website-analytics.ts` — refetch missed hourly Cloudflare snapshots
   (worker/capture outage gap-filler).
+- `backfill-hourly-downloads.ts` — deterministically rebuilds
+  `analytics/hourly/downloads.csv` (rolling per-listing hourly deltas) from the
+  git history of `downloads.json`; initial backfill and the recovery path if
+  the hourly appender's series is ever lost or corrupted.
 
 One-time migrations that already ran are deleted rather than kept here — git
 history is the archive (see tmp/plans/registry-downsizing-audit.md for the list).
