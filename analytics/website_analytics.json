@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-08-12T17:01:29.658Z",
+  "generated_at": "2026-08-12T17:38:32.211Z",
   "valid_paths": [
     "/",
     "/community",
@@ -791,6 +791,7 @@
     "/registry/maps/au-brisbane",
     "/registry/maps/baltimore-dc-corridor",
     "/registry/maps/bangkok",
+    "/registry/maps/bangkok/gallery",
     "/registry/maps/bangkok/versions",
     "/registry/maps/bangkok/versions/v1.0.0",
     "/registry/maps/barcelona",
@@ -1652,8 +1653,8 @@
     "latest_hour": "2026-08-12T17:00:00.000Z",
     "total_days": 118,
     "total_hours": 1810,
-    "latest_day_visits": 214,
-    "latest_hour_visits": 0
+    "latest_day_visits": 239,
+    "latest_hour_visits": 25
   },
   "time_series": {
     "by_day": [
@@ -2127,7 +2128,7 @@
       },
       {
         "date": "2026-08-12",
-        "visits": 214
+        "visits": 239
       }
     ],
     "by_hour": [
@@ -9369,7 +9370,7 @@
       },
       {
         "hour": "2026-08-12T17:00:00.000Z",
-        "visits": 0
+        "visits": 25
       }
     ]
   },
@@ -26351,18 +26352,19 @@
       }
     },
     "2026-08-12": {
-      "captured_at": "2026-08-12T17:01:27.463Z",
+      "captured_at": "2026-08-12T17:38:29.935Z",
       "window_start": "2026-08-12T00:00:00.000Z",
       "window_end": "2026-08-12T18:00:00.000Z",
       "totals": {
-        "visits": 214
+        "visits": 239
       },
       "pages": {
-        "/": 68,
+        "/": 73,
         "/license": 1,
-        "/railyard": 17,
-        "/railyard/docs": 1,
+        "/railyard": 21,
+        "/railyard/docs": 2,
         "/railyard/docs/latest/game-version-incompatibility": 1,
+        "/railyard/docs/v0.2/github-token": 1,
         "/railyard/docs/v0.2/installing-railyard/macos": 1,
         "/railyard/updates/v0.1.0": 1,
         "/railyard/updates/v0.2.4": 2,
@@ -26376,10 +26378,14 @@
         "/registry/authors/roquerodrigo": 1,
         "/registry/authors/rslurry/subwaybuilder-maps": 1,
         "/registry/authors/whistlerhu": 1,
-        "/registry/maps": 3,
+        "/registry/authors/xoaninc": 1,
+        "/registry/docs/data-quality/scoring-rubric": 1,
+        "/registry/maps": 4,
         "/registry/maps/bangkok": 1,
+        "/registry/maps/bangkok/gallery": 1,
         "/registry/maps/barcelona": 2,
         "/registry/maps/busan-4": 1,
+        "/registry/maps/catania": 1,
         "/registry/maps/greater-baltimore/versions": 1,
         "/registry/maps/greater-kuala-lumpur": 1,
         "/registry/maps/greater-los-angeles": 1,
@@ -26387,7 +26393,7 @@
         "/registry/maps/jelegend-tokyo": 1,
         "/registry/maps/jelegend-tokyo/versions": 1,
         "/registry/maps/lyon": 1,
-        "/registry/maps/madrid": 2,
+        "/registry/maps/madrid": 3,
         "/registry/maps/mfn-hong-kong": 1,
         "/registry/maps/mississippi": 1,
         "/registry/maps/montreal": 2,
@@ -26405,8 +26411,9 @@
         "/registry/maps/yukina-asahikawa/versions": 1,
         "/registry/maps/yukina-asahikawa/versions/0.1.1": 3,
         "/registry/maps/yukina-cz-hradec-pardubice/versions/0.4.1": 1,
+        "/registry/maps/yukina-cz-karlovy-vary": 1,
         "/registry/maps/yukina-cz-liberec-jablonec": 1,
-        "/registry/maps/yukina-cz-praha": 1,
+        "/registry/maps/yukina-cz-praha": 2,
         "/registry/maps/yukina-cz-ustecko-chomutov/versions/0.1.0": 1,
         "/registry/maps/yukina-ee-tallinn": 1,
         "/registry/maps/yukina-ee-tartu": 1,
@@ -26417,12 +26424,13 @@
         "/registry/maps/yukina-lt-kaunas": 2,
         "/registry/maps/yukina-lt-vilnius": 4,
         "/registry/maps/yukina-okinawa/versions/0.5.0": 2,
+        "/registry/maps/yukina-tsugaru": 1,
         "/registry/maps/yukina-tw-hsinchu": 3,
         "/registry/maps/yukina-tw-kaohsiung/versions/0.1.0": 1,
         "/registry/maps/yukina-tw-tainan": 2,
         "/registry/maps/yukina-utsunomiya": 2,
         "/registry/markdown-playground": 1,
-        "/registry/mods": 2,
+        "/registry/mods": 3,
         "/registry/mods/basedgoat-trains/versions": 1,
         "/registry/mods/citymapper": 4,
         "/registry/mods/hide-and-seek/versions/v1.0.0": 1,
@@ -26433,62 +26441,66 @@
         "/registry/mods/neighborhood-station-names": 1,
         "/registry/mods/neighborhood-station-names/analytics": 1,
         "/registry/mods/orbital-surveyor": 1,
-        "/registry/mods/subwaybuilder-regions": 3,
+        "/registry/mods/subwaybuilder-regions": 5,
         "/registry/mods/track-visualizer": 1,
+        "/registry/mods/transit-overlay/versions/1.5.1": 1,
         "/registry/world-map": 1,
         "/template-mod": 1,
         "/template-mod/docs": 1,
         "/template-mod/docs/v1.0/getting-started": 1,
+        "/template-mod/docs/v1.0/project-structure": 1,
         "/website/updates": 1
       },
       "countries": {
+        "AR": 2,
         "AU": 1,
         "BE": 1,
         "BR": 10,
         "CA": 13,
-        "CH": 4,
+        "CH": 5,
         "CN": 2,
         "CZ": 4,
         "DE": 5,
         "DZ": 3,
-        "ES": 7,
-        "GB": 3,
-        "HK": 1,
+        "ES": 9,
+        "GB": 4,
+        "HK": 2,
         "ID": 5,
-        "IE": 2,
+        "IE": 3,
         "IT": 1,
         "JP": 3,
         "MY": 1,
         "NL": 1,
-        "PL": 1,
+        "PL": 2,
         "SE": 1,
+        "SG": 1,
         "TW": 43,
-        "US": 105
+        "US": 120
       },
       "browsers": {
         "BingBot": 11,
-        "Chrome": 47,
+        "Chrome": 55,
         "ChromeMobile": 6,
-        "Edge": 28,
-        "Firefox": 9,
-        "GoogleBot": 39,
+        "Edge": 29,
+        "Firefox": 12,
+        "GoogleBot": 43,
         "MobileSafari": 9,
-        "Opera": 29,
-        "Safari": 10,
-        "Unknown": 28
+        "Opera": 30,
+        "Safari": 11,
+        "Unknown": 35
       },
       "operating_systems": {
-        "Android": 39,
+        "Android": 43,
         "ChromeOS": 1,
         "Linux": 8,
-        "MacOSX": 24,
-        "Unknown": 43,
-        "Windows": 90,
+        "MacOSX": 27,
+        "Unknown": 50,
+        "Windows": 101,
         "iOS": 11
       },
       "devices": {
-        "desktop": 165,
-        "mobile": 49
+        "desktop": 186,
+        "mobile": 53
       }
     }
   }
