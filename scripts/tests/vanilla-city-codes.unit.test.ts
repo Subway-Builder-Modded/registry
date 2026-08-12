@@ -4,6 +4,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  findListingCollisions,
   mergeVanillaCityCodes,
   parseLatestCitiesCodes,
 } from "../downloads/sync-vanilla-city-codes.js";
@@ -52,6 +53,28 @@ test("loadVanillaCityCodeSet unions the hardcoded floor with the synced file", (
   for (const code of VANILLA_CITY_CODE_SET) {
     assert.ok(codes.has(code), `floor code ${code} present`);
   }
+});
+
+test("findListingCollisions reports listing, code, and author for colliding manifests", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "vanilla-collisions-"));
+  const write = (id: string, manifest: unknown): void => {
+    mkdirSync(join(repoRoot, "maps", id), { recursive: true });
+    writeFileSync(join(repoRoot, "maps", id, "manifest.json"), JSON.stringify(manifest), "utf-8");
+  };
+  write("clashing", { id: "clashing", city_code: "DUB", author: "someone" });
+  write("authorless", { id: "authorless", city_code: "MAR" });
+  write("clean", { id: "clean", city_code: "ZZZ", author: "other" });
+  writeFileSync(
+    join(repoRoot, "maps", "index.json"),
+    JSON.stringify({ maps: ["clashing", "authorless", "clean", "missing-dir"] }),
+    "utf-8",
+  );
+
+  const collisions = findListingCollisions(repoRoot, new Set(["DUB", "MAR"]));
+  assert.deepEqual(collisions, [
+    { listing_id: "clashing", city_code: "DUB", author: "someone" },
+    { listing_id: "authorless", city_code: "MAR", author: null },
+  ]);
 });
 
 test("loadVanillaCityCodeSet degrades to the floor when the synced file is absent or malformed", () => {

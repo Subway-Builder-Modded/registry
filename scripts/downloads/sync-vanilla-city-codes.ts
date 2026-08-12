@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { isObject, readJsonFile, writeJsonFile } from "../lib/json-utils.js";
@@ -68,8 +68,16 @@ function loadPrevious(path: string): VanillaCityCodesFile | null {
   }
 }
 
-function findListingCollisions(repoRoot: string, codes: Set<string>): string[] {
-  const collisions: string[] = [];
+export interface VanillaCodeCollision {
+  listing_id: string;
+  city_code: string;
+  // Listing author's GitHub login, used by the workflow's issue-filing step to
+  // @mention them; null when the manifest lacks one.
+  author: string | null;
+}
+
+export function findListingCollisions(repoRoot: string, codes: Set<string>): VanillaCodeCollision[] {
+  const collisions: VanillaCodeCollision[] = [];
   const indexPath = resolve(repoRoot, "maps", "index.json");
   if (!existsSync(indexPath)) return collisions;
   const index = readJsonFile<{ maps?: string[] }>(indexPath);
@@ -77,9 +85,18 @@ function findListingCollisions(repoRoot: string, codes: Set<string>): string[] {
     const manifestPath = resolve(repoRoot, "maps", listingId, "manifest.json");
     if (!existsSync(manifestPath)) continue;
     try {
-      const manifest = JSON.parse(readFileSync(manifestPath, "utf-8")) as { city_code?: unknown };
+      const manifest = JSON.parse(readFileSync(manifestPath, "utf-8")) as {
+        city_code?: unknown;
+        author?: unknown;
+      };
       if (typeof manifest.city_code === "string" && codes.has(manifest.city_code)) {
-        collisions.push(`${listingId}=${manifest.city_code}`);
+        collisions.push({
+          listing_id: listingId,
+          city_code: manifest.city_code,
+          author: typeof manifest.author === "string" && manifest.author.trim() !== ""
+            ? manifest.author.trim()
+            : null,
+        });
       }
     } catch {
       continue;
@@ -122,15 +139,23 @@ async function run(): Promise<void> {
 
   const collisions = findListingCollisions(repoRoot, new Set(fetchedCodes));
   for (const collision of collisions) {
-    console.warn(`[vanilla-city-codes] WARNING: listing collides with a live vanilla city code: ${collision} — needs an author-side code change`);
+    console.warn(
+      `[vanilla-city-codes] WARNING: listing collides with a live vanilla city code: ${collision.listing_id}=${collision.city_code} (author: ${collision.author ?? "unknown"}) — needs an author-side code change`,
+    );
   }
+  // Written on every successful sync (empty array included) so the workflow's
+  // issue-filing step can both open issues for new conflicts and auto-close
+  // resolved ones; a failed fetch never reaches here, leaving no report and
+  // therefore no false closes.
+  mkdirSync(resolve(repoRoot, "tmp"), { recursive: true });
+  writeJsonFile(resolve(repoRoot, "tmp", "vanilla-city-code-collisions.json"), collisions);
   console.log(
     `[vanilla-city-codes] synced ${fetchedCodes.length} live codes (${newCodes.length} new: ${newCodes.join(", ") || "none"}), total ${merged.codes.length}, listing collisions: ${collisions.length}`,
   );
   appendGitHubOutput([
     "vanilla_codes_fetch_ok=true",
     `vanilla_codes_new=${newCodes.join(",")}`,
-    `vanilla_codes_collisions=${collisions.join(",")}`,
+    `vanilla_codes_collisions=${collisions.map((c) => `${c.listing_id}=${c.city_code}`).join(",")}`,
   ]);
 }
 

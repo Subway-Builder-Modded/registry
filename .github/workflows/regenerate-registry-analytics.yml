@@ -502,6 +502,69 @@ jobs:
         id: sync_vanilla_codes
         run: pnpm --dir scripts run sync-vanilla-city-codes
 
+      # Files one labeled issue per listing whose city code collides with the live
+      # vanilla list (deduped via a body marker), and auto-closes issues whose
+      # conflict is no longer detected. Skips entirely when the sync's fetch
+      # failed (no report file), so a CDN outage can never close issues.
+      - name: File issues for vanilla city-code conflicts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            const reportPath = "tmp/vanilla-city-code-collisions.json";
+            if (!fs.existsSync(reportPath)) {
+              core.info("No collision report (sync fetch failed or skipped); leaving issues untouched.");
+              return;
+            }
+            const collisions = JSON.parse(fs.readFileSync(reportPath, "utf-8"));
+            const label = "city-code-conflict";
+            try {
+              await github.rest.issues.getLabel({ ...context.repo, name: label });
+            } catch {
+              await github.rest.issues.createLabel({
+                ...context.repo,
+                name: label,
+                color: "d93f0b",
+                description: "Listing city code collides with a base-game (vanilla) city",
+              });
+            }
+            const open = await github.paginate(github.rest.issues.listForRepo, {
+              ...context.repo, state: "open", labels: label, per_page: 100,
+            });
+            const markerFor = (c) => "<!-- city-code-conflict:" + c.listing_id + ":" + c.city_code + " -->";
+            const current = new Set(collisions.map(markerFor));
+            for (const collision of collisions) {
+              const marker = markerFor(collision);
+              if (open.some((issue) => issue.body && issue.body.includes(marker))) continue;
+              const mention = collision.author ? "@" + collision.author + ": " : "";
+              await github.rest.issues.create({
+                ...context.repo,
+                title: "City code conflict: `" + collision.listing_id + "` collides with vanilla code `" + collision.city_code + "`",
+                labels: [label],
+                body: [
+                  marker,
+                  mention + "the `" + collision.listing_id + "` listing's city code `" + collision.city_code + "` collides with a base-game (vanilla) city code in the game's live `latest-cities.yml`.",
+                  "",
+                  "On up-to-date game installs the Railyard app refuses to install a map whose code matches a vanilla city, so this listing is effectively uninstallable there until it is re-released under a different code.",
+                  "",
+                  "**Action needed:** publish a map update that changes the city code to one that is neither a vanilla code nor used by another listing. See KNOWN_INCIDENTS.md (2026-08 French-city entry) for how the previous migration went and what to avoid.",
+                  "",
+                  "_Filed automatically by the vanilla city-code sync (regenerate-registry-analytics). This issue closes automatically once the conflict is no longer detected._",
+                ].join("\n"),
+              });
+              core.notice("Filed city-code conflict issue for " + collision.listing_id + " (" + collision.city_code + ")");
+            }
+            for (const issue of open) {
+              const match = issue.body && issue.body.match(/<!-- city-code-conflict:\S+ -->/);
+              if (!match || current.has(match[0])) continue;
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: issue.number,
+                body: "The vanilla city-code sync no longer detects this conflict — closing.",
+              });
+              await github.rest.issues.update({ ...context.repo, issue_number: issue.number, state: "closed" });
+              core.notice("Closed resolved city-code conflict issue #" + issue.number);
+            }
+
       - name: Mint bot token
         id: bot-token
         uses: ./.github/actions/mint-bot-token
