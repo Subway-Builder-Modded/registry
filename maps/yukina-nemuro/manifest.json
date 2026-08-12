@@ -26,10 +26,10 @@
   },
   "city_code": "SHB",
   "country": "JP",
-  "population": 47813,
-  "residents_total": 47813,
-  "points_count": 2327,
-  "population_count": 4636,
+  "population": 47862,
+  "residents_total": 47862,
+  "points_count": 2339,
+  "population_count": 4642,
   "initial_view_state": {
     "latitude": 43.489121,
     "longitude": 145.205321,
@@ -50,40 +50,44 @@
   "difficulty": "very-hard",
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 6.65,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ooaza.geojson.gz": 0.85,
+    ".railyard_map/regions/shichouson.geojson.gz": 1.03,
     ".railyard_map/special_demand_points.json": 0.02,
     ".railyard_map/special_demand_types.json": 0.07,
     "SHB.pmtiles": 24.2,
     "buildings_index.bin.gz": 5.73,
-    "config.json": 0,
-    "demand_data.json": 9.02,
+    "config.json": 0.01,
+    "demand_data.json": 0.8,
+    "driving_paths.json.gz": 0.94,
     "ocean_depth_index.json": 52.57,
     "roads.geojson": 2.55,
     "runways_taxiways.geojson": 0.07
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.07548117951041004,
-      "p25": 0.09266256686040304,
-      "p50": 0.11896328724236696,
-      "p75": 0.1853251337223863,
-      "p90": 0.3167091137589022,
-      "mean": 0.23412435991488656
+      "p10": 0.07486493023010228,
+      "p25": 0.09196264295013058,
+      "p50": 0.11929308901367597,
+      "p75": 0.1844730813541256,
+      "p90": 0.3163321522179328,
+      "mean": 0.23347286515237828
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.08245281840275617,
-      "p25": 0.09640351678329237,
-      "p50": 0.11962537520958114,
-      "p75": 0.17543563247991403,
-      "p90": 0.3142094816943255,
-      "mean": 0.2107189567777627
+      "p10": 0.08040298033983424,
+      "p25": 0.09538505136203654,
+      "p50": 0.11966816207096549,
+      "p75": 0.17549976632386707,
+      "p90": 0.31429481273067295,
+      "mean": 0.20977646937971897
     },
     "commuteDistanceKm": {
-      "p10": 316,
-      "p25": 1310,
+      "p10": 318,
+      "p25": 1309,
       "p50": 3355,
-      "p75": 12784,
-      "p90": 26731,
-      "mean": 10552.292709232097
+      "p75": 12818,
+      "p90": 26806,
+      "mean": 10558.670185264971
     },
     "residentCellDensity": {
       "p10": 9,
@@ -91,7 +95,7 @@
       "p50": 25,
       "p75": 58,
       "p90": 270,
-      "mean": 101.1927966101695
+      "mean": 100.86919831223629
     },
     "workerCellDensity": {
       "p10": 7,
@@ -99,53 +103,53 @@
       "p50": 26,
       "p75": 81,
       "p90": 337,
-      "mean": 124.00263157894737
+      "mean": 124.13157894736842
     },
     "detail": {
-      "radiusKm": 0.11929387189848992,
-      "expectedPointSpacingKm": 0.5236150824982814,
-      "normalizedRadius": 0.22782741728773917,
-      "activityPerPoint": 20.547056295659647,
+      "radiusKm": 0.11948047836376739,
+      "expectedPointSpacingKm": 0.5226793209125644,
+      "normalizedRadius": 0.22859231957974188,
+      "activityPerPoint": 20.462590850790935,
       "playableAreaKm2": 1864,
-      "playableAreaPerPointKm2": 0.8010313708637731,
-      "playableCatchmentRadiusKm": 0.5049516853019638,
+      "playableAreaPerPointKm2": 0.7969217614365113,
+      "playableCatchmentRadiusKm": 0.5036547182150107,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
     },
     "polycentrism": {
       "activity": {
-        "score": 0.8927678249983935,
-        "continuousScore": 0.992976979990942,
+        "score": 0.8929462633804797,
+        "continuousScore": 0.9929847026556675,
         "detectedCenterCount": 2,
-        "effectiveCenterCount": 1.8063058906295766,
-        "largestCenterShare": 0.6637316211072303,
+        "effectiveCenterCount": 1.8065970366598143,
+        "largestCenterShare": 0.663595336592704,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 145.01887899476003,
-            "latitude": 43.56627076088153,
-            "massShare": 0.6637316211072303,
-            "assignedMass": 63470,
-            "assignedPointCount": 1781,
+            "longitude": 145.018921582381,
+            "latitude": 43.56627367915053,
+            "massShare": 0.663595336592704,
+            "assignedMass": 63522,
+            "assignedPointCount": 1791,
             "prominenceRatio": 1
           },
           {
-            "longitude": 145.5788550281469,
-            "latitude": 43.33549104503425,
-            "massShare": 0.3362683788927697,
-            "assignedMass": 32156,
-            "assignedPointCount": 546,
+            "longitude": 145.5788472299856,
+            "latitude": 43.335473226445615,
+            "massShare": 0.33640466340729597,
+            "assignedMass": 32202,
+            "assignedPointCount": 548,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1785888000,
+  "last_updated": 1786579200,
   "search_aliases": [
     "Nemuro",
     "根室市",
