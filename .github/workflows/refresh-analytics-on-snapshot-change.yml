@@ -1,0 +1,123 @@
+name: Refresh Analytics On Snapshot Change
+
+# The analytics CSVs (by-day graphs, popularity rankings) are derived from the
+# history/snapshot_*.json series but normally regenerate only in the daily
+# cache-download-history run. When a snapshot is rewritten outside that cycle —
+# e.g. a manual correction clamping inflated values (KNOWN_INCIDENTS.md) — the
+# published graphs stay stale for up to a day. This workflow closes that gap:
+# the push paths filter is the change detector, so it runs only when snapshot
+# content actually lands on main, regenerates the CSVs, and opens a bot PR only
+# when their content differs. The daily run's own snapshot+CSV merge triggers a
+# no-op here (regeneration matches what it just committed).
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "history/snapshot_*.json"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Shares the daily workflow's group so snapshot generation and CSV regeneration
+# never run concurrently.
+concurrency:
+  group: cache-download-history
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # An un-merged daily bot PR may hold snapshot days not yet on main; without
+      # them a regeneration would drop the latest day's column and produce a
+      # regressed CSV diff.
+      - name: Restore missing cached snapshots from bot branch
+        run: |
+          if git ls-remote --exit-code --heads origin bot/cache-download-history >/dev/null 2>&1; then
+            git fetch origin bot/cache-download-history:refs/remotes/origin/bot/cache-download-history
+            while IFS= read -r path; do
+              if [ -f "$path" ]; then
+                continue
+              fi
+              mkdir -p "$(dirname "$path")"
+              git show "origin/bot/cache-download-history:$path" > "$path"
+            done < <(
+              git ls-tree -r --name-only origin/bot/cache-download-history -- \
+                'history/snapshot_*.json' \
+                'history/download_attribution_*.json'
+            )
+          else
+            echo "No bot/cache-download-history branch found; using history from checked out ref."
+          fi
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Regenerate analytics CSVs
+        run: pnpm --dir scripts run analytics -- --top-k-listings 0 --top-k-authors 0
+
+      - name: Stage analytics changes
+        id: commit_changes
+        run: |
+          git add analytics/*.csv 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "Analytics CSVs unchanged; nothing to refresh."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update bot PR
+        id: create_pr
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        continue-on-error: true
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: refresh analytics after snapshot change"
+          branch: bot/refresh-analytics
+          delete-branch: true
+          add-paths: |
+            analytics/*.csv
+          title: "chore: refresh analytics after snapshot change"
+          body: "Automated CSV regeneration triggered by a snapshot change on main."
+
+      - name: Mint bot token
+        id: bot-token
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
+      - name: Finalize bot PR automation
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        uses: ./.github/actions/bot-pr-automation
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_token: ${{ steps.bot-token.outputs.token }}
+          repo: ${{ github.repository }}
+          bot_branch: bot/refresh-analytics
+          pr_number: ${{ steps.create_pr.outputs.pull-request-number }}
+          pr_url: ${{ steps.create_pr.outputs.pull-request-url }}
+          pr_head_sha: ${{ steps.create_pr.outputs.pull-request-head-sha }}
