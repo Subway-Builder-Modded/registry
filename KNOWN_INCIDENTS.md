@@ -10,8 +10,8 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 **What happened:** the base game's 2026-08 update shipped vanilla Lyon/Marseille/Paris
 whose city codes collided with pierreggt's modded listings, so all three re-released
-under new codes (`LYS`→`LSY`, `MRS`→`MAR`, `PAR`→`PRS`; registry metadata PRs
-#7142/#7144/#7146, merged 2026-08-09). The Railyard app resolves an installed map's
+under new codes (`LYS`→`LSY`, `MRS`→`MAR`, `PAR`→`PRS`; registry metadata
+PRs #7142/#7144/#7146, merged 2026-08-09). The Railyard app resolves an installed map's
 expected disk location from the *manifest's* (latest) city code, but a pinned old
 version's files live under the *old* code — so on every launch the app silently
 dropped the map from installed state and subscription sync re-downloaded the pinned
@@ -22,10 +22,17 @@ excess (small install bases).
 
 **Correction:** spec-driven, re-runnable repair via
 `scripts/ops/repair-loop-inflated-downloads.ts` with spec
-`history/loop-repair-specs/2026_08_13_french_city_code_loop.json`. Per incident day
-it estimates the organic share from the pre-incident baseline (2026-07-24 →
-2026-08-06 raw day-deltas, allowance rounded UP so estimation errs toward
-attributing less) and attributes only the excess: one manual-attribution delta per
+`history/loop-repair-specs/2026_08_13_french_city_code_loop.json`. The organic
+allowance is two-phase, keyed on each target's `superseded_start` (the first
+snapshot day its successor version was available, 2026-08-08 for all three):
+before it (old version still the latest) the pre-incident baseline rate applies
+(2026-07-24 → 2026-08-06 raw day-deltas); from it on, only the **superseded-peer
+rate** — pooled post-supersession old-version traffic of the four yukina JP maps
+whose old versions were superseded the same week (0.69/day pooled; every
+comparable, including 800-1500-install maps like amsterdam/berlin-val, drops to
+~0-2/day once a successor exists, so pre-incident demand must NOT be carried into
+the superseded window). All allowance means are rounded UP so estimation errs
+toward attributing less. Excess is attributed as one manual-attribution delta per
 (listing, version, day) with stable delta ids
 (`manual-loop-repair:french-city-code-loop-2026-08:<id>@<version>:<date>`), so
 re-runs are idempotent and only newly observed days apply. The same run clamps the
@@ -34,9 +41,11 @@ charleston clamp — prevents `history-max:` reseeding), lowers the version-buck
 ceilings, and lowers `downloads.json` (self-heals upward on the next hourly
 reconcile for downloads that arrived after the last snapshot).
 
-**Applied 2026-08-13:** 427 fetches attributed (paris-ile-de-france v1.0.0: 423,
-lyon v1.0.0: 1, marseille v1.0.0: 3, days 2026-08-07 → 2026-08-12), 6 snapshots
-clamped, paris v1.0.0 display count 1434 → 1011.
+**Applied 2026-08-13** (peer-based estimate, superseding an initial 427-fetch
+baseline-only estimate that was reverted before publication): 595 fetches
+attributed (paris-ile-de-france v1.0.0: 568, lyon v1.0.0: 14, marseille v1.0.0:
+13, days 2026-08-07 → 2026-08-12), 6 snapshots clamped, paris v1.0.0 display
+count 1434 → 866.
 
 **While the incident is open:** re-run the repair (preview first, then `--apply`)
 every day or two to attribute new loop days — the app-side fix (PR #615) has to

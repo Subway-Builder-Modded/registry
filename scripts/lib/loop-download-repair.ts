@@ -21,7 +21,22 @@ export interface LoopRepairTarget {
   listing_id: string;
   // Version key exactly as it appears in downloads.json / snapshots (e.g. "v1.0.0").
   version: string;
+  // First snapshot day on which a successor version was available (YYYY-MM-DD).
+  // From this day on, organic old-version demand collapses to the superseded-peer
+  // rate; before it (old version still latest) the baseline-window rate applies.
+  // Defaults to incident_start when absent.
+  superseded_start?: string;
   note?: string;
+}
+
+// A known-good comparable whose old version was superseded around the same time.
+// Its post-supersession old-version traffic measures what organic demand for a
+// superseded version actually looks like.
+export interface LoopRepairPeer {
+  listing_type: LoopRepairListingType;
+  listing_id: string;
+  version: string;
+  superseded_start: string;
 }
 
 export interface LoopRepairSpec {
@@ -33,8 +48,13 @@ export interface LoopRepairSpec {
   // First inflated day (YYYY-MM-DD).
   incident_start: string;
   // Baseline window (inclusive, YYYY-MM-DD); must end before incident_start.
+  // Governs the allowance for incident days BEFORE a target's superseded_start.
   baseline_start: string;
   baseline_end: string;
+  // Comparables whose pooled post-supersession old-version rate becomes the
+  // allowance for incident days ON/AFTER a target's superseded_start. When empty,
+  // the baseline-window rate applies to all days (the pre-revision behavior).
+  peers?: LoopRepairPeer[];
   // Set once the causing bug is fixed to stop attributing new days (inclusive).
   incident_end?: string | null;
   note?: string;
@@ -94,9 +114,30 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
       listing_type: listingType,
       listing_id: requireNonEmptyString(entry.listing_id, `targets[${index}].listing_id`),
       version: requireNonEmptyString(entry.version, `targets[${index}].version`),
+      superseded_start: entry.superseded_start == null
+        ? undefined
+        : requireDateKey(entry.superseded_start, `targets[${index}].superseded_start`),
       note: typeof entry.note === "string" && entry.note.trim() !== "" ? entry.note.trim() : undefined,
     };
   });
+
+  const peers: LoopRepairPeer[] = !Array.isArray(value.peers)
+    ? []
+    : value.peers.map((entry, index) => {
+      if (!isObject(entry)) {
+        throw new Error(`Expected peers[${index}] to be an object.`);
+      }
+      const listingType = requireNonEmptyString(entry.listing_type, `peers[${index}].listing_type`);
+      if (listingType !== "map" && listingType !== "mod") {
+        throw new Error(`Expected peers[${index}].listing_type to be 'map' or 'mod'.`);
+      }
+      return {
+        listing_type: listingType,
+        listing_id: requireNonEmptyString(entry.listing_id, `peers[${index}].listing_id`),
+        version: requireNonEmptyString(entry.version, `peers[${index}].version`),
+        superseded_start: requireDateKey(entry.superseded_start, `peers[${index}].superseded_start`),
+      };
+    });
 
   const spec: LoopRepairSpec = {
     incident: requireNonEmptyString(value.incident, "spec.incident"),
@@ -105,6 +146,7 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
     incident_start: requireDateKey(value.incident_start, "spec.incident_start"),
     baseline_start: requireDateKey(value.baseline_start, "spec.baseline_start"),
     baseline_end: requireDateKey(value.baseline_end, "spec.baseline_end"),
+    peers,
     incident_end: value.incident_end == null
       ? null
       : requireDateKey(value.incident_end, "spec.incident_end"),
@@ -199,24 +241,72 @@ export function computeBaselineDailyRate(
   return total / deltas.length;
 }
 
+// computePeerSupersededRate pools the peers' post-supersession old-version raw
+// day-deltas into a single mean daily rate — the empirical organic demand for a
+// version that has a successor. Returns null when the spec configures no peers or
+// no peer has measurable post-supersession days. The first post-supersession day
+// (which carries an in-flight release-day residual) is deliberately included: it
+// raises the allowance, which errs toward attributing less.
+export function computePeerSupersededRate(
+  snapshots: Array<{ dateKey: string; data: SnapshotFileLike }>,
+  spec: LoopRepairSpec,
+): number | null {
+  const peers = spec.peers ?? [];
+  if (peers.length === 0) return null;
+  let total = 0;
+  let count = 0;
+  for (const peer of peers) {
+    const series = extractTargetSeries(snapshots, {
+      listing_type: peer.listing_type,
+      listing_id: peer.listing_id,
+      version: peer.version,
+    });
+    for (const delta of computeRawDayDeltas(series)) {
+      if (delta.dateKey < peer.superseded_start) continue;
+      total += delta.rawDelta;
+      count += 1;
+    }
+  }
+  return count === 0 ? null : total / count;
+}
+
+export interface OrganicAllowanceRates {
+  baselineDailyRate: number;
+  // Pooled superseded-peer rate; null when no peers are configured (all incident
+  // days then use the baseline rate).
+  peerSupersededRate: number | null;
+}
+
 // computeDaySpuriousEstimates estimates each incident day's excess over the organic
-// allowance. The allowance is the baseline mean rounded UP, so estimation always
-// errs toward attributing less (the registry's conservative-corrections policy).
+// allowance. Days before the target's superseded_start (old version still the
+// latest) allow the baseline-window rate; days from superseded_start on allow only
+// the superseded-peer rate — organic demand for an old version collapses once a
+// successor exists (observed at ~0-2/day across comparables regardless of install
+// base). Every allowance is a mean rounded UP, so estimation always errs toward
+// attributing less (the registry's conservative-corrections policy).
 export function computeDaySpuriousEstimates(
   series: SnapshotDayValue[],
   spec: LoopRepairSpec,
-  baselineDailyRate: number,
+  target: LoopRepairTarget,
+  rates: OrganicAllowanceRates,
 ): DaySpuriousEstimate[] {
-  const organicAllowance = Math.ceil(Math.max(0, baselineDailyRate));
+  const baselineAllowance = Math.ceil(Math.max(0, rates.baselineDailyRate));
+  const peerAllowance = rates.peerSupersededRate === null
+    ? baselineAllowance
+    : Math.ceil(Math.max(0, rates.peerSupersededRate));
+  const supersededStart = target.superseded_start ?? spec.incident_start;
   const lastDateKey = spec.incident_end ?? series[series.length - 1]?.dateKey ?? spec.incident_start;
   return computeRawDayDeltas(series)
     .filter((delta) => delta.dateKey >= spec.incident_start && delta.dateKey <= lastDateKey)
-    .map((delta) => ({
-      dateKey: delta.dateKey,
-      rawDelta: delta.rawDelta,
-      organicAllowance,
-      spurious: Math.max(0, delta.rawDelta - organicAllowance),
-    }));
+    .map((delta) => {
+      const organicAllowance = delta.dateKey >= supersededStart ? peerAllowance : baselineAllowance;
+      return {
+        dateKey: delta.dateKey,
+        rawDelta: delta.rawDelta,
+        organicAllowance,
+        spurious: Math.max(0, delta.rawDelta - organicAllowance),
+      };
+    });
 }
 
 // loopRepairDeltaId is stable per (incident, target, day) so the ledger's

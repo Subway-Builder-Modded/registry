@@ -1,23 +1,54 @@
 {
   "incident": "french-city-code-loop-2026-08",
   "source": "manual-correction/french-city-code-loop",
-  "note": "Railyard app bootstrap re-download loop: after lyon/marseille/paris-ile-de-france re-released under new city codes (LYS->LSY, MRS->MAR, PAR->PRS, registry PRs #7142/#7144/#7146, 2026-08-09) to avoid colliding with the base game's new vanilla French cities, installed clients whose pinned old version wrote disk under the old code were silently dropped at startup and re-downloaded the pinned version on every launch (monorepo PR #615 has the fix). Old-version counters inflated from 2026-08-07/08 onward. Baseline window ends 2026-08-06, before the first inflated Paris day; it starts 2026-07-24, after the 07-20/21 release-burst days. incident_end stays null until the app release containing PR #615 has saturated.",
+  "note": "Railyard app bootstrap re-download loop: after lyon/marseille/paris-ile-de-france re-released under new city codes (LYS->LSY, MRS->MAR, PAR->PRS, registry PRs #7142/#7144/#7146) to avoid colliding with the base game's new vanilla French cities, installed clients whose pinned old version wrote disk under the old code were silently dropped at startup and re-downloaded the pinned version on every launch (monorepo PR #615 has the fix). Old-version counters inflated from 2026-08-07. Allowance model: before each target's superseded_start (old version still latest) the baseline-window rate applies (window 2026-07-24 -> 2026-08-06, after the 07-20/21 release burst); from superseded_start on, organic old-version demand collapses to the superseded-peer rate, pooled from the yukina JP maps whose old versions were superseded the same week (all show ~0-2/day regardless of install base; the known-good reference). incident_end stays null until the app release containing PR #615 has saturated.",
   "targets": [
     {
       "listing_type": "map",
       "listing_id": "paris-ile-de-france",
       "version": "v1.0.0",
-      "note": "dominant share of the loop traffic (largest install base)"
+      "superseded_start": "2026-08-08",
+      "note": "dominant share of the loop traffic (largest install base); v1.0.5 first counted in the 2026-08-08 snapshot"
     },
     {
       "listing_type": "map",
       "listing_id": "lyon",
-      "version": "v1.0.0"
+      "version": "v1.0.0",
+      "superseded_start": "2026-08-08",
+      "note": "v1.0.2 first counted in the 2026-08-08 snapshot"
     },
     {
       "listing_type": "map",
       "listing_id": "marseille",
-      "version": "v1.0.0"
+      "version": "v1.0.0",
+      "superseded_start": "2026-08-08",
+      "note": "v1.0.2 first counted in the 2026-08-08 snapshot"
+    }
+  ],
+  "peers": [
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-osaka",
+      "version": "0.3.0",
+      "superseded_start": "2026-08-05"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-sapporo-chitose",
+      "version": "0.6.1",
+      "superseded_start": "2026-08-06"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-sendai",
+      "version": "0.5.1",
+      "superseded_start": "2026-08-06"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-yamagata",
+      "version": "0.5.1",
+      "superseded_start": "2026-08-06"
     }
   ],
   "incident_start": "2026-08-07",

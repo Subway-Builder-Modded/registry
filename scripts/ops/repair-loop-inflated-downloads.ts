@@ -17,6 +17,7 @@ import {
 import {
   computeBaselineDailyRate,
   computeDaySpuriousEstimates,
+  computePeerSupersededRate,
   computeSnapshotClampPlan,
   extractTargetSeries,
   loopRepairDeltaId,
@@ -208,6 +209,16 @@ async function run(): Promise<void> {
   const clampPlans = new Map<LoopRepairTarget, ReturnType<typeof computeSnapshotClampPlan>>();
   let totalNewSpurious = 0;
 
+  const peerRate = computePeerSupersededRate(snapshots, spec);
+  if ((spec.peers?.length ?? 0) > 0 && peerRate === null) {
+    throw new Error("spec.peers configured but no peer has measurable post-supersession days.");
+  }
+  console.log(
+    peerRate === null
+      ? "[loop-repair] no peers configured; baseline-window allowance applies to all incident days"
+      : `[loop-repair] superseded-peer rate=${peerRate.toFixed(2)}/day (pooled from ${spec.peers!.length} peers)`,
+  );
+
   for (const target of spec.targets) {
     const label = `${target.listing_type}:${target.listing_id}@${target.version}`;
     const series = extractTargetSeries(snapshots, target);
@@ -215,16 +226,21 @@ async function run(): Promise<void> {
     if (baseline === null) {
       throw new Error(`No baseline-window data for ${label}; refusing to estimate against an empty baseline.`);
     }
-    const days = computeDaySpuriousEstimates(series, spec, baseline);
+    const days = computeDaySpuriousEstimates(series, spec, target, {
+      baselineDailyRate: baseline,
+      peerSupersededRate: peerRate,
+    });
     clampPlans.set(target, computeSnapshotClampPlan(series, spec, days));
 
-    console.log(`[loop-repair] ${label} baseline=${baseline.toFixed(2)}/day allowance=${days[0]?.organicAllowance ?? Math.ceil(baseline)}/day`);
+    console.log(
+      `[loop-repair] ${label} baseline=${baseline.toFixed(2)}/day superseded_start=${target.superseded_start ?? spec.incident_start}`,
+    );
     const assetKey = resolveAssetKey(target);
     for (const day of days) {
       const deltaId = loopRepairDeltaId(spec.incident, target, day.dateKey);
       const alreadyApplied = Boolean(attributionLedger.applied_delta_ids?.[deltaId]);
       const status = alreadyApplied ? "already-applied" : day.spurious > 0 ? "new" : "no-excess";
-      console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} spurious=${day.spurious} (${status})`);
+      console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} allowance=${day.organicAllowance} spurious=${day.spurious} (${status})`);
       if (alreadyApplied || day.spurious === 0) continue;
 
       const delta = createDownloadAttributionDelta(spec.source, deltaId, `${day.dateKey}T12:00:00.000Z`);
