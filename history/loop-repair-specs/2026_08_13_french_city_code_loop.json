@@ -1,0 +1,27 @@
+{
+  "incident": "french-city-code-loop-2026-08",
+  "source": "manual-correction/french-city-code-loop",
+  "note": "Railyard app bootstrap re-download loop: after lyon/marseille/paris-ile-de-france re-released under new city codes (LYS->LSY, MRS->MAR, PAR->PRS, registry PRs #7142/#7144/#7146, 2026-08-09) to avoid colliding with the base game's new vanilla French cities, installed clients whose pinned old version wrote disk under the old code were silently dropped at startup and re-downloaded the pinned version on every launch (monorepo PR #615 has the fix). Old-version counters inflated from 2026-08-07/08 onward. Baseline window ends 2026-08-06, before the first inflated Paris day; it starts 2026-07-24, after the 07-20/21 release-burst days. incident_end stays null until the app release containing PR #615 has saturated.",
+  "targets": [
+    {
+      "listing_type": "map",
+      "listing_id": "paris-ile-de-france",
+      "version": "v1.0.0",
+      "note": "dominant share of the loop traffic (largest install base)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "lyon",
+      "version": "v1.0.0"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "marseille",
+      "version": "v1.0.0"
+    }
+  ],
+  "incident_start": "2026-08-07",
+  "baseline_start": "2026-07-24",
+  "baseline_end": "2026-08-06",
+  "incident_end": null
+}

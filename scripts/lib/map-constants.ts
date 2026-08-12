@@ -1,3 +1,8 @@
+// Union of city codes the base game has shipped across versions. A code stays here
+// even if a later game version renames it: an older install still owns the old code.
+// When the game adds cities, add their codes here (source: the game's
+// cities/latest-cities.yml) — see KNOWN_INCIDENTS.md 2026-08 French-city entry for
+// what a missed addition costs.
 export const VANILLA_CITY_CODES = [
   "NYC",
   "DAL",
@@ -33,6 +38,19 @@ export const VANILLA_CITY_CODES = [
   "MAN",
   "LIV",
   "NCL",
+  // Codes observed in shipped latest-cities.yml files but missing above
+  // (game code spellings that diverged from this list's originals).
+  "SF",
+  "DC",
+  "LA",
+  "BIR",
+  "COL",
+  // French cities added by the 2026-08 base-game update. Their codes collided with
+  // pierreggt's modded Lyon/Marseille/Paris listings, which re-released under
+  // LSY/MAR/PRS (see KNOWN_INCIDENTS.md).
+  "LYS",
+  "MRS",
+  "PAR",
 ] as const;
 
 import {

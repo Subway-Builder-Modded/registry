@@ -90,6 +90,18 @@ test("publish validation rejects city codes that clash with vanilla maps", () =>
   assert.match(output, /\*\*city-code\*\*: `NYC` clashes with a vanilla city code\./);
 });
 
+test("publish validation rejects the 2026-08 French vanilla city codes", () => {
+  const issue = basePublishMapIssue({ "city-code": "LYS" });
+  const result = runScript("validate-publish", {
+    LISTING_TYPE: "map",
+    ISSUE_JSON: JSON.stringify(issue),
+  });
+
+  assert.notEqual(result.status, 0, "Validation should fail for a French vanilla city code");
+  const output = readValidationError();
+  assert.match(output, /\*\*city-code\*\*: `LYS` clashes with a vanilla city code\./);
+});
+
 test("publish validation enforces ISO country code format (2 uppercase letters)", () => {
   const issue = basePublishMapIssue({ country: "uS" });
   const result = runScript("validate-publish", {
