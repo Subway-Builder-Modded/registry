@@ -1,0 +1,65 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { mkdtempSync, mkdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import {
+  mergeVanillaCityCodes,
+  parseLatestCitiesCodes,
+} from "../downloads/sync-vanilla-city-codes.js";
+import { loadVanillaCityCodeSet, VANILLA_CITY_CODE_SET } from "../lib/map-constants.js";
+
+test("parseLatestCitiesCodes extracts codes without YAML boolean pitfalls", () => {
+  const yml = [
+    "cities:",
+    "  - id: new-york",
+    "    code: NYC",
+    "    fileName: NYC-v1.tar.gz",
+    "  - id: new-orleans",
+    "    code: NO", // YAML 1.1 would read this as boolean false; the regex must not.
+    "  - id: quoted",
+    "    code: \"KC\"",
+    "    barcode: XXX", // must not match: key is not `code`
+    "",
+  ].join("\n");
+  assert.deepEqual(parseLatestCitiesCodes(yml), ["KC", "NO", "NYC"]);
+});
+
+test("mergeVanillaCityCodes is a monotonic union", () => {
+  const previous = {
+    schema_version: 1,
+    synced_at: "2026-08-01T00:00:00.000Z",
+    source_url: "https://example.com",
+    codes: ["OLD", "NYC"],
+  };
+  const merged = mergeVanillaCityCodes(previous, ["NYC", "DUB"], "2026-08-13T00:00:00.000Z");
+  // OLD is retained even though the live list no longer carries it.
+  assert.deepEqual(merged.codes, ["DUB", "NYC", "OLD"]);
+  assert.equal(merged.synced_at, "2026-08-13T00:00:00.000Z");
+});
+
+test("loadVanillaCityCodeSet unions the hardcoded floor with the synced file", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "vanilla-codes-"));
+  mkdirSync(join(repoRoot, "maps"), { recursive: true });
+  writeFileSync(
+    join(repoRoot, "maps", "vanilla-city-codes.json"),
+    JSON.stringify({ schema_version: 1, codes: ["ZZZ"] }),
+    "utf-8",
+  );
+  const codes = loadVanillaCityCodeSet(repoRoot);
+  assert.ok(codes.has("ZZZ"), "synced code present");
+  assert.ok(codes.has("NYC"), "hardcoded floor present");
+  for (const code of VANILLA_CITY_CODE_SET) {
+    assert.ok(codes.has(code), `floor code ${code} present`);
+  }
+});
+
+test("loadVanillaCityCodeSet degrades to the floor when the synced file is absent or malformed", () => {
+  const missingRoot = mkdtempSync(join(tmpdir(), "vanilla-codes-missing-"));
+  assert.deepEqual([...loadVanillaCityCodeSet(missingRoot)].sort(), [...VANILLA_CITY_CODE_SET].sort());
+
+  const badRoot = mkdtempSync(join(tmpdir(), "vanilla-codes-bad-"));
+  mkdirSync(join(badRoot, "maps"), { recursive: true });
+  writeFileSync(join(badRoot, "maps", "vanilla-city-codes.json"), "not json", "utf-8");
+  assert.deepEqual([...loadVanillaCityCodeSet(badRoot)].sort(), [...VANILLA_CITY_CODE_SET].sort());
+});

@@ -1,8 +1,9 @@
-// Union of city codes the base game has shipped across versions. A code stays here
-// even if a later game version renames it: an older install still owns the old code.
-// When the game adds cities, add their codes here (source: the game's
-// cities/latest-cities.yml) — see KNOWN_INCIDENTS.md 2026-08 French-city entry for
-// what a missed addition costs.
+// Union of city codes the base game has shipped across versions, plus codes
+// reserved by incident history. A code stays here even if a later game version
+// renames it: an older install still owns the old code. The CURRENT game list is
+// synced automatically into maps/vanilla-city-codes.json (sync-vanilla-city-codes,
+// 4-hourly) and unioned with this floor via loadVanillaCityCodeSet — see
+// KNOWN_INCIDENTS.md 2026-08 French-city entry for what a stale list costs.
 export const VANILLA_CITY_CODES = [
   "NYC",
   "DAL",
@@ -45,14 +46,28 @@ export const VANILLA_CITY_CODES = [
   "LA",
   "BIR",
   "COL",
-  // French cities added by the 2026-08 base-game update. Their codes collided with
-  // pierreggt's modded Lyon/Marseille/Paris listings, which re-released under
-  // LSY/MAR/PRS (see KNOWN_INCIDENTS.md).
+  "NEW",
+  // Cities added by the 2026-08 base-game update, per the live
+  // ctiles.subwaybuilder.com/cities/latest-cities.yml. The French codes collided
+  // with pierreggt's modded listings (PAR directly; and marseille's rename landed
+  // ON the vanilla MAR — see KNOWN_INCIDENTS.md).
+  "PAR",
+  "LYO",
+  "MAR",
+  "NO",
+  "RAL",
+  "SAC",
+  "KC",
+  "NAS",
+  "DUB",
+  // Reserved (never vanilla): pierreggt's pre-rename French codes; stale installs
+  // on user disks still hold them during the migration.
   "LYS",
   "MRS",
-  "PAR",
 ] as const;
 
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
   LocationTagSchema,
   SourceQualitySchema,
@@ -75,6 +90,31 @@ export const DEFAULT_LEVEL_OF_DETAIL = "low-detail" as const;
 export const MAX_OSM_SOURCE_QUALITY = "medium-quality" as const;
 
 export const VANILLA_CITY_CODE_SET = new Set<string>(VANILLA_CITY_CODES);
+
+// loadVanillaCityCodeSet unions the hardcoded historical floor above with the
+// auto-synced current game list (maps/vanilla-city-codes.json, written by
+// sync-vanilla-city-codes in the 4-hourly analytics workflow). Validators should
+// prefer this over VANILLA_CITY_CODE_SET so newly shipped vanilla cities reject
+// colliding listings without a manual constants update. A missing or malformed
+// synced file degrades to the hardcoded floor.
+export function loadVanillaCityCodeSet(repoRoot: string): Set<string> {
+  const codes = new Set<string>(VANILLA_CITY_CODES);
+  try {
+    const raw = JSON.parse(
+      readFileSync(resolve(repoRoot, "maps", "vanilla-city-codes.json"), "utf-8"),
+    ) as { codes?: unknown };
+    if (Array.isArray(raw.codes)) {
+      for (const code of raw.codes) {
+        if (typeof code === "string" && code.trim() !== "") {
+          codes.add(code.trim());
+        }
+      }
+    }
+  } catch {
+    // Synced file absent or unreadable — the hardcoded floor still applies.
+  }
+  return codes;
+}
 export const LOCATION_TAG_SET = new Set<string>(LOCATION_TAGS);
 export const SPECIAL_DEMAND_TAG_SET = new Set<string>(SPECIAL_DEMAND_TAGS);
 export const SOURCE_QUALITY_SET = new Set<string>(SOURCE_QUALITY_VALUES);

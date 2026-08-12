@@ -68,11 +68,27 @@ attribution-ledger rebuild, re-apply this spec like the manual-attribution specs
 (ops/README.md).
 
 **Prevention (registry side):** `VANILLA_CITY_CODES` in
-`scripts/lib/map-constants.ts` was missing the new French vanilla codes (and several
-older game code spellings: `SF`, `DC`, `LA`, `BIR`, `COL`); all added in the same
-change so intake validation now rejects new listings claiming them. The list should
-be synced against the game's `cities/latest-cities.yml` whenever a game update adds
-cities.
+`scripts/lib/map-constants.ts` was missing the entire 2026-08 game update (per the
+live `ctiles.subwaybuilder.com/cities/latest-cities.yml`: `PAR`/`LYO`/`MAR` for the
+French cities — NOT the `LYS`/`MRS` this incident was first written up against —
+plus `NO`, `RAL`, `SAC`, `KC`, `NAS`, `DUB`, `NEW`) and several older game code
+spellings (`SF`, `DC`, `LA`, `BIR`, `COL`). All added, and the list is now synced
+**automatically**: `sync-vanilla-city-codes` (4-hourly analytics workflow) fetches
+the live game list into `maps/vanilla-city-codes.json` (monotonic union — codes are
+never dropped), and intake validation unions that file with the hardcoded floor via
+`loadVanillaCityCodeSet`.
+
+**Two existing listings collide with the live vanilla list** (flagged by every sync
+run, need author-side renames):
+
+- **`marseille` → `MAR`** — the 2026-08-09 re-release renamed `MRS` directly onto
+  the vanilla Marseille code. On updated games the app's vanilla-conflict check
+  makes v1.0.2 **uninstallable** (download succeeds, extract is refused), so
+  marseille's re-download churn will NOT fully stop when the app fix (monorepo
+  PR #615) ships — the listing needs a second rename. Keep its `adoption_targets`
+  entry open until that lands.
+- **`dublin` → `DUB`** — collided silently when the game update shipped vanilla
+  Dublin; same uninstallable-on-updated-games consequence.
 
 ---
 

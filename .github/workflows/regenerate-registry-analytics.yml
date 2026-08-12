@@ -498,6 +498,10 @@ jobs:
         id: merge_attribution
         run: pnpm --dir scripts run merge-download-attribution
 
+      - name: Sync vanilla city codes from the live game list
+        id: sync_vanilla_codes
+        run: pnpm --dir scripts run sync-vanilla-city-codes
+
       - name: Mint bot token
         id: bot-token
         uses: ./.github/actions/mint-bot-token
@@ -679,6 +683,7 @@ jobs:
             mods/*/manifest.json
             maps/basemap-completeness.json
             maps/demand-stats-cache.json
+            maps/vanilla-city-codes.json
             history/registry-download-attribution.json
             history/content-announcements.json
 

@@ -13,7 +13,7 @@ import {
   LEVEL_OF_DETAIL_VALUES,
   SOURCE_QUALITY_VALUES,
   SPECIAL_DEMAND_TAG_SET,
-  VANILLA_CITY_CODE_SET,
+  loadVanillaCityCodeSet,
   isOsmDataSource,
 } from "../lib/map-constants.js";
 import {
@@ -167,7 +167,7 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
     );
   }
 
-  if (VANILLA_CITY_CODE_SET.has(parsed.data["city-code"])) {
+  if (loadVanillaCityCodeSet(REPO_ROOT).has(parsed.data["city-code"])) {
     errors.push(`**city-code**: \`${parsed.data["city-code"]}\` clashes with a vanilla city code.`);
   }
   errors.push(...checkCityCodeUniqueness({ repoRoot: REPO_ROOT, cityCode: parsed.data["city-code"], currentMapId: null }));
