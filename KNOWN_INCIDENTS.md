@@ -6,6 +6,92 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 ---
 
+## 2026-08-07 → ongoing — French-map re-download loop after city-code re-releases (correction applied, incident open)
+
+**What happened:** the base game's 2026-08 update shipped vanilla Lyon/Marseille/Paris
+whose city codes collided with pierreggt's modded listings, so all three re-released
+under new codes (`LYS`→`LSY`, `MRS`→`MAR`, `PAR`→`PRS`; registry metadata
+PRs #7142/#7144/#7146, merged 2026-08-09). The Railyard app resolves an installed map's
+expected disk location from the *manifest's* (latest) city code, but a pinned old
+version's files live under the *old* code — so on every launch the app silently
+dropped the map from installed state and subscription sync re-downloaded the pinned
+old version, in a loop (fixed by monorepo PR #615). Old-version counters inflated
+from 2026-08-07/08: `paris-ile-de-france` v1.0.0 jumped from a ~29/day baseline to
+63/146/119/113/87/75 per day (Aug 7–12); lyon/marseille v1.0.0 saw only marginal
+excess (small install bases).
+
+**Correction:** spec-driven, re-runnable repair via
+`scripts/ops/repair-loop-inflated-downloads.ts` with spec
+`history/loop-repair-specs/2026_08_13_french_city_code_loop.json`. The organic
+allowance is two-phase, keyed on each target's `superseded_start` (the first
+snapshot day its successor version was available, 2026-08-08 for all three):
+before it (old version still the latest) the pre-incident baseline rate applies
+(2026-07-24 → 2026-08-06 raw day-deltas); from it on, only the **superseded-peer
+rate** — pooled post-supersession old-version traffic of the four yukina JP maps
+whose old versions were superseded the same week (0.69/day pooled; every
+comparable, including 800-1500-install maps like amsterdam/berlin-val, drops to
+~0-2/day once a successor exists, so pre-incident demand must NOT be carried into
+the superseded window). All allowance means are rounded UP so estimation errs
+toward attributing less. Excess is attributed as one manual-attribution delta per
+(listing, version, day) with stable delta ids
+(`manual-loop-repair:french-city-code-loop-2026-08:<id>@<version>:<date>`), so
+re-runs are idempotent and only newly observed days apply. The same run clamps the
+affected snapshot trajectories to the organic estimate (min-guarded, mirroring the
+charleston clamp — prevents `history-max:` reseeding), lowers the version-bucket
+ceilings, and lowers `downloads.json` (self-heals upward on the next hourly
+reconcile for downloads that arrived after the last snapshot).
+
+**NEW-version traffic is also affected for lyon/marseille:** early updaters whose
+clients still held a pre-merge manifest (old city code) looped on the *new* asset,
+and client manifest-cache staleness smeared this past the 2026-08-09 merge —
+lyon v1.0.2 pulled 0.74× its install base in 5 days and marseille v1.0.2 1.28×
+(more copies than installs), against a 0.10–0.35× organic envelope measured across
+peer updates. These are corrected via `adoption_targets` in the same spec: the
+allowance is the **peer-adoption curve** — for each day since release, the most
+generous per-day adoption fraction of install base observed across the same-week
+yukina updates (`adoption_peers`), scaled to the target's cumulative pre-release
+base and rounded UP. paris v1.0.5 sits inside the peer envelope (0.31×, curve
+matching yukina-sendai) and is deliberately NOT targeted.
+
+**Applied 2026-08-13** (peer-based estimates, superseding an initial 427-fetch
+baseline-only estimate that was reverted before publication): **820 fetches**
+attributed for days 2026-08-07 → 2026-08-12 — old versions 595
+(paris-ile-de-france v1.0.0: 568 → display 1434 → 866; lyon v1.0.0: 14;
+marseille v1.0.0: 13) and new versions 225 (lyon v1.0.2: 83 → display 127 → 44;
+marseille v1.0.2: 142 → display 177 → 35), 6 snapshots clamped.
+
+**While the incident is open:** re-run the repair (preview first, then `--apply`)
+every day or two to attribute new loop days — the app-side fix (PR #615) has to
+ship and saturate before the loop traffic stops. Then set `incident_end` in the
+spec, run one final `--apply`, and move this entry to closed. After any
+attribution-ledger rebuild, re-apply this spec like the manual-attribution specs
+(ops/README.md).
+
+**Prevention (registry side):** `VANILLA_CITY_CODES` in
+`scripts/lib/map-constants.ts` was missing the entire 2026-08 game update (per the
+live `ctiles.subwaybuilder.com/cities/latest-cities.yml`: `PAR`/`LYO`/`MAR` for the
+French cities — NOT the `LYS`/`MRS` this incident was first written up against —
+plus `NO`, `RAL`, `SAC`, `KC`, `NAS`, `DUB`, `NEW`) and several older game code
+spellings (`SF`, `DC`, `LA`, `BIR`, `COL`). All added, and the list is now synced
+**automatically**: `sync-vanilla-city-codes` (4-hourly analytics workflow) fetches
+the live game list into `maps/vanilla-city-codes.json` (monotonic union — codes are
+never dropped), and intake validation unions that file with the hardcoded floor via
+`loadVanillaCityCodeSet`.
+
+**Two existing listings collide with the live vanilla list** (flagged by every sync
+run, need author-side renames):
+
+- **`marseille` → `MAR`** — the 2026-08-09 re-release renamed `MRS` directly onto
+  the vanilla Marseille code. On updated games the app's vanilla-conflict check
+  makes v1.0.2 **uninstallable** (download succeeds, extract is refused), so
+  marseille's re-download churn will NOT fully stop when the app fix (monorepo
+  PR #615) ships — the listing needs a second rename. Keep its `adoption_targets`
+  entry open until that lands.
+- **`dublin` → `DUB`** — collided silently when the game update shipped vanilla
+  Dublin; same uninstallable-on-updated-games consequence.
+
+---
+
 ## 2026-08-04 → 2026-08-05 — Private-repo wipe of three mod listings (fully recovered, listings deprecated)
 
 **What happened:** two authors made their source repos private, and the

@@ -14,6 +14,12 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   Applied specs are committed under `history/manual-attribution-specs/`;
   application is idempotent (`applied_delta_ids`), so **after any
   attribution-ledger rebuild, re-apply every committed spec**.
+- `repair-loop-inflated-downloads.ts` — spec-driven, re-runnable repair for client
+  re-download loops (excess over a baseline/superseded-peer/peer-adoption organic
+  allowance → per-day attribution deltas + snapshot clamp + bucket-ceiling
+  lowering). Specs live under
+  `history/loop-repair-specs/`; like manual-attribution specs, **re-apply after any
+  attribution-ledger rebuild**. See KNOWN_INCIDENTS.md 2026-08 French-city entry.
 - `backfill-charleston-snapshot-clamp.ts` — one-shot snapshot re-interpolation
   for the charleston-huntington-wv faulty-client inflation (KNOWN_INCIDENTS.md,
   2026-07 entry). Retained because **any snapshot rebuild from git

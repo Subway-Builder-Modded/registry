@@ -11,7 +11,7 @@ import {
 } from "../lib/manifests.js";
 import { resolveCollaboratorUpdate } from "../lib/collaborators.js";
 import { getActiveCaretaker, resolveCaretakerUpdate } from "../lib/caretakers.js";
-import { VANILLA_CITY_CODE_SET } from "../lib/map-constants.js";
+import { loadVanillaCityCodeSet } from "../lib/map-constants.js";
 import { isPresentIssueValue } from "../lib/map-field-utils.js";
 import { validateMapUpdateFields } from "../lib/map-update-logic.js";
 import { checkCityCodeUniqueness } from "../lib/registry-uniqueness.js";
@@ -132,7 +132,7 @@ async function main() {
         validateMapUpdateFields(manifest as MapManifest, data, errors);
         if (isPresentIssueValue(data["city-code"])) {
           const cityCode = data["city-code"] as string;
-          if (VANILLA_CITY_CODE_SET.has(cityCode)) {
+          if (loadVanillaCityCodeSet(REPO_ROOT).has(cityCode)) {
             errors.push(`**city-code**: \`${cityCode}\` clashes with a vanilla city code.`);
           }
           errors.push(...checkCityCodeUniqueness({ repoRoot: REPO_ROOT, cityCode, currentMapId: id }));
