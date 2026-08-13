@@ -29,6 +29,12 @@ export const IntegrityVersionEntrySchema = z.object({
     // Optional: only present once the version has been (re)checked or backfilled
     // since this field was introduced.
     released_at: z.string().optional(),
+    // Present only when the version is no longer downloadable by design:
+    // "retired" = the author's update.json still lists the version but marks it
+    // retired (download stripped); "removed" = the version stopped being
+    // enumerated upstream entirely and this entry is carried forward frozen from
+    // the previous committed integrity output. Absent on live versions.
+    availability: z.enum(["retired", "removed"]).optional(),
 });
 export const ListingIntegrityEntrySchema = z.object({
     has_complete_version: z.boolean(),

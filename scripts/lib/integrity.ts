@@ -35,6 +35,12 @@ export interface IntegrityVersionEntry {
   // Immutable publish date (github release publishedAt, else custom update.json
   // date). Rules-bump-proof; backfilled onto reused cache entries at no cost.
   released_at?: string;
+  // Present only when the version is no longer downloadable by design:
+  // "retired" = the author's update.json still lists the version but marks it
+  // retired (download stripped); "removed" = the version stopped being
+  // enumerated upstream entirely and this entry is carried forward frozen from
+  // the previous committed integrity output. Absent on live versions.
+  availability?: "retired" | "removed";
 }
 
 // GAME_DEPENDENCY_KEY is the manifest dependency key declaring the required

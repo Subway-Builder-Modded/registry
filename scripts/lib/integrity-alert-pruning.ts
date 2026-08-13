@@ -54,7 +54,7 @@ export function resolveAlertAgainstIntegrity(
     return { resolved: true, reason: "listing_removed" };
   }
   const version = listing.versions[ref.version];
-  if (!version) {
+  if (!version || version.availability === "removed") {
     return { resolved: true, reason: "version_removed" };
   }
   if (version.is_complete) {

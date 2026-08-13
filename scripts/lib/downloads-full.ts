@@ -12,6 +12,7 @@ import type {
   ManifestGameDependency,
 } from "./integrity.js";
 import { GAME_VERSION_REQUIRED_SINCE_EPOCH, parseManifestGameDependency } from "./integrity.js";
+import { carryForwardRemovedVersions } from "./integrity-tombstones.js";
 import type { LoadedSecurityRules } from "./mod-security.js";
 import {
   type CustomVersionCandidate,
@@ -1184,9 +1185,15 @@ async function evaluateCustomListing(
           )
           : undefined
       );
-      const result = withBuildingsIndexPresenceIfMissing(
+      const reused = withBuildingsIndexPresenceIfMissing(
         withReleaseSizeIfMissing(cached.result, sizeFromMetadata),
       );
+      // Cache results can predate the availability field (or a flag flip);
+      // stamp retirement onto reused incomplete entries so it never waits out
+      // the non-sha recheck window.
+      const result = candidate.retired && !reused.is_complete && reused.availability !== "retired"
+        ? { ...reused, availability: "retired" as const }
+        : reused;
       state.versionEntries[versionKey] = result;
       state.nextListingCacheEntries[versionKey] = {
         ...cached,
@@ -1199,6 +1206,16 @@ async function evaluateCustomListing(
         ctx.nowIso,
         candidate.errors,
       );
+      // Author-declared retirement is only meaningful once the artifacts are
+      // actually withdrawn; a retired-flagged entry that still evaluates
+      // complete stays a normal live version. Retired entries keep the
+      // update.json-declared compatibility metadata since there is no release
+      // manifest left to parse it from.
+      if (candidate.retired) {
+        result.availability = "retired";
+        if (candidate.gameMeta?.game_version) result.game_version = candidate.gameMeta.game_version;
+        if (candidate.gameMeta?.dependencies) result.dependencies = candidate.gameMeta.dependencies;
+      }
       state.versionEntries[versionKey] = result;
       state.nextListingCacheEntries[versionKey] = {
         fingerprint,
@@ -1283,6 +1300,14 @@ function finalizeListingEntries(
     if (cacheEntry) nextListingCacheEntries[version] = { ...cacheEntry, result: stamped };
   }
 
+  // Carry forward frozen tombstones for previously complete/retired versions the
+  // fresh enumeration no longer produced (release deleted or update entry
+  // pruned). Deliberately after released_at stamping and outside the cache:
+  // tombstones are re-derived from the previous committed output each run.
+  for (const version of carryForwardRemovedVersions(ctx.previousIntegrity?.listings[id], versionEntries)) {
+    warnListing(ctx.warnings, id, "carried forward removed version (no longer enumerated upstream)", version);
+  }
+
   for (const [version, entry] of Object.entries(versionEntries)) {
     if (!entry.is_complete && Object.values(entry.required_checks).some((v) => v === false)) {
       const prevEntry = ctx.previousIntegrity?.listings[id]?.versions?.[version];
@@ -1310,6 +1335,8 @@ function finalizeListingEntries(
   }
 
   for (const result of Object.values(versionEntries)) {
+    // Removed tombstones were not checked this run; keep them out of the tallies.
+    if (result.availability === "removed") continue;
     if (result.is_complete) {
       ctx.stats.completeVersions += 1;
     } else {
