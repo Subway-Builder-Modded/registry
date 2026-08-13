@@ -20,6 +20,11 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   lowering). Specs live under
   `history/loop-repair-specs/`; like manual-attribution specs, **re-apply after any
   attribution-ledger rebuild**. See KNOWN_INCIDENTS.md 2026-08 French-city entry.
+  If a repair target has an entry in `maps|mods/grandfathered-downloads.json`,
+  **lower that entry too**: the deprecate/delete freeze takes the max of
+  ledger, committed, and existing grandfathered values, so a stale high
+  grandfathered count silently resurrects the inflated total if the listing is
+  later deprecated or deleted (or otherwise leaves pipeline output).
 - `backfill-charleston-snapshot-clamp.ts` — one-shot snapshot re-interpolation
   for the charleston-huntington-wv faulty-client inflation (KNOWN_INCIDENTS.md,
   2026-07 entry). Retained because **any snapshot rebuild from git
