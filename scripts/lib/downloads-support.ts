@@ -32,6 +32,9 @@ export interface CustomVersionCandidate {
   // Author-declared release date ("YYYY-MM-DD") from the custom update JSON, used
   // to derive last_updated. Null when absent or malformed.
   date: string | null;
+  // Author-declared retirement (update.json `retired: true`): the version is
+  // listed for identity/changelog purposes but its artifacts were withdrawn.
+  retired: boolean;
   gameMeta?: ManifestGameDependency;
   errors: string[];
 }
@@ -546,6 +549,7 @@ export async function fetchCustomVersions(
       manifestUrl,
       parsedManifest,
       date,
+      retired: (entry as { retired?: unknown }).retired === true,
       gameMeta: gameVersion || dependencies
         ? { game_version: gameVersion, dependencies }
         : undefined,
@@ -602,7 +606,12 @@ export function createListingIntegrityEntry(
   versionEntries: Record<string, IntegrityVersionEntry>,
   lastUpdated?: number,
 ): ListingIntegrityEntry {
-  const semverVersions = Object.keys(versionEntries).filter((version) => isSupportedReleaseTag(version));
+  // Carried-forward "removed" tombstones keep their identity in `versions` but
+  // are excluded from the listing aggregates: a rolled-back (deleted) latest
+  // release must not stay pinned as latest_semver_version.
+  const semverVersions = Object.keys(versionEntries).filter(
+    (version) => isSupportedReleaseTag(version) && versionEntries[version]?.availability !== "removed",
+  );
   const completeVersions = semverVersions
     .filter((version) => versionEntries[version]?.is_complete === true)
     .sort(compareSemverDescending);
