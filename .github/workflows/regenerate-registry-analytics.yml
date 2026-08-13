@@ -305,10 +305,21 @@ jobs:
           OSM_OVERPASS_URL: https://overpass-api.de/api/interpreter
         run: pnpm run generate-map-basemaps:backfill -- --continue-on-error
 
+      # Re-mint right before the push: app installation tokens live 1 hour, and the
+      # demand-stats + basemap steps can run past that (a 49-map re-extraction took
+      # ~87 minutes on 2026-08-13 and the publish failed with an expired token).
+      - name: Re-mint bot token for publish
+        id: bot-token-publish
+        if: ${{ always() }}
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
       - name: Publish grid + basemap to map-data
         if: ${{ always() }}
         env:
-          GITHUB_TOKEN: ${{ steps.bot-token.outputs.token || secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.bot-token-publish.outputs.token || secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           shopt -s nullglob
