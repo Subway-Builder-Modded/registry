@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-13T00:01:40.326Z",
+  "generated_at": "2026-08-13T01:18:12.080Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -24661,12 +24661,13 @@
       }
     },
     "yukina-akita": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -24686,15 +24687,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 5772 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -24717,6 +24716,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 288.09,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 17.33,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 5.93,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.84,
+            ".railyard_map/special_demand_points.json": 0.16,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "AXT.pmtiles": 118.52,
+            "buildings_index.bin.gz": 62.58,
+            "buildings_index.json": 174.92,
+            "config.json": 0.01,
+            "demand_data.json": 5.54,
+            "driving_paths.json.gz": 16.01,
+            "ocean_depth_index.json": 97.14,
+            "roads.geojson": 34.13,
+            "runways_taxiways.geojson": 0.15
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -24725,19 +24741,20 @@
             "asset_name": "AXT.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/AXT.zip"
           },
-          "fingerprint": "rules:v6:sha256:80dba30563fad810f77839ae5f8c3c8336a47ab4fb124a2b0df3d83b12d6046f",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:67af1828f3720dba2ade072f566a91f679697149181ed89af1a1675f9cc8dc7a",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-asahikawa": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.2"
+      ],
       "incomplete_versions": [
-        "0.2.2",
         "0.2.1",
         "0.2.0",
         "0.1.1",
@@ -24802,15 +24819,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 3278 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -24833,6 +24848,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 129.75,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 11.1,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 0.66,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.65,
+            ".railyard_map/special_demand_points.json": 0.11,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "AKJ.pmtiles": 46.84,
+            "buildings_index.bin.gz": 27.01,
+            "buildings_index.json": 75.93,
+            "config.json": 0.01,
+            "demand_data.json": 2.58,
+            "driving_paths.json.gz": 3.23,
+            "ocean_depth_index.json": 73.58,
+            "roads.geojson": 11.08,
+            "runways_taxiways.geojson": 0.13
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -24841,8 +24873,8 @@
             "asset_name": "AKJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/AKJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:6a8bdd08e55fdad0a9148858ad76aad7f0a8a3b07d8bc928ef89300ca33a68a8",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:55dbb670b13f94c8800b8c5f46d9288869e326a6717e1403066ce7a58967b00e",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
@@ -29281,12 +29313,13 @@
       }
     },
     "yukina-fuji-numazu": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -29306,15 +29339,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 818 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -29337,6 +29368,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 192.31,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 12.39,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.34,
+            ".railyard_map/regions/shichouson.geojson.gz": 2.82,
+            ".railyard_map/special_demand_points.json": 0.13,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "FJN.pmtiles": 73.37,
+            "buildings_index.bin.gz": 47.59,
+            "buildings_index.json": 134.03,
+            "config.json": 0.01,
+            "demand_data.json": 3.63,
+            "driving_paths.json.gz": 11.75,
+            "ocean_depth_index.json": 43.27,
+            "roads.geojson": 23.38,
+            "runways_taxiways.geojson": 0.02
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -29345,19 +29393,20 @@
             "asset_name": "FJN.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/FJN.zip"
           },
-          "fingerprint": "rules:v6:sha256:a2f915087a5b93ef272e53ee853e308e54a224ce30a38757212147b56146f7f5",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:41994684d12971ea0029f3e6680a964144c9f83820b88a8610d425580578b3d5",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-fukui": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -29377,15 +29426,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 7185 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -29408,6 +29455,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 109.72,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 6.57,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.52,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.75,
+            ".railyard_map/special_demand_points.json": 0.1,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "FKJ.pmtiles": 43.7,
+            "buildings_index.bin.gz": 26.72,
+            "buildings_index.json": 76.29,
+            "config.json": 0.01,
+            "demand_data.json": 3.13,
+            "driving_paths.json.gz": 5.13,
+            "ocean_depth_index.json": 24.78,
+            "roads.geojson": 15.01,
+            "runways_taxiways.geojson": 0.02
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -29416,19 +29480,20 @@
             "asset_name": "FKJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/FKJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:32779123756c5da7a7587e1caaa3f2f7cd1b3e6c86db74d4494ba27a0a5360ba",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:7ba6891539ff1e8a7f6a1f045ed2d14ae80af3362cc17a532f16d22a89b6a745",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-fukuoka": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.6.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.6.2"
+      ],
       "incomplete_versions": [
-        "0.6.2",
         "0.6.1",
         "0.6.0",
         "0.5.1",
@@ -29538,15 +29603,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.6.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 58 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -29569,6 +29632,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 173.75,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 16.22,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.15,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.4,
+            ".railyard_map/special_demand_points.json": 0.27,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "FUK.pmtiles": 59.5,
+            "buildings_index.bin.gz": 47.14,
+            "buildings_index.json": 133.53,
+            "config.json": 0.01,
+            "demand_data.json": 4.96,
+            "driving_paths.json.gz": 6.39,
+            "ocean_depth_index.json": 40.43,
+            "roads.geojson": 23.94,
+            "runways_taxiways.geojson": 0.64
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -29577,19 +29657,20 @@
             "asset_name": "FUK.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/FUK.zip"
           },
-          "fingerprint": "rules:v6:sha256:d322652b0e636c000c5d009c0a8ac78101c21c3b4ad8a0f1f27d3b5d85dbb6cc",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:0cb9d83c82481d5a46cb24de797dbd47a4b17a6ff771f14d0fbd79e1008a723d",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-fukuyama": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -29609,15 +29690,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1631 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -29640,6 +29719,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 147.55,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 16.88,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.51,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.1,
+            ".railyard_map/special_demand_points.json": 0.12,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "QFY.pmtiles": 48,
+            "buildings_index.bin.gz": 36.34,
+            "buildings_index.json": 102,
+            "config.json": 0.01,
+            "demand_data.json": 2.8,
+            "driving_paths.json.gz": 9.88,
+            "ocean_depth_index.json": 33.06,
+            "roads.geojson": 20.79,
+            "runways_taxiways.geojson": 0.1
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -29648,19 +29744,20 @@
             "asset_name": "QFY.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/QFY.zip"
           },
-          "fingerprint": "rules:v6:sha256:fcbe830852d61d849fb5de97d34f9e716eeb0a3520a91f35e8052ddc19f0c1c3",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:2031855d57d727efb0d0693d9f3f263c810105e04acced44504a69aab329efe5",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-hachinohe": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -29680,15 +29777,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 3385 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -29711,6 +29806,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 155.46,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 16.82,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.91,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.6,
+            ".railyard_map/special_demand_points.json": 0.1,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "HHE.pmtiles": 58.31,
+            "buildings_index.bin.gz": 34.1,
+            "buildings_index.json": 95.02,
+            "config.json": 0.01,
+            "demand_data.json": 3.29,
+            "driving_paths.json.gz": 8.51,
+            "ocean_depth_index.json": 46.09,
+            "roads.geojson": 16.65,
+            "runways_taxiways.geojson": 0.5
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -29719,19 +29831,20 @@
             "asset_name": "HHE.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/HHE.zip"
           },
-          "fingerprint": "rules:v6:sha256:3ccec0f03633cbf6a8a5242f2665791f93f5d6a072875c2cdfcff5cdb794cf24",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:2ffdd4610fe4b8229c3d3bb7e3abbaa7a1a97342b4beb82d37d1a83b2e828281",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-hakodate": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.5.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.5.3"
+      ],
       "incomplete_versions": [
-        "0.5.3",
         "0.5.2",
         "0.5.1",
         "0.5.0",
@@ -29826,15 +29939,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.5.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 977 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -29857,6 +29968,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 97.5,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 4.63,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 1.87,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.92,
+            ".railyard_map/special_demand_points.json": 0.08,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "HKD.pmtiles": 42.31,
+            "buildings_index.bin.gz": 18.63,
+            "buildings_index.json": 52.29,
+            "config.json": 0.01,
+            "demand_data.json": 1.71,
+            "driving_paths.json.gz": 3.75,
+            "ocean_depth_index.json": 67.84,
+            "roads.geojson": 6.57,
+            "runways_taxiways.geojson": 0.16
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -29865,19 +29993,20 @@
             "asset_name": "HKD.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/HKD.zip"
           },
-          "fingerprint": "rules:v6:sha256:1d9832a18367e2e6d2d7adcadd24237638d14e5e6ec3ec3f21f0a47ee7e63087",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:9fba0e185b0efa8bb4845f4551565fa2cc02c35c8c6540200890fc853c27457e",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-hiroshima-kure": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.6.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.6.3"
+      ],
       "incomplete_versions": [
-        "0.6.3",
         "0.6.2",
         "0.6.1",
         "0.6.0",
@@ -29987,15 +30116,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.6.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1081 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30018,6 +30145,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 186.97,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 15.8,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 6.96,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.32,
+            ".railyard_map/special_demand_points.json": 0.25,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "HIJ.pmtiles": 64.62,
+            "buildings_index.bin.gz": 47.18,
+            "buildings_index.json": 132.87,
+            "config.json": 0.01,
+            "demand_data.json": 4.37,
+            "driving_paths.json.gz": 10.99,
+            "ocean_depth_index.json": 36.58,
+            "roads.geojson": 29.69,
+            "runways_taxiways.geojson": 0.12
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30026,19 +30170,20 @@
             "asset_name": "HIJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/HIJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:ddaf4f2d08b5de545b898898578ea8e7ae0386a82125d816d5d54313e11699ad",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:05328913228c292e93ae8dd0cdebab826d76430def0041814302a31e6fbd0479",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-kagoshima-kirishima": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.5.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.5.2"
+      ],
       "incomplete_versions": [
-        "0.5.2",
         "0.5.1",
         "0.5.0",
         "0.4.0",
@@ -30118,15 +30263,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.5.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 211 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30149,6 +30292,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 177.63,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 15.63,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 2.09,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.98,
+            ".railyard_map/special_demand_points.json": 0.22,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KOJ.pmtiles": 60.82,
+            "buildings_index.bin.gz": 37.89,
+            "buildings_index.json": 106.33,
+            "config.json": 0.01,
+            "demand_data.json": 3.91,
+            "driving_paths.json.gz": 16.75,
+            "ocean_depth_index.json": 74.41,
+            "roads.geojson": 36.57,
+            "runways_taxiways.geojson": 0.52
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30157,19 +30317,20 @@
             "asset_name": "KOJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KOJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:c0541975ae267adf326ed9c9e93f04d06627192a7a56c6fd2f5459812b6b125f",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:e724e3d5fea2d9bdc4106da5db09c8b08695c47ada90bd46e658443cb8c5fcab",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-kanazawa": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -30189,15 +30350,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1429 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30220,6 +30379,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 164.85,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 8,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.62,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.84,
+            ".railyard_map/special_demand_points.json": 0.13,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KMQ.pmtiles": 66.22,
+            "buildings_index.bin.gz": 43.53,
+            "buildings_index.json": 124.97,
+            "config.json": 0.01,
+            "demand_data.json": 3.49,
+            "driving_paths.json.gz": 6.6,
+            "ocean_depth_index.json": 37.45,
+            "roads.geojson": 20.68,
+            "runways_taxiways.geojson": 0.05
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30228,19 +30404,20 @@
             "asset_name": "KMQ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KMQ.zip"
           },
-          "fingerprint": "rules:v6:sha256:8ab9278b7d88e7c3d52244fa5cbfc268c44eacee06450117438d624dc53d18e7",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:914c7f8d4fedd20e92d73124a6ae26c224e752d7a5635c2bd66f9c8cd3eede69",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-keihanshin": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.3"
+      ],
       "incomplete_versions": [
-        "0.1.3",
         "0.1.2",
         "0.1.1",
         "0.1.0"
@@ -30290,15 +30467,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.1.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 3841 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30321,6 +30496,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 545.32,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 49.4,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 15.89,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.91,
+            ".railyard_map/special_demand_points.json": 1.58,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KHS.pmtiles": 214.7,
+            "buildings_index.bin.gz": 203.03,
+            "config.json": 0.02,
+            "demand_data.json": 23.98,
+            "driving_paths.json.gz": 26.53,
+            "ocean_depth_index.json": 59.99,
+            "roads.geojson": 110.85,
+            "runways_taxiways.geojson": 2.12
+          },
           "game_version": ">1.3.0",
           "source": {
             "update_type": "custom",
@@ -30329,19 +30520,20 @@
             "asset_name": "KHS.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KHS.zip"
           },
-          "fingerprint": "rules:v6:sha256:0b19acb060db9cc5730112734a32d28871b08f912d00eda859761b8a9412089f",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:14760f0a97964aff8f22a3dc84b7807f4125f2f55ea64c521b9e5d40fccdf22e",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-kitakyushu-shimonoseki": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.6.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.6.2"
+      ],
       "incomplete_versions": [
-        "0.6.2",
         "0.6.1",
         "0.6.0",
         "0.5.1",
@@ -30451,15 +30643,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.6.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 310 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30482,6 +30672,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 154.13,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 10.86,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 5.02,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.03,
+            ".railyard_map/special_demand_points.json": 0.27,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KKJ.pmtiles": 51.76,
+            "buildings_index.bin.gz": 36.69,
+            "buildings_index.json": 102.52,
+            "config.json": 0.01,
+            "demand_data.json": 5.19,
+            "driving_paths.json.gz": 13.73,
+            "ocean_depth_index.json": 40.91,
+            "roads.geojson": 30.92,
+            "runways_taxiways.geojson": 0.4
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30490,19 +30697,20 @@
             "asset_name": "KKJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KKJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:bada76e4d4568a945afdf439d6989a5c35b8fadbfc4656680d7a21277540db8f",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:27b1099e094cb6a6fe150e3818f3fa6fb533555f28377935f0c261d4c7d6e718",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-kobe-akashi": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.5.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.5.3"
+      ],
       "incomplete_versions": [
-        "0.5.3",
         "0.5.2",
         "0.5.1",
         "0.5.0",
@@ -30597,15 +30805,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.5.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 434 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30628,6 +30834,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 327.77,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 23.52,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 9.11,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.43,
+            ".railyard_map/special_demand_points.json": 0.45,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "UKB.pmtiles": 115.52,
+            "buildings_index.bin.gz": 89.09,
+            "buildings_index.json": 252.73,
+            "config.json": 0.01,
+            "demand_data.json": 8.41,
+            "driving_paths.json.gz": 20.23,
+            "ocean_depth_index.json": 44.79,
+            "roads.geojson": 48.67,
+            "runways_taxiways.geojson": 0.17
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30636,19 +30859,20 @@
             "asset_name": "UKB.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/UKB.zip"
           },
-          "fingerprint": "rules:v6:sha256:932b0455ecb623f20dccd0c39a3325713992a2689d1d150e94c52e96b81efce0",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:771a9a337ca2c25745049d425c2923c8c17cb836389238bc4953df89a57e9672",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-kochi": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.6.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.6.3"
+      ],
       "incomplete_versions": [
-        "0.6.3",
         "0.6.2",
         "0.6.1",
         "0.6.0",
@@ -30758,15 +30982,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.6.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 4211 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30789,6 +31011,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 92.77,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 9.14,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.14,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.14,
+            ".railyard_map/special_demand_points.json": 0.12,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KCZ.pmtiles": 31.8,
+            "buildings_index.bin.gz": 17.39,
+            "buildings_index.json": 48.93,
+            "config.json": 0.01,
+            "demand_data.json": 2.55,
+            "driving_paths.json.gz": 7.76,
+            "ocean_depth_index.json": 33.98,
+            "roads.geojson": 19.73,
+            "runways_taxiways.geojson": 0.13
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30797,19 +31036,20 @@
             "asset_name": "KCZ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KCZ.zip"
           },
-          "fingerprint": "rules:v6:sha256:de99902f57482bdbf17ef1da60e6605f5cc6bea289f35477518fb93275a7cd85",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:03c511ff38aa031ddff1d9a164e615bd86c168888d634e0c2e5e69b566bd23b6",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-kofu": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -30829,15 +31069,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 938 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30860,6 +31098,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 144.24,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 10.54,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.04,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.05,
+            ".railyard_map/special_demand_points.json": 0.12,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KFU.pmtiles": 58.4,
+            "buildings_index.bin.gz": 36.73,
+            "buildings_index.json": 102.64,
+            "config.json": 0.01,
+            "demand_data.json": 3.82,
+            "driving_paths.json.gz": 10.64,
+            "roads.geojson": 19.39,
+            "runways_taxiways.geojson": 0.02
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30868,19 +31122,20 @@
             "asset_name": "KFU.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KFU.zip"
           },
-          "fingerprint": "rules:v6:sha256:8aeccd32f6810504b455ae9420a25e07320b3ab89e90d1948683125724c00da1",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:3b35fa8b3a698d0262852022aae2f984e506e1979b79670884a86cd7c62d8ef8",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-kumamoto": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.2"
+      ],
       "incomplete_versions": [
-        "0.2.2",
         "0.2.1",
         "0.2.0",
         "0.1.0"
@@ -30930,15 +31185,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 969 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -30961,6 +31214,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 203.01,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 13.99,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.26,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.94,
+            ".railyard_map/special_demand_points.json": 0.23,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KMJ.pmtiles": 75.32,
+            "buildings_index.bin.gz": 49.82,
+            "buildings_index.json": 139.44,
+            "config.json": 0.01,
+            "demand_data.json": 4.99,
+            "driving_paths.json.gz": 13.79,
+            "ocean_depth_index.json": 44.52,
+            "roads.geojson": 34.23,
+            "runways_taxiways.geojson": 0.16
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30969,19 +31239,20 @@
             "asset_name": "KMJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KMJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:23ae45c9c88c47d5c12b4f2470c80bc97945aa8825a79ba8245e4520033ae4af",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:6c71855524bb9609cc12ce6ae57715d994494c038a859ff14788855d7d80fd3a",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-kyoto": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.6.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.6.2"
+      ],
       "incomplete_versions": [
-        "0.6.2",
         "0.6.1",
         "0.6.0",
         "0.5.0",
@@ -31076,15 +31347,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.6.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 891 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -31107,6 +31376,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 322.71,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 23.91,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.81,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.7,
+            ".railyard_map/special_demand_points.json": 0.37,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "UKY.pmtiles": 106.92,
+            "buildings_index.bin.gz": 92.09,
+            "buildings_index.json": 273.45,
+            "config.json": 0.01,
+            "demand_data.json": 7.19,
+            "driving_paths.json.gz": 12.94,
+            "ocean_depth_index.json": 77.23,
+            "roads.geojson": 37.16,
+            "runways_taxiways.geojson": 0.02
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -31115,8 +31401,8 @@
             "asset_name": "UKY.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/UKY.zip"
           },
-          "fingerprint": "rules:v6:sha256:5402a3d0e5baabc72804a4a139a35ec49f9242f64313dc648cf0bb1e0b79af5c",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:10243d59d81a4c87384392e8fab7958a673ee20c1f0387b037a2b059b9b8827b",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
@@ -32250,12 +32536,13 @@
       }
     },
     "yukina-maebashi": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -32275,15 +32562,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 4060 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -32306,6 +32591,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 310.62,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 17.6,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 5.4,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.19,
+            ".railyard_map/special_demand_points.json": 0.25,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "MBS.pmtiles": 118.01,
+            "buildings_index.bin.gz": 95.03,
+            "buildings_index.json": 266.27,
+            "config.json": 0.01,
+            "demand_data.json": 6.61,
+            "driving_paths.json.gz": 12.84,
+            "roads.geojson": 49.76,
+            "runways_taxiways.geojson": 0.08
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -32314,19 +32615,20 @@
             "asset_name": "MBS.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/MBS.zip"
           },
-          "fingerprint": "rules:v6:sha256:b8a4e22910515776ae4a91038f22cb19f9dcdf02787f59be1f55b54eeb1242fa",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:145aedbd90f8945fabc1ce748998bad7ca9ae99af7cc956b108cb39ff485a9f8",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-matsumoto": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -32346,15 +32648,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 4904 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -32377,6 +32677,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 137.83,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 6.59,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 1.83,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.61,
+            ".railyard_map/special_demand_points.json": 0.09,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "MMJ.pmtiles": 58.49,
+            "buildings_index.bin.gz": 37.79,
+            "buildings_index.json": 105.63,
+            "config.json": 0.01,
+            "demand_data.json": 3.48,
+            "driving_paths.json.gz": 8.82,
+            "roads.geojson": 17.7,
+            "runways_taxiways.geojson": 0.02
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -32385,19 +32701,20 @@
             "asset_name": "MMJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/MMJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:5f76831bd94796fb3ebb7fa05438553666a90a811f64e6fc88b0456a443196b0",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:e344aa818699bc71a75778eaa6cc2570181bf1a68590fd5c5438e08732496623",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-matsuyama": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.6.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.6.3"
+      ],
       "incomplete_versions": [
-        "0.6.3",
         "0.6.2",
         "0.6.1",
         "0.6.0",
@@ -32507,15 +32824,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.6.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 2795 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -32538,6 +32853,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 154.43,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 16.79,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.44,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.5,
+            ".railyard_map/special_demand_points.json": 0.18,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "MYJ.pmtiles": 53.21,
+            "buildings_index.bin.gz": 31.95,
+            "buildings_index.json": 90.83,
+            "config.json": 0.01,
+            "demand_data.json": 3.51,
+            "driving_paths.json.gz": 9.26,
+            "ocean_depth_index.json": 56.65,
+            "roads.geojson": 34.66,
+            "runways_taxiways.geojson": 0.13
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -32546,19 +32878,20 @@
             "asset_name": "MYJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/MYJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:d394c3455a2b2452fcc2855130e0ce8ad8a9f0c5abcc534785298971dc73f299",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:adcb0b36749253c16875d0ea517d39a92bda7f898c332b41148713bfd73bed4f",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-mito-hitachi": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -32578,15 +32911,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 503 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -32609,6 +32940,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 177.23,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 9.68,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.3,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.7,
+            ".railyard_map/special_demand_points.json": 0.13,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "QIS.pmtiles": 67.77,
+            "buildings_index.bin.gz": 47.95,
+            "buildings_index.json": 133.13,
+            "config.json": 0.01,
+            "demand_data.json": 3.86,
+            "driving_paths.json.gz": 10.22,
+            "ocean_depth_index.json": 32.69,
+            "roads.geojson": 22.49,
+            "runways_taxiways.geojson": 0.01
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -32617,19 +32965,20 @@
             "asset_name": "QIS.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/QIS.zip"
           },
-          "fingerprint": "rules:v6:sha256:44c14d7c7d9bf0a2f31f641fb7ee4be20aec5c86385377f41fc591c0e677e699",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:5a4ac63a6257dbf88f0184c0763a2c241065d12a941d492c5600849eee8f72bc",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-miyazaki": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -32649,15 +32998,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 491 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -32680,6 +33027,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 115.34,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 7.49,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 2.64,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.67,
+            ".railyard_map/special_demand_points.json": 0.14,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KMI.pmtiles": 40.63,
+            "buildings_index.bin.gz": 26.5,
+            "buildings_index.json": 73.39,
+            "config.json": 0.01,
+            "demand_data.json": 4.19,
+            "driving_paths.json.gz": 11.18,
+            "ocean_depth_index.json": 30.97,
+            "roads.geojson": 24.13,
+            "runways_taxiways.geojson": 0.25
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -32688,19 +33052,20 @@
             "asset_name": "KMI.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KMI.zip"
           },
-          "fingerprint": "rules:v6:sha256:da5e099d53814723919d725cc687de9ae83d8d0623740792f8fa594963fc5213",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:c465e1c73896d069a365181ad220fd9b2f4618c160da41f861e5f4717b3207fa",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-morioka": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.2"
+      ],
       "incomplete_versions": [
-        "0.2.2",
         "0.2.1",
         "0.2.0",
         "0.1.0"
@@ -32750,15 +33115,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 10281 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -32781,6 +33144,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 216.25,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 22.31,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 2.14,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.73,
+            ".railyard_map/special_demand_points.json": 0.17,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "HNA.pmtiles": 77.43,
+            "buildings_index.bin.gz": 46.08,
+            "buildings_index.json": 127.48,
+            "config.json": 0.01,
+            "demand_data.json": 5.46,
+            "driving_paths.json.gz": 14.13,
+            "ocean_depth_index.json": 72.25,
+            "roads.geojson": 25.44,
+            "runways_taxiways.geojson": 0.06
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -32789,19 +33169,20 @@
             "asset_name": "HNA.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/HNA.zip"
           },
-          "fingerprint": "rules:v6:sha256:6cdd59bef60e2ac3781b64e7aadcbbb45461e7d893d6f1b5463753629e10a5f6",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:7110c919fb8d2bd874786726d8bbfbaa4ad0985e0b7952b114f42a1dc2aac709",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-nagano": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -32821,15 +33202,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 2833 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -32852,6 +33231,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 150.44,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 10.88,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.2,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.8,
+            ".railyard_map/special_demand_points.json": 0.12,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "QNG.pmtiles": 58.3,
+            "buildings_index.bin.gz": 38.19,
+            "buildings_index.json": 106.98,
+            "config.json": 0.01,
+            "demand_data.json": 3.81,
+            "driving_paths.json.gz": 12.47,
+            "roads.geojson": 30.96,
+            "runways_taxiways.geojson": 0
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -32860,19 +33255,20 @@
             "asset_name": "QNG.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/QNG.zip"
           },
-          "fingerprint": "rules:v6:sha256:9aa23b9e24b0e94b93145813ed5bdf717bc3a3c9620c6574e40732ed5674de66",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:86ddefabbf605ce06b2a5158a19aabf3d877f6b102b5a227f172e0e84f11c77a",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-nagasaki": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.3.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.3.3"
+      ],
       "incomplete_versions": [
-        "0.3.3",
         "0.3.2",
         "0.3.1",
         "0.3.0",
@@ -32952,15 +33348,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.3.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 26 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -32983,6 +33377,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 124.33,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 7.76,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.99,
+            ".railyard_map/regions/shichouson.geojson.gz": 2.21,
+            ".railyard_map/special_demand_points.json": 0.15,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "NGS.pmtiles": 42.57,
+            "buildings_index.bin.gz": 27.05,
+            "buildings_index.json": 75.89,
+            "config.json": 0.01,
+            "demand_data.json": 2.81,
+            "driving_paths.json.gz": 11.1,
+            "ocean_depth_index.json": 47.47,
+            "roads.geojson": 21.86,
+            "runways_taxiways.geojson": 0.19
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -32991,19 +33402,20 @@
             "asset_name": "NGS.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/NGS.zip"
           },
-          "fingerprint": "rules:v6:sha256:6988f20547e66a1f590d1b946a8edebb6f43844094e8022734ad23ee3b662906",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:77e3c42ef3093b955bd637c8891fe7346c4f9a994ab5924e0620fcd62db479c8",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-nagoya": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.2"
+      ],
       "incomplete_versions": [
-        "0.2.2",
         "0.2.1",
         "0.2.0",
         "0.1.5",
@@ -33068,15 +33480,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 2307 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -33099,6 +33509,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 604.98,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 70.79,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 15.01,
+            ".railyard_map/regions/shichouson.geojson.gz": 2.71,
+            ".railyard_map/special_demand_points.json": 1.14,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "NGO.pmtiles": 217.55,
+            "buildings_index.bin.gz": 239.69,
+            "config.json": 0.02,
+            "demand_data.json": 21.86,
+            "driving_paths.json.gz": 14.49,
+            "ocean_depth_index.json": 108.81,
+            "roads.geojson": 127.11,
+            "runways_taxiways.geojson": 1.11
+          },
           "game_version": ">1.3.0",
           "source": {
             "update_type": "custom",
@@ -33107,19 +33533,20 @@
             "asset_name": "NGO.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/NGO.zip"
           },
-          "fingerprint": "rules:v6:sha256:895998af8e876a5f75dd3d8ff74976eae088b038100714f4012a60857ea7e416",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:ba88c27a7a7b3d21057089bc9b45598758a70f602bdffa21bba3bd392e820e79",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-nakadoori": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.3"
+      ],
       "incomplete_versions": [
-        "0.2.3",
         "0.2.2",
         "0.2.1",
         "0.2.0",
@@ -33199,15 +33626,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 3283 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -33230,6 +33655,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 204.15,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 12.48,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.1,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.99,
+            ".railyard_map/special_demand_points.json": 0.17,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "FKS.pmtiles": 71.63,
+            "buildings_index.bin.gz": 51.96,
+            "buildings_index.json": 145.3,
+            "config.json": 0.01,
+            "demand_data.json": 4.41,
+            "driving_paths.json.gz": 12.76,
+            "ocean_depth_index.json": 45.55,
+            "roads.geojson": 34.36,
+            "runways_taxiways.geojson": 0.18
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -33238,19 +33680,20 @@
             "asset_name": "FKS.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/FKS.zip"
           },
-          "fingerprint": "rules:v6:sha256:f3df48bdda67678087ba870b1565d14a0101077cd931b57e99015054a10630c6",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:9741e9722fa66131fc0eeb44764a67a38742c14cd1c1719e02e50f4253f1424b",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-nakaumi": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.4.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.4.2"
+      ],
       "incomplete_versions": [
-        "0.4.2",
         "0.4.1",
         "0.4.0",
         "0.3.0",
@@ -33330,15 +33773,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.4.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 2405 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -33361,6 +33802,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 142.62,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 23.31,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.48,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.83,
+            ".railyard_map/special_demand_points.json": 0.14,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "IZO.pmtiles": 45.54,
+            "buildings_index.bin.gz": 26.63,
+            "buildings_index.json": 74.41,
+            "config.json": 0.01,
+            "demand_data.json": 3.77,
+            "driving_paths.json.gz": 11.32,
+            "ocean_depth_index.json": 48.32,
+            "roads.geojson": 23.16,
+            "runways_taxiways.geojson": 0.24
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -33369,8 +33827,8 @@
             "asset_name": "IZO.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/IZO.zip"
           },
-          "fingerprint": "rules:v6:sha256:2fb0397b7661f49d44b30b738bd964d4079bd86e84cd4df15756edc890c820e1",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:67217c27741737800d70f5e3f351f4062a11b38746a87c6a5b2caab99757c8b8",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
@@ -33500,19 +33958,20 @@
             "asset_name": "SHB.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/SHB.zip"
           },
-          "fingerprint": "rules:v6:sha256:5a302788cb85f4f3bf76ff22c23a4e51195bf82ce0449bfd9bd1a3ac8f42f59a",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:aaea9fe7712301791d3190288f158e9f1605ba55cb33f0ebf75239247e97fcde",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-niigata": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.5.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.5.3"
+      ],
       "incomplete_versions": [
-        "0.5.3",
         "0.5.2",
         "0.5.1",
         "0.5.0",
@@ -33607,15 +34066,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.5.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 174 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -33638,6 +34095,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 267.19,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 17.34,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 5.81,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.06,
+            ".railyard_map/special_demand_points.json": 0.27,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "KIJ.pmtiles": 106.77,
+            "buildings_index.bin.gz": 71.49,
+            "buildings_index.json": 199.83,
+            "config.json": 0.01,
+            "demand_data.json": 5.82,
+            "driving_paths.json.gz": 12.01,
+            "ocean_depth_index.json": 36.58,
+            "roads.geojson": 32.17,
+            "runways_taxiways.geojson": 0.18
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -33646,19 +34120,20 @@
             "asset_name": "KIJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/KIJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:d4e921ab72d64a9f6fd5aed881986c358d4999f1fff630977856f4a7276fa0d9",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:ebafec11154262626b4e1360cdce7cfe5f903c60ee5ee1314dc060f56d04a5c1",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-northern-kyushu": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.2"
+      ],
       "incomplete_versions": [
-        "0.2.2",
         "0.2.1",
         "0.2.0",
         "0.1.1",
@@ -33723,15 +34198,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 2155 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -33754,6 +34227,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 486.19,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 78.36,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 13.66,
+            ".railyard_map/regions/shichouson.geojson.gz": 3.09,
+            ".railyard_map/special_demand_points.json": 0.72,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "FOKK.pmtiles": 138.07,
+            "buildings_index.bin.gz": 120.57,
+            "buildings_index.json": 339.69,
+            "config.json": 0.01,
+            "demand_data.json": 14.12,
+            "driving_paths.json.gz": 22.75,
+            "ocean_depth_index.json": 108.69,
+            "roads.geojson": 92.13,
+            "runways_taxiways.geojson": 1.11
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -33762,19 +34252,20 @@
             "asset_name": "FOKK.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/FOKK.zip"
           },
-          "fingerprint": "rules:v6:sha256:ed1da5b81a4f15a65b1bcde484131879d6437ce313b8ec2df40f6e25f480bcbc",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:bfec961a4302bb6ade64e3f7863d259dc4553168e5a970eec528cdc32889eb3c",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-oita": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -33794,15 +34285,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1063 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -33825,6 +34314,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 118.02,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 9.48,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.68,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.39,
+            ".railyard_map/special_demand_points.json": 0.15,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "OIT.pmtiles": 39.43,
+            "buildings_index.bin.gz": 22.54,
+            "buildings_index.json": 63.47,
+            "config.json": 0.01,
+            "demand_data.json": 3.88,
+            "driving_paths.json.gz": 13.83,
+            "ocean_depth_index.json": 38.78,
+            "roads.geojson": 25.57,
+            "runways_taxiways.geojson": 0.04
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -33833,19 +34339,20 @@
             "asset_name": "OIT.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/OIT.zip"
           },
-          "fingerprint": "rules:v6:sha256:5f743531084d21ccc7482ce004352dc4934a06ba015b87a161361f47fe73d19a",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:96b1db1ce8da745b2164bbecc71da927f1beb50c455ffb215e2c792d3d6dff42",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-okayama": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.2"
+      ],
       "incomplete_versions": [
-        "0.2.2",
         "0.2.1",
         "0.2.0",
         "0.1.0"
@@ -33895,15 +34402,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 627 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -33926,6 +34431,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 205.74,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 18.64,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.03,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.92,
+            ".railyard_map/special_demand_points.json": 0.23,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "OKJ.pmtiles": 68.91,
+            "buildings_index.bin.gz": 51.62,
+            "buildings_index.json": 146.69,
+            "config.json": 0.01,
+            "demand_data.json": 4.84,
+            "driving_paths.json.gz": 14.68,
+            "ocean_depth_index.json": 44.32,
+            "roads.geojson": 36.17,
+            "runways_taxiways.geojson": 0.28
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -33934,19 +34456,20 @@
             "asset_name": "OKJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/OKJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:d9c5e3b5d7c88b4178a7194ebd53ca5b1c139c7bbca03165b6cd728a0c7f4139",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:15e5848d34123c2b34d8e51b0386c2969c3f7b740ec34ded7621e2c07a422eb7",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-okinawa": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.6.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.6.2"
+      ],
       "incomplete_versions": [
-        "0.6.2",
         "0.6.1",
         "0.6.0",
         "0.5.0",
@@ -34041,15 +34564,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.6.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 422 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -34072,6 +34593,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 106.02,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 11.84,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.48,
+            ".railyard_map/regions/shichouson.geojson.gz": 2.3,
+            ".railyard_map/special_demand_points.json": 0.18,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "OKA.pmtiles": 38.11,
+            "buildings_index.bin.gz": 17.25,
+            "buildings_index.json": 48.07,
+            "config.json": 0.01,
+            "demand_data.json": 3.19,
+            "driving_paths.json.gz": 9.97,
+            "ocean_depth_index.json": 54.61,
+            "roads.geojson": 17.83,
+            "runways_taxiways.geojson": 1.68
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -34080,19 +34618,20 @@
             "asset_name": "OKA.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/OKA.zip"
           },
-          "fingerprint": "rules:v6:sha256:5d44db563ef5a199236604905b2e1bc31d10261656fd6f1050200eeed8934a77",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:e79271ce0456c6aa1226fe5a5cdb6d3675706c2bc3e710c2098ef2e093b9fb4a",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-osaka": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.3.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.3.2"
+      ],
       "incomplete_versions": [
-        "0.3.2",
         "0.3.1",
         "0.3.0",
         "0.2.0",
@@ -34202,15 +34741,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.3.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 633 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -34233,6 +34770,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 363.39,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 18.23,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 8.1,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.89,
+            ".railyard_map/special_demand_points.json": 0.92,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "ITM.pmtiles": 154.82,
+            "buildings_index.bin.gz": 154.75,
+            "config.json": 0.01,
+            "demand_data.json": 13.05,
+            "driving_paths.json.gz": 9.79,
+            "ocean_depth_index.json": 34.64,
+            "roads.geojson": 60.01,
+            "runways_taxiways.geojson": 1.93
+          },
           "game_version": ">1.3.0",
           "source": {
             "update_type": "custom",
@@ -34241,8 +34794,8 @@
             "asset_name": "ITM.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/ITM.zip"
           },
-          "fingerprint": "rules:v6:sha256:eb5fde7d230d9c803b2fa04e6a84c95331b459ef5b6a1df002d44a18b6187c32",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:4d97f3f527be24839d269a4707b1dc480e336dbbf0917d392eabdb1493e956ae",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
@@ -37850,12 +38403,13 @@
       }
     },
     "yukina-sapporo-chitose": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.6.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.6.3"
+      ],
       "incomplete_versions": [
-        "0.6.3",
         "0.6.2",
         "0.6.1",
         "0.6.0",
@@ -37965,15 +38519,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.6.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1853 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -37996,6 +38548,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 267.29,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 16.58,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.93,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.38,
+            ".railyard_map/special_demand_points.json": 0.36,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "SPK.pmtiles": 102.32,
+            "buildings_index.bin.gz": 73.69,
+            "buildings_index.json": 205.89,
+            "config.json": 0.01,
+            "demand_data.json": 6.37,
+            "driving_paths.json.gz": 6.18,
+            "ocean_depth_index.json": 73,
+            "roads.geojson": 24.89,
+            "runways_taxiways.geojson": 0.8
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -38004,19 +38573,20 @@
             "asset_name": "SPK.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/SPK.zip"
           },
-          "fingerprint": "rules:v6:sha256:133e5092436d4529bddb54e3046a84a11532043331aa7253041a6834a7c676f9",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:83d3a1bfab0dffafbabbac43df546d6a9670d190473f4c3689f686b6d97c448a",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-sendai": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.5.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.5.3"
+      ],
       "incomplete_versions": [
-        "0.5.3",
         "0.5.2",
         "0.5.1",
         "0.5.0",
@@ -38111,15 +38681,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.5.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 150 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -38142,6 +38710,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 164.84,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 12.89,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.61,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.28,
+            ".railyard_map/special_demand_points.json": 0.21,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "SDJ.pmtiles": 60.85,
+            "buildings_index.bin.gz": 46.13,
+            "buildings_index.json": 130.68,
+            "config.json": 0.01,
+            "demand_data.json": 3.81,
+            "driving_paths.json.gz": 6.5,
+            "ocean_depth_index.json": 18.21,
+            "roads.geojson": 22.66,
+            "runways_taxiways.geojson": 0.29
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -38150,19 +38735,20 @@
             "asset_name": "SDJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/SDJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:a6ccbe7a9b15804e29ef2a211fdac10efa4392dcb9ffe6e7483a240add555e60",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:6b67495187bbc78360af33fe6f9376c7b5a41b83901affb571997370cd47eeae",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-shizuoka-hamamatsu": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.2"
+      ],
       "incomplete_versions": [
-        "0.2.2",
         "0.2.1",
         "0.2.0",
         "0.1.0"
@@ -38212,15 +38798,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 339 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -38243,6 +38827,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 356.61,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 45.41,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.72,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.09,
+            ".railyard_map/special_demand_points.json": 0.23,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "FSZ.pmtiles": 121.05,
+            "buildings_index.bin.gz": 97.91,
+            "buildings_index.json": 248.99,
+            "config.json": 0.01,
+            "demand_data.json": 5.84,
+            "driving_paths.json.gz": 10.09,
+            "ocean_depth_index.json": 54.52,
+            "roads.geojson": 44.2,
+            "runways_taxiways.geojson": 0.45
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -38251,19 +38852,20 @@
             "asset_name": "FSZ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/FSZ.zip"
           },
-          "fingerprint": "rules:v6:sha256:3c96cbff8f96a085c2f7c31bb090d16bdb9c3bcbfdf2f927a60d232faeccee1c",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:c30abbaaee861ea9bac7cbb60fa5d8425bf6c1d140474e6df1a5c1f83bac00ed",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-takamatsu": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.3.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.3.2"
+      ],
       "incomplete_versions": [
-        "0.3.2",
         "0.3.1",
         "0.3.0",
         "0.2.0",
@@ -38328,15 +38930,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.3.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1382 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -38359,6 +38959,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 128.24,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 10.89,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.52,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.38,
+            ".railyard_map/special_demand_points.json": 0.15,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "TAK.pmtiles": 43.88,
+            "buildings_index.bin.gz": 29.47,
+            "buildings_index.json": 81.84,
+            "config.json": 0.01,
+            "demand_data.json": 3.36,
+            "driving_paths.json.gz": 7.56,
+            "ocean_depth_index.json": 48.88,
+            "roads.geojson": 22.06,
+            "runways_taxiways.geojson": 0.14
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -38367,19 +38984,20 @@
             "asset_name": "TAK.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/TAK.zip"
           },
-          "fingerprint": "rules:v6:sha256:d585b53ac141bcd4d84ce9d811fc7eade913adfa489d00f37d68bc8327dd8af9",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:63e81dddb3e7ba79894f3123e979b526c7ec23b77e4ba5aab793ea27c13ac858",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-tokushima": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -38399,15 +39017,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 3770 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -38430,6 +39046,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 123.48,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 14.8,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.18,
+            ".railyard_map/regions/shichouson.geojson.gz": 2.03,
+            ".railyard_map/special_demand_points.json": 0.13,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "TKS.pmtiles": 41.08,
+            "buildings_index.bin.gz": 23.24,
+            "buildings_index.json": 65.31,
+            "config.json": 0.01,
+            "demand_data.json": 3.53,
+            "driving_paths.json.gz": 10.33,
+            "ocean_depth_index.json": 45.07,
+            "roads.geojson": 24.92,
+            "runways_taxiways.geojson": 0.17
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -38438,19 +39071,20 @@
             "asset_name": "TKS.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/TKS.zip"
           },
-          "fingerprint": "rules:v6:sha256:2f5dc6a3e7a2f76d04c4f62a6b2bc882a1f63d73fa2c2b4f3587626ceb2ba6d3",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:05898ea03781255b44ba9e669e31114929ac44f0d548318ec260f3f2d7b47f7c",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-tokyo": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -38470,15 +39104,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 396 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -38501,6 +39133,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 1195.4,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 144.07,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 30.81,
+            ".railyard_map/regions/shichouson.geojson.gz": 6.09,
+            ".railyard_map/special_demand_points.json": 2.79,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "HND.pmtiles": 440.96,
+            "buildings_index.bin.gz": 423.7,
+            "config.json": 0.01,
+            "demand_data.json": 50.15,
+            "driving_paths.json.gz": 82.09,
+            "ocean_depth_index.json": 154.38,
+            "roads.geojson": 201.43,
+            "runways_taxiways.geojson": 6.86
+          },
           "game_version": ">1.3.0",
           "source": {
             "update_type": "custom",
@@ -38509,19 +39157,20 @@
             "asset_name": "HND.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/HND.zip"
           },
-          "fingerprint": "rules:v6:sha256:38a8b9370304905c5bd5e92f50812fc9d542c3620e2b51137ff1b955d7a4a101",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:4c8599578f2195b417aa914b564b513780529b393e45b5f848b9c82fbf08c7f1",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-tottori": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.2",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.2"
+      ],
       "incomplete_versions": [
-        "0.2.2",
         "0.2.1",
         "0.2.0",
         "0.1.0"
@@ -38571,15 +39220,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.2": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1170 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -38602,6 +39249,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 96.27,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 9.37,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 2.6,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.03,
+            ".railyard_map/special_demand_points.json": 0.07,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "TTJ.pmtiles": 32.93,
+            "buildings_index.bin.gz": 18.04,
+            "buildings_index.json": 50.75,
+            "config.json": 0.01,
+            "demand_data.json": 1.91,
+            "driving_paths.json.gz": 4.88,
+            "ocean_depth_index.json": 54.48,
+            "roads.geojson": 13.96,
+            "runways_taxiways.geojson": 0.07
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -38610,19 +39274,20 @@
             "asset_name": "TTJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/TTJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:5209309ddafb20a6aa4f14518c0961ce7c63a164e45960a38f83cb6f40278e14",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:c6a07e75fdc1a813fe1af07ae592a26626154e191477818d738c4e71b782f866",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-toyama": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.3.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.3.3"
+      ],
       "incomplete_versions": [
-        "0.3.3",
         "0.3.2",
         "0.3.1",
         "0.3.0",
@@ -38702,15 +39367,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.3.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 2965 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -38733,6 +39396,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 183.9,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 11.9,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.2,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.59,
+            ".railyard_map/special_demand_points.json": 0.17,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "TOY.pmtiles": 71.76,
+            "buildings_index.bin.gz": 46.04,
+            "buildings_index.json": 128.46,
+            "config.json": 0.01,
+            "demand_data.json": 4.07,
+            "driving_paths.json.gz": 9.06,
+            "ocean_depth_index.json": 40.65,
+            "roads.geojson": 27.9,
+            "runways_taxiways.geojson": 0.03
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -38741,19 +39421,20 @@
             "asset_name": "TOY.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/TOY.zip"
           },
-          "fingerprint": "rules:v6:sha256:d796ba8ae0c9e51bf0b204e31c754c61e8f637c273284dc02675465443035f20",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:31599df6571badac77fda32b3516023930924ee3d2d2752f5d55ea1ffb3f3700",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-tsugaru": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.3"
+      ],
       "incomplete_versions": [
-        "0.2.3",
         "0.2.2",
         "0.2.1",
         "0.2.0",
@@ -38833,15 +39514,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 2130 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -38864,6 +39543,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 144.75,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 13.68,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.45,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.98,
+            ".railyard_map/special_demand_points.json": 0.12,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "AOJ.pmtiles": 55.81,
+            "buildings_index.bin.gz": 31.39,
+            "buildings_index.json": 88.18,
+            "config.json": 0.01,
+            "demand_data.json": 3.33,
+            "driving_paths.json.gz": 8.14,
+            "ocean_depth_index.json": 54.43,
+            "roads.geojson": 13.39,
+            "runways_taxiways.geojson": 0.17
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -38872,8 +39568,8 @@
             "asset_name": "AOJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/AOJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:82cd4659b443c51ec70f89f7de7ecf1dcc5831bbb8c399fcddffebbbe8a04c72",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:5c865d32d5374c8f8eff6be7b7990f98dfc6a79727a18c01deafb4c50642f99b",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
@@ -40958,12 +41654,13 @@
       }
     },
     "yukina-utsunomiya": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -40983,15 +41680,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1020 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -41014,6 +41709,22 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 265.19,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 24.68,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 3.88,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.81,
+            ".railyard_map/special_demand_points.json": 0.2,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "QUT.pmtiles": 101.33,
+            "buildings_index.bin.gz": 72.99,
+            "buildings_index.json": 203.32,
+            "config.json": 0.01,
+            "demand_data.json": 6.4,
+            "driving_paths.json.gz": 15.85,
+            "roads.geojson": 34.84,
+            "runways_taxiways.geojson": 0.08
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -41022,19 +41733,20 @@
             "asset_name": "QUT.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/QUT.zip"
           },
-          "fingerprint": "rules:v6:sha256:da6c2ab63b3444233f3fb0f21f8561a770087e6e52e8e656fa79e906fa924c93",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:a86b54f42ef89abb767fead926383cba2e58bd15949a1cd0f5650b5d27c5b849",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-wakayama": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -41054,15 +41766,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 5853 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -41085,6 +41795,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 106.88,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 5.71,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 2.5,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.56,
+            ".railyard_map/special_demand_points.json": 0.1,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "WKY.pmtiles": 41.95,
+            "buildings_index.bin.gz": 25.81,
+            "buildings_index.json": 73.64,
+            "config.json": 0.01,
+            "demand_data.json": 2.73,
+            "driving_paths.json.gz": 6.72,
+            "ocean_depth_index.json": 27.33,
+            "roads.geojson": 15,
+            "runways_taxiways.geojson": 0
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -41093,19 +41820,20 @@
             "asset_name": "WKY.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/WKY.zip"
           },
-          "fingerprint": "rules:v6:sha256:296aea9289ff7b65ac89af0f95563bbec2162e1473f914c37d223408a3fa9288",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:6c97ef4c6c91fe38e9b626b761124fc49323e554df7c522d78f687c87caca7f3",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-wakkanai": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.2.4",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.2.4"
+      ],
       "incomplete_versions": [
-        "0.2.4",
         "0.2.3",
         "0.2.2",
         "0.2.1",
@@ -41200,15 +41928,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.2.4": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1097 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -41231,6 +41957,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 35.47,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 4.17,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 0.95,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.58,
+            ".railyard_map/special_demand_points.json": 0.02,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "WKJ.pmtiles": 13.09,
+            "buildings_index.bin.gz": 4.77,
+            "buildings_index.json": 12.03,
+            "config.json": 0.01,
+            "demand_data.json": 0.54,
+            "driving_paths.json.gz": 0.76,
+            "ocean_depth_index.json": 47.02,
+            "roads.geojson": 2.85,
+            "runways_taxiways.geojson": 0.09
+          },
           "game_version": ">1.3.0",
           "source": {
             "update_type": "custom",
@@ -41239,19 +41982,20 @@
             "asset_name": "WKJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/WKJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:0248a81a30343433230df08889e55a3001341941f4c88d54e8cf49b2ee02dcf5",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:317519c6d7f899b5002cb122316d9e8109404e4c1c0a57b869c82ffb7886fd5b",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-yamagata": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.5.3",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.5.3"
+      ],
       "incomplete_versions": [
-        "0.5.3",
         "0.5.2",
         "0.5.1",
         "0.5.0",
@@ -41346,15 +42090,13 @@
           "released_at": "2026-08-05T00:00:00.000Z"
         },
         "0.5.3": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 2501 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -41377,6 +42119,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 141.23,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 5.5,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 4.21,
+            ".railyard_map/regions/shichouson.geojson.gz": 0.63,
+            ".railyard_map/special_demand_points.json": 0.14,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "GAJ.pmtiles": 54.85,
+            "buildings_index.bin.gz": 33.49,
+            "buildings_index.json": 94.45,
+            "config.json": 0.01,
+            "demand_data.json": 3.82,
+            "driving_paths.json.gz": 6.25,
+            "ocean_depth_index.json": 46.65,
+            "roads.geojson": 14.13,
+            "runways_taxiways.geojson": 0.03
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -41385,19 +42144,20 @@
             "asset_name": "GAJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/GAJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:4295377ec4b7fc9c511e0075a1ffa377fabef7c22a04e20cf5c2a8d49af15400",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:75328cb1acb64e4ded40f9f261f610a477812fcd86f67106a702ca29bef9faab",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
     },
     "yukina-yamaguchi": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "0.1.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.1"
+      ],
       "incomplete_versions": [
-        "0.1.1",
         "0.1.0"
       ],
       "last_updated": 1786579200,
@@ -41417,15 +42177,13 @@
           "released_at": "2026-08-10T00:00:00.000Z"
         },
         "0.1.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data phantom-points check failed: grid commute at index 1601 has negative drivingDistance"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
-            "demand_phantom_points": false,
+            "demand_phantom_points": true,
             "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
@@ -41448,6 +42206,23 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 138.36,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 16.09,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/ooaza.geojson.gz": 5.28,
+            ".railyard_map/regions/shichouson.geojson.gz": 1.42,
+            ".railyard_map/special_demand_points.json": 0.13,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "UBJ.pmtiles": 46.28,
+            "buildings_index.bin.gz": 28.43,
+            "buildings_index.json": 79.01,
+            "config.json": 0.01,
+            "demand_data.json": 2.95,
+            "driving_paths.json.gz": 8.98,
+            "ocean_depth_index.json": 54.87,
+            "roads.geojson": 23.98,
+            "runways_taxiways.geojson": 0.18
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -41456,8 +42231,8 @@
             "asset_name": "UBJ.zip",
             "download_url": "https://github.com/ahkimn/subwaybuilder-jp-maps/releases/download/0.4.12/UBJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:48724554455a9bac65ea885c161afb3fe63e58ef17ddfc91dde619329f88f5e3",
-          "checked_at": "2026-08-12T23:29:26.564Z",
+          "fingerprint": "rules:v6:sha256:e1ae8600992d1c4ac14577b6e7a84fdb0a03716b0b87070e004b97cf5395bd10",
+          "checked_at": "2026-08-13T01:18:12.080Z",
           "released_at": "2026-08-13T00:00:00.000Z"
         }
       }
