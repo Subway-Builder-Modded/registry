@@ -45,12 +45,8 @@ function main() {
         errors.push(`**asset-id**: The ${resolved.type} \`${id}\` is already deleted.`);
       }
 
-      if (manifest.is_test === true) {
-        errors.push(
-          `**asset-id**: \`${id}\` is a test listing. Test listings are removed outright rather `
-          + `than deleted — please contact a maintainer.`,
-        );
-      }
+      // Test listings may be deleted like any other listing — they are the
+      // natural candidates for exercising lifecycle states end to end.
 
       // Same authorization rule as deprecation: only the original publisher
       // or the ACTIVE caretaker, never ordinary collaborators.

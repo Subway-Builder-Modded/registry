@@ -40,12 +40,8 @@ function main() {
         );
       }
 
-      if (manifest.is_test === true) {
-        errors.push(
-          `**asset-id**: \`${id}\` is a test listing. Test listings are removed outright rather `
-          + `than deprecated — please contact a maintainer.`,
-        );
-      }
+      // Test listings may be deprecated like any other listing — they are the
+      // natural candidates for exercising lifecycle states end to end.
 
       // Deprecation is deliberately stricter than metadata updates: only the
       // original publisher or the ACTIVE caretaker may deprecate. Ordinary
