@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "yukina-tw-hualien-taitung",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "exact_footprints",
+    "workplace_intensity": "fine_types_calibrated",
+    "resident_count": "working_age",
+    "resident_granularity": "adm4",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "structured_marginals",
+    "od_granularity": "adm3"
+  },
+  "notes": "Taiwan bundles combine the DGBAS 2020 Population & Housing Census (主計總處人口及住宅普查) tables with the DGBAS Minimum Statistical Area (最小統計區) polygon population field for within-village (里) population weighting at the sub-村里 census-cell level. For distributing jobs, a 14-class Non-Negative Least-Squares (NNLS) workplace-classification model disaggregates the 2021 Industry & Services Census (110年工商業普查) per-township industry totals onto a 100m mesh, with the NLSC 國土利用調查 (NLUI) Level-2 raster providing land-use class and NLSC LoD1 buildings (內政部國土測繪中心 3D 精緻建物模型) providing per-building height and floor count for the volume signal. Administrative boundaries come from the MOI 村里界圖 (VILLAGE_NLSC). For resident-worker flows, the DGBAS census provides per-county and per-township workplace × residence O/D matrices; a gravity model with distance-decay distributes commutes among point pairs while a cordon-snap pass injects cross-bundle commute mass from neighbouring counties as anchored sinks at county centroids, and a Generalized IPF (GIPF) pass pins each township's self-loop share to the per-township census ground truth.",
+  "derived_from": "yukina-tw-chiayi",
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "ahkimn",
+    "reviewed_by": null,
+    "date": "2026-08-13"
+  }
+}
