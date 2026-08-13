@@ -1,11 +1,14 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import {
+  applyHourlySuppressions,
   computeListingDeltas,
   HOURLY_DOWNLOADS_CSV_RELATIVE_PATH,
   HOURLY_DOWNLOADS_RETENTION_DAYS,
+  HOURLY_SUPPRESSIONS_RELATIVE_PATH,
   mergeHourlyRows,
+  parseHourlySuppressions,
   serializeHourlyDownloadsCsv,
   truncateToHourBucketUtc,
   type DownloadsFile,
@@ -127,6 +130,14 @@ async function run(): Promise<void> {
       previous = next;
     }
     console.log(`[backfill-hourly-downloads] ${spec.listingType}s: ${commits.length} commits, ${pairs} in-window deltas`);
+  }
+
+  const suppressionsPath = resolve(repoRoot, ...HOURLY_SUPPRESSIONS_RELATIVE_PATH.split("/"));
+  if (existsSync(suppressionsPath)) {
+    const suppressions = parseHourlySuppressions(JSON.parse(readFileSync(suppressionsPath, "utf-8")));
+    const applied = applyHourlySuppressions(rows, suppressions);
+    rows = applied.rows;
+    console.log(`[backfill-hourly-downloads] applied ${applied.suppressed} committed suppression(s)`);
   }
 
   const csvPath = resolve(repoRoot, ...HOURLY_DOWNLOADS_CSV_RELATIVE_PATH.split("/"));

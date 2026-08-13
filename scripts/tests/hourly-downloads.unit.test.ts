@@ -1,9 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import {
+  applyHourlySuppressions,
   computeListingDeltas,
   mergeHourlyRows,
   parseHourlyDownloadsCsv,
+  parseHourlySuppressions,
   pruneHourlyRows,
   serializeHourlyDownloadsCsv,
   truncateToHourBucketUtc,
@@ -90,4 +94,62 @@ test("pruneHourlyRows drops buckets outside the retention window", () => {
   ];
   // 14-day cutoff from 2026-08-15T12:30Z is 2026-08-01T12:00Z.
   assert.deepEqual(pruneHourlyRows(rows, nowMs).map((row) => row.id), ["kept"]);
+});
+
+test("parseHourlySuppressions keeps valid entries and drops malformed ones", () => {
+  const parsed = parseHourlySuppressions({
+    schema_version: 1,
+    suppressions: [
+      { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "gone-mod", reason: "restore burst" },
+      { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "partial", downloads: 40, reason: "partial raise" },
+      { bucket_utc: "not-an-hour", listing_type: "mod", id: "bad-bucket", reason: "x" },
+      { bucket_utc: "2026-08-06T01:00Z", listing_type: "widget", id: "bad-type", reason: "x" },
+      { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "no-reason" },
+    ],
+  });
+  assert.deepEqual(parsed.map((entry) => entry.id), ["gone-mod", "partial"]);
+  assert.equal(parsed[0]!.downloads, undefined);
+  assert.equal(parsed[1]!.downloads, 40);
+});
+
+test("applyHourlySuppressions drops whole rows and subtracts partial amounts", () => {
+  const rows: HourlyDownloadRow[] = [
+    { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "gone-mod", downloads: 2376 },
+    { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "partial", downloads: 50 },
+    { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "swallowed", downloads: 30 },
+    { bucket_utc: "2026-08-06T01:00Z", listing_type: "map", id: "gone-mod", downloads: 7 },
+    { bucket_utc: "2026-08-06T02:00Z", listing_type: "mod", id: "gone-mod", downloads: 5 },
+  ];
+  const { rows: result, suppressed } = applyHourlySuppressions(rows, [
+    { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "gone-mod", reason: "full drop" },
+    { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "partial", downloads: 40, reason: "subtract" },
+    { bucket_utc: "2026-08-06T01:00Z", listing_type: "mod", id: "swallowed", downloads: 30, reason: "exact subtract drops" },
+  ]);
+  assert.equal(suppressed, 3);
+  const key = (row: HourlyDownloadRow): string => `${row.bucket_utc} ${row.listing_type} ${row.id}`;
+  const byKey = new Map(result.map((row) => [key(row), row.downloads]));
+  assert.equal(byKey.has("2026-08-06T01:00Z mod gone-mod"), false);
+  assert.equal(byKey.get("2026-08-06T01:00Z mod partial"), 10);
+  assert.equal(byKey.has("2026-08-06T01:00Z mod swallowed"), false);
+  // Same id under a different type or hour is untouched.
+  assert.equal(byKey.get("2026-08-06T01:00Z map gone-mod"), 7);
+  assert.equal(byKey.get("2026-08-06T02:00Z mod gone-mod"), 5);
+});
+
+test("the committed suppression spec matches the pruned restoration rows", () => {
+  const spec = JSON.parse(
+    readFileSync(resolve(import.meta.dirname, "..", "..", "..", "history", "hourly-suppressions.json"), "utf-8"),
+  ) as unknown;
+  const parsed = parseHourlySuppressions(spec);
+  assert.deepEqual(
+    parsed.map((entry) => `${entry.bucket_utc} ${entry.listing_type} ${entry.id}`).sort(),
+    [
+      "2026-08-06T01:00Z mod danield1909-dantrains",
+      "2026-08-06T01:00Z mod imb11-moveit",
+      "2026-08-06T01:00Z mod imb11-subwaycine",
+    ],
+  );
+  for (const entry of parsed) {
+    assert.equal(entry.downloads, undefined, "restoration rows are whole-row drops");
+  }
 });
