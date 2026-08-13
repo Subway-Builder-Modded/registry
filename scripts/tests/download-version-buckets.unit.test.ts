@@ -176,3 +176,85 @@ test("applyVersionBucketMonotonicCounts drops synthetic legacy buckets when cano
     ["owner/repo@1.0.0/sample.zip#assetA"],
   );
 });
+
+test("applyVersionBucketMonotonicCounts freezes previously committed versions whose releases were deleted", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+
+  // The upstream release/asset for 0.1.0 was deleted, so the pipeline only
+  // produced the still-live 0.2.0. 0.1.0 keeps its last committed value; the
+  // zero-count 0.0.1 is not emitted.
+  const next = applyVersionBucketMonotonicCounts(
+    ledger,
+    { sample: { "0.2.0": 3 } },
+    { sample: { "0.2.0": [{ bucketKey: "owner/pack@0.4.12/AXT.zip#assetB", adjustedCount: 3 }] } },
+    "2026-04-05T01:00:00.000Z",
+    { sample: { "0.0.1": 0, "0.1.0": 17 } },
+  );
+
+  assert.deepEqual(next.sample, { "0.1.0": 17, "0.2.0": 3 });
+});
+
+test("applyVersionBucketMonotonicCounts does not resurrect ledger versions absent from the committed output", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+  ledger.listings.sample = {
+    versions: {
+      "1.0.0": {
+        max_total_downloads: 42,
+        buckets: {
+          "owner/repo@1.0.0/sample.zip#assetA": {
+            max_adjusted_downloads: 42,
+            last_adjusted_downloads: 42,
+            updated_at: "2026-04-05T00:00:00.000Z",
+          },
+        },
+        updated_at: "2026-04-05T00:00:00.000Z",
+      },
+    },
+  };
+
+  // 1.0.0 exists only in the ledger (dropped from downloads.json before this
+  // guard existed, or removed by hand). The freeze is keyed on the previous
+  // committed output, so it stays out.
+  const next = applyVersionBucketMonotonicCounts(
+    ledger,
+    { sample: { "2.0.0": 5 } },
+    { sample: { "2.0.0": [{ bucketKey: "owner/repo@2.0.0/sample.zip#assetB", adjustedCount: 5 }] } },
+    "2026-04-05T01:00:00.000Z",
+    { sample: { "2.0.0": 4 } },
+  );
+
+  assert.deepEqual(next.sample, { "2.0.0": 5 });
+});
+
+test("applyVersionBucketMonotonicCounts does not resurrect listings absent from pipeline output", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+
+  // Deprecated/deleted listings are removed from pipeline output entirely
+  // (overlay); the freeze only applies to listings the pipeline still emits.
+  const next = applyVersionBucketMonotonicCounts(
+    ledger,
+    { other: { "1.0.0": 5 } },
+    { other: { "1.0.0": [{ bucketKey: "owner/other@1.0.0/o.zip#assetB", adjustedCount: 5 }] } },
+    "2026-04-05T01:00:00.000Z",
+    { deprecated: { "1.0.0": 42 }, other: { "1.0.0": 4 } },
+  );
+
+  assert.equal(next.deprecated, undefined);
+  assert.deepEqual(next.other, { "1.0.0": 5 });
+});
+
+test("applyVersionBucketMonotonicCounts freeze never overrides a freshly resolved count", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+
+  // A still-live version keeps its pipeline-computed value even when the
+  // previous committed value differs (e.g. a deliberate downward repair).
+  const next = applyVersionBucketMonotonicCounts(
+    ledger,
+    { sample: { "1.0.0": 65 } },
+    { sample: { "1.0.0": [{ bucketKey: "owner/repo@1.0.0/sample.zip#assetA", adjustedCount: 65 }] } },
+    "2026-04-05T01:00:00.000Z",
+    { sample: { "1.0.0": 800 } },
+  );
+
+  assert.deepEqual(next.sample, { "1.0.0": 65 });
+});
