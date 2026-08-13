@@ -33,7 +33,12 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
 - `backfill-hourly-downloads.ts` — deterministically rebuilds
   `analytics/hourly/downloads.csv` (rolling per-listing hourly deltas) from the
   git history of `downloads.json`; initial backfill and the recovery path if
-  the hourly appender's series is ever lost or corrupted.
+  the hourly appender's series is ever lost or corrupted. Caveat: any
+  administrative counter RAISE (grandfathered restore, ledger-rebuild recovery)
+  reads as a one-hour download burst — the clamp only guards drops. After such
+  a recovery (and after any backfill re-run spanning one), prune the affected
+  bucket rows manually; they otherwise distort the hour-of-day seasonality
+  until they age out of the 14-day window.
 
 One-time migrations that already ran are deleted rather than kept here — git
 history is the archive (see tmp/plans/registry-downsizing-audit.md for the list).
