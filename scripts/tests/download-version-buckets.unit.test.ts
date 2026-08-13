@@ -176,3 +176,107 @@ test("applyVersionBucketMonotonicCounts drops synthetic legacy buckets when cano
     ["owner/repo@1.0.0/sample.zip#assetA"],
   );
 });
+
+test("applyVersionBucketMonotonicCounts freezes ledger versions whose releases were deleted", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+  ledger.listings.sample = {
+    versions: {
+      "0.1.0": {
+        max_total_downloads: 17,
+        buckets: {
+          "owner/pack@0.4.11/AXT.zip#assetA": {
+            max_adjusted_downloads: 17,
+            last_adjusted_downloads: 17,
+            updated_at: "2026-04-05T00:00:00.000Z",
+          },
+        },
+        updated_at: "2026-04-05T00:00:00.000Z",
+      },
+      "0.0.1": {
+        max_total_downloads: 0,
+        buckets: {
+          "owner/pack@0.4.01/AXT.zip#assetZ": {
+            max_adjusted_downloads: 0,
+            last_adjusted_downloads: 0,
+            updated_at: "2026-04-05T00:00:00.000Z",
+          },
+        },
+        updated_at: "2026-04-05T00:00:00.000Z",
+      },
+    },
+  };
+
+  // The upstream release/asset for 0.1.0 was deleted, so the pipeline only
+  // produced the still-live 0.2.0. 0.1.0 keeps its final value; the
+  // zero-count 0.0.1 is not emitted.
+  const next = applyVersionBucketMonotonicCounts(
+    ledger,
+    { sample: { "0.2.0": 3 } },
+    { sample: { "0.2.0": [{ bucketKey: "owner/pack@0.4.12/AXT.zip#assetB", adjustedCount: 3 }] } },
+    "2026-04-05T01:00:00.000Z",
+  );
+
+  assert.deepEqual(next.sample, { "0.1.0": 17, "0.2.0": 3 });
+  // The retired version's ledger entry is carried through untouched.
+  assert.equal(ledger.listings.sample?.versions["0.1.0"]?.max_total_downloads, 17);
+});
+
+test("applyVersionBucketMonotonicCounts freeze respects repaired (lowered) final values", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+  ledger.listings.sample = {
+    versions: {
+      "1.0.0": {
+        max_total_downloads: 500,
+        buckets: {
+          "owner/repo@1.0.0/sample.zip#assetA": {
+            max_adjusted_downloads: 500,
+            last_adjusted_downloads: 120,
+            updated_at: "2026-04-05T00:00:00.000Z",
+          },
+        },
+        updated_at: "2026-04-05T00:00:00.000Z",
+      },
+    },
+  };
+
+  // Single canonical bucket: the frozen value is the last observed (possibly
+  // repaired-down) count, not the historical max.
+  const next = applyVersionBucketMonotonicCounts(
+    ledger,
+    { sample: {} },
+    {},
+    "2026-04-05T01:00:00.000Z",
+  );
+
+  assert.deepEqual(next.sample, { "1.0.0": 120 });
+});
+
+test("applyVersionBucketMonotonicCounts does not resurrect listings absent from pipeline output", () => {
+  const ledger = createEmptyDownloadVersionBucketLedger("2026-04-05T00:00:00.000Z");
+  ledger.listings.deprecated = {
+    versions: {
+      "1.0.0": {
+        max_total_downloads: 42,
+        buckets: {
+          "owner/repo@1.0.0/sample.zip#assetA": {
+            max_adjusted_downloads: 42,
+            last_adjusted_downloads: 42,
+            updated_at: "2026-04-05T00:00:00.000Z",
+          },
+        },
+        updated_at: "2026-04-05T00:00:00.000Z",
+      },
+    },
+  };
+
+  // Deprecated/deleted listings are removed from pipeline output entirely
+  // (overlay); the freeze only applies to listings the pipeline still emits.
+  const next = applyVersionBucketMonotonicCounts(
+    ledger,
+    { other: { "1.0.0": 5 } },
+    { other: { "1.0.0": [{ bucketKey: "owner/other@1.0.0/o.zip#assetB", adjustedCount: 5 }] } },
+    "2026-04-05T01:00:00.000Z",
+  );
+
+  assert.equal(next.deprecated, undefined);
+});

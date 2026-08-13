@@ -336,6 +336,19 @@ export function applyVersionBucketMonotonicCounts(
       nextVersions[version] = computeRecoveredDisplayTotalFromBuckets(nextBuckets, computedValue);
     }
 
+    // Versions in the ledger but absent from the pipeline's output no longer
+    // resolve upstream (release/asset deleted, e.g. an only-latest-download
+    // map pack retiring superseded artifacts). Their final counts stay frozen
+    // in downloads.json; the ledger entry is already carried through above.
+    for (const [version, entry] of Object.entries(nextVersionEntries)) {
+      if (nextVersions[version] !== undefined) continue;
+      const frozen = computeRecoveredDisplayTotalFromBuckets(
+        entry.buckets,
+        entry.max_total_downloads,
+      );
+      if (frozen > 0) nextVersions[version] = frozen;
+    }
+
     nextLedger.listings[listingId] = {
       versions: sortObjectByKeys(nextVersionEntries),
     };
