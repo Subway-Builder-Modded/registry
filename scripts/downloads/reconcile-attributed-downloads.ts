@@ -16,6 +16,7 @@ import {
   mergeGrandfatheredDownloads,
 } from "../lib/grandfathered-downloads.js";
 import { generateDownloadHistorySnapshot } from "../lib/download-history.js";
+import { loadDownloadsSnapshot } from "../lib/downloads-support.js";
 import { appendGitHubOutput, getNonEmptyEnv, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
 interface CliOptions {
@@ -86,12 +87,14 @@ async function run(): Promise<void> {
     mapResult.downloads,
     mapResult.versionBucketInputs,
     nowIso,
+    loadDownloadsSnapshot(repoRoot, "maps"),
   );
   const modsBucketDownloads = applyVersionBucketMonotonicCounts(
     modVersionBucketLedger,
     modResult.downloads,
     modResult.versionBucketInputs,
     nowIso,
+    loadDownloadsSnapshot(repoRoot, "mods"),
   );
 
   const mapsGrandfathered = loadGrandfatheredDownloads(repoRoot, "map");

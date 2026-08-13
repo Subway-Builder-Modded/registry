@@ -18,7 +18,7 @@ import {
   mergeGrandfatheredDownloads,
 } from "../lib/grandfathered-downloads.js";
 import { loadContentAnnouncementLedger } from "../lib/content-announcements.js";
-import { loadIntegritySnapshot } from "../lib/downloads-support.js";
+import { loadDownloadsSnapshot, loadIntegritySnapshot } from "../lib/downloads-support.js";
 import { buildPendingAnnouncements } from "../lib/pending-announcements.js";
 import type { IntegrityOutput } from "../lib/integrity.js";
 import type { ManifestType } from "../lib/manifests.js";
@@ -278,6 +278,8 @@ async function run(): Promise<void> {
     versionBucketLedger,
     rawDownloads,
     versionBucketInputs,
+    new Date().toISOString(),
+    loadDownloadsSnapshot(repoRoot, outputDir),
   );
 
   const grandfathered = loadGrandfatheredDownloads(repoRoot, listingType);

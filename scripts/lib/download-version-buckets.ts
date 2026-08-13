@@ -261,6 +261,7 @@ export function applyVersionBucketMonotonicCounts(
   downloads: DownloadsByListing,
   bucketInputs: VersionBucketInputsByListing,
   nowIso = new Date().toISOString(),
+  previousDownloads: DownloadsByListing = {},
 ): DownloadsByListing {
   const nextLedger = normalizeDownloadVersionBucketLedger(ledger, nowIso);
   const nextDownloads: DownloadsByListing = {};
@@ -336,16 +337,15 @@ export function applyVersionBucketMonotonicCounts(
       nextVersions[version] = computeRecoveredDisplayTotalFromBuckets(nextBuckets, computedValue);
     }
 
-    // Versions in the ledger but absent from the pipeline's output no longer
-    // resolve upstream (release/asset deleted, e.g. an only-latest-download
-    // map pack retiring superseded artifacts). Their final counts stay frozen
-    // in downloads.json; the ledger entry is already carried through above.
-    for (const [version, entry] of Object.entries(nextVersionEntries)) {
+    // A version in the committed downloads.json that the pipeline no longer
+    // produced stopped resolving upstream (release/asset deleted, e.g. an
+    // only-latest-download map pack retiring superseded artifacts). Its last
+    // committed count stays frozen. Scoped to the previous committed output —
+    // not the ledger — so versions dropped before this guard existed stay
+    // dropped, and removing an entry from downloads.json by hand still sticks.
+    for (const [version, previousCount] of Object.entries(previousDownloads[listingId] ?? {})) {
       if (nextVersions[version] !== undefined) continue;
-      const frozen = computeRecoveredDisplayTotalFromBuckets(
-        entry.buckets,
-        entry.max_total_downloads,
-      );
+      const frozen = toFiniteNonNegativeNumber(previousCount) ?? 0;
       if (frozen > 0) nextVersions[version] = frozen;
     }
 

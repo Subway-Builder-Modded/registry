@@ -6,6 +6,42 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 ---
 
+## 2026-08-12 — jp-maps only-latest asset retirement wiped 183 version counts (corrected, prevention shipped)
+
+**What happened:** jp-data's `publish_map_pack.py --only-latest-download`
+(PoR §12.2) deletes superseded release assets from
+`ahkimn/subwaybuilder-jp-maps` so stale/differently-watermarked artifacts 404.
+The 2026-08-12T23:40Z hourly run (#7693) saw those versions stop resolving and
+dropped them from `maps/downloads.json` entirely: **183 versions across 50
+yukina listings, 16,297 recorded downloads**, 49 listings left with empty
+download maps. `applyVersionBucketMonotonicCounts` only emitted versions
+present in the fresh resolution; the version-bucket ledger retained every
+retired version's counts, but nothing carried them into the output.
+
+**Correction:** the 183 versions were restored into `maps/downloads.json` at
+their exact pre-wipe committed values (`f29481065`, the analytics run minutes
+before the wipe). Ledger versions that had already fallen out of
+`downloads.json` **before** this wipe (21 versions across 16 other listings,
+mostly `legacy:`-seeded entries last seen 2026-04-05 or drops during the
+2026-07-08 429-cascade window) were deliberately **not** restored — their
+provenance is uncertain and several overlap earlier incident eras.
+
+**Prevention:** `applyVersionBucketMonotonicCounts` now carries forward any
+version present in the previously committed `downloads.json` that the fresh
+run did not produce, at its last committed value (both the hourly/full
+pipeline and `reconcile-attributed-downloads`). Keyed on the committed output
+— not the ledger — so pre-guard drops stay dropped and hand-removing an entry
+from `downloads.json` still sticks. This also closes the residual
+transient-failure path where a resolution outage could zero recorded counts.
+The tw-maps and eu-maps packs will adopt the same only-latest retirement
+policy; no registry-side action is needed when they do.
+
+**Residual effect:** retired versions' counts are frozen at their final
+observed values and no longer track upstream (the assets 404). busan-3/cairo
+style re-tag history (`vX.Y.Z` rows alongside `X.Y.Z`) remains as-is.
+
+---
+
 ## 2026-08-07 → ongoing — French-map re-download loop after city-code re-releases (correction applied, incident open)
 
 **What happened:** the base game's 2026-08 update shipped vanilla Lyon/Marseille/Paris
