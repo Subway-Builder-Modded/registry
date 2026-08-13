@@ -56,9 +56,111 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 5.76,
+    ".railyard_map/regions/li.geojson.gz": 1.77,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/township.geojson.gz": 1.36,
+    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "TTT.pmtiles": 47.91,
+    "buildings_index.bin.gz": 18.87,
+    "buildings_index.json": 52.59,
+    "config.json": 0.01,
+    "demand_data.json": 1.72,
+    "driving_paths.json.gz": 6.89,
+    "ocean_depth_index.json": 98.25,
+    "roads.geojson": 6.42,
+    "runways_taxiways.geojson": 0.52
+  },
   "included_cities": [
     "Hualien",
     "Taitung"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.11894644620042653,
+      "p25": 0.1331273755480756,
+      "p50": 0.15564652948760158,
+      "p75": 0.20691711999455992,
+      "p90": 0.3004178972695271,
+      "mean": 0.20118003899176123
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.12332114081846343,
+      "p25": 0.13800956329119468,
+      "p50": 0.1682728203687285,
+      "p75": 0.21864146793492334,
+      "p90": 0.3156797297298119,
+      "mean": 0.20811108958324034
+    },
+    "commuteDistanceKm": {
+      "p10": 802,
+      "p25": 2324,
+      "p50": 5016,
+      "p75": 12853,
+      "p90": 36488,
+      "mean": 15008.7584474436
+    },
+    "residentCellDensity": {
+      "p10": 14,
+      "p25": 26,
+      "p50": 61,
+      "p75": 153,
+      "p90": 489,
+      "mean": 239.9082483781279
+    },
+    "workerCellDensity": {
+      "p10": 14,
+      "p25": 23,
+      "p50": 54,
+      "p75": 154,
+      "p90": 603,
+      "mean": 275.06382978723406
+    },
+    "detail": {
+      "radiusKm": 0.16183658578171745,
+      "expectedPointSpacingKm": 0.5460479175949315,
+      "normalizedRadius": 0.29637799278592036,
+      "activityPerPoint": 60.02527243218178,
+      "playableAreaKm2": 2684,
+      "playableAreaPerPointKm2": 0.6223046603292371,
+      "playableCatchmentRadiusKm": 0.44506822578234223,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9540637759719006,
+        "continuousScore": 0.9487335535509379,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.912162476118878,
+        "largestCenterShare": 0.6071636879125802,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 121.55214254397278,
+            "latitude": 23.879387435500774,
+            "massShare": 0.6071636879125802,
+            "assignedMass": 314376,
+            "assignedPointCount": 2430,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 121.14261940267545,
+            "latitude": 22.817665299608624,
+            "massShare": 0.3928363120874197,
+            "assignedMass": 203402,
+            "assignedPointCount": 1883,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1786579200
 }
