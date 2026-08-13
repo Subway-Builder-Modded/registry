@@ -20,6 +20,11 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   lowering). Specs live under
   `history/loop-repair-specs/`; like manual-attribution specs, **re-apply after any
   attribution-ledger rebuild**. See KNOWN_INCIDENTS.md 2026-08 French-city entry.
+  If a repair target has an entry in `maps|mods/grandfathered-downloads.json`,
+  **lower that entry too**: the deprecate/delete freeze takes the max of
+  ledger, committed, and existing grandfathered values, so a stale high
+  grandfathered count silently resurrects the inflated total if the listing is
+  later deprecated or deleted (or otherwise leaves pipeline output).
 - `backfill-charleston-snapshot-clamp.ts` — one-shot snapshot re-interpolation
   for the charleston-huntington-wv faulty-client inflation (KNOWN_INCIDENTS.md,
   2026-07 entry). Retained because **any snapshot rebuild from git
@@ -33,12 +38,14 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
 - `backfill-hourly-downloads.ts` — deterministically rebuilds
   `analytics/hourly/downloads.csv` (rolling per-listing hourly deltas) from the
   git history of `downloads.json`; initial backfill and the recovery path if
-  the hourly appender's series is ever lost or corrupted. Caveat: any
-  administrative counter RAISE (grandfathered restore, ledger-rebuild recovery)
-  reads as a one-hour download burst — the clamp only guards drops. After such
-  a recovery (and after any backfill re-run spanning one), prune the affected
-  bucket rows manually; they otherwise distort the hour-of-day seasonality
-  until they age out of the 14-day window.
+  the hourly appender's series is ever lost or corrupted. Any administrative
+  counter RAISE (grandfathered restore, ledger-rebuild recovery) reads as a
+  one-hour download burst — the clamp only guards drops. **After such a
+  recovery, add an entry to `history/hourly-suppressions.json`** (bucket hour +
+  listing; omit `downloads` to drop the whole row, set it to subtract an
+  amount): the backfill applies committed suppressions automatically, so
+  re-runs spanning the raise stay pruned. If the burst row already landed via
+  the live appender, delete it from the CSV in the same commit.
 
 One-time migrations that already ran are deleted rather than kept here — git
 history is the archive (see tmp/plans/registry-downsizing-audit.md for the list).
