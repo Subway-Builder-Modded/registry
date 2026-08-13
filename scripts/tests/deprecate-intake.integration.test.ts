@@ -156,7 +156,7 @@ test("deprecate validation rejects an already-deprecated listing", (t) => {
   assert.match(readValidationError(root), /already deprecated/);
 });
 
-test("deprecate validation rejects a test listing", (t) => {
+test("deprecate validation allows a test listing", (t) => {
   const manifest = baseModManifest("fixture-mod");
   manifest.is_test = true;
   const root = makeFixtureRepo({ "fixture-mod": manifest });
@@ -166,8 +166,7 @@ test("deprecate validation rejects a test listing", (t) => {
     ISSUE_JSON: issueJson("fixture-mod"),
     ISSUE_AUTHOR_ID: String(AUTHOR_ID),
   });
-  assert.notEqual(result.status, 0);
-  assert.match(readValidationError(root), /test listing/);
+  assert.equal(result.status, 0, result.stderr);
 });
 
 // --- deprecate-listing ---

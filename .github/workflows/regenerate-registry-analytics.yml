@@ -505,6 +505,18 @@ jobs:
           fi
           tar -xf "${DEMAND_ARTIFACT_FILE}" -C .
 
+      - name: Reset hourly-owned reconcile inputs to committed state
+        run: |
+          # The artifact copies of these files are hours stale by the time this
+          # job runs (demand stats dominate the wall clock). Reconcile
+          # regenerates them from a fresh fetch, and its monotonic floors and
+          # carry-forward base must come from COMMITTED state: committed floors
+          # absorb GitHub replica lag exactly as the hourly path does, while
+          # stale artifact floors let lag surface as phantom negative deltas in
+          # the Discord report. These files are hourly-owned and never staged
+          # by this workflow, so nothing else consumes the artifact copies.
+          git checkout HEAD -- maps/downloads.json mods/downloads.json maps/download-version-buckets.json mods/download-version-buckets.json
+
       - name: Merge registry download attribution ledger
         id: merge_attribution
         run: pnpm --dir scripts run merge-download-attribution
@@ -974,7 +986,7 @@ jobs:
               "- **Attribution subtraction this run:** maps \($adjusted_delta_maps), mods \($adjusted_delta_mods)",
               "- **Attribution-clamped versions:** maps \($clamped_versions_maps), mods \($clamped_versions_mods)",
               "- **New downloads:** +\($new_downloads_total)",
-              "- **Net delta:** \($net_delta_total)",
+              "- **Net delta:** \($net_delta_total) (reconcile preview - counts land via the hourly runs)",
               "- **Maps:** \($updated_records_maps) updated records, +\($new_downloads_maps) (net \($net_delta_maps))",
               "- **Mods:** \($updated_records_mods) updated records, +\($new_downloads_mods) (net \($net_delta_mods))",
               "- **Commit:** \($commit_display)"
