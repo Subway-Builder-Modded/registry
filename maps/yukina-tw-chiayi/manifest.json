@@ -23,14 +23,14 @@
   },
   "city_code": "CYI",
   "country": "TW",
-  "population": 525369,
-  "residents_total": 525369,
-  "points_count": 5557,
-  "population_count": 10489,
+  "population": 814213,
+  "residents_total": 814213,
+  "points_count": 9957,
+  "population_count": 22106,
   "initial_view_state": {
-    "latitude": 23.459222,
-    "longitude": 120.386583,
-    "zoom": 12,
+    "latitude": 23.558996,
+    "longitude": 120.416421,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "主計總處人口及住宅普查 / 110年工商業普查 / 內政部戶政司村里人口統計",
@@ -42,96 +42,116 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 6.41,
-    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/landuse_provenance.parquet": 10.25,
+    ".railyard_map/regions/li.geojson.gz": 3.53,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/township.geojson.gz": 2,
+    ".railyard_map/special_demand_points.json": 0.04,
     ".railyard_map/special_demand_types.json": 0.07,
-    "CYI.pmtiles": 65.91,
-    "buildings_index.bin.gz": 33.66,
-    "buildings_index.json": 99.37,
+    "CYI.pmtiles": 78.22,
+    "buildings_index.bin.gz": 54,
+    "buildings_index.json": 159.16,
     "config.json": 0.01,
-    "demand_data.json": 29.62,
-    "ocean_depth_index.json": 22.42,
-    "roads.geojson": 5.59,
-    "runways_taxiways.geojson": 0.14
+    "demand_data.json": 3.84,
+    "driving_paths.json.gz": 11,
+    "ocean_depth_index.json": 42.8,
+    "roads.geojson": 9.96,
+    "runways_taxiways.geojson": 0.13
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.14543744513615547,
-      "p25": 0.15969148436442349,
-      "p50": 0.1829796990866556,
-      "p75": 0.22586265441623551,
-      "p90": 0.3131914481958346,
-      "mean": 0.21898859928721506
+      "p10": 0.15510505841392438,
+      "p25": 0.16773857253426983,
+      "p50": 0.186213823911679,
+      "p75": 0.23225692817744775,
+      "p90": 0.318338976598649,
+      "mean": 0.22435652509830759
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.14214423749049565,
-      "p25": 0.15777804849357638,
-      "p50": 0.1828399339177081,
-      "p75": 0.22063339327162773,
-      "p90": 0.295429388316248,
-      "mean": 0.20446503396671772
+      "p10": 0.15284467110424524,
+      "p25": 0.16851562615706803,
+      "p50": 0.19134955460731012,
+      "p75": 0.2372855555962029,
+      "p90": 0.3123913130567777,
+      "mean": 0.21885622141328695
     },
     "commuteDistanceKm": {
-      "p10": 1962,
-      "p25": 3704,
-      "p50": 7148,
-      "p75": 16187,
-      "p90": 29026,
-      "mean": 11704.491657927352
+      "p10": 916,
+      "p25": 2555,
+      "p50": 5906,
+      "p75": 17953,
+      "p90": 39163,
+      "mean": 13736.277888356102
     },
     "residentCellDensity": {
-      "p10": 33,
-      "p25": 68,
-      "p50": 155,
-      "p75": 371,
-      "p90": 884,
-      "mean": 401.61285386381024
+      "p10": 32,
+      "p25": 63,
+      "p50": 145,
+      "p75": 339,
+      "p90": 820,
+      "mean": 358.2781690140845
     },
     "workerCellDensity": {
       "p10": 22,
-      "p25": 39,
-      "p50": 106,
-      "p75": 334,
-      "p90": 1074,
-      "mean": 479.95974382433667
+      "p25": 41,
+      "p50": 98,
+      "p75": 313,
+      "p90": 919,
+      "mean": 410.42091965639213
     },
     "detail": {
-      "radiusKm": 0.18290980315249977,
-      "expectedPointSpacingKm": 0.5178129837360274,
-      "normalizedRadius": 0.3532352584765318,
-      "activityPerPoint": 94.54183912182832,
-      "playableAreaKm2": 2004,
-      "playableAreaPerPointKm2": 0.36062623717833364,
-      "playableCatchmentRadiusKm": 0.33880805260667,
-      "localityScore": 0.990257798740365,
+      "radiusKm": 0.1887642240129836,
+      "expectedPointSpacingKm": 0.5131591653812329,
+      "normalizedRadius": 0.3678473205730392,
+      "activityPerPoint": 81.77292357135684,
+      "playableAreaKm2": 3540,
+      "playableAreaPerPointKm2": 0.35552877372702624,
+      "playableCatchmentRadiusKm": 0.3364049992198576,
+      "localityScore": 0.9473405722560055,
       "deaggregationScore": 1,
-      "score": 0.9951169774154016
+      "score": 0.9733142207201154
     },
     "polycentrism": {
       "activity": {
-        "score": 0,
-        "continuousScore": 0.8478085946706571,
-        "detectedCenterCount": 1,
-        "effectiveCenterCount": 1,
-        "largestCenterShare": 1,
+        "score": 0.9139796464961601,
+        "continuousScore": 0.911841229891698,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.559638058697857,
+        "largestCenterShare": 0.4690535523259884,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 120.39107348568419,
-            "latitude": 23.464643620737235,
-            "massShare": 1,
-            "assignedMass": 1050738,
-            "assignedPointCount": 5557,
+            "longitude": 120.4127772075335,
+            "latitude": 23.50522203757302,
+            "massShare": 0.4690535523259884,
+            "assignedMass": 763819,
+            "assignedPointCount": 4076,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 120.4733596019238,
+            "latitude": 23.718021338984915,
+            "massShare": 0.38736853869933296,
+            "assignedMass": 630801,
+            "assignedPointCount": 4075,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 120.29182487547358,
+            "latitude": 23.349327559438166,
+            "massShare": 0.14357790897467862,
+            "assignedMass": 233806,
+            "assignedPointCount": 1806,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1784073600,
+  "last_updated": 1786579200,
   "search_aliases": [
     "嘉義市",
     "Chiayi City",

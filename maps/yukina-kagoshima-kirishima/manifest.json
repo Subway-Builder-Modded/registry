@@ -25,7 +25,7 @@
   },
   "city_code": "KOJ",
   "country": "JP",
-  "population": 751771,
+  "population": 752140,
   "level_of_detail": "high-detail",
   "source_quality": "high-quality",
   "data_source": "統計局・令和２年国勢調査・令和3年経済センサス",
@@ -37,9 +37,9 @@
     "schools",
     "universities"
   ],
-  "residents_total": 751771,
-  "points_count": 10157,
-  "population_count": 23089,
+  "residents_total": 752140,
+  "points_count": 10185,
+  "population_count": 23103,
   "initial_view_state": {
     "latitude": 31.618717,
     "longitude": 130.526825,
@@ -47,40 +47,56 @@
     "bearing": 0
   },
   "difficulty": "hard",
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 15.63,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ooaza.geojson.gz": 2.09,
+    ".railyard_map/regions/shichouson.geojson.gz": 1.98,
+    ".railyard_map/special_demand_points.json": 0.22,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "KOJ.pmtiles": 60.82,
+    "buildings_index.bin.gz": 37.89,
+    "buildings_index.json": 106.33,
+    "config.json": 0.01,
+    "demand_data.json": 3.91,
+    "driving_paths.json.gz": 16.75,
+    "ocean_depth_index.json": 74.41,
+    "roads.geojson": 36.57,
+    "runways_taxiways.geojson": 0.52
+  },
   "is_test": false,
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.15203384554137567,
-      "p25": 0.165694052958091,
-      "p50": 0.17902049816121365,
-      "p75": 0.2099961561499568,
-      "p90": 0.2588777133748864,
-      "mean": 0.20616051488427442
+      "p10": 0.15135846276778314,
+      "p25": 0.16530701903832654,
+      "p50": 0.1788841818750931,
+      "p75": 0.2097411732164218,
+      "p90": 0.2590012092468402,
+      "mean": 0.20561622135416058
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.13950579702115581,
-      "p25": 0.15461817862578256,
-      "p50": 0.17258642484595527,
-      "p75": 0.205044517684961,
-      "p90": 0.2568451630924763,
-      "mean": 0.19615995771943592
+      "p10": 0.13954381277735695,
+      "p25": 0.1546258178045322,
+      "p50": 0.1726491795006717,
+      "p75": 0.205052505248833,
+      "p90": 0.2565953922159802,
+      "mean": 0.19584158320289483
     },
     "commuteDistanceKm": {
       "p10": 566,
       "p25": 1992,
-      "p50": 5954,
-      "p75": 15335,
-      "p90": 30344,
-      "mean": 11441.934730824201
+      "p50": 5952,
+      "p75": 15331,
+      "p90": 30316,
+      "mean": 11438.925204518893
     },
     "residentCellDensity": {
       "p10": 20,
       "p25": 33,
-      "p50": 73,
+      "p50": 74,
       "p75": 206,
-      "p90": 827,
-      "mean": 341.9704276615105
+      "p90": 831,
+      "mean": 342.13830755232027
     },
     "workerCellDensity": {
       "p10": 21,
@@ -88,24 +104,24 @@
       "p50": 101,
       "p75": 326,
       "p90": 999,
-      "mean": 441.77366255144034
+      "mean": 441.73090481786136
     },
     "detail": {
-      "radiusKm": 0.17577402467880676,
-      "expectedPointSpacingKm": 0.49183547702215974,
-      "normalizedRadius": 0.35738378561676476,
-      "activityPerPoint": 74.01506350300285,
+      "radiusKm": 0.17573903159623863,
+      "expectedPointSpacingKm": 0.4910589881050174,
+      "normalizedRadius": 0.35787763965875163,
+      "activityPerPoint": 73.84781541482572,
       "playableAreaKm2": 4060,
-      "playableAreaPerPointKm2": 0.39972432804962094,
-      "playableCatchmentRadiusKm": 0.35670184379445957,
-      "localityScore": 0.9778952586225613,
+      "playableAreaPerPointKm2": 0.39862542955326463,
+      "playableCatchmentRadiusKm": 0.35621119453361416,
+      "localityScore": 0.9764331502486416,
       "deaggregationScore": 1,
-      "score": 0.9888858673388762
+      "score": 0.9881463202626631
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.9763674278073249,
+        "continuousScore": 0.9763804078186842,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -115,11 +131,11 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 130.530699959918,
-            "latitude": 31.618246103503374,
+            "longitude": 130.5307002139309,
+            "latitude": 31.618250380529716,
             "massShare": 1,
-            "assignedMass": 1503542,
-            "assignedPointCount": 10157,
+            "assignedMass": 1504280,
+            "assignedPointCount": 10185,
             "prominenceRatio": 1
           }
         ]
