@@ -255,6 +255,27 @@ Category tags from issue templates:
 
 Validation checks reachable/updateable endpoints at publish/update time.
 
+### Custom update.json format
+
+```json
+{ "schema_version": 1, "versions": [{ "version": "1.0.0", "download": "…", "sha256": "…" }] }
+```
+
+Only `versions` is read by the pipeline; entries missing `version` are skipped with a warning.
+Per entry:
+
+| Field          | Type              | Notes                                                                    |
+| -------------- | ----------------- | ------------------------------------------------------------------------ |
+| `version`      | string            | Required. Semver, `X.Y.Z` or `vX.Y.Z`; non-semver is recorded incomplete. |
+| `download`     | string            | Must be a `github.com/<owner>/<repo>/releases/download/<tag>/<asset>` URL — download counts are read from the release asset. |
+| `sha256`       | string            | Verified by clients on install.                                           |
+| `manifest`     | string            | Mods only: the release's `manifest.json` asset, parsed for compatibility. |
+| `date`         | string            | Publish date; becomes `released_at`.                                      |
+| `game_version` | string            | Range against `subway-builder`. Required on versions published on/after the cutoff in `integrity.ts`. |
+| `dependencies` | object            | Mod id => range. String values only; other types are dropped.             |
+| `retired`      | boolean           | See below. Read by the pipeline only.                                     |
+| `changelog`    | string            | Not read here — clients fetch it from `update.json` directly.             |
+
 ### Withdrawing a single version
 
 Version-level retirement is author-driven — no intake form, no manifest field. Each source
