@@ -841,6 +841,19 @@ async function evaluateGithubListing(
         ctx.nowIso,
         ["release has no .zip asset"],
       );
+      // Pruning the ZIP off a published release is the github analog of a
+      // custom source's `retired: true`: the artifact is withdrawn, the version
+      // stays listed. Gated on the version having been installable before, so a
+      // release still awaiting its first upload is never labelled retired, and
+      // accepting a previously-retired entry keeps the label across cache
+      // invalidation. Compatibility metadata is carried over for the same
+      // reason the custom path keeps it — there is no release ZIP left to parse.
+      const previous = ctx.previousIntegrity?.listings[id]?.versions?.[tag];
+      if (previous?.is_complete === true || previous?.availability === "retired") {
+        result.availability = "retired";
+        if (previous.game_version) result.game_version = previous.game_version;
+        if (previous.dependencies) result.dependencies = previous.dependencies;
+      }
       state.versionEntries[tag] = result;
       state.nextListingCacheEntries[tag] = {
         fingerprint,
