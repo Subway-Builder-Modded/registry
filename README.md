@@ -24,14 +24,23 @@ All submissions are handled through GitHub Issues. Pick a template to get starte
 - [Update Your Author Profile](https://github.com/Subway-Builder-Modded/registry/issues/new?template=update-author.yml)
 - [Report an Issue](https://github.com/Subway-Builder-Modded/registry/issues/new?template=report.yml)
 - [Deprecate an Asset](https://github.com/Subway-Builder-Modded/registry/issues/new?template=deprecate-asset.yml)
+- [Delete an Asset](https://github.com/Subway-Builder-Modded/registry/issues/new?template=delete-asset.yml)
 - [Remove Asset Deprecation](https://github.com/Subway-Builder-Modded/registry/issues/new?template=undeprecate-asset.yml)
 
-Deprecation is asset-type agnostic (mods and maps share one form) and is restricted to the
-listing's original publisher or its **active caretaker** — collaborators cannot deprecate.
-A deprecated listing stops being downloadable and is hidden from browse and search results by
-default (it remains viewable behind the Deprecated filter on the app and website), and the
-listing itself, its download history, and its author attribution are kept permanently.
-Deprecation is fully reversible via the Remove Asset Deprecation form (same authorization rule).
+Retirement is asset-type agnostic (mods and maps share each form) and is restricted to the
+listing's original publisher or its **active caretaker** — collaborators cannot retire a
+listing. A retired listing stops being downloadable and is hidden from browse and search
+results by default (its class is selectable under the Status filter on the app and website),
+while the listing itself, its download history, and its author attribution are kept
+permanently.
+
+Two forms, differing only in permanence:
+
+- **Deprecate an Asset** is reversible via the Remove Asset Deprecation form (same
+  authorization rule). Existing installs are left in place.
+- **Delete an Asset** is permanent — there is no restoration flow, and clients purge the
+  asset from profiles, uninstalling it for users who had it. A deprecated listing may later
+  be escalated to deleted; the reverse is not possible.
 
 ## How It Works
 
@@ -44,7 +53,7 @@ PRs. Who can use each command is enforced by the workflows:
 
 | Command | Where | Who | Effect |
 | --- | --- | --- | --- |
-| `revalidate` | Any submission/update issue (publish-mod/map, update-mod/map, update-author, data-quality, deprecate-asset, undeprecate-asset) | Issue author or org OWNER/MEMBER/COLLABORATOR | Re-runs validation after the issue was edited (e.g. after a `failed-validation` result). |
+| `revalidate` | Any submission/update issue (publish-mod/map, update-mod/map, update-author, data-quality, deprecate-asset, delete-asset, undeprecate-asset) | Issue author or org OWNER/MEMBER/COLLABORATOR | Re-runs validation after the issue was edited (e.g. after a `failed-validation` result). |
 | `rescore_data [flags]` | Automated data-quality / publish **PRs** | OWNER/MEMBER/COLLABORATOR | Confirms the submitter's data-quality answers, applies the tier, and marks the publish PR ready to merge. Optional flags on the same line are passed through (e.g. `--admin` to bypass-merge). |
 | `admin_author` | Publish issues | Repo admin/maintain | Creates the listing with author `subway-builder-modded-admin`; the issue submitter is recorded as active **caretaker** (credited for downloads of versions released during their tenure) and added as a collaborator. Use for assets whose true author has no GitHub account. |
 | `data_quality_exempt` | Publish-map issues | Repo admin/maintain | Waives the data-quality merge gate for this submission: the publish PR is created (or updated) ready with the `dq-grandfathered` label and merges at `unknown-quality`. |
@@ -71,6 +80,11 @@ Download and release-integrity snapshots are generated into:
 - `mods/downloads.json`
 - `maps/integrity.json`
 - `mods/integrity.json`
+- `maps/grandfathered-downloads.json`, `mods/grandfathered-downloads.json` — counts frozen
+  when a listing is retired or a version stops resolving, so totals never regress
+- `maps/repo-liveness.json`, `mods/repo-liveness.json` — source repos observed as
+  definitively unreachable (deleted, renamed, or made private), with the clock that drives
+  the daily `repo-liveness-review` workflow
 
 Local commands:
 
@@ -100,6 +114,10 @@ Automation:
 - `regenerate-downloads-hourly.yml` runs hourly in download-only mode (updates downloads only; no ZIP integrity pass).
 - `regenerate-registry-analytics.yml` runs every 3 hours in full mode (refreshes downloads + integrity + integrity cache, map demand stats, and syncs map manifest `file_sizes` from integrity).
 - Full mode posts two Discord summaries (downloads/integrity and map demand stats) to the same webhook secret: `DISCORD_WEBHOOK_URL`.
+- `repo-liveness-review.yml` runs daily: source repos that have been definitively
+  unreachable past the threshold (default 72h) get a maintainer review issue labelled
+  `repo-unreachable`, closed automatically once the repo returns. Counts and integrity are
+  preserved throughout, so this is hygiene rather than data-loss triage.
 
 ## Security
 
