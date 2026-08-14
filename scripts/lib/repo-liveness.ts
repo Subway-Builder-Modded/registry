@@ -3,34 +3,54 @@ import { resolve } from "node:path";
 import type { ManifestDirectory } from "./manifests.js";
 import { isObject, writeJsonFile } from "./json-utils.js";
 
-// Tracks source repos that are currently unreachable in the permanent sense
-// (GitHub "Could not resolve to a Repository": deleted, renamed without
-// redirect, or made private). Transient failures (429/5xx) never touch this
-// file — an entry's first_unreachable_at only starts, and only clears, on a
-// definitive observation. Consumed by the repo-liveness review workflow,
-// which nags maintainers once a repo has been unreachable for multiple days.
+// Tracks update sources that are currently unreachable in the permanent sense:
+// a GitHub repo that returns "Could not resolve to a Repository" (deleted,
+// renamed without redirect, or made private), or a custom update JSON whose
+// endpoint returns a non-transient HTTP error. Transient failures (429/5xx,
+// network errors) never touch this file — an entry's first_unreachable_at only
+// starts, and only clears, on a definitive observation. Consumed by the
+// repo-liveness review workflow, which nags maintainers once a source has been
+// unreachable for multiple days.
+//
+// The file name predates custom-source support; entries are keyed by kind.
 
-export const REPO_LIVENESS_SCHEMA_VERSION = 1;
+export const REPO_LIVENESS_SCHEMA_VERSION = 2;
 
-export interface RepoLivenessEntry {
+export type LivenessSourceKind = "repo" | "url";
+
+/** Key space: "repo:owner/name" and "url:https://…" cannot collide. */
+export function livenessSourceKey(kind: LivenessSourceKind, value: string): string {
+  return `${kind}:${value}`;
+}
+
+export function parseLivenessSourceKey(
+  key: string,
+): { kind: LivenessSourceKind; value: string } | null {
+  if (key.startsWith("repo:")) return { kind: "repo", value: key.slice(5) };
+  if (key.startsWith("url:")) return { kind: "url", value: key.slice(4) };
+  return null;
+}
+
+export interface SourceLivenessEntry {
+  kind: LivenessSourceKind;
   first_unreachable_at: string;
   last_checked_at: string;
-  /** Non-deprecated, non-test listings that reference the repo. */
+  /** Non-deprecated, non-test listings that reference the source. */
   listings: string[];
 }
 
-export interface RepoLivenessFile {
+export interface SourceLivenessFile {
   schema_version: number;
   updated_at: string;
-  repos: Record<string, RepoLivenessEntry>;
+  sources: Record<string, SourceLivenessEntry>;
 }
 
-export interface RepoLivenessObservations {
-  /** Repos that resolved successfully this run. */
+export interface SourceLivenessObservations {
+  /** Source keys that resolved successfully this run. */
   reachable: Iterable<string>;
-  /** Repos that failed transiently this run (existing entries are kept as-is). */
+  /** Source keys that failed transiently (existing entries are kept as-is). */
   transient: Iterable<string>;
-  /** Definitively-unreachable repos, with the eligible listings referencing each. */
+  /** Definitively-unreachable source keys, with the eligible listings referencing each. */
   notFound: Record<string, string[]>;
 }
 
@@ -38,23 +58,32 @@ export function getRepoLivenessPath(repoRoot: string, dir: ManifestDirectory): s
   return resolve(repoRoot, dir, "repo-liveness.json");
 }
 
-export function loadRepoLiveness(repoRoot: string, dir: ManifestDirectory): RepoLivenessFile {
+export function loadSourceLiveness(repoRoot: string, dir: ManifestDirectory): SourceLivenessFile {
   const path = getRepoLivenessPath(repoRoot, dir);
-  const empty: RepoLivenessFile = {
+  const empty: SourceLivenessFile = {
     schema_version: REPO_LIVENESS_SCHEMA_VERSION,
     updated_at: "",
-    repos: {},
+    sources: {},
   };
   if (!existsSync(path)) return empty;
   try {
     const raw = JSON.parse(readFileSync(path, "utf-8")) as unknown;
-    if (!isObject(raw) || !isObject(raw.repos)) return empty;
-    const repos: Record<string, RepoLivenessEntry> = {};
-    for (const [repo, value] of Object.entries(raw.repos)) {
+    if (!isObject(raw)) return empty;
+    // v1 stored bare repo names under `repos`; read them as repo-kind sources.
+    const legacy = isObject(raw.repos) ? raw.repos : null;
+    const current = isObject(raw.sources) ? raw.sources : null;
+    const sources: Record<string, SourceLivenessEntry> = {};
+    for (const [rawKey, value] of Object.entries(current ?? legacy ?? {})) {
       if (!isObject(value)) continue;
-      const entry = value as Partial<RepoLivenessEntry>;
-      if (typeof entry.first_unreachable_at !== "string" || typeof entry.last_checked_at !== "string") continue;
-      repos[repo] = {
+      const entry = value as Partial<SourceLivenessEntry>;
+      if (typeof entry.first_unreachable_at !== "string" || typeof entry.last_checked_at !== "string") {
+        continue;
+      }
+      const key = current ? rawKey : livenessSourceKey("repo", rawKey);
+      const parsed = parseLivenessSourceKey(key);
+      if (!parsed) continue;
+      sources[key] = {
+        kind: parsed.kind,
         first_unreachable_at: entry.first_unreachable_at,
         last_checked_at: entry.last_checked_at,
         listings: Array.isArray(entry.listings)
@@ -62,7 +91,7 @@ export function loadRepoLiveness(repoRoot: string, dir: ManifestDirectory): Repo
           : [],
       };
     }
-    return { ...empty, repos };
+    return { ...empty, sources };
   } catch {
     return empty;
   }
@@ -70,52 +99,59 @@ export function loadRepoLiveness(repoRoot: string, dir: ManifestDirectory): Repo
 
 /**
  * Pure state transition:
- * - reachable repo -> entry removed (repo recovered)
- * - not-found repo with eligible listings -> entry upserted; the original
+ * - reachable source -> entry removed (source recovered)
+ * - not-found source with eligible listings -> entry upserted; the original
  *   first_unreachable_at is preserved so the unreachable clock keeps running
- * - not-found repo whose listings are all deprecated/test -> never tracked
- * - transient repo -> existing entry carried over untouched (state unknown)
- * - repo absent from every observation (no longer referenced) -> entry removed
+ * - not-found source whose listings are all deprecated/test -> never tracked
+ * - transient source -> existing entry carried over untouched (state unknown)
+ * - source absent from every observation (no longer referenced) -> entry removed
  */
-export function applyRepoLivenessObservations(
-  previous: RepoLivenessFile,
-  observations: RepoLivenessObservations,
+export function applySourceLivenessObservations(
+  previous: SourceLivenessFile,
+  observations: SourceLivenessObservations,
   nowIso: string,
-): RepoLivenessFile {
+): SourceLivenessFile {
   const transient = new Set(observations.transient);
-  const repos: Record<string, RepoLivenessEntry> = {};
+  const sources: Record<string, SourceLivenessEntry> = {};
 
-  for (const repo of transient) {
-    const existing = previous.repos[repo];
-    if (existing) repos[repo] = existing;
+  for (const key of transient) {
+    const existing = previous.sources[key];
+    if (existing) sources[key] = existing;
   }
-  for (const [repo, listings] of Object.entries(observations.notFound)) {
+  for (const [key, listings] of Object.entries(observations.notFound)) {
     if (listings.length === 0) continue;
-    repos[repo] = {
-      first_unreachable_at: previous.repos[repo]?.first_unreachable_at ?? nowIso,
+    const parsed = parseLivenessSourceKey(key);
+    if (!parsed) continue;
+    sources[key] = {
+      kind: parsed.kind,
+      first_unreachable_at: previous.sources[key]?.first_unreachable_at ?? nowIso,
       last_checked_at: nowIso,
       listings: [...listings].sort(),
     };
   }
 
-  const sorted: Record<string, RepoLivenessEntry> = {};
-  for (const repo of Object.keys(repos).sort()) {
-    sorted[repo] = repos[repo]!;
+  const sorted: Record<string, SourceLivenessEntry> = {};
+  for (const key of Object.keys(sources).sort()) {
+    sorted[key] = sources[key]!;
   }
   return {
     schema_version: REPO_LIVENESS_SCHEMA_VERSION,
     updated_at: nowIso,
-    repos: sorted,
+    sources: sorted,
   };
 }
 
-export function updateRepoLiveness(
+export function updateSourceLiveness(
   repoRoot: string,
   dir: ManifestDirectory,
-  observations: RepoLivenessObservations,
+  observations: SourceLivenessObservations,
   nowIso: string,
-): RepoLivenessFile {
-  const next = applyRepoLivenessObservations(loadRepoLiveness(repoRoot, dir), observations, nowIso);
+): SourceLivenessFile {
+  const next = applySourceLivenessObservations(
+    loadSourceLiveness(repoRoot, dir),
+    observations,
+    nowIso,
+  );
   writeJsonFile(getRepoLivenessPath(repoRoot, dir), next);
   return next;
 }

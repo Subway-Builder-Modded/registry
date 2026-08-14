@@ -433,7 +433,9 @@ export async function fetchZipBuffer(
 
 export type CustomVersionFetchResult =
   | { transientError: true; versions: [] }
-  | { transientError: false; versions: CustomVersionCandidate[] };
+  // sourceUnreachable marks the endpoint itself as definitively gone (a
+  // non-transient HTTP status), as opposed to reachable-but-unusable content.
+  | { transientError: false; versions: CustomVersionCandidate[]; sourceUnreachable?: boolean };
 
 function isTransientCustomFetchStatus(status: number): boolean {
   return status === 408 || status === 425 || status === 429 || status >= 500;
@@ -468,7 +470,8 @@ export async function fetchCustomVersions(
   if (!response.ok) {
     const transientError = isTransientCustomFetchStatus(response.status);
     warnListing(warnings, listingId, `custom update JSON returned HTTP ${response.status}${transientError ? " (transient; previous counts preserved)" : ""}`);
-    return { transientError, versions: [] };
+    if (transientError) return { transientError: true, versions: [] };
+    return { transientError: false, versions: [], sourceUnreachable: true };
   }
 
   let body: unknown;
