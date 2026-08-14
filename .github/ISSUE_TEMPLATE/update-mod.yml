@@ -113,3 +113,16 @@ body:
         Leave blank to keep the current caretaker. Enter `None` to end the current caretakership. Otherwise,
         enter a single GitHub user ID to hand over caretakership; the previous caretaker's window is closed and
         the new caretaker is added as a collaborator.
+
+  - type: markdown
+    attributes:
+      value: |
+        ## Authorization
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Terms
+      options:
+        - label: I attest that I have reviewed the Subway Builder Modded platform [Terms of Service](https://subwaybuildermodded.com/terms-of-service).
+          required: true
