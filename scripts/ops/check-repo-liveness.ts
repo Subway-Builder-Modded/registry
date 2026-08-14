@@ -76,7 +76,9 @@ function buildIssueBody(entry: OverdueRepo): string {
   const subject =
     entry.kind === "url"
       ? `The custom update endpoint \`${entry.repo}\` has been returning a permanent error`
-      : `The source repository \`${entry.repo}\` has been definitively unreachable\n(deleted, renamed without redirect, or made private)`;
+      : entry.kind === "listing"
+        ? `The listing \`${entry.repo}\` has had no installable version — its source answers, but every version has been removed upstream —`
+        : `The source repository \`${entry.repo}\` has been definitively unreachable\n(deleted, renamed without redirect, or made private)`;
   return [
     `${subject} since`,
     `**${entry.firstUnreachableAt}** — about **${Math.floor(entry.hoursUnreachable / 24)} day(s)** —`,
@@ -85,15 +87,19 @@ function buildIssueBody(entry: OverdueRepo): string {
     "Affected listings:",
     ...listingLines,
     "",
-    "Download counts and integrity state are preserved automatically while the",
-    "repo is unreachable, so there is no data-loss urgency. Suggested review:",
+    "Download counts and integrity state are preserved automatically, so there is",
+    "no data-loss urgency. Suggested review:",
     "",
     entry.kind === "url"
       ? "1. Check whether the JSON moved — if so, update the listing's custom update URL."
-      : "1. Check whether the repo moved (rename/transfer) — if so, update the listing manifests.",
-    "2. If the author intends to keep it unavailable, deprecate the listing(s) via the",
-    "   **Deprecate asset** issue form (download counts are frozen automatically on deprecation).",
-    "3. If the outage was temporary, this issue closes itself once the repo is reachable again.",
+      : entry.kind === "listing"
+        ? "1. Check whether the releases were removed deliberately — if not, re-publishing one restores the listing."
+        : "1. Check whether the repo moved (rename/transfer) — if so, update the listing manifests.",
+    "2. If the author intends to keep it unavailable, retire the listing(s) via the",
+    "   **Deprecate an Asset** or **Delete an Asset** form (counts are frozen either way).",
+    entry.kind === "listing"
+      ? "3. This issue closes itself once any version is installable again."
+      : "3. This issue closes itself once the source is reachable again.",
     "",
     "_Opened automatically by the repo-liveness review workflow; see KNOWN_INCIDENTS.md_",
     "_(2026-08-04 private-repo wipe) for the incident that motivated this check._",
@@ -158,7 +164,7 @@ async function ensureLabelExists(): Promise<void> {
     body: JSON.stringify({
       name: REPO_UNREACHABLE_LABEL,
       color: "d93f0b",
-      description: "Source repo for one or more listings is unreachable; maintainer review needed",
+      description: "A listing is unavailable (dead source, or no installable version); maintainer review needed",
     }),
   });
   // 422 = already exists — the expected steady state.

@@ -3,22 +3,26 @@ import { resolve } from "node:path";
 import type { ManifestDirectory } from "./manifests.js";
 import { isObject, writeJsonFile } from "./json-utils.js";
 
-// Tracks update sources that are currently unreachable in the permanent sense:
-// a GitHub repo that returns "Could not resolve to a Repository" (deleted,
-// renamed without redirect, or made private), or a custom update JSON whose
-// endpoint returns a non-transient HTTP error. Transient failures (429/5xx,
-// network errors) never touch this file — an entry's first_unreachable_at only
-// starts, and only clears, on a definitive observation. Consumed by the
-// repo-liveness review workflow, which nags maintainers once a source has been
-// unreachable for multiple days.
+// Tracks listings that are effectively unavailable, by cause:
+//   repo    — GitHub repo returning "Could not resolve to a Repository"
+//             (deleted, renamed without redirect, or made private)
+//   url     — custom update JSON whose endpoint returns a non-transient error
+//   listing — source reachable, but no installable version remains (every
+//             version removed upstream), which no per-version integrity alert
+//             can catch: tombstones carry no failed checks
+// Transient failures (429/5xx, network errors) never touch this file — an
+// entry's first_unreachable_at only starts, and only clears, on a definitive
+// observation. Consumed by the repo-liveness review workflow, which nags
+// maintainers once a cause has persisted for multiple days.
 //
-// The file name predates custom-source support; entries are keyed by kind.
+// The file name predates both custom sources and listing entries; the key kind
+// carries the distinction.
 
 export const REPO_LIVENESS_SCHEMA_VERSION = 2;
 
-export type LivenessSourceKind = "repo" | "url";
+export type LivenessSourceKind = "repo" | "url" | "listing";
 
-/** Key space: "repo:owner/name" and "url:https://…" cannot collide. */
+/** Key space: "repo:owner/name", "url:https://…" and "listing:<id>" cannot collide. */
 export function livenessSourceKey(kind: LivenessSourceKind, value: string): string {
   return `${kind}:${value}`;
 }
@@ -28,6 +32,7 @@ export function parseLivenessSourceKey(
 ): { kind: LivenessSourceKind; value: string } | null {
   if (key.startsWith("repo:")) return { kind: "repo", value: key.slice(5) };
   if (key.startsWith("url:")) return { kind: "url", value: key.slice(4) };
+  if (key.startsWith("listing:")) return { kind: "listing", value: key.slice(8) };
   return null;
 }
 
@@ -35,7 +40,7 @@ export interface SourceLivenessEntry {
   kind: LivenessSourceKind;
   first_unreachable_at: string;
   last_checked_at: string;
-  /** Non-deprecated, non-test listings that reference the source. */
+  /** Non-deprecated, non-test listings affected (the listing itself, for listing-kind). */
   listings: string[];
 }
 
@@ -154,4 +159,26 @@ export function updateSourceLiveness(
   );
   writeJsonFile(getRepoLivenessPath(repoRoot, dir), next);
   return next;
+}
+
+/**
+ * Listing-level observations: listings with no installable version left, keyed
+ * as listing-kind sources. Deprecated and test listings are excluded (their
+ * empty version set is intended), as are listings whose own source is already
+ * reported unreachable — one dead upstream should raise one issue.
+ */
+export function collectListingsWithoutInstallableVersion(params: {
+  ids: readonly string[];
+  isEligible: (id: string) => boolean;
+  hasCompleteVersion: (id: string) => boolean;
+  hasUnreachableSource: (id: string) => boolean;
+}): Record<string, string[]> {
+  const notFound: Record<string, string[]> = {};
+  for (const id of params.ids) {
+    if (!params.isEligible(id)) continue;
+    if (params.hasCompleteVersion(id)) continue;
+    if (params.hasUnreachableSource(id)) continue;
+    notFound[livenessSourceKey("listing", id)] = [id];
+  }
+  return notFound;
 }

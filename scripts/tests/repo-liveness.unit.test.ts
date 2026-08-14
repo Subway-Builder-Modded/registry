@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
   applySourceLivenessObservations,
+  collectListingsWithoutInstallableVersion,
   livenessSourceKey,
   loadSourceLiveness,
   updateSourceLiveness,
@@ -175,4 +176,62 @@ test("a v1 file's bare repo names load as repo-kind sources", (t) => {
     last_checked_at: T0,
     listings: ["mod-a"],
   });
+});
+
+test("a listing with no installable version is tracked", () => {
+  const found = collectListingsWithoutInstallableVersion({
+    ids: ["live-mod", "dead-mod"],
+    isEligible: () => true,
+    hasCompleteVersion: (id) => id === "live-mod",
+    hasUnreachableSource: () => false,
+  });
+  assert.deepEqual(found, { "listing:dead-mod": ["dead-mod"] });
+});
+
+test("deprecated and test listings are never tracked as dead listings", () => {
+  // Their empty version set is the deprecation overlay working as intended.
+  const found = collectListingsWithoutInstallableVersion({
+    ids: ["retired-mod", "test-mod"],
+    isEligible: () => false,
+    hasCompleteVersion: () => false,
+    hasUnreachableSource: () => false,
+  });
+  assert.deepEqual(found, {});
+});
+
+test("a listing whose source is already reported is not double-reported", () => {
+  // One dead upstream should raise one issue, not two.
+  const found = collectListingsWithoutInstallableVersion({
+    ids: ["orphan-mod"],
+    isEligible: () => true,
+    hasCompleteVersion: () => false,
+    hasUnreachableSource: () => true,
+  });
+  assert.deepEqual(found, {});
+});
+
+test("listing entries share the clock and recovery rules of every other kind", () => {
+  const key = livenessSourceKey("listing", "dead-mod");
+  const first = applySourceLivenessObservations(fileWith({}), {
+    reachable: [],
+    transient: [],
+    notFound: { [key]: ["dead-mod"] },
+  }, T0);
+  assert.equal(first.sources[key]?.kind, "listing");
+
+  // A transient source failure must not advance or clear the clock.
+  const held = applySourceLivenessObservations(first, {
+    reachable: [],
+    transient: [key],
+    notFound: {},
+  }, T1);
+  assert.equal(held.sources[key]?.first_unreachable_at, T0);
+
+  // A version becoming installable again clears it.
+  const recovered = applySourceLivenessObservations(held, {
+    reachable: [key],
+    transient: [],
+    notFound: {},
+  }, T1);
+  assert.deepEqual(recovered.sources, {});
 });

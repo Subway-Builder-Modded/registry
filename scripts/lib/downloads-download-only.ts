@@ -10,7 +10,11 @@ import {
 } from "./download-attribution.js";
 import { toDownloadAssetBucketKey } from "./download-version-buckets.js";
 import { isManifestDeprecated } from "./downloads-full/deprecation.js";
-import { livenessSourceKey, updateSourceLiveness } from "./repo-liveness.js";
+import {
+  collectListingsWithoutInstallableVersion,
+  livenessSourceKey,
+  updateSourceLiveness,
+} from "./repo-liveness.js";
 import {
   type ListingContext,
   emptyIntegrity,
@@ -136,23 +140,53 @@ export async function generateDownloadsDataDownloadOnly(
 
   {
     const notFound: Record<string, string[]> = {};
+    const unreachableSourceKeys = new Set<string>();
     for (const repo of repoSet) {
       if (repoIndexes.has(repo) || unavailableRepos.has(repo)) continue;
-      const key = livenessSourceKey("repo", repo);
-      notFound[key] = [...(sourceEligibleListings.get(key) ?? [])];
+      unreachableSourceKeys.add(livenessSourceKey("repo", repo));
     }
     for (const url of unreachableUrls) {
-      const key = livenessSourceKey("url", url);
+      unreachableSourceKeys.add(livenessSourceKey("url", url));
+    }
+    for (const key of unreachableSourceKeys) {
       notFound[key] = [...(sourceEligibleListings.get(key) ?? [])];
     }
+
+    // Listing-level cause, evaluated against the published integrity snapshot
+    // this mode already loads. Both modes must apply it: the hourly
+    // download-only run would otherwise drop entries the full run recorded,
+    // resetting the clock every hour.
+    const eligibleForListingCheck = (id: string): boolean => {
+      try {
+        const manifest = getManifest(repoRoot, dir, id);
+        return !isManifestDeprecated(manifest) && manifest.is_test !== true;
+      } catch {
+        return false;
+      }
+    };
+    Object.assign(notFound, collectListingsWithoutInstallableVersion({
+      ids,
+      isEligible: (id) => hasIntegritySnapshot && eligibleForListingCheck(id),
+      hasCompleteVersion: (id) => integrity.listings[id]?.has_complete_version === true,
+      hasUnreachableSource: (id) =>
+        [...unreachableSourceKeys].some((key) => sourceEligibleListings.get(key)?.has(id) === true),
+    }));
+
     updateSourceLiveness(repoRoot, dir, {
       reachable: [
         ...[...repoIndexes.keys()].map((repo) => livenessSourceKey("repo", repo)),
         ...[...reachableUrls].map((url) => livenessSourceKey("url", url)),
+        ...(hasIntegritySnapshot
+          ? ids
+              .filter((id) => integrity.listings[id]?.has_complete_version === true)
+              .map((id) => livenessSourceKey("listing", id))
+          : []),
       ],
       transient: [
         ...[...unavailableRepos].map((repo) => livenessSourceKey("repo", repo)),
         ...[...transientUrls].map((url) => livenessSourceKey("url", url)),
+        // No integrity snapshot means no verdict on any listing this run.
+        ...(hasIntegritySnapshot ? [] : ids.map((id) => livenessSourceKey("listing", id))),
       ],
       notFound,
     }, nowIso);

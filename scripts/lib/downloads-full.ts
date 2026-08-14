@@ -2,6 +2,7 @@ import type { ManifestDirectory, MapManifest } from "./manifests.js";
 import * as D from "./download-definitions.js";
 import { createGraphqlUsageState, fetchRepoReleaseIndexes, isSupportedReleaseTag, graphqlUsageSnapshot } from "./release-resolution.js";
 import {
+  collectListingsWithoutInstallableVersion,
   livenessSourceKey,
   parseLivenessSourceKey,
   updateSourceLiveness,
@@ -79,6 +80,7 @@ interface ListingMetaEntry {
   authorId: string;
   caretakerGithubId?: number;
   deprecated?: boolean;
+  isTest?: boolean;
 }
 
 interface AdjustedVersionCount {
@@ -409,6 +411,7 @@ async function resolveListingContexts(params: {
       authorId: manifest.author,
       caretakerGithubId: getActiveCaretaker(manifest)?.github_id,
       deprecated: isManifestDeprecated(manifest),
+      isTest: manifest.is_test === true,
     });
 
     if (manifest.update.type === "github") {
@@ -1483,30 +1486,6 @@ export async function generateDownloadsDataFull(
     suppressWarningRepos,
   });
 
-  {
-    const notFound: Record<string, string[]> = {};
-    for (const repo of repoSet) {
-      if (repoIndexes.has(repo) || unavailableRepos.has(repo)) continue;
-      const key = livenessSourceKey("repo", repo);
-      notFound[key] = [...(repoEligibleListings.get(key) ?? [])];
-    }
-    for (const url of urlObservations.unreachable) {
-      const key = livenessSourceKey("url", url);
-      notFound[key] = [...(repoEligibleListings.get(key) ?? [])];
-    }
-    updateSourceLiveness(repoRoot, dir, {
-      reachable: [
-        ...[...repoIndexes.keys()].map((repo) => livenessSourceKey("repo", repo)),
-        ...[...urlObservations.reachable].map((url) => livenessSourceKey("url", url)),
-      ],
-      transient: [
-        ...[...unavailableRepos].map((repo) => livenessSourceKey("repo", repo)),
-        ...[...urlObservations.transient].map((url) => livenessSourceKey("url", url)),
-      ],
-      notFound,
-    }, nowIso);
-  }
-
   const ctx: FullRunContext = {
     listingType,
     fetchImpl,
@@ -1551,6 +1530,57 @@ export async function generateDownloadsDataFull(
       continue;
     }
     await evaluateListing(ctx, id, context);
+  }
+
+  {
+    const notFound: Record<string, string[]> = {};
+    const unreachableSourceKeys = new Set<string>();
+    for (const repo of repoSet) {
+      if (repoIndexes.has(repo) || unavailableRepos.has(repo)) continue;
+      unreachableSourceKeys.add(livenessSourceKey("repo", repo));
+    }
+    for (const url of urlObservations.unreachable) {
+      unreachableSourceKeys.add(livenessSourceKey("url", url));
+    }
+    for (const key of unreachableSourceKeys) {
+      notFound[key] = [...(repoEligibleListings.get(key) ?? [])];
+    }
+
+    // Listing-level cause: the source answers, but nothing installable is
+    // left. Tombstoned versions carry no failed checks, so no per-version
+    // integrity alert can fire — this is the only signal for it. Skipped when
+    // the listing's own source is already reported above, so one dead upstream
+    // raises one issue rather than two.
+    const listingNotFound = collectListingsWithoutInstallableVersion({
+      ids,
+      isEligible: (id) => {
+        const meta = listingMeta.get(id);
+        return meta?.deprecated !== true && meta?.isTest !== true;
+      },
+      hasCompleteVersion: (id) => ctx.integrityListings[id]?.has_complete_version === true,
+      hasUnreachableSource: (id) =>
+        [...unreachableSourceKeys].some((key) => repoEligibleListings.get(key)?.has(id) === true),
+    });
+    Object.assign(notFound, listingNotFound);
+
+    updateSourceLiveness(repoRoot, dir, {
+      reachable: [
+        ...[...repoIndexes.keys()].map((repo) => livenessSourceKey("repo", repo)),
+        ...[...urlObservations.reachable].map((url) => livenessSourceKey("url", url)),
+        // Listings that still have an installable version clear any entry.
+        ...ids
+          .filter((id) => ctx.integrityListings[id]?.has_complete_version === true)
+          .map((id) => livenessSourceKey("listing", id)),
+      ],
+      transient: [
+        ...[...unavailableRepos].map((repo) => livenessSourceKey("repo", repo)),
+        ...[...urlObservations.transient].map((url) => livenessSourceKey("url", url)),
+        // A listing whose source failed transiently has an unknown version
+        // set this run; carry any existing entry rather than judging it.
+        ...[...transientErrorListings].map((id) => livenessSourceKey("listing", id)),
+      ],
+      notFound,
+    }, nowIso);
   }
 
   const sortedDownloads: D.DownloadsByListing = {};
