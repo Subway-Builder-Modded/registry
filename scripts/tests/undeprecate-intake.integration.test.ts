@@ -172,3 +172,29 @@ test("undeprecate-listing refuses a listing that is not deprecated", (t) => {
   const result = runScript("undeprecate-listing", root, { ISSUE_JSON });
   assert.notEqual(result.status, 0);
 });
+
+test("a code owner may remove a deprecation they did not create", (t) => {
+  const root = makeFixtureRepo({ "fixture-mod": deprecatedModManifest("fixture-mod") });
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // subway-builder-modded-admin — see lib/maintainers.ts.
+  const result = runScript("validate-undeprecate", root, {
+    ISSUE_JSON,
+    ISSUE_AUTHOR_ID: "268817724",
+  });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test("a code owner still cannot restore a deleted listing", (t) => {
+  const manifest = deprecatedModManifest("fixture-mod");
+  (manifest.deprecation as Record<string, unknown>).deleted = true;
+  const root = makeFixtureRepo({ "fixture-mod": manifest });
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // Deletion is permanent for everyone; the override covers ownership only.
+  const result = runScript("validate-undeprecate", root, {
+    ISSUE_JSON,
+    ISSUE_AUTHOR_ID: "268817724",
+  });
+  assert.notEqual(result.status, 0);
+});

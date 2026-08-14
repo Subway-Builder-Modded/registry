@@ -1,6 +1,7 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { getActiveCaretaker, type ManifestWithCaretakers } from "../lib/caretakers.js";
+import { isMaintainer } from "../lib/maintainers.js";
 import { resolveListingById } from "../lib/manifests.js";
 
 const REPO_ROOT = process.env.RAILYARD_REPO_ROOT
@@ -55,7 +56,10 @@ function main() {
       const activeCaretaker = getActiveCaretaker(manifest as unknown as ManifestWithCaretakers);
       const caretakerId = activeCaretaker ? String(activeCaretaker.github_id) : null;
 
-      if (requesterId !== ownerId && requesterId !== caretakerId) {
+      // Code owners may act on any listing (see lib/maintainers.ts); the
+      // stamped by_github_id records who did, so the manifest still shows it
+      // was a maintainer action rather than the author's.
+      if (!isMaintainer(requesterId) && requesterId !== ownerId && requesterId !== caretakerId) {
         errors.push(
           `**Ownership check failed**: Only the original publisher or the active caretaker of `
           + `\`${id}\` can delete it. Collaborators cannot delete a listing.`,

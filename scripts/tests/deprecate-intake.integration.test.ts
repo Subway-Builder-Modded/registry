@@ -276,3 +276,26 @@ test("deprecate-listing succeeds without freezing when the listing has no counts
   assert.ok(result.stdout.includes("No download counts to freeze"));
   assert.equal(existsSync(join(root, "mods", "grandfathered-downloads.json")), false);
 });
+
+test("a code owner may deprecate a listing they do not own", (t) => {
+  const root = makeFixtureRepo({ "fixture-mod": baseModManifest("fixture-mod") });
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // subway-builder-modded-admin — see lib/maintainers.ts.
+  const result = runScript("validate-deprecate", root, {
+    ISSUE_JSON: issueJson("fixture-mod"),
+    ISSUE_AUTHOR_ID: "268817724",
+  });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test("a non-owner who is not a code owner is still rejected", (t) => {
+  const root = makeFixtureRepo({ "fixture-mod": baseModManifest("fixture-mod") });
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  const result = runScript("validate-deprecate", root, {
+    ISSUE_JSON: issueJson("fixture-mod"),
+    ISSUE_AUTHOR_ID: String(STRANGER_ID),
+  });
+  assert.notEqual(result.status, 0);
+});
