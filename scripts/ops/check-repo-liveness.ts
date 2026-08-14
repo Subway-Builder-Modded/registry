@@ -1,7 +1,11 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { ManifestDirectory } from "../lib/manifests.js";
-import { loadRepoLiveness } from "../lib/repo-liveness.js";
+import {
+  loadSourceLiveness,
+  parseLivenessSourceKey,
+  type LivenessSourceKind,
+} from "../lib/repo-liveness.js";
 
 // Daily review pass over definitively-unreachable source repos (deleted,
 // renamed without redirect, or made private), as recorded in maps/mods
@@ -36,7 +40,9 @@ const apiHeaders: Record<string, string> = {
 };
 
 interface OverdueRepo {
+  /** Display form: "owner/name" for repos, the endpoint URL for custom sources. */
   repo: string;
+  kind: LivenessSourceKind;
   dir: ManifestDirectory;
   listings: string[];
   firstUnreachableAt: string;
@@ -51,11 +57,13 @@ interface IssueListItem {
 }
 
 function buildIssueTitle(repo: string): string {
-  return `Unreachable source repository: ${repo}`;
+  return `Unreachable source: ${repo}`;
 }
 
 function parseIssueTitle(title: string): string | null {
-  const match = /^Unreachable source repository: (\S+)$/.exec(title.trim());
+  // The legacy title form is still matched so issues opened before custom
+  // sources were tracked are recognised (and closed) rather than duplicated.
+  const match = /^Unreachable source(?: repository)?: (\S+)$/.exec(title.trim());
   return match ? match[1]! : null;
 }
 
@@ -65,9 +73,12 @@ function buildIssueBody(entry: OverdueRepo): string {
     const suffix = total !== undefined ? ` — ${total} preserved downloads` : "";
     return `- \`${entry.dir}/${id}\`${suffix}`;
   });
+  const subject =
+    entry.kind === "url"
+      ? `The custom update endpoint \`${entry.repo}\` has been returning a permanent error`
+      : `The source repository \`${entry.repo}\` has been definitively unreachable\n(deleted, renamed without redirect, or made private)`;
   return [
-    `The source repository \`${entry.repo}\` has been definitively unreachable`,
-    `(deleted, renamed without redirect, or made private) since`,
+    `${subject} since`,
     `**${entry.firstUnreachableAt}** — about **${Math.floor(entry.hoursUnreachable / 24)} day(s)** —`,
     `last confirmed at ${entry.lastCheckedAt}.`,
     "",
@@ -77,7 +88,9 @@ function buildIssueBody(entry: OverdueRepo): string {
     "Download counts and integrity state are preserved automatically while the",
     "repo is unreachable, so there is no data-loss urgency. Suggested review:",
     "",
-    "1. Check whether the repo moved (rename/transfer) — if so, update the listing manifests.",
+    entry.kind === "url"
+      ? "1. Check whether the JSON moved — if so, update the listing's custom update URL."
+      : "1. Check whether the repo moved (rename/transfer) — if so, update the listing manifests.",
     "2. If the author intends to keep it unavailable, deprecate the listing(s) via the",
     "   **Deprecate asset** issue form (download counts are frozen automatically on deprecation).",
     "3. If the outage was temporary, this issue closes itself once the repo is reachable again.",
@@ -101,9 +114,12 @@ function collectRepoState(nowMs: number): { overdue: OverdueRepo[]; tracked: Set
   const overdue: OverdueRepo[] = [];
   const tracked = new Set<string>();
   for (const dir of ["maps", "mods"] as const) {
-    const liveness = loadRepoLiveness(REPO_ROOT, dir);
+    const liveness = loadSourceLiveness(REPO_ROOT, dir);
     const downloads = loadListingTotals(dir);
-    for (const [repo, entry] of Object.entries(liveness.repos)) {
+    for (const [key, entry] of Object.entries(liveness.sources)) {
+      const parsed = parseLivenessSourceKey(key);
+      if (!parsed) continue;
+      const repo = parsed.value;
       tracked.add(repo);
       const firstMs = Date.parse(entry.first_unreachable_at);
       if (!Number.isFinite(firstMs)) continue;
@@ -118,6 +134,7 @@ function collectRepoState(nowMs: number): { overdue: OverdueRepo[]; tracked: Set
       }
       overdue.push({
         repo,
+        kind: parsed.kind,
         dir,
         listings: entry.listings,
         firstUnreachableAt: entry.first_unreachable_at,

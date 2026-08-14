@@ -1,7 +1,11 @@
 import type { ManifestDirectory, MapManifest } from "./manifests.js";
 import * as D from "./download-definitions.js";
 import { createGraphqlUsageState, fetchRepoReleaseIndexes, isSupportedReleaseTag, graphqlUsageSnapshot } from "./release-resolution.js";
-import { updateRepoLiveness } from "./repo-liveness.js";
+import {
+  livenessSourceKey,
+  parseLivenessSourceKey,
+  updateSourceLiveness,
+} from "./repo-liveness.js";
 import type {
   IntegrityCache,
   IntegrityCacheEntry,
@@ -344,6 +348,11 @@ async function resolveListingContexts(params: {
   repoActiveUse: Map<string, boolean>;
   // repo -> non-deprecated, non-test listing ids referencing it (liveness tracking).
   repoEligibleListings: Map<string, Set<string>>;
+  urlObservations: {
+    reachable: Set<string>;
+    transient: Set<string>;
+    unreachable: Set<string>;
+  };
   transientErrorListings: Set<string>;
 }): Promise<void> {
   const {
@@ -360,17 +369,21 @@ async function resolveListingContexts(params: {
     repoSet,
     repoActiveUse,
     repoEligibleListings,
+    urlObservations,
     transientErrorListings,
   } = params;
 
-  const markRepoUse = (repo: string, id: string, manifest: { is_test?: boolean; deprecation?: unknown }) => {
+  const markSourceUse = (key: string, id: string, manifest: { is_test?: boolean; deprecation?: unknown }) => {
     const isActive = !isManifestDeprecated(manifest) && manifest.is_test !== true;
-    repoActiveUse.set(repo, (repoActiveUse.get(repo) ?? false) || isActive);
+    const parsed = parseLivenessSourceKey(key);
+    if (parsed?.kind === "repo") {
+      repoActiveUse.set(parsed.value, (repoActiveUse.get(parsed.value) ?? false) || isActive);
+    }
     if (isActive) {
-      let listings = repoEligibleListings.get(repo);
+      let listings = repoEligibleListings.get(key);
       if (!listings) {
         listings = new Set();
-        repoEligibleListings.set(repo, listings);
+        repoEligibleListings.set(key, listings);
       }
       listings.add(id);
     }
@@ -401,7 +414,7 @@ async function resolveListingContexts(params: {
     if (manifest.update.type === "github") {
       const repo = manifest.update.repo.toLowerCase();
       repoSet.add(repo);
-      markRepoUse(repo, id, manifest);
+      markSourceUse(livenessSourceKey("repo", repo), id, manifest);
       listingContexts.set(id, {
         id,
         listingType,
@@ -415,17 +428,25 @@ async function resolveListingContexts(params: {
       await new Promise<void>((resolve) => setTimeout(resolve, CUSTOM_UPDATE_INTER_FETCH_DELAY_MS));
     }
     customFetchCount += 1;
-    const customFetch = await fetchCustomVersions(id, manifest.update.url, fetchImpl, warnings);
+    const updateUrl = manifest.update.url;
+    markSourceUse(livenessSourceKey("url", updateUrl), id, manifest);
+    const customFetch = await fetchCustomVersions(id, updateUrl, fetchImpl, warnings);
     if (customFetch.transientError) {
+      urlObservations.transient.add(updateUrl);
       downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
       transientErrorListings.add(id);
       warnListing(warnings, id, "preserved previous custom-update downloads (transient fetch error)");
       continue;
     }
+    if (customFetch.sourceUnreachable) {
+      urlObservations.unreachable.add(updateUrl);
+    } else {
+      urlObservations.reachable.add(updateUrl);
+    }
     for (const version of customFetch.versions) {
       if (version.parsed) {
         repoSet.add(version.parsed.repo);
-        markRepoUse(version.parsed.repo, id, manifest);
+        markSourceUse(livenessSourceKey("repo", version.parsed.repo), id, manifest);
       }
     }
     listingContexts.set(id, {
@@ -1425,6 +1446,11 @@ export async function generateDownloadsDataFull(
   const repoSet = new Set<string>();
   const repoActiveUse = new Map<string, boolean>();
   const repoEligibleListings = new Map<string, Set<string>>();
+  const urlObservations = {
+    reachable: new Set<string>(),
+    transient: new Set<string>(),
+    unreachable: new Set<string>(),
+  };
   const transientErrorListings = new Set<string>();
 
   await resolveListingContexts({
@@ -1441,6 +1467,7 @@ export async function generateDownloadsDataFull(
     repoSet,
     repoActiveUse,
     repoEligibleListings,
+    urlObservations,
     transientErrorListings,
   });
 
@@ -1460,11 +1487,22 @@ export async function generateDownloadsDataFull(
     const notFound: Record<string, string[]> = {};
     for (const repo of repoSet) {
       if (repoIndexes.has(repo) || unavailableRepos.has(repo)) continue;
-      notFound[repo] = [...(repoEligibleListings.get(repo) ?? [])];
+      const key = livenessSourceKey("repo", repo);
+      notFound[key] = [...(repoEligibleListings.get(key) ?? [])];
     }
-    updateRepoLiveness(repoRoot, dir, {
-      reachable: repoIndexes.keys(),
-      transient: unavailableRepos,
+    for (const url of urlObservations.unreachable) {
+      const key = livenessSourceKey("url", url);
+      notFound[key] = [...(repoEligibleListings.get(key) ?? [])];
+    }
+    updateSourceLiveness(repoRoot, dir, {
+      reachable: [
+        ...[...repoIndexes.keys()].map((repo) => livenessSourceKey("repo", repo)),
+        ...[...urlObservations.reachable].map((url) => livenessSourceKey("url", url)),
+      ],
+      transient: [
+        ...[...unavailableRepos].map((repo) => livenessSourceKey("repo", repo)),
+        ...[...urlObservations.transient].map((url) => livenessSourceKey("url", url)),
+      ],
       notFound,
     }, nowIso);
   }

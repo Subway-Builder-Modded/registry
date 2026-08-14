@@ -10,7 +10,7 @@ import {
 } from "./download-attribution.js";
 import { toDownloadAssetBucketKey } from "./download-version-buckets.js";
 import { isManifestDeprecated } from "./downloads-full/deprecation.js";
-import { updateRepoLiveness } from "./repo-liveness.js";
+import { livenessSourceKey, updateSourceLiveness } from "./repo-liveness.js";
 import {
   type ListingContext,
   emptyIntegrity,
@@ -48,17 +48,27 @@ export async function generateDownloadsDataDownloadOnly(
   const versionBucketInputs: D.VersionBucketInputsByListing = {};
   const listingContexts = new Map<string, ListingContext>();
   const repoSet = new Set<string>();
-  // Repo -> non-deprecated, non-test listings referencing it, for liveness tracking.
-  const repoEligibleListings = new Map<string, Set<string>>();
-  const trackRepoListing = (repo: string, id: string, manifest: { is_test?: boolean; deprecation?: unknown }) => {
+  // Source key -> non-deprecated, non-test listings referencing it.
+  const sourceEligibleListings = new Map<string, Set<string>>();
+  const trackSourceListing = (
+    key: string,
+    id: string,
+    manifest: { is_test?: boolean; deprecation?: unknown },
+  ) => {
     if (manifest.is_test || isManifestDeprecated(manifest)) return;
-    let listings = repoEligibleListings.get(repo);
+    let listings = sourceEligibleListings.get(key);
     if (!listings) {
       listings = new Set();
-      repoEligibleListings.set(repo, listings);
+      sourceEligibleListings.set(key, listings);
     }
     listings.add(id);
   };
+  // Custom update endpoints, tracked alongside repos: when the host serving
+  // the JSON dies, the fetch fails before any repo can be parsed out of it, so
+  // repo-only tracking would never see the listing at all.
+  const reachableUrls = new Set<string>();
+  const transientUrls = new Set<string>();
+  const unreachableUrls = new Set<string>();
 
   for (const id of ids) {
     downloadsByListing[id] = {};
@@ -74,7 +84,7 @@ export async function generateDownloadsDataDownloadOnly(
     if (manifest.update.type === "github") {
       const repo = manifest.update.repo.toLowerCase();
       repoSet.add(repo);
-      trackRepoListing(repo, id, manifest);
+      trackSourceListing(livenessSourceKey("repo", repo), id, manifest);
       listingContexts.set(id, {
         id,
         listingType,
@@ -84,16 +94,24 @@ export async function generateDownloadsDataDownloadOnly(
       continue;
     }
 
-    const customFetch = await fetchCustomVersions(id, manifest.update.url, fetchImpl, warnings);
+    const updateUrl = manifest.update.url;
+    trackSourceListing(livenessSourceKey("url", updateUrl), id, manifest);
+    const customFetch = await fetchCustomVersions(id, updateUrl, fetchImpl, warnings);
     if (customFetch.transientError) {
+      transientUrls.add(updateUrl);
       downloadsByListing[id] = sortObjectByKeys(previousDownloads[id] ?? {});
       warnListing(warnings, id, "preserved previous custom-update downloads (transient fetch error)");
       continue;
     }
+    if (customFetch.sourceUnreachable) {
+      unreachableUrls.add(updateUrl);
+    } else {
+      reachableUrls.add(updateUrl);
+    }
     for (const version of customFetch.versions) {
       if (version.parsed) {
         repoSet.add(version.parsed.repo);
-        trackRepoListing(version.parsed.repo, id, manifest);
+        trackSourceListing(livenessSourceKey("repo", version.parsed.repo), id, manifest);
       }
     }
     listingContexts.set(id, {
@@ -120,11 +138,22 @@ export async function generateDownloadsDataDownloadOnly(
     const notFound: Record<string, string[]> = {};
     for (const repo of repoSet) {
       if (repoIndexes.has(repo) || unavailableRepos.has(repo)) continue;
-      notFound[repo] = [...(repoEligibleListings.get(repo) ?? [])];
+      const key = livenessSourceKey("repo", repo);
+      notFound[key] = [...(sourceEligibleListings.get(key) ?? [])];
     }
-    updateRepoLiveness(repoRoot, dir, {
-      reachable: repoIndexes.keys(),
-      transient: unavailableRepos,
+    for (const url of unreachableUrls) {
+      const key = livenessSourceKey("url", url);
+      notFound[key] = [...(sourceEligibleListings.get(key) ?? [])];
+    }
+    updateSourceLiveness(repoRoot, dir, {
+      reachable: [
+        ...[...repoIndexes.keys()].map((repo) => livenessSourceKey("repo", repo)),
+        ...[...reachableUrls].map((url) => livenessSourceKey("url", url)),
+      ],
+      transient: [
+        ...[...unavailableRepos].map((repo) => livenessSourceKey("repo", repo)),
+        ...[...transientUrls].map((url) => livenessSourceKey("url", url)),
+      ],
       notFound,
     }, nowIso);
   }

@@ -487,8 +487,8 @@ test("download-only mode preserves previous downloads when a GitHub repo is temp
     );
     const liveness = JSON.parse(
       readFileSync(join(repoRoot, "mods", "repo-liveness.json"), "utf-8"),
-    ) as { repos: Record<string, unknown> };
-    assert.deepEqual(liveness.repos, {});
+    ) as { sources: Record<string, unknown> };
+    assert.deepEqual(liveness.sources, {});
   });
 });
 
@@ -643,8 +643,8 @@ test("download-only mode preserves previous downloads when a GitHub repo is priv
     );
     const liveness = JSON.parse(
       readFileSync(join(repoRoot, "mods", "repo-liveness.json"), "utf-8"),
-    ) as { repos: Record<string, { listings: string[] }> };
-    assert.deepEqual(liveness.repos["owner/gone"]?.listings, ["github-mod"]);
+    ) as { sources: Record<string, { listings: string[] }> };
+    assert.deepEqual(liveness.sources["repo:owner/gone"]?.listings, ["github-mod"]);
   });
 });
 
