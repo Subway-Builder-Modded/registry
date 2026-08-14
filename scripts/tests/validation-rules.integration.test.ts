@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync, unlinkSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
+import { tmpdir } from "node:os";
 import { spawnSync, type SpawnSyncReturns } from "node:child_process";
 import JSZip from "jszip";
 
@@ -272,4 +273,105 @@ test("update validation rejects malformed collaborators", () => {
   assert.notEqual(result.status, 0, "Validation should fail for malformed collaborators");
   const output = readValidationError();
   assert.match(output, /\*\*collaborators\*\*: Collaborators must be a comma-separated list of GitHub user IDs with no empty entries\./);
+});
+
+// --- privileged update fields (ownership parity with retirement) ---
+
+const UPDATE_OWNER_ID = 4100;
+const UPDATE_COLLABORATOR_ID = 4200;
+const UPDATE_CARETAKER_ID = 4300;
+
+function makeUpdateFixtureRepo(): string {
+  const root = mkdtempSync(join(tmpdir(), "railyard-update-auth-"));
+  mkdirSync(join(root, "mods", "fixture-mod"), { recursive: true });
+  mkdirSync(join(root, "scripts"), { recursive: true });
+  writeFileSync(
+    join(root, "mods", "fixture-mod", "manifest.json"),
+    JSON.stringify({
+      schema_version: 1,
+      id: "fixture-mod",
+      name: "Fixture Mod",
+      author: "fixture-author",
+      github_id: UPDATE_OWNER_ID,
+      collaborators: [UPDATE_COLLABORATOR_ID, UPDATE_CARETAKER_ID],
+      caretakers: [{ github_id: UPDATE_CARETAKER_ID, since: "2026-03-01T00:00:00Z" }],
+      description: "A fixture mod.",
+      tags: ["qol"],
+      gallery: [],
+      is_test: false,
+      source: "https://example.com/fixture",
+      update: { type: "github", repo: "fixture/fixture" },
+    }, null, 2) + "\n",
+    "utf-8",
+  );
+  return root;
+}
+
+function runUpdateInFixture(root: string, authorId: number, issue: Record<string, string>) {
+  return spawnSync(
+    process.execPath,
+    [resolve(scriptsRoot, ".test-dist", "intake", "validate-update.js")],
+    {
+      cwd: root,
+      env: {
+        ...process.env,
+        RAILYARD_REPO_ROOT: root,
+        LISTING_TYPE: "mod",
+        ISSUE_AUTHOR_ID: String(authorId),
+        ISSUE_JSON: JSON.stringify({ "mod-id": "fixture-mod", ...issue }),
+      },
+      encoding: "utf-8" as const,
+    },
+  );
+}
+
+function fixtureValidationError(root: string): string {
+  const path = join(root, "scripts", "validation-error.md");
+  return existsSync(path) ? readFileSync(path, "utf-8") : "";
+}
+
+test("update validation blocks a collaborator from repointing the update source", (t) => {
+  const root = makeUpdateFixtureRepo();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  const result = runUpdateInFixture(root, UPDATE_COLLABORATOR_ID, { "update-type": "GitHub Releases" });
+  assert.notEqual(result.status, 0, "collaborators must not be able to repoint downloads");
+  assert.match(fixtureValidationError(root), /Authorization check failed.*update-type/s);
+});
+
+test("update validation blocks a collaborator from rewriting collaborators or caretaker", (t) => {
+  const root = makeUpdateFixtureRepo();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  const result = runUpdateInFixture(root, UPDATE_COLLABORATOR_ID, { caretaker: "not-an-id" });
+  assert.notEqual(result.status, 0);
+  assert.match(fixtureValidationError(root), /Authorization check failed.*caretaker/s);
+});
+
+test("update validation still lets a collaborator edit presentation metadata", (t) => {
+  const root = makeUpdateFixtureRepo();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  const result = runUpdateInFixture(root, UPDATE_COLLABORATOR_ID, {
+    name: "Renamed Fixture Mod",
+    description: "An updated description.",
+  });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test("update validation lets the active caretaker change the update source", (t) => {
+  const root = makeUpdateFixtureRepo();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  const result = runUpdateInFixture(root, UPDATE_CARETAKER_ID, { "update-type": "GitHub Releases" });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test("update validation lets a code owner change the update source", (t) => {
+  const root = makeUpdateFixtureRepo();
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // subway-builder-modded-admin — see lib/maintainers.ts.
+  const result = runUpdateInFixture(root, 268817724, { "update-type": "GitHub Releases" });
+  assert.equal(result.status, 0, result.stderr);
 });
