@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "updated_at": "2026-08-14T21:01:39.277Z",
+  "updated_at": "2026-08-14T21:56:25.740Z",
   "valid_paths": [
     "/",
     "/community",
@@ -737,6 +737,7 @@
     "/registry/docs/data-quality/submission-questions",
     "/registry/docs/dependencies",
     "/registry/docs/manifest-requirements",
+    "/registry/docs/markdown-playground",
     "/registry/docs/publishing-content",
     "/registry/docs/tagging",
     "/registry/docs/updating-content",
@@ -1292,6 +1293,7 @@
     "/registry/maps/yukina-lt-klaipeda",
     "/registry/maps/yukina-lt-klaipeda/versions/0.1.0",
     "/registry/maps/yukina-lt-panevezys",
+    "/registry/maps/yukina-lt-panevezys/versions",
     "/registry/maps/yukina-lt-siauliai",
     "/registry/maps/yukina-lt-siauliai/versions/0.1.1",
     "/registry/maps/yukina-lt-vilnius",
@@ -1604,6 +1606,7 @@
     "/registry/mods/tod/versions/v0.2.2",
     "/registry/mods/tod/versions/v0.2.5",
     "/registry/mods/tod/versions/v0.2.8",
+    "/registry/mods/tod/versions/v0.2.9",
     "/registry/mods/track-anarchy",
     "/registry/mods/track-anarchy/description",
     "/registry/mods/track-anarchy/versions",
@@ -66407,17 +66410,53 @@
       "devices": {}
     },
     "2026-08-14T21:00:00.000Z": {
-      "captured_at": "2026-08-14T21:01:39.277Z",
+      "captured_at": "2026-08-14T21:56:25.740Z",
       "window_start": "2026-08-14T21:00:00.000Z",
       "window_end": "2026-08-14T22:00:00.000Z",
       "totals": {
-        "visits": 0
+        "visits": 22
       },
-      "pages": {},
-      "countries": {},
-      "browsers": {},
-      "operating_systems": {},
-      "devices": {}
+      "pages": {
+        "/": 10,
+        "/railyard": 4,
+        "/railyard/docs/v0.2/installing-railyard/macos": 1,
+        "/registry/docs/markdown-playground": 2,
+        "/registry/maps/yukina-lt-panevezys/versions": 1,
+        "/registry/maps/yukina-pl-wroclaw/versions/0.4.0": 1,
+        "/registry/mods/tod/versions/v0.2.9": 1,
+        "/template-mod/docs": 1,
+        "/terms-of-service": 1
+      },
+      "countries": {
+        "BR": 2,
+        "ES": 1,
+        "MX": 2,
+        "NO": 1,
+        "PT": 1,
+        "US": 15
+      },
+      "browsers": {
+        "BingBot": 1,
+        "Chrome": 8,
+        "ChromeHeadless": 2,
+        "ChromeMobile": 1,
+        "GoogleBot": 3,
+        "MobileSafari": 2,
+        "Safari": 4,
+        "Unknown": 1
+      },
+      "operating_systems": {
+        "Android": 4,
+        "Linux": 3,
+        "MacOSX": 7,
+        "Unknown": 2,
+        "Windows": 4,
+        "iOS": 2
+      },
+      "devices": {
+        "desktop": 16,
+        "mobile": 6
+      }
     }
   },
   "daily_snapshots": {
@@ -83719,20 +83758,21 @@
       }
     },
     "2026-08-14": {
-      "captured_at": "2026-08-14T21:01:39.277Z",
+      "captured_at": "2026-08-14T21:56:25.740Z",
       "window_start": "2026-08-14T00:00:00.000Z",
       "window_end": "2026-08-14T22:00:00.000Z",
       "totals": {
-        "visits": 141
+        "visits": 163
       },
       "pages": {
-        "/": 44,
+        "/": 54,
         "/credits": 1,
         "/depot": 1,
         "/depot/updates": 1,
-        "/railyard": 8,
+        "/railyard": 12,
         "/railyard/docs": 3,
         "/railyard/docs/v0.2/github-token": 1,
+        "/railyard/docs/v0.2/installing-railyard/macos": 1,
         "/railyard/docs/v0.2/troubleshooting-railyard": 2,
         "/railyard/updates": 1,
         "/railyard/updates/v0.1.0": 2,
@@ -83745,6 +83785,7 @@
         "/registry/authors/rslurry/subwaybuilder-maps": 2,
         "/registry/authors/xoaninc": 2,
         "/registry/docs": 3,
+        "/registry/docs/markdown-playground": 2,
         "/registry/maps": 4,
         "/registry/maps/au-melbourne": 1,
         "/registry/maps/bangkok": 1,
@@ -83769,10 +83810,12 @@
         "/registry/maps/yukina-fukuyama": 1,
         "/registry/maps/yukina-hakodate/versions/0.4.0": 1,
         "/registry/maps/yukina-kagoshima-kirishima": 1,
+        "/registry/maps/yukina-lt-panevezys/versions": 1,
         "/registry/maps/yukina-mito-hitachi": 1,
         "/registry/maps/yukina-morioka/versions/0.2.0": 1,
         "/registry/maps/yukina-nagoya": 4,
         "/registry/maps/yukina-pl-rzeszow/versions/0.3.0": 1,
+        "/registry/maps/yukina-pl-wroclaw/versions/0.4.0": 1,
         "/registry/maps/yukina-tokyo": 1,
         "/registry/markdown-playground": 2,
         "/registry/mods/advanced-analytics": 1,
@@ -83786,62 +83829,67 @@
         "/registry/mods/mode-manager/gallery": 1,
         "/registry/mods/orbital-surveyor": 1,
         "/registry/mods/orbital-surveyor/versions/v1.2.2": 1,
+        "/registry/mods/tod/versions/v0.2.9": 1,
         "/registry/mods/track-anarchy/versions": 1,
         "/registry/mods/valdotoriums-trains/gallery": 1,
         "/template-mod": 1,
+        "/template-mod/docs": 1,
         "/template-mod/updates/v1.0.1": 1,
-        "/terms-of-service": 5,
+        "/terms-of-service": 6,
         "/website/updates/v1.0.1": 1
       },
       "countries": {
         "AR": 1,
         "BD": 1,
         "BE": 2,
-        "BR": 3,
+        "BR": 5,
         "CA": 9,
         "CH": 2,
         "CN": 2,
         "DE": 5,
-        "ES": 2,
+        "ES": 3,
         "FI": 2,
         "GB": 11,
         "HK": 1,
         "IN": 5,
         "IT": 3,
         "JP": 1,
-        "MX": 1,
+        "MX": 3,
         "MY": 1,
         "NL": 10,
+        "NO": 1,
         "PE": 2,
+        "PT": 1,
         "RU": 1,
         "SG": 1,
-        "US": 75,
+        "US": 90,
         "VN": 1
       },
       "browsers": {
-        "BingBot": 7,
-        "Chrome": 43,
-        "ChromeMobile": 3,
+        "BingBot": 8,
+        "Chrome": 51,
+        "ChromeHeadless": 2,
+        "ChromeMobile": 4,
         "Edge": 9,
         "Firefox": 7,
-        "GoogleBot": 38,
-        "MobileSafari": 6,
+        "GoogleBot": 41,
+        "MobileSafari": 8,
         "Opera": 3,
-        "Safari": 2,
-        "Unknown": 24
+        "Safari": 6,
+        "Unknown": 25
       },
       "operating_systems": {
-        "Android": 41,
+        "Android": 45,
         "ChromeOS": 1,
-        "Linux": 6,
-        "MacOSX": 18,
-        "Unknown": 30,
-        "Windows": 39,
-        "iOS": 6
+        "Linux": 9,
+        "MacOSX": 25,
+        "Unknown": 32,
+        "Windows": 43,
+        "iOS": 8
       },
       "devices": {
-        "desktop": 94,
-        "mobile": 47,
+        "desktop": 110,
+        "mobile": 53,
         "tablet": 1
       }
     }
