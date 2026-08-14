@@ -25,32 +25,16 @@ registry/
 |       |-- close-invalid.yml
 |       `-- report.yml
 |-- scripts/
-|   |-- lib/
-|   |   |-- manifests.ts
-|   |   |-- map-constants.ts
-|   |   |-- map-field-utils.ts
-|   |   |-- map-update-logic.ts
-|   |   |-- downloads.ts
-|   |   |-- download-history.ts
-|   |   |-- map-demand-stats.ts
-|   |   |-- release-resolution.ts
-|   |   |-- discord-webhook.ts
-|   |   |-- registry-manifest.ts
-|   |   |-- mod-manifest.ts
-|   |   |-- gallery.ts
-|   |   |-- github.ts
-|   |   `-- custom-url.ts
-|   |-- tests/
-|   |-- generate-map-templates.ts
-|   |-- validate-publish.ts
-|   |-- validate-update.ts
-|   |-- create-listing.ts
-|   |-- update-listing.ts
-|   |-- generate-downloads.ts
-|   |-- generate-download-history.ts
-|   |-- generate-map-demand-stats.ts
-|   |-- notify-discord.ts
-|   `-- regenerate-indexes.ts
+|   |-- lib/            # shared modules (manifests, downloads, integrity, ...)
+|   |-- intake/         # issue-form flows: validate-*/create-listing/update-listing,
+|   |                   #   deprecate-listing, delete-listing, undeprecate-listing
+|   |-- downloads/      # generate-downloads, download history, attribution reconcile
+|   |-- listings/       # indexes, basemaps, demand stats, manifest sync
+|   |-- quality/        # data-quality checks, check-formatting
+|   |-- announce/       # Discord notification + announcement records
+|   |-- telemetry/      # app/website analytics capture
+|   |-- ops/            # one-off and recurring maintenance (repo liveness, repairs)
+|   `-- tests/
 |-- mods/
 |   |-- index.json
 |   |-- downloads.json
@@ -158,9 +142,19 @@ Each daily snapshot includes:
   "update": {
     "type": "github",
     "repo": "someuser/better-trains"
-  }
+  },
+  "is_test": false
 }
 ```
+
+Registry-maintained fields authors do not write directly:
+
+- `caretakers`: tenure records; the active caretaker shares the publisher's authority over
+  metadata, retirement, and download credit.
+- `deprecation` (`{since, by_github_id, reason?, deleted?}`): present iff the listing is
+  retired. `deleted: true` makes it permanent. Every consumer derives retirement from this
+  one field — the pipeline republishes retired listings with no complete integrity versions,
+  and clients hide them from browse by default.
 
 ### Map manifest (`maps/<map-id>/manifest.json`)
 
@@ -322,17 +316,27 @@ map-name.zip
 
 ## Script Responsibilities
 
-- `validate-publish.ts`: publish-time validation for maps/mods.
-- `validate-update.ts`: update-time validation and ownership checks.
-- `create-listing.ts`: creates new manifests and gallery files.
-- `update-listing.ts`: applies manifest metadata updates.
-- `regenerate-indexes.ts`: reindexes listings.
-- `generate-downloads.ts`: generates downloads in `full` or `download-only` mode.
-- `generate-download-history.ts`: caches daily combined download snapshots in `history/`.
-- `generate-map-demand-stats.ts`: updates map `population`/`residents_total`/`points_count`/`population_count`, writes `maps/<id>/grid.geojson`, and refreshes the versioned demand-stats cache.
-- `sync-map-file-sizes.ts`: syncs map manifest `file_sizes` from `maps/integrity.json` latest complete semver entries.
-- `generate-map-templates.ts`: generates and verifies map issue templates.
-- `notify-discord.ts`: shared Discord webhook notifier for workflow summaries.
+- `intake/validate-publish.ts`: publish-time validation for maps/mods.
+- `intake/validate-update.ts`: update-time validation and ownership checks.
+- `intake/create-listing.ts`: creates new manifests and gallery files.
+- `intake/update-listing.ts`: applies manifest metadata updates.
+- `intake/validate-deprecate.ts` / `intake/deprecate-listing.ts`: reversible retirement —
+  publisher or active caretaker only; stamps `deprecation` and freezes download counts.
+- `intake/validate-delete.ts` / `intake/delete-listing.ts`: permanent retirement — same
+  authorization, requires the permanence acknowledgement, accepts an already-deprecated
+  listing as escalation, and freezes counts the same way.
+- `intake/validate-undeprecate.ts` / `intake/undeprecate-listing.ts`: reverses a
+  deprecation; refuses deleted listings.
+- `listings/regenerate-indexes.ts`: reindexes listings.
+- `downloads/generate-downloads.ts`: generates downloads in `full` or `download-only` mode.
+- `downloads/generate-download-history.ts`: caches daily combined download snapshots in `history/`.
+- `listings/generate-map-demand-stats.ts`: updates map `population`/`residents_total`/`points_count`/`population_count`, writes `maps/<id>/grid.geojson`, and refreshes the versioned demand-stats cache.
+- `listings/sync-map-file-sizes.ts`: syncs map manifest `file_sizes` from `maps/integrity.json` latest complete semver entries.
+- `intake/generate-map-templates.ts`: generates and verifies map issue templates.
+- `announce/notify-discord.ts`: shared Discord webhook notifier for workflow summaries.
+- `ops/check-repo-liveness.ts`: opens/closes `repo-unreachable` review issues from
+  `maps|mods/repo-liveness.json`.
+- `quality/check-formatting.ts`: encoding and canonical-JSON invariants over tracked files.
 
 ## Testing
 
