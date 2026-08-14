@@ -11,6 +11,7 @@ import {
 } from "../lib/manifests.js";
 import { resolveCollaboratorUpdate } from "../lib/collaborators.js";
 import { getActiveCaretaker, resolveCaretakerUpdate } from "../lib/caretakers.js";
+import { isMaintainer } from "../lib/maintainers.js";
 import { loadVanillaCityCodeSet } from "../lib/map-constants.js";
 import { isPresentIssueValue } from "../lib/map-field-utils.js";
 import { validateMapUpdateFields } from "../lib/map-update-logic.js";
@@ -19,6 +20,17 @@ import { checkCityCodeUniqueness } from "../lib/registry-uniqueness.js";
 const REPO_ROOT = process.env.RAILYARD_REPO_ROOT
   ? resolve(process.env.RAILYARD_REPO_ROOT)
   : resolve(import.meta.dirname, "..", "..");
+
+// Fields that decide who controls a listing, or where its artifacts are served
+// from. Editing any of them carries the same authorization as retiring the
+// listing; everything else on the update forms is presentation metadata.
+const PRIVILEGED_UPDATE_FIELDS = [
+  "update-type",
+  "github-repo",
+  "custom-update-url",
+  "collaborators",
+  "caretaker",
+] as const;
 
 function getString(value: unknown): string | undefined {
   return typeof value === "string" ? value : undefined;
@@ -121,11 +133,32 @@ async function main() {
         ? manifest.collaborators.map((id) => String(id))
         : [];
 
-      if (ownerId !== authorId && !collaboratorIds.includes(authorId)) {
+      // Code owners may act on any listing (see lib/maintainers.ts), matching
+      // the retirement validators.
+      if (!isMaintainer(authorId) && ownerId !== authorId && !collaboratorIds.includes(authorId)) {
         errors.push(
           `**Ownership check failed**: Your GitHub account does not match the original publisher or any listed collaborator of \`${id}\`. `
           + `Only the original publisher or a listed collaborator can update this listing.`,
         );
+      }
+
+      // Without this, the weaker-authenticated path would grant strictly more
+      // than the stronger one: a collaborator cannot deprecate a listing, but
+      // could repoint its downloads or write themselves a caretakership.
+      const activeCaretaker = getActiveCaretaker(manifest);
+      const mayEditPrivileged = isMaintainer(authorId)
+        || ownerId === authorId
+        || (activeCaretaker !== undefined && String(activeCaretaker.github_id) === authorId);
+      if (!mayEditPrivileged) {
+        const attempted = PRIVILEGED_UPDATE_FIELDS.filter((field) => isPresentIssueValue(data[field]));
+        if (attempted.length > 0) {
+          errors.push(
+            `**Authorization check failed**: ${attempted.map((f) => `\`${f}\``).join(", ")} `
+            + `can only be changed by the original publisher or the active caretaker of \`${id}\`, `
+            + `the same rule that governs deprecation. Leave these fields blank to update the `
+            + `listing's other metadata.`,
+          );
+        }
       }
 
       if (manifestType === "map") {
