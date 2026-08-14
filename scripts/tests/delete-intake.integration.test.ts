@@ -250,3 +250,27 @@ test("un-deprecation refuses permanently deleted assets", (t) => {
   );
   assert.equal(existsSync(join(root, "mods", "fixture-mod", "grandfathered-downloads.json")), false);
 });
+
+test("a code owner may delete a listing they do not own", (t) => {
+  const root = makeFixtureRepo({ "fixture-mod": baseModManifest("fixture-mod") });
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // ahkimn — see lib/maintainers.ts.
+  const result = runScript("validate-delete", root, {
+    ISSUE_JSON: issueJson("fixture-mod"),
+    ISSUE_AUTHOR_ID: "19807509",
+  });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test("a code owner still has to acknowledge permanence", (t) => {
+  const root = makeFixtureRepo({ "fixture-mod": baseModManifest("fixture-mod") });
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // The override covers ownership only; every other guard still applies.
+  const result = runScript("validate-delete", root, {
+    ISSUE_JSON: issueJson("fixture-mod", { confirmed: false }),
+    ISSUE_AUTHOR_ID: "19807509",
+  });
+  assert.notEqual(result.status, 0);
+});
