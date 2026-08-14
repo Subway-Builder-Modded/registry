@@ -82,9 +82,11 @@ Download and release-integrity snapshots are generated into:
 - `mods/integrity.json`
 - `maps/grandfathered-downloads.json`, `mods/grandfathered-downloads.json` — counts frozen
   when a listing is retired or a version stops resolving, so totals never regress
-- `maps/repo-liveness.json`, `mods/repo-liveness.json` — source repos observed as
-  definitively unreachable (deleted, renamed, or made private), with the clock that drives
-  the daily `repo-liveness-review` workflow
+- `maps/repo-liveness.json`, `mods/repo-liveness.json` — listings observed as unavailable,
+  with the clock that drives the daily `repo-liveness-review` workflow. Entries are keyed by
+  cause: `repo:` (GitHub repo deleted, renamed, or made private), `url:` (custom update JSON
+  returning a permanent error), and `listing:` (source answers, but no installable version
+  remains). The file name predates the last two kinds.
 
 Local commands:
 
@@ -114,10 +116,12 @@ Automation:
 - `regenerate-downloads-hourly.yml` runs hourly in download-only mode (updates downloads only; no ZIP integrity pass).
 - `regenerate-registry-analytics.yml` runs every 3 hours in full mode (refreshes downloads + integrity + integrity cache, map demand stats, and syncs map manifest `file_sizes` from integrity).
 - Full mode posts two Discord summaries (downloads/integrity and map demand stats) to the same webhook secret: `DISCORD_WEBHOOK_URL`.
-- `repo-liveness-review.yml` runs daily: source repos that have been definitively
-  unreachable past the threshold (default 72h) get a maintainer review issue labelled
-  `repo-unreachable`, closed automatically once the repo returns. Counts and integrity are
-  preserved throughout, so this is hygiene rather than data-loss triage.
+- `repo-liveness-review.yml` runs daily: listings that have been unavailable past the
+  threshold (default 72h) — dead repo, dead custom endpoint, or no installable version left
+  — get a maintainer review issue labelled `repo-unreachable`, closed automatically once the
+  listing recovers. Counts and integrity are preserved throughout, so this is hygiene rather
+  than data-loss triage. Deprecated and test listings are never flagged; a listing whose
+  source is already reported is not reported twice.
 
 ## Security
 
