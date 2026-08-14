@@ -161,6 +161,17 @@ export const DeprecationSchema = z.object({
   deleted: z.literal(true).optional(),
 });
 
+// A closed deprecation window, appended when a deprecation is reversed. No
+// `deleted` variant: deletion is permanent, so it never becomes history.
+export const DeprecationHistoryEntrySchema = DeprecationSchema
+  .omit({ deleted: true })
+  .extend({
+    until: z.string().datetime(),
+    // Who reversed it — not necessarily who deprecated it, since code owners
+    // may act on any listing.
+    removed_by_github_id: z.number().int().min(1),
+  });
+
 const BaseManifestSchema = z.object({
   schema_version: z.literal(1),
   id: z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/),
@@ -177,6 +188,12 @@ const BaseManifestSchema = z.object({
   caretakers: CaretakersSchema.optional(),
   // Present iff the listing is deprecated (see DeprecationSchema above).
   deprecation: DeprecationSchema.optional(),
+  // Reversed deprecations, ascending by since. Removing `deprecation` restores
+  // the listing everywhere, so without this the retirement leaves no trace.
+  deprecation_history: z.array(DeprecationHistoryEntrySchema).refine(
+    (entries) => entries.every((entry, i) => i === 0 || entries[i - 1]!.since <= entry.since),
+    { message: "deprecation_history must be ascending by since" },
+  ).optional(),
   description: z.string().min(1),
   tags: z.array(z.string().min(1)).refine(
     (a) => new Set(a).size === a.length,
@@ -238,6 +255,7 @@ export const ListingManifestSchema = z.union([MapManifestSchema, ModManifestSche
 
 export type CaretakerWindow = z.infer<typeof CaretakerWindowSchema>;
 export type Deprecation = z.infer<typeof DeprecationSchema>;
+export type DeprecationHistoryEntry = z.infer<typeof DeprecationHistoryEntrySchema>;
 export type UpdateConfig = z.infer<typeof UpdateConfigSchema>;
 export type InitialViewState = z.infer<typeof InitialViewStateSchema>;
 export type ModManifest = z.infer<typeof ModManifestSchema>;

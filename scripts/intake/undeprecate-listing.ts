@@ -1,5 +1,6 @@
 import { writeFileSync } from "node:fs";
 import { resolve } from "node:path";
+import type { Deprecation, DeprecationHistoryEntry } from "@subway-builder-modded/registry-schemas";
 import { resolveListingById } from "../lib/manifests.js";
 import { assertValidRegistryManifest } from "../lib/registry-manifest.js";
 
@@ -12,6 +13,11 @@ function main() {
 
   if (!issueJson) {
     console.error("ISSUE_JSON environment variable is required");
+    process.exit(1);
+  }
+
+  if (!process.env.ISSUE_AUTHOR_ID) {
+    console.error("ISSUE_AUTHOR_ID environment variable is required");
     process.exit(1);
   }
 
@@ -30,6 +36,18 @@ function main() {
   // Removing the field is the complete reversal: the published integrity view,
   // search visibility, and downloadability all derive from it and self-heal on
   // the next pipeline run (the integrity cache kept the true state throughout).
+  // Close the window into deprecation_history first, so the reversal does not
+  // also erase the fact that it happened.
+  const { deleted: _deleted, ...closed } = resolved.manifest.deprecation as Deprecation;
+  const history = (resolved.manifest.deprecation_history ?? []) as DeprecationHistoryEntry[];
+  resolved.manifest.deprecation_history = [
+    ...history,
+    {
+      ...closed,
+      until: new Date().toISOString(),
+      removed_by_github_id: Number(process.env.ISSUE_AUTHOR_ID),
+    },
+  ];
   delete resolved.manifest.deprecation;
 
   assertValidRegistryManifest(
