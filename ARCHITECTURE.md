@@ -159,6 +159,10 @@ Registry-maintained fields authors do not write directly:
   retired. `deleted: true` makes it permanent. Every consumer derives retirement from this
   one field — the pipeline republishes retired listings with no complete integrity versions,
   and clients hide them from browse by default.
+- `deprecation_history` (array, ascending by `since`): deprecations that were reversed, each
+  the original record plus `until` and `removed_by_github_id`. Appended on un-deprecation,
+  which otherwise deletes the only evidence a listing was ever retired. Never holds a
+  `deleted` record — deletion is permanent, so it never becomes history.
 
 ### Map manifest (`maps/<map-id>/manifest.json`)
 

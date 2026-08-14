@@ -150,7 +150,10 @@ test("undeprecate-listing removes the deprecation field and keeps everything els
   const root = makeFixtureRepo({ "fixture-mod": deprecatedModManifest("fixture-mod") });
   t.after(() => rmSync(root, { recursive: true, force: true }));
 
-  const result = runScript("undeprecate-listing", root, { ISSUE_JSON });
+  const result = runScript("undeprecate-listing", root, {
+    ISSUE_JSON,
+    ISSUE_AUTHOR_ID: String(AUTHOR_ID),
+  });
   assert.equal(result.status, 0, result.stderr);
 
   const written = JSON.parse(
@@ -161,6 +164,44 @@ test("undeprecate-listing removes the deprecation field and keeps everything els
   assert.deepEqual(written.caretakers, [
     { github_id: ACTIVE_CARETAKER_ID, since: "2026-03-01T00:00:00Z" },
   ]);
+
+  const history = written.deprecation_history as Array<Record<string, unknown>>;
+  assert.equal(history.length, 1);
+  assert.equal(history[0].since, "2026-08-01T00:00:00Z");
+  assert.equal(history[0].by_github_id, AUTHOR_ID);
+  assert.equal(history[0].reason, "Superseded");
+  assert.equal(history[0].removed_by_github_id, AUTHOR_ID);
+  assert.match(String(history[0].until), /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test("undeprecate-listing appends to an existing history and records who reversed it", (t) => {
+  const manifest = deprecatedModManifest("fixture-mod");
+  manifest.deprecation_history = [{
+    since: "2026-01-01T00:00:00Z",
+    until: "2026-02-01T00:00:00Z",
+    by_github_id: AUTHOR_ID,
+    removed_by_github_id: AUTHOR_ID,
+  }];
+  const root = makeFixtureRepo({ "fixture-mod": manifest });
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // A code owner reversing someone else's deprecation: by_github_id and
+  // removed_by_github_id are different people, which is the case the pair exists for.
+  const result = runScript("undeprecate-listing", root, {
+    ISSUE_JSON,
+    ISSUE_AUTHOR_ID: "268817724",
+  });
+  assert.equal(result.status, 0, result.stderr);
+
+  const written = JSON.parse(
+    readFileSync(join(root, "mods", "fixture-mod", "manifest.json"), "utf-8"),
+  ) as Record<string, unknown>;
+  const history = written.deprecation_history as Array<Record<string, unknown>>;
+  assert.equal(history.length, 2);
+  assert.equal(history[0].since, "2026-01-01T00:00:00Z");
+  assert.equal(history[1].since, "2026-08-01T00:00:00Z");
+  assert.equal(history[1].by_github_id, AUTHOR_ID);
+  assert.equal(history[1].removed_by_github_id, 268817724);
 });
 
 test("undeprecate-listing refuses a listing that is not deprecated", (t) => {
@@ -169,7 +210,10 @@ test("undeprecate-listing refuses a listing that is not deprecated", (t) => {
   const root = makeFixtureRepo({ "fixture-mod": manifest });
   t.after(() => rmSync(root, { recursive: true, force: true }));
 
-  const result = runScript("undeprecate-listing", root, { ISSUE_JSON });
+  const result = runScript("undeprecate-listing", root, {
+    ISSUE_JSON,
+    ISSUE_AUTHOR_ID: String(AUTHOR_ID),
+  });
   assert.notEqual(result.status, 0);
 });
 

@@ -435,6 +435,7 @@ jobs:
       - name: Un-deprecate listing
         env:
           ISSUE_JSON: ${{ steps.parser.outputs.jsonString }}
+          ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
         run: pnpm --dir scripts run undeprecate-listing
 
       - name: Commit and push changes
