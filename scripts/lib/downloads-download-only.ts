@@ -131,11 +131,18 @@ export async function generateDownloadsDataDownloadOnly(
   }
 
   const usageState = createGraphqlUsageState();
+  // A repo referenced only by deprecated/test listings is expected to stop
+  // resolving, so its fetch failure is not news. Full mode has always
+  // suppressed these; hourly runs did not, and re-reported them every hour.
+  const suppressWarningRepos = new Set(
+    [...repoSet].filter((repo) => !sourceEligibleListings.has(livenessSourceKey("repo", repo))),
+  );
   const { repoIndexes, unavailableRepos } = await fetchRepoReleaseIndexes(repoSet, {
     fetchImpl,
     token,
     warnings,
     usageState,
+    suppressWarningRepos,
   });
 
   {

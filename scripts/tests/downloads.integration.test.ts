@@ -2596,3 +2596,55 @@ test("github release that never carried a ZIP is not marked retired", async () =
     );
   });
 });
+
+// Retired listings are expected to lose their upstream, so hourly runs must not
+// re-report the failure every hour. Full mode has always suppressed these.
+test("download-only mode does not warn about repos only deprecated listings use", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["retired-mod", "live-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "retired-mod", {
+      ...makeBaseModManifest("retired-mod"),
+      update: { type: "github", repo: "owner/retired" },
+      deprecation: { since: "2026-08-01T00:00:00Z", by_github_id: 1, deleted: true },
+    });
+    writeManifest("mods", "live-mod", {
+      ...makeBaseModManifest("live-mod"),
+      update: { type: "github", repo: "owner/live" },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: (_input, init) => {
+          const body = JSON.parse(String(init?.body)) as { variables: { name: string } };
+          return Response.json({
+            data: { repository: null },
+            errors: [{
+              message: `Could not resolve to a Repository with the name 'owner/${body.variables.name}'.`,
+            }],
+          });
+        },
+      },
+    ]);
+
+    const { warnings } = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      mode: "download-only",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.equal(
+      warnings.some((warning) => warning.includes("repo=owner/retired")),
+      false,
+      `deprecated-only repo warning leaked: ${JSON.stringify(warnings)}`,
+    );
+    // The suppression must be scoped to retired repos, not blanket.
+    assert.ok(
+      warnings.some((warning) => warning.includes("repo=owner/live")),
+      `live repo warning was suppressed too: ${JSON.stringify(warnings)}`,
+    );
+  });
+});
