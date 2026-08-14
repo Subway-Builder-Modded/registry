@@ -281,7 +281,7 @@ const UPDATE_OWNER_ID = 4100;
 const UPDATE_COLLABORATOR_ID = 4200;
 const UPDATE_CARETAKER_ID = 4300;
 
-function makeUpdateFixtureRepo(): string {
+function makeUpdateFixtureRepo(deprecation?: Record<string, unknown>): string {
   const root = mkdtempSync(join(tmpdir(), "railyard-update-auth-"));
   mkdirSync(join(root, "mods", "fixture-mod"), { recursive: true });
   mkdirSync(join(root, "scripts"), { recursive: true });
@@ -301,6 +301,7 @@ function makeUpdateFixtureRepo(): string {
       is_test: false,
       source: "https://example.com/fixture",
       update: { type: "github", repo: "fixture/fixture" },
+      ...(deprecation ? { deprecation } : {}),
     }, null, 2) + "\n",
     "utf-8",
   );
@@ -373,5 +374,42 @@ test("update validation lets a code owner change the update source", (t) => {
 
   // subway-builder-modded-admin — see lib/maintainers.ts.
   const result = runUpdateInFixture(root, 268817724, { "update-type": "GitHub Releases" });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+const DELETED_RECORD = {
+  since: "2026-08-01T00:00:00Z",
+  by_github_id: UPDATE_OWNER_ID,
+  deleted: true,
+};
+
+test("update validation refuses metadata edits on a deleted listing", (t) => {
+  const root = makeUpdateFixtureRepo(DELETED_RECORD);
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  const result = runUpdateInFixture(root, UPDATE_OWNER_ID, { description: "A new description." });
+  assert.notEqual(result.status, 0, "deletion is permanent for the publisher too");
+  assert.match(fixtureValidationError(root), /was permanently deleted and its metadata can no longer be changed/);
+});
+
+test("update validation lets a code owner correct a deleted listing's record", (t) => {
+  const root = makeUpdateFixtureRepo(DELETED_RECORD);
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // subway-builder-modded-admin — see lib/maintainers.ts.
+  const result = runUpdateInFixture(root, 268817724, { description: "A corrected description." });
+  assert.equal(result.status, 0, result.stderr);
+});
+
+test("update validation still accepts edits on a listing that is merely deprecated", (t) => {
+  const root = makeUpdateFixtureRepo({
+    since: "2026-08-01T00:00:00Z",
+    by_github_id: UPDATE_OWNER_ID,
+    reason: "Superseded",
+  });
+  t.after(() => rmSync(root, { recursive: true, force: true }));
+
+  // Tidying a listing before restoring it is legitimate; deprecation reverses.
+  const result = runUpdateInFixture(root, UPDATE_OWNER_ID, { description: "A new description." });
   assert.equal(result.status, 0, result.stderr);
 });

@@ -133,6 +133,18 @@ async function main() {
         ? manifest.collaborators.map((id) => String(id))
         : [];
 
+      // Deletion is permanent: the listing survives only as a record, so its
+      // metadata stops being the author's to edit. Plain deprecation is
+      // reversible, and tidying a listing before restoring it is legitimate.
+      if ((manifest.deprecation as { deleted?: boolean } | undefined)?.deleted === true
+        && !isMaintainer(authorId)) {
+        errors.push(
+          `**${manifestType}-id**: \`${id}\` was permanently deleted and its metadata can no `
+          + `longer be changed. Returning the content to the registry requires publishing a new `
+          + `listing; contact a maintainer if the record itself is wrong.`,
+        );
+      }
+
       // Code owners may act on any listing (see lib/maintainers.ts), matching
       // the retirement validators.
       if (!isMaintainer(authorId) && ownerId !== authorId && !collaboratorIds.includes(authorId)) {
