@@ -2388,3 +2388,211 @@ test("repo-level fetch warnings are suppressed for repos referenced only by depr
     );
   });
 });
+
+// Author-declared version retirement, github flavor: the release survives, its
+// ZIP does not. Mirrors the custom-source `retired: true` outcome.
+test("github release whose ZIP was pruned after publishing is marked retired", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["pruned-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "pruned-mod", {
+      ...makeBaseModManifest("pruned-mod"),
+      update: { type: "github", repo: "owner/pruned" },
+    });
+    writeJson(join(repoRoot, "mods", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-14T00:00:00Z",
+      listings: {
+        "pruned-mod": {
+          has_complete_version: true,
+          latest_semver_version: "v1.0.0",
+          latest_semver_complete: true,
+          complete_versions: ["v1.0.0"],
+          incomplete_versions: [],
+          versions: {
+            "v1.0.0": {
+              is_complete: true,
+              errors: [],
+              required_checks: { release_manifest_asset: true, zip_manifest_json: true },
+              matched_files: { release_manifest_asset: "manifest.json", zip_manifest_json: "manifest.json" },
+              game_version: ">=0.2.0",
+              dependencies: { "subway-builder": ">=0.2.0" },
+              source: {
+                update_type: "github",
+                repo: "owner/pruned",
+                tag: "v1.0.0",
+                asset_name: "pruned-v1.zip",
+                download_url: "https://downloads.example.com/pruned-v1.zip",
+              },
+              fingerprint: "github:owner/pruned:v1.0.0:pruned-v1.zip",
+              checked_at: "2026-03-14T00:00:00Z",
+            },
+          },
+        },
+      },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+            rateLimit: { remaining: 120, cost: 1, resetAt: "2026-03-14T00:00:00Z" },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    const version = result.integrity.listings["pruned-mod"].versions["v1.0.0"];
+    assert.equal(version.availability, "retired");
+    assert.equal(version.is_complete, false);
+    assert.deepEqual(version.errors, ["release has no .zip asset"]);
+    // Compatibility metadata survives the withdrawal; the ZIP that declared it
+    // is gone, so it cannot be re-derived.
+    assert.equal(version.game_version, ">=0.2.0");
+    assert.deepEqual(version.dependencies, { "subway-builder": ">=0.2.0" });
+    // The version stays listed (not a "removed" tombstone) but stops being
+    // installable, and a deliberate withdrawal must not nag the author.
+    assert.deepEqual(result.integrity.listings["pruned-mod"].complete_versions, []);
+    assert.deepEqual(result.integrity.listings["pruned-mod"].incomplete_versions, ["v1.0.0"]);
+    assert.equal(result.integrity.listings["pruned-mod"].latest_semver_version, "v1.0.0");
+    assert.deepEqual(result.integrityAlerts, []);
+  });
+});
+
+test("a retired github version keeps its label when the integrity cache is bypassed", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["still-pruned-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "still-pruned-mod", {
+      ...makeBaseModManifest("still-pruned-mod"),
+      update: { type: "github", repo: "owner/still-pruned" },
+    });
+    writeJson(join(repoRoot, "mods", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-14T00:00:00Z",
+      listings: {
+        "still-pruned-mod": {
+          has_complete_version: false,
+          latest_semver_version: "v1.0.0",
+          latest_semver_complete: false,
+          complete_versions: [],
+          incomplete_versions: ["v1.0.0"],
+          versions: {
+            "v1.0.0": {
+              is_complete: false,
+              availability: "retired",
+              errors: ["release has no .zip asset"],
+              required_checks: {},
+              matched_files: {},
+              source: { update_type: "github", repo: "owner/still-pruned", tag: "v1.0.0" },
+              fingerprint: "github:owner/still-pruned:v1.0.0:no-zip",
+              checked_at: "2026-03-14T00:00:00Z",
+            },
+          },
+        },
+      },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+            rateLimit: { remaining: 120, cost: 1, resetAt: "2026-03-14T00:00:00Z" },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    // Nothing upstream distinguishes this from a never-published release once
+    // the previously-complete entry has aged out of the committed snapshot.
+    assert.equal(
+      result.integrity.listings["still-pruned-mod"].versions["v1.0.0"].availability,
+      "retired",
+    );
+  });
+});
+
+test("github release that never carried a ZIP is not marked retired", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["fresh-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "fresh-mod", {
+      ...makeBaseModManifest("fresh-mod"),
+      update: { type: "github", repo: "owner/fresh" },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [
+                  {
+                    tagName: "v1.0.0",
+                    releaseAssets: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
+                  },
+                ],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+            rateLimit: { remaining: 120, cost: 1, resetAt: "2026-03-14T00:00:00Z" },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    // A release awaiting its first upload looks identical upstream; only the
+    // absence of a previously-installable entry separates the two.
+    assert.equal(
+      result.integrity.listings["fresh-mod"].versions["v1.0.0"].availability,
+      undefined,
+    );
+  });
+});

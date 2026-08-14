@@ -36,8 +36,9 @@ export interface IntegrityVersionEntry {
   // date). Rules-bump-proof; backfilled onto reused cache entries at no cost.
   released_at?: string;
   // Present only when the version is no longer downloadable by design:
-  // "retired" = the author's update.json still lists the version but marks it
-  // retired (download stripped); "removed" = the version stopped being
+  // "retired" = the author withdrew the artifact but kept the version listed —
+  // update.json marks it `retired: true`, or a github release lost the ZIP it
+  // was published with; "removed" = the version stopped being
   // enumerated upstream entirely and this entry is carried forward frozen from
   // the previous committed integrity output. Absent on live versions.
   availability?: "retired" | "removed";
