@@ -104,6 +104,10 @@ Each file includes:
 - `versions.<version>` entries containing:
 - `is_complete`, `errors`
 - `required_checks`, `matched_files`
+- `availability` (absent on live versions): `retired` when the author withdrew the artifact
+  but kept the version listed, `removed` when the version stopped being enumerated upstream
+  and this entry is a frozen carry-forward. Clients render both as display-only history
+  rows; a version with neither flag and no complete check simply does not appear.
 - `file_sizes` (maps only, complete versions only; ZIP entry path => uncompressed MiB rounded to 2 decimals)
 - `source`, `fingerprint`, `checked_at`
 
@@ -250,6 +254,39 @@ Category tags from issue templates:
 ```
 
 Validation checks reachable/updateable endpoints at publish/update time.
+
+### Custom update.json format
+
+```json
+{ "schema_version": 1, "versions": [{ "version": "1.0.0", "download": "…", "sha256": "…" }] }
+```
+
+Only `versions` is read by the pipeline; entries missing `version` are skipped with a warning.
+Per entry:
+
+| Field          | Type              | Notes                                                                    |
+| -------------- | ----------------- | ------------------------------------------------------------------------ |
+| `version`      | string            | Required. Semver, `X.Y.Z` or `vX.Y.Z`; non-semver is recorded incomplete. |
+| `download`     | string            | Must be a `github.com/<owner>/<repo>/releases/download/<tag>/<asset>` URL — download counts are read from the release asset. |
+| `sha256`       | string            | Verified by clients on install.                                           |
+| `manifest`     | string            | Mods only: the release's `manifest.json` asset, parsed for compatibility. |
+| `date`         | string            | Publish date; becomes `released_at`.                                      |
+| `game_version` | string            | Range against `subway-builder`. Required on versions published on/after the cutoff in `integrity.ts`. |
+| `dependencies` | object            | Mod id => range. String values only; other types are dropped.             |
+| `retired`      | boolean           | See below. Read by the pipeline only.                                     |
+| `changelog`    | string            | Not read here — clients fetch it from `update.json` directly.             |
+
+### Withdrawing a single version
+
+Version-level retirement is author-driven — no intake form, no manifest field. Each source
+type has one gesture, and both land as `availability: "retired"`:
+
+- `custom`: keep the `versions[]` entry, set `retired: true`, and null the `download`.
+  Pruning the entry instead makes the version `removed` and loses its changelog.
+- `github`: delete the release's ZIP asset, keeping the release itself. Only versions that
+  were previously complete are marked retired — a release still awaiting its first upload is
+  indistinguishable upstream, so it is left alone. Deleting the release or tag makes the
+  version `removed`.
 
 ## Map ZIP Format
 
