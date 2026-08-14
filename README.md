@@ -42,6 +42,12 @@ Two forms, differing only in permanence:
   asset from profiles, uninstalling it for users who had it. A deprecated listing may later
   be escalated to deleted; the reverse is not possible.
 
+Retiring a single **version** is a separate, author-driven action that needs no form: withdraw
+the artifact and keep the version listed — `retired: true` with a null `download` for custom
+update sources, or delete the release's ZIP asset (not the release) for GitHub sources. The
+version stops being installable but keeps its date, changelog, and frozen download count in
+the version history. See [Retiring Versions](https://subwaybuildermodded.com/registry/docs/retiring-versions).
+
 ## How It Works
 
 `registry` stores metadata only - manifests, gallery images, and pointers to where your mod or map is actually hosted (GitHub Releases, CDNs, etc.). When you submit through an issue template, CI validates your submission and opens a PR automatically. Once merged, your listing goes live.
