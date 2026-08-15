@@ -24,14 +24,14 @@
   },
   "city_code": "KTW",
   "country": "PL",
-  "population": 1509308,
-  "residents_total": 1509308,
-  "points_count": 25193,
-  "population_count": 38580,
+  "population": 1510353,
+  "residents_total": 1510353,
+  "points_count": 24207,
+  "population_count": 47498,
   "initial_view_state": {
-    "latitude": 50.265858,
-    "longitude": 18.960876,
-    "zoom": 12,
+    "latitude": 50.26557,
+    "longitude": 18.959737,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -45,74 +45,79 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 26.64,
-    ".railyard_map/special_demand_points.json": 0.08,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "KTW.pmtiles": 121.89,
+    ".railyard_map/regions/gmina.geojson.gz": 2.96,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 2.1,
+    ".railyard_map/regions/rejon.geojson.gz": 10.11,
+    ".railyard_map/special_demand_points.json": 0.09,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "KTW.pmtiles": 74.31,
     "buildings_index.bin.gz": 84.52,
     "buildings_index.json": 199.52,
     "config.json": 0.01,
-    "demand_data.json": 94.74,
+    "demand_data.json": 8.77,
+    "driving_paths.json.gz": 18.72,
     "ocean_depth_index.json": 20.1,
-    "roads.geojson": 25.27,
+    "roads.geojson": 27.57,
     "runways_taxiways.geojson": 0.27
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.10797643135606362,
-      "p25": 0.11639834782856964,
-      "p50": 0.13469292912228398,
-      "p75": 0.17448239050236858,
-      "p90": 0.23277874617232544,
-      "mean": 0.15763967737572723
+      "p10": 0.13478595351560763,
+      "p25": 0.15653828310559478,
+      "p50": 0.1707192664259634,
+      "p75": 0.18962429621595878,
+      "p90": 0.23465378790342512,
+      "mean": 0.1825478590709392
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.10831021070878957,
-      "p25": 0.11940628012763851,
-      "p50": 0.1482204179216902,
-      "p75": 0.20460658747187,
-      "p90": 0.27796356996997595,
-      "mean": 0.17807532850486807
+      "p10": 0.1442064645000996,
+      "p25": 0.16704498238856902,
+      "p50": 0.18411185910950018,
+      "p75": 0.2168354193642888,
+      "p90": 0.2784337882696686,
+      "mean": 0.20385384885212993
     },
     "commuteDistanceKm": {
-      "p10": 2471,
-      "p25": 4773,
-      "p50": 9107,
-      "p75": 18601,
-      "p90": 35897,
-      "mean": 14596.297433903577
+      "p10": 1530,
+      "p25": 3607,
+      "p50": 8335,
+      "p75": 21294,
+      "p90": 46687,
+      "mean": 16865.377763274242
     },
     "residentCellDensity": {
       "p10": 23,
-      "p25": 41,
-      "p50": 97,
-      "p75": 253,
-      "p90": 850,
-      "mean": 313.0377515038374
+      "p25": 42,
+      "p50": 100,
+      "p75": 254,
+      "p90": 840,
+      "mean": 312.07873527588345
     },
     "workerCellDensity": {
-      "p10": 24,
+      "p10": 23,
       "p25": 45,
-      "p50": 121,
-      "p75": 410,
-      "p90": 1099,
-      "mean": 421.5846368715084
+      "p50": 120,
+      "p75": 409,
+      "p90": 1100,
+      "mean": 416.4091535704439
     },
     "detail": {
-      "radiusKm": 0.14129487692624076,
-      "expectedPointSpacingKm": 0.4627170768841212,
-      "normalizedRadius": 0.305359114640209,
-      "activityPerPoint": 59.90981621879094,
+      "radiusKm": 0.17728914667145929,
+      "expectedPointSpacingKm": 0.47261521591481437,
+      "normalizedRadius": 0.37512365387621044,
+      "activityPerPoint": 62.39323336225059,
       "playableAreaKm2": 6492,
-      "playableAreaPerPointKm2": 0.2576906283491446,
-      "playableCatchmentRadiusKm": 0.28640089835830773,
-      "localityScore": 1,
+      "playableAreaPerPointKm2": 0.26818688809022184,
+      "playableCatchmentRadiusKm": 0.2921755257101175,
+      "localityScore": 0.9266009754611089,
       "deaggregationScore": 1,
-      "score": 1
+      "score": 0.9626011507686394
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.8506725555246555,
+        "continuousScore": 0.8514351866632431,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 18.963697754391294,
-            "latitude": 50.26735182198678,
+            "longitude": 18.963042882347338,
+            "latitude": 50.26718904919944,
             "massShare": 1,
-            "assignedMass": 3018616,
-            "assignedPointCount": 25193,
+            "assignedMass": 3020706,
+            "assignedPointCount": 24207,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Zabrze",
     "Ruda Śląska",

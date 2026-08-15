@@ -25,14 +25,14 @@
   },
   "city_code": "SZY",
   "country": "PL",
-  "population": 260068,
-  "residents_total": 260068,
-  "points_count": 7740,
-  "population_count": 11057,
+  "population": 260250,
+  "residents_total": 260250,
+  "points_count": 7697,
+  "population_count": 12553,
   "initial_view_state": {
-    "latitude": 53.753229,
-    "longitude": 20.466728,
-    "zoom": 12,
+    "latitude": 53.753838,
+    "longitude": 20.467721,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -47,66 +47,71 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 30.24,
+    ".railyard_map/regions/gmina.geojson.gz": 1.31,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 0.67,
+    ".railyard_map/regions/rejon.geojson.gz": 4.21,
     ".railyard_map/special_demand_points.json": 0.02,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "SZY.pmtiles": 47.25,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "SZY.pmtiles": 35.94,
     "buildings_index.bin.gz": 19.53,
     "buildings_index.json": 45.94,
     "config.json": 0.01,
-    "demand_data.json": 40.94,
+    "demand_data.json": 2.41,
+    "driving_paths.json.gz": 6.79,
     "ocean_depth_index.json": 24.87,
-    "roads.geojson": 7.86,
+    "roads.geojson": 8,
     "runways_taxiways.geojson": 0.09
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.08232021560563056,
-      "p25": 0.0946817211217256,
-      "p50": 0.12011803339045377,
-      "p75": 0.1751106095790168,
-      "p90": 0.3477660599697345,
-      "mean": 0.20330070294024102
+      "p10": 0.10950303835887948,
+      "p25": 0.11793590974534827,
+      "p50": 0.13079856620650607,
+      "p75": 0.17743582663139898,
+      "p90": 0.3513837129417084,
+      "mean": 0.2157205494551826
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.07255248297911233,
-      "p25": 0.09439789419682279,
-      "p50": 0.13153154516582488,
-      "p75": 0.18475930931243892,
-      "p90": 0.27494430769699574,
-      "mean": 0.17074928786572277
+      "p10": 0.10602234348309984,
+      "p25": 0.1190687799338825,
+      "p50": 0.14111398536167105,
+      "p75": 0.18547437769978,
+      "p90": 0.28475092645697536,
+      "mean": 0.18266903508414445
     },
     "commuteDistanceKm": {
-      "p10": 1706,
-      "p25": 3724,
-      "p50": 8431,
-      "p75": 18842,
-      "p90": 37468,
-      "mean": 14686.501854029122
+      "p10": 1220,
+      "p25": 2920,
+      "p50": 7248,
+      "p75": 18953,
+      "p90": 45061,
+      "mean": 15619.379192224966
     },
     "residentCellDensity": {
       "p10": 12,
       "p25": 16,
-      "p50": 26,
-      "p75": 55,
-      "p90": 136,
-      "mean": 96.26555555555555
+      "p50": 27,
+      "p75": 58,
+      "p90": 137,
+      "mean": 96.15489833641405
     },
     "workerCellDensity": {
-      "p10": 13,
-      "p25": 20,
-      "p50": 42,
-      "p75": 113,
-      "p90": 399,
-      "mean": 188.8228031953522
+      "p10": 14,
+      "p25": 21,
+      "p50": 43,
+      "p75": 115,
+      "p90": 408,
+      "mean": 191.17634092578987
     },
     "detail": {
-      "radiusKm": 0.12569530832185635,
-      "expectedPointSpacingKm": 0.6307167490808052,
-      "normalizedRadius": 0.1992896312093223,
-      "activityPerPoint": 33.60051679586563,
+      "radiusKm": 0.13585840775230829,
+      "expectedPointSpacingKm": 0.6315510251868626,
+      "normalizedRadius": 0.21511865602959104,
+      "activityPerPoint": 33.811874756398595,
       "playableAreaKm2": 7588,
-      "playableAreaPerPointKm2": 0.9803617571059432,
-      "playableCatchmentRadiusKm": 0.5586222689110539,
+      "playableAreaPerPointKm2": 0.9858386384305574,
+      "playableCatchmentRadiusKm": 0.5601804930506006,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -114,7 +119,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.994050325975028,
+        "continuousScore": 0.9939201329774033,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -124,18 +129,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 20.463554093101056,
-            "latitude": 53.75291729120148,
+            "longitude": 20.464106842706997,
+            "latitude": 53.753242488315074,
             "massShare": 1,
-            "assignedMass": 520136,
-            "assignedPointCount": 7740,
+            "assignedMass": 520500,
+            "assignedPointCount": 7697,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Ольштын",
     "Olštýn",

@@ -24,14 +24,14 @@
   },
   "city_code": "KRK",
   "country": "PL",
-  "population": 1263223,
-  "residents_total": 1263223,
-  "points_count": 28341,
-  "population_count": 40070,
+  "population": 1263997,
+  "residents_total": 1263997,
+  "points_count": 27617,
+  "population_count": 45943,
   "initial_view_state": {
-    "latitude": 50.016317,
-    "longitude": 19.973027,
-    "zoom": 12,
+    "latitude": 50.015946,
+    "longitude": 19.973292,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -45,66 +45,71 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 39.86,
-    ".railyard_map/special_demand_points.json": 0.07,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "KRK.pmtiles": 130.24,
+    ".railyard_map/regions/gmina.geojson.gz": 4.79,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 2.02,
+    ".railyard_map/regions/rejon.geojson.gz": 14.96,
+    ".railyard_map/special_demand_points.json": 0.08,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "KRK.pmtiles": 80.75,
     "buildings_index.bin.gz": 84.94,
     "buildings_index.json": 201.18,
     "config.json": 0.01,
-    "demand_data.json": 132.61,
+    "demand_data.json": 8.86,
+    "driving_paths.json.gz": 24.1,
     "ocean_depth_index.json": 20.1,
-    "roads.geojson": 25.67,
+    "roads.geojson": 26.61,
     "runways_taxiways.geojson": 0.29
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.10997885057135906,
-      "p25": 0.12231196655823255,
-      "p50": 0.14865668798906553,
-      "p75": 0.20590096641177594,
-      "p90": 0.2975009413862361,
-      "mean": 0.1859944732866886
+      "p10": 0.14807538390914657,
+      "p25": 0.16439667415923306,
+      "p50": 0.1782792375293888,
+      "p75": 0.2164470622432983,
+      "p90": 0.2948913601245429,
+      "mean": 0.20872325054058924
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.10504710020492983,
-      "p25": 0.11940671647556393,
-      "p50": 0.14698579229159853,
-      "p75": 0.19681675804023574,
-      "p90": 0.26897372299497646,
-      "mean": 0.17102706542193702
+      "p10": 0.13350439960447352,
+      "p25": 0.16732974680165644,
+      "p50": 0.18584946088714882,
+      "p75": 0.21484182535764262,
+      "p90": 0.26724101560649594,
+      "mean": 0.19783418582577642
     },
     "commuteDistanceKm": {
-      "p10": 2891,
-      "p25": 5562,
-      "p50": 9949,
-      "p75": 20866,
-      "p90": 42566,
-      "mean": 16858.719465934613
+      "p10": 1753,
+      "p25": 4064,
+      "p50": 8542,
+      "p75": 20105,
+      "p90": 48077,
+      "mean": 17158.911694926323
     },
     "residentCellDensity": {
       "p10": 20,
-      "p25": 31,
-      "p50": 59,
-      "p75": 122,
-      "p90": 244,
-      "mean": 163.14053216223198
+      "p25": 32,
+      "p50": 60,
+      "p75": 123,
+      "p90": 233,
+      "mean": 162.58728933487714
     },
     "workerCellDensity": {
-      "p10": 19,
+      "p10": 20,
       "p25": 30,
-      "p50": 63,
-      "p75": 167,
-      "p90": 512,
-      "mean": 293.4315911730546
+      "p50": 64,
+      "p75": 163,
+      "p90": 506,
+      "mean": 291.8487647194643
     },
     "detail": {
-      "radiusKm": 0.14781887925267786,
-      "expectedPointSpacingKm": 0.535201027397087,
-      "normalizedRadius": 0.2761931903822844,
-      "activityPerPoint": 44.572280441762814,
-      "playableAreaKm2": 8332,
-      "playableAreaPerPointKm2": 0.2939910377192054,
-      "playableCatchmentRadiusKm": 0.30590889780366765,
+      "radiusKm": 0.1820249987837079,
+      "expectedPointSpacingKm": 0.5429051388492268,
+      "normalizedRadius": 0.3352795649890857,
+      "activityPerPoint": 45.768801824962885,
+      "playableAreaKm2": 8360,
+      "playableAreaPerPointKm2": 0.3027120976210305,
+      "playableCatchmentRadiusKm": 0.3104130366788849,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +117,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.6614627807649953,
+        "continuousScore": 0.6620790202629802,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 19.970703733295796,
-            "latitude": 50.01778860452986,
+            "longitude": 19.97080931609773,
+            "latitude": 50.01757571824972,
             "massShare": 1,
-            "assignedMass": 2526446,
-            "assignedPointCount": 28341,
+            "assignedMass": 2527994,
+            "assignedPointCount": 27617,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Krakau",
     "Krakow",

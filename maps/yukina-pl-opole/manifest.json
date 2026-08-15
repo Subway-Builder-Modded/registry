@@ -25,14 +25,14 @@
   },
   "city_code": "OPL",
   "country": "PL",
-  "population": 314740,
-  "residents_total": 314740,
-  "points_count": 11652,
-  "population_count": 15678,
+  "population": 315067,
+  "residents_total": 315067,
+  "points_count": 11636,
+  "population_count": 17575,
   "initial_view_state": {
-    "latitude": 50.639605,
-    "longitude": 18.03519,
-    "zoom": 12,
+    "latitude": 50.639618,
+    "longitude": 18.034182,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -47,103 +47,108 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 14.3,
+    ".railyard_map/regions/gmina.geojson.gz": 1.61,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 1,
+    ".railyard_map/regions/rejon.geojson.gz": 5.32,
     ".railyard_map/special_demand_points.json": 0.02,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "OPL.pmtiles": 55.08,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "OPL.pmtiles": 39.05,
     "buildings_index.bin.gz": 32.34,
     "buildings_index.json": 75.97,
     "config.json": 0.01,
-    "demand_data.json": 51.74,
+    "demand_data.json": 3.47,
+    "driving_paths.json.gz": 7.97,
     "ocean_depth_index.json": 12.36,
-    "roads.geojson": 8.25,
+    "roads.geojson": 9,
     "runways_taxiways.geojson": 0.04
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.0825345207984163,
-      "p25": 0.10127307040235094,
-      "p50": 0.12337992900422982,
-      "p75": 0.16881347583137118,
-      "p90": 0.24961467998717196,
-      "mean": 0.1559962063498135
+      "p10": 0.10617116462927784,
+      "p25": 0.11521121535753752,
+      "p50": 0.13011019384781033,
+      "p75": 0.1685935265550054,
+      "p90": 0.2483734763033622,
+      "mean": 0.1642444577622024
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.07473945666216843,
-      "p25": 0.10080861690222166,
-      "p50": 0.13306115820434716,
-      "p75": 0.18741810312961457,
-      "p90": 0.27312447970904585,
-      "mean": 0.16153373312894717
+      "p10": 0.10598329852736411,
+      "p25": 0.11801932463839415,
+      "p50": 0.14201237300875102,
+      "p75": 0.19427661557661668,
+      "p90": 0.2676709616811873,
+      "mean": 0.17459185112667303
     },
     "commuteDistanceKm": {
-      "p10": 2204,
-      "p25": 5013,
-      "p50": 10016,
-      "p75": 19995,
-      "p90": 36279,
-      "mean": 15482.024684270953
+      "p10": 979,
+      "p25": 3257,
+      "p50": 8398,
+      "p75": 19854,
+      "p90": 44009,
+      "mean": 15892.440853485065
     },
     "residentCellDensity": {
       "p10": 14,
       "p25": 22,
       "p50": 44,
       "p75": 94,
-      "p90": 192,
-      "mean": 109.18292259632072
+      "p90": 194,
+      "mean": 109.25850104094378
     },
     "workerCellDensity": {
       "p10": 13,
       "p25": 21,
-      "p50": 47,
-      "p75": 121,
-      "p90": 387,
-      "mean": 166.84358430540829
+      "p50": 46,
+      "p75": 119,
+      "p90": 370,
+      "mean": 164.31664058424622
     },
     "detail": {
-      "radiusKm": 0.1281291389671879,
-      "expectedPointSpacingKm": 0.5252792564798454,
-      "normalizedRadius": 0.2439257545135977,
-      "activityPerPoint": 27.011671815997254,
-      "playableAreaKm2": 5932,
-      "playableAreaPerPointKm2": 0.5090971507037418,
-      "playableCatchmentRadiusKm": 0.4025551590738842,
+      "radiusKm": 0.1359310758471224,
+      "expectedPointSpacingKm": 0.5263754919006984,
+      "normalizedRadius": 0.25823975078377326,
+      "activityPerPoint": 27.07691646613957,
+      "playableAreaKm2": 5928,
+      "playableAreaPerPointKm2": 0.5094534204193881,
+      "playableCatchmentRadiusKm": 0.4026959898852214,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
     },
     "polycentrism": {
       "activity": {
-        "score": 0.8098087923013817,
-        "continuousScore": 0.9611107814166815,
+        "score": 0.8096194107864871,
+        "continuousScore": 0.9608692397976466,
         "detectedCenterCount": 2,
-        "effectiveCenterCount": 1.68040226399189,
-        "largestCenterShare": 0.718054584736608,
+        "effectiveCenterCount": 1.6801349233369174,
+        "largestCenterShare": 0.7181631208600076,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 18.01088621639642,
-            "latitude": 50.7312192101105,
-            "massShare": 0.718054584736608,
-            "assignedMass": 452001,
-            "assignedPointCount": 8650,
+            "longitude": 18.010773523612333,
+            "latitude": 50.73136519791226,
+            "massShare": 0.7181631208600076,
+            "assignedMass": 452539,
+            "assignedPointCount": 8640,
             "prominenceRatio": 1
           },
           {
-            "longitude": 18.113669012019887,
-            "latitude": 50.39966383951941,
-            "massShare": 0.281945415263392,
-            "assignedMass": 177479,
-            "assignedPointCount": 3002,
+            "longitude": 18.112232425789024,
+            "latitude": 50.3991259799656,
+            "massShare": 0.28183687913999245,
+            "assignedMass": 177595,
+            "assignedPointCount": 2996,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Kędzierzyn-Koźle",
     "Nysa",

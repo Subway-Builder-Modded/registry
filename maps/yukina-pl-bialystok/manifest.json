@@ -24,14 +24,14 @@
   },
   "city_code": "BTK",
   "country": "PL",
-  "population": 317034,
-  "residents_total": 317034,
-  "points_count": 9411,
-  "population_count": 13743,
+  "population": 317367,
+  "residents_total": 317367,
+  "points_count": 9334,
+  "population_count": 15445,
   "initial_view_state": {
-    "latitude": 53.121511,
-    "longitude": 23.158042,
-    "zoom": 12,
+    "latitude": 53.121731,
+    "longitude": 23.157508,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -45,66 +45,71 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 27.59,
-    ".railyard_map/special_demand_points.json": 0.02,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "BTK.pmtiles": 68.88,
+    ".railyard_map/regions/gmina.geojson.gz": 2.02,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 0.96,
+    ".railyard_map/regions/rejon.geojson.gz": 5.04,
+    ".railyard_map/special_demand_points.json": 0.03,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "BTK.pmtiles": 50.64,
     "buildings_index.bin.gz": 34.82,
     "buildings_index.json": 82.08,
     "config.json": 0.01,
-    "demand_data.json": 33.59,
+    "demand_data.json": 2.96,
+    "driving_paths.json.gz": 4.45,
     "ocean_depth_index.json": 28.45,
-    "roads.geojson": 7.78,
+    "roads.geojson": 8.24,
     "runways_taxiways.geojson": 0.08
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.08172084029960935,
-      "p25": 0.09585307483369289,
-      "p50": 0.11803231187664967,
-      "p75": 0.16484542214274575,
-      "p90": 0.312859133339291,
-      "mean": 0.18872604822724554
+      "p10": 0.10917086097175321,
+      "p25": 0.11874488154230332,
+      "p50": 0.13111333718500548,
+      "p75": 0.16553119880245637,
+      "p90": 0.3073908650004655,
+      "mean": 0.19960460647109585
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.06997943410711965,
-      "p25": 0.09571632631563767,
-      "p50": 0.12711621950499638,
-      "p75": 0.18202509301461345,
-      "p90": 0.25681292598395217,
-      "mean": 0.1643517358945632
+      "p10": 0.10351547698158037,
+      "p25": 0.11716714664469989,
+      "p50": 0.13955746123692023,
+      "p75": 0.18150530380246277,
+      "p90": 0.2604761485245046,
+      "mean": 0.17847511507565356
     },
     "commuteDistanceKm": {
-      "p10": 1913,
-      "p25": 4047,
-      "p50": 7572,
-      "p75": 14327,
-      "p90": 33384,
-      "mean": 13076.650149166848
+      "p10": 974,
+      "p25": 2834,
+      "p50": 6134,
+      "p75": 13459,
+      "p90": 33543,
+      "mean": 12151.727484622856
     },
     "residentCellDensity": {
       "p10": 12,
       "p25": 16,
       "p50": 25,
       "p75": 46,
-      "p90": 132,
-      "mean": 103.78774975434
+      "p90": 128,
+      "mean": 103.5726412014365
     },
     "workerCellDensity": {
       "p10": 12,
       "p25": 17,
-      "p50": 30,
+      "p50": 29,
       "p75": 83,
-      "p90": 331,
-      "mean": 164.36514522821577
+      "p90": 345,
+      "mean": 164.7803738317757
     },
     "detail": {
-      "radiusKm": 0.12249008639557077,
-      "expectedPointSpacingKm": 0.6067834581841502,
-      "normalizedRadius": 0.20186787352795096,
-      "activityPerPoint": 33.68759961746892,
-      "playableAreaKm2": 7916,
-      "playableAreaPerPointKm2": 0.8411433428966103,
-      "playableCatchmentRadiusKm": 0.5174400851709049,
+      "radiusKm": 0.13526952528873476,
+      "expectedPointSpacingKm": 0.6105107508485415,
+      "normalizedRadius": 0.22156780220614508,
+      "activityPerPoint": 34.00117848725091,
+      "playableAreaKm2": 7944,
+      "playableAreaPerPointKm2": 0.8510820655667453,
+      "playableCatchmentRadiusKm": 0.5204880742376488,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +117,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.682760553795637,
+        "continuousScore": 0.6760318989639089,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 23.16202349406102,
-            "latitude": 53.12073951778827,
+            "longitude": 23.161732090423705,
+            "latitude": 53.120970901092335,
             "massShare": 1,
-            "assignedMass": 634068,
-            "assignedPointCount": 9411,
+            "assignedMass": 634734,
+            "assignedPointCount": 9334,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Bialystok",
     "Беласток",

@@ -26,14 +26,14 @@
   },
   "city_code": "RIX",
   "country": "LV",
-  "population": 702689,
-  "residents_total": 702689,
-  "points_count": 17237,
-  "population_count": 27035,
+  "population": 703087,
+  "residents_total": 703087,
+  "points_count": 16293,
+  "population_count": 30380,
   "initial_view_state": {
-    "latitude": 56.907352,
-    "longitude": 24.127208,
-    "zoom": 12,
+    "latitude": 56.907394,
+    "longitude": 24.127944,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "CSP Tautskaite 2021 | Blīvi apdzīvotās teritorijas | VZD",
@@ -48,16 +48,20 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 52.42,
-    ".railyard_map/special_demand_points.json": 1.32,
+    ".railyard_map/landuse_provenance.parquet": 23.91,
+    ".railyard_map/regions/lv-apkaimes.geojson.gz": 0.27,
+    ".railyard_map/regions/lv-pasvaldibas.geojson.gz": 1.26,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/special_demand_points.json": 1.33,
     ".railyard_map/special_demand_types.json": 0.07,
-    "RIX.pmtiles": 76.16,
+    "RIX.pmtiles": 75.49,
     "buildings_index.bin.gz": 49.88,
     "buildings_index.json": 126.82,
     "config.json": 0.01,
-    "demand_data.json": 94.49,
+    "demand_data.json": 5.49,
+    "driving_paths.json.gz": 12.16,
     "ocean_depth_index.json": 101.15,
-    "roads.geojson": 17.64,
+    "roads.geojson": 17.63,
     "runways_taxiways.geojson": 0.7
   },
   "included_cities": [
@@ -66,53 +70,53 @@
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.06587106103736892,
-      "p25": 0.07463825983990752,
-      "p50": 0.09239921310559288,
-      "p75": 0.11973220066258686,
-      "p90": 0.1918594263256675,
-      "mean": 0.1382306088332659
+      "p10": 0.10544348163092239,
+      "p25": 0.11589258558582154,
+      "p50": 0.12751601879523233,
+      "p75": 0.15026540298185304,
+      "p90": 0.192217597176483,
+      "mean": 0.16875625326254573
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.06719304638257492,
-      "p25": 0.08266034738062901,
-      "p50": 0.10932593762119044,
-      "p75": 0.17386795350894454,
-      "p90": 0.2496612297861189,
-      "mean": 0.15485341916316128
+      "p10": 0.10627658623426599,
+      "p25": 0.12056639335410248,
+      "p50": 0.14140507954108392,
+      "p75": 0.17892941899215306,
+      "p90": 0.24245711513090829,
+      "mean": 0.17582276844860747
     },
     "commuteDistanceKm": {
-      "p10": 2955,
-      "p25": 5987,
-      "p50": 11651,
-      "p75": 28390,
-      "p90": 53281,
-      "mean": 20641.405030515998
+      "p10": 1964,
+      "p25": 4398,
+      "p50": 9399,
+      "p75": 21326,
+      "p90": 45335,
+      "mean": 16773.199934167216
     },
     "residentCellDensity": {
       "p10": 13,
       "p25": 18,
-      "p50": 33,
-      "p75": 106,
-      "p90": 362,
-      "mean": 200.11335801765878
+      "p50": 35,
+      "p75": 104,
+      "p90": 374,
+      "mean": 199.60136286201023
     },
     "workerCellDensity": {
       "p10": 12,
       "p25": 19,
       "p50": 46,
-      "p75": 168,
-      "p90": 684,
-      "mean": 309.64918466284706
+      "p75": 166,
+      "p90": 696,
+      "mean": 309.27936647602286
     },
     "detail": {
-      "radiusKm": 0.10050686846295197,
-      "expectedPointSpacingKm": 0.4954980945108292,
-      "normalizedRadius": 0.2028400705802419,
-      "activityPerPoint": 40.76631664442768,
-      "playableAreaKm2": 8360,
-      "playableAreaPerPointKm2": 0.48500319081046583,
-      "playableCatchmentRadiusKm": 0.39291387156176444,
+      "radiusKm": 0.134281096139785,
+      "expectedPointSpacingKm": 0.5103723745652063,
+      "normalizedRadius": 0.2631041624346949,
+      "activityPerPoint": 43.15270361504941,
+      "playableAreaKm2": 8364,
+      "playableAreaPerPointKm2": 0.5133492911066102,
+      "playableCatchmentRadiusKm": 0.40423279731446177,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -120,7 +124,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.3311597592894581,
+        "continuousScore": 0.34697938382780547,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -130,18 +134,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 24.12168457088322,
-            "latitude": 56.912540388845905,
+            "longitude": 24.12204366482864,
+            "latitude": 56.91255293940271,
             "massShare": 1,
-            "assignedMass": 1405378,
-            "assignedPointCount": 17237,
+            "assignedMass": 1406174,
+            "assignedPointCount": 16293,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1784505600,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Riga",
     "Елгава",

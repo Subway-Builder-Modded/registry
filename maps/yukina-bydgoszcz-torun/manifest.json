@@ -24,14 +24,14 @@
   },
   "city_code": "BZG",
   "country": "PL",
-  "population": 725886,
-  "residents_total": 725886,
-  "points_count": 20690,
-  "population_count": 30168,
+  "population": 726511,
+  "residents_total": 726511,
+  "points_count": 20158,
+  "population_count": 35503,
   "initial_view_state": {
-    "latitude": 53.099243,
-    "longitude": 18.31146,
-    "zoom": 12,
+    "latitude": 53.098865,
+    "longitude": 18.312297,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -45,103 +45,108 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 28.94,
-    ".railyard_map/special_demand_points.json": 0.05,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "BZG.pmtiles": 96.56,
+    ".railyard_map/regions/gmina.geojson.gz": 2.17,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 0.96,
+    ".railyard_map/regions/rejon.geojson.gz": 7.83,
+    ".railyard_map/special_demand_points.json": 0.06,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "BZG.pmtiles": 66.04,
     "buildings_index.bin.gz": 52.69,
     "buildings_index.json": 124.46,
     "config.json": 0.01,
-    "demand_data.json": 92.65,
+    "demand_data.json": 6.74,
+    "driving_paths.json.gz": 16.05,
     "ocean_depth_index.json": 23.72,
-    "roads.geojson": 16.59,
+    "roads.geojson": 17.43,
     "runways_taxiways.geojson": 0.43
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.09607893240520508,
-      "p25": 0.10406653145314555,
-      "p50": 0.12971592704857476,
-      "p75": 0.1799835509989017,
-      "p90": 0.33107133651343645,
-      "mean": 0.18550440418940992
+      "p10": 0.13407492780882585,
+      "p25": 0.14541936756074356,
+      "p50": 0.1590344700965295,
+      "p75": 0.19013222795526052,
+      "p90": 0.32582132451936774,
+      "mean": 0.20785655635238987
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.09261773778524347,
-      "p25": 0.10497708789091498,
-      "p50": 0.13225153964526146,
-      "p75": 0.18696906503976513,
-      "p90": 0.25999733447824497,
-      "mean": 0.16445233669657047
+      "p10": 0.13369180694801513,
+      "p25": 0.14949080378033652,
+      "p50": 0.1655209749750879,
+      "p75": 0.19474940684424666,
+      "p90": 0.2585013688601736,
+      "mean": 0.18787690877542557
     },
     "commuteDistanceKm": {
-      "p10": 2239,
-      "p25": 4626,
-      "p50": 9194,
-      "p75": 18851,
-      "p90": 37620,
-      "mean": 15294.11754176611
+      "p10": 1321,
+      "p25": 3283,
+      "p50": 7623,
+      "p75": 17601,
+      "p90": 43191,
+      "mean": 15807.627017435147
     },
     "residentCellDensity": {
       "p10": 12,
       "p25": 16,
       "p50": 27,
       "p75": 56,
-      "p90": 151,
-      "mean": 106.10833333333333
+      "p90": 149,
+      "mean": 105.90756670068524
     },
     "workerCellDensity": {
       "p10": 13,
       "p25": 20,
-      "p50": 44,
-      "p75": 136,
-      "p90": 484,
-      "mean": 203.49453322119427
+      "p50": 43,
+      "p75": 134,
+      "p90": 476,
+      "mean": 202.42073000835887
     },
     "detail": {
-      "radiusKm": 0.1309775975832754,
-      "expectedPointSpacingKm": 0.6029971862067217,
-      "normalizedRadius": 0.21721095981760216,
-      "activityPerPoint": 35.08390526824553,
-      "playableAreaKm2": 10620,
-      "playableAreaPerPointKm2": 0.513291445142581,
-      "playableCatchmentRadiusKm": 0.40421002150175395,
+      "radiusKm": 0.16224530977819981,
+      "expectedPointSpacingKm": 0.6124838138792841,
+      "normalizedRadius": 0.2648973019394389,
+      "activityPerPoint": 36.04082746304197,
+      "playableAreaKm2": 10612,
+      "playableAreaPerPointKm2": 0.526441115189999,
+      "playableCatchmentRadiusKm": 0.40935487227904893,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
     },
     "polycentrism": {
       "activity": {
-        "score": 0.9968851974087922,
-        "continuousScore": 0.94765280236958,
+        "score": 0.9974138693392067,
+        "continuousScore": 0.9483304209848836,
         "detectedCenterCount": 2,
-        "effectiveCenterCount": 1.9937897385560222,
-        "largestCenterShare": 0.5279052082558419,
+        "effectiveCenterCount": 1.9948410803187777,
+        "largestCenterShare": 0.5254270066110492,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 18.03058221425676,
-            "latitude": 53.121583982782575,
-            "massShare": 0.5279052082558419,
-            "assignedMass": 766398,
-            "assignedPointCount": 10539,
+            "longitude": 18.029409519807917,
+            "latitude": 53.120557253318935,
+            "massShare": 0.5254270066110492,
+            "assignedMass": 763457,
+            "assignedPointCount": 10244,
             "prominenceRatio": 1
           },
           {
-            "longitude": 18.627676703857183,
-            "latitude": 53.07105120360524,
-            "massShare": 0.4720947917441582,
-            "assignedMass": 685374,
-            "assignedPointCount": 10151,
+            "longitude": 18.626834274934133,
+            "latitude": 53.07203089400569,
+            "massShare": 0.47457299338895076,
+            "assignedMass": 689565,
+            "assignedPointCount": 9914,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Bydgoszcz",
     "Torun",

@@ -24,14 +24,14 @@
   },
   "city_code": "DGV",
   "country": "LV",
-  "population": 61031,
-  "residents_total": 61031,
-  "points_count": 2768,
-  "population_count": 4387,
+  "population": 61125,
+  "residents_total": 61125,
+  "points_count": 2749,
+  "population_count": 4981,
   "initial_view_state": {
-    "latitude": 55.929809,
-    "longitude": 26.595901,
-    "zoom": 12,
+    "latitude": 55.929759,
+    "longitude": 26.595961,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "CSP Tautskaite 2021 | Blīvi apdzīvotās teritorijas | VZD",
@@ -45,66 +45,70 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 13.85,
+    ".railyard_map/regions/lv-apkaimes.geojson.gz": 0.2,
+    ".railyard_map/regions/lv-pasvaldibas.geojson.gz": 0.49,
+    ".railyard_map/regions/manifest.json": 0,
     ".railyard_map/special_demand_points.json": 0.03,
     ".railyard_map/special_demand_types.json": 0.07,
-    "DGV.pmtiles": 20.27,
+    "DGV.pmtiles": 19.52,
     "buildings_index.bin.gz": 14.44,
     "buildings_index.json": 37.01,
     "config.json": 0.01,
-    "demand_data.json": 9.72,
+    "demand_data.json": 0.88,
+    "driving_paths.json.gz": 0.98,
     "ocean_depth_index.json": 14.07,
     "roads.geojson": 3.12,
     "runways_taxiways.geojson": 0.12
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.06199947007593865,
-      "p25": 0.0754101141193462,
-      "p50": 0.09623667601871744,
-      "p75": 0.1387376850614079,
-      "p90": 0.29309648113250497,
-      "mean": 0.17962905609188337
+      "p10": 0.0882895411106367,
+      "p25": 0.09943468167264516,
+      "p50": 0.11314269256584716,
+      "p75": 0.14625773834467518,
+      "p90": 0.29251304110082416,
+      "mean": 0.19489737197246865
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.05742538953007093,
-      "p25": 0.07196953774181952,
-      "p50": 0.11783867403838498,
-      "p75": 0.1717653400913256,
-      "p90": 0.265805758338126,
-      "mean": 0.17068683871904677
+      "p10": 0.08662614624989257,
+      "p25": 0.1005788792930316,
+      "p50": 0.12587088195886717,
+      "p75": 0.1702956872213676,
+      "p90": 0.25231095289342814,
+      "mean": 0.18157681983912402
     },
     "commuteDistanceKm": {
-      "p10": 1301,
-      "p25": 2804,
-      "p50": 5276,
-      "p75": 14364,
-      "p90": 36496,
-      "mean": 12267.418281285616
+      "p10": 1032,
+      "p25": 2254,
+      "p50": 4360,
+      "p75": 8887,
+      "p90": 27235,
+      "mean": 9734.949608512346
     },
     "residentCellDensity": {
       "p10": 6,
       "p25": 10,
       "p50": 17,
       "p75": 36,
-      "p90": 134,
-      "mean": 83.53086419753086
+      "p90": 133,
+      "mean": 83.65980795610425
     },
     "workerCellDensity": {
       "p10": 6,
       "p25": 9,
       "p50": 17,
       "p75": 48,
-      "p90": 223,
-      "mean": 132.10173160173161
+      "p90": 233,
+      "mean": 132.01943844492442
     },
     "detail": {
-      "radiusKm": 0.10649132497958369,
-      "expectedPointSpacingKm": 0.5683105476873686,
-      "normalizedRadius": 0.18738227789881753,
-      "activityPerPoint": 22.04877167630058,
+      "radiusKm": 0.11933721339324187,
+      "expectedPointSpacingKm": 0.5705899890577736,
+      "normalizedRadius": 0.20914705074006948,
+      "activityPerPoint": 22.235358312113497,
       "playableAreaKm2": 2412,
-      "playableAreaPerPointKm2": 0.8713872832369942,
-      "playableCatchmentRadiusKm": 0.5266604095137304,
+      "playableAreaPerPointKm2": 0.8774099672608221,
+      "playableCatchmentRadiusKm": 0.5284773096503915,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +116,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.3085491045704958,
+        "continuousScore": 0.30948343821241575,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +126,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 26.594032711598835,
-            "latitude": 55.92654485335999,
+            "longitude": 26.594149984932493,
+            "latitude": 55.92648725824137,
             "massShare": 1,
-            "assignedMass": 122062,
-            "assignedPointCount": 2768,
+            "assignedMass": 122250,
+            "assignedPointCount": 2749,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1784505600,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Даугавпилс",
     "Dünaburg",
