@@ -8,6 +8,7 @@ import {
   type DownloadAttributionLedger,
 } from "./download-attribution.js";
 import type { IntegritySource } from "./integrity.js";
+import { isSupportedReleaseTag } from "./release-resolution.js";
 import { isObject, toFiniteNumber, readJsonFile, writeJsonFile } from "./json-utils.js";
 import { toSnapshotDate, toCanonicalHistoryCutoffIso, getHistoryDir, CANONICAL_HISTORY_CUTOFF_HOUR_UTC } from "./history-utils.js";
 import type { DownloadHistorySnapshot } from "@subway-builder-modded/registry-schemas";
@@ -40,6 +41,7 @@ interface DownloadHistorySection {
 
 interface IntegrityVersionLike {
   source?: unknown;
+  availability?: unknown;
 }
 
 interface IntegrityListingLike {
@@ -179,8 +181,15 @@ function normalizeIntegritySourcesFromIntegrity(
         listingSources[version] = null;
         continue;
       }
-      const normalizedSource = normalizeIntegritySource((versionRaw as IntegrityVersionLike).source);
-      if ((versionRaw as IntegrityVersionLike).source && !normalizedSource) {
+      const versionEntry = versionRaw as IntegrityVersionLike;
+      const normalizedSource = normalizeIntegritySource(versionEntry.source);
+      // Two states can never carry an asset to match against, so warning about
+      // them reports a design decision back every run: a withdrawn version
+      // (availability set) and a non-semver tag, which is recorded incomplete
+      // deliberately.
+      const cannotCarryAsset = versionEntry.availability !== undefined
+        || !isSupportedReleaseTag(version);
+      if (versionEntry.source && !normalizedSource && !cannotCarryAsset) {
         warnings.push(
           `${listingKind}/integrity.json: listing='${listingId}' version='${version}' has invalid source metadata; strict attribution matching skipped for this version`,
         );
