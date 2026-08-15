@@ -24,14 +24,14 @@
   },
   "city_code": "POZ",
   "country": "PL",
-  "population": 1057771,
-  "residents_total": 1057771,
-  "points_count": 21239,
-  "population_count": 30613,
+  "population": 1058543,
+  "residents_total": 1058543,
+  "points_count": 20520,
+  "population_count": 36721,
   "initial_view_state": {
-    "latitude": 52.378194,
-    "longitude": 16.92013,
-    "zoom": 12,
+    "latitude": 52.378526,
+    "longitude": 16.92,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -45,66 +45,71 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 30.86,
-    ".railyard_map/special_demand_points.json": 0.06,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "POZ.pmtiles": 118.41,
+    ".railyard_map/regions/gmina.geojson.gz": 2.22,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 1.09,
+    ".railyard_map/regions/rejon.geojson.gz": 8.43,
+    ".railyard_map/special_demand_points.json": 0.07,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "POZ.pmtiles": 74.92,
     "buildings_index.bin.gz": 72.48,
     "buildings_index.json": 171.2,
     "config.json": 0.01,
-    "demand_data.json": 69.23,
+    "demand_data.json": 6.94,
+    "driving_paths.json.gz": 12.23,
     "ocean_depth_index.json": 26.32,
-    "roads.geojson": 19.8,
+    "roads.geojson": 21.21,
     "runways_taxiways.geojson": 0.8
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.10616554997157666,
-      "p25": 0.11659114725087696,
-      "p50": 0.14175947776949818,
-      "p75": 0.1907986393560609,
-      "p90": 0.26738166441910677,
-      "mean": 0.18672608493739526
+      "p10": 0.1488411129983726,
+      "p25": 0.16579909225093684,
+      "p50": 0.17706805191876296,
+      "p75": 0.2071399846771144,
+      "p90": 0.26662464773097916,
+      "mean": 0.21436826471942816
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.103556183246129,
-      "p25": 0.11644841932168674,
-      "p50": 0.14877660550257518,
-      "p75": 0.2074250786727402,
-      "p90": 0.2940019314076089,
-      "mean": 0.18615030363468074
+      "p10": 0.139390131416643,
+      "p25": 0.16835186608093455,
+      "p50": 0.18631430473185867,
+      "p75": 0.22283907968735597,
+      "p90": 0.2903956026600139,
+      "mean": 0.21167670425945437
     },
     "commuteDistanceKm": {
-      "p10": 2502,
-      "p25": 5238,
-      "p50": 9972,
-      "p75": 20504,
-      "p90": 42622,
-      "mean": 16914.121647666023
+      "p10": 1242,
+      "p25": 3604,
+      "p50": 8697,
+      "p75": 20619,
+      "p90": 52413,
+      "mean": 18126.78257672721
     },
     "residentCellDensity": {
       "p10": 19,
       "p25": 27,
       "p50": 50,
       "p75": 122,
-      "p90": 349,
-      "mean": 177.71752646614016
+      "p90": 345,
+      "mean": 176.1116472545757
     },
     "workerCellDensity": {
       "p10": 20,
       "p25": 30,
       "p50": 59,
-      "p75": 166,
-      "p90": 543,
-      "mean": 246.73331777881475
+      "p75": 169,
+      "p90": 555,
+      "mean": 246.24616100511867
     },
     "detail": {
-      "radiusKm": 0.14522566543267657,
-      "expectedPointSpacingKm": 0.5693573609874296,
-      "normalizedRadius": 0.25506944387407837,
-      "activityPerPoint": 49.80323932388531,
-      "playableAreaKm2": 11784,
-      "playableAreaPerPointKm2": 0.5548283817505533,
-      "playableCatchmentRadiusKm": 0.4202467835053058,
+      "radiusKm": 0.18163235114777593,
+      "expectedPointSpacingKm": 0.5823508852970328,
+      "normalizedRadius": 0.3118950373967971,
+      "activityPerPoint": 51.58591617933723,
+      "playableAreaKm2": 11788,
+      "playableAreaPerPointKm2": 0.5744639376218323,
+      "playableCatchmentRadiusKm": 0.4276184638215446,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +117,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.7394811887548731,
+        "continuousScore": 0.7425721309848742,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 16.917278067679682,
-            "latitude": 52.37998174252034,
+            "longitude": 16.917161330460885,
+            "latitude": 52.38016613738997,
             "massShare": 1,
-            "assignedMass": 2115542,
-            "assignedPointCount": 21239,
+            "assignedMass": 2117086,
+            "assignedPointCount": 20520,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Posen",
     "Poznan",

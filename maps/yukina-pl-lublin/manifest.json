@@ -24,14 +24,14 @@
   },
   "city_code": "LUZ",
   "country": "PL",
-  "population": 524110,
-  "residents_total": 524110,
-  "points_count": 17934,
-  "population_count": 25097,
+  "population": 524664,
+  "residents_total": 524664,
+  "points_count": 17758,
+  "population_count": 28561,
   "initial_view_state": {
-    "latitude": 51.236782,
-    "longitude": 22.505834,
-    "zoom": 12,
+    "latitude": 51.237149,
+    "longitude": 22.505757,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -45,66 +45,71 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 23.96,
+    ".railyard_map/regions/gmina.geojson.gz": 3.28,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 1.72,
+    ".railyard_map/regions/rejon.geojson.gz": 8.62,
     ".railyard_map/special_demand_points.json": 0.04,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "LUZ.pmtiles": 88.94,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "LUZ.pmtiles": 60.02,
     "buildings_index.bin.gz": 52.53,
     "buildings_index.json": 123.77,
     "config.json": 0.01,
-    "demand_data.json": 66.08,
+    "demand_data.json": 5.55,
+    "driving_paths.json.gz": 10.9,
     "ocean_depth_index.json": 18.02,
-    "roads.geojson": 12.74,
+    "roads.geojson": 12.97,
     "runways_taxiways.geojson": 0.12
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.10025521655870831,
-      "p25": 0.11002166758700671,
-      "p50": 0.14031936443772305,
-      "p75": 0.2042356109335759,
-      "p90": 0.352343869476043,
-      "mean": 0.19203689226331475
+      "p10": 0.13625367691150447,
+      "p25": 0.1456245692418286,
+      "p50": 0.16433258414518168,
+      "p75": 0.2157454095790038,
+      "p90": 0.3496615027335242,
+      "mean": 0.21175904357270287
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.092344202841636,
-      "p25": 0.10840248356978625,
-      "p50": 0.13745860972208845,
-      "p75": 0.1971630053383549,
-      "p90": 0.27451629558272905,
-      "mean": 0.17016649417880636
+      "p10": 0.1259555703989789,
+      "p25": 0.14874865311894997,
+      "p50": 0.16747898241046588,
+      "p75": 0.19867815738331263,
+      "p90": 0.2740823551594585,
+      "mean": 0.19005480444858877
     },
     "commuteDistanceKm": {
-      "p10": 2376,
-      "p25": 4685,
-      "p50": 8570,
-      "p75": 16986,
-      "p90": 34130,
-      "mean": 13981.540662230545
+      "p10": 1411,
+      "p25": 3395,
+      "p50": 7171,
+      "p75": 16328,
+      "p90": 41809,
+      "mean": 14762.739539932076
     },
     "residentCellDensity": {
-      "p10": 13,
+      "p10": 12,
       "p25": 17,
       "p50": 30,
-      "p75": 55,
-      "p90": 106,
-      "mean": 87.52865497076023
+      "p75": 56,
+      "p90": 107,
+      "mean": 87.25973377703826
     },
     "workerCellDensity": {
       "p10": 12,
       "p25": 18,
       "p50": 34,
-      "p75": 82,
-      "p90": 267,
-      "mean": 158.89235900545785
+      "p75": 79,
+      "p90": 269,
+      "mean": 157.6546438232642
     },
     "detail": {
-      "radiusKm": 0.13888162136401083,
-      "expectedPointSpacingKm": 0.5953239594587965,
-      "normalizedRadius": 0.23328747173264594,
-      "activityPerPoint": 29.224378275900524,
-      "playableAreaKm2": 8688,
-      "playableAreaPerPointKm2": 0.4844429575108732,
-      "playableCatchmentRadiusKm": 0.39268687610846503,
+      "radiusKm": 0.16589832419140732,
+      "expectedPointSpacingKm": 0.599958702637038,
+      "normalizedRadius": 0.27651623930484465,
+      "activityPerPoint": 29.545219056200022,
+      "playableAreaKm2": 8672,
+      "playableAreaPerPointKm2": 0.488343281901115,
+      "playableCatchmentRadiusKm": 0.394264498123484,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +117,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.9209400209498011,
+        "continuousScore": 0.9190467815308986,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 22.50889456902758,
-            "latitude": 51.23658470307381,
+            "longitude": 22.50876738692667,
+            "latitude": 51.2367573348686,
             "massShare": 1,
-            "assignedMass": 1048220,
-            "assignedPointCount": 17934,
+            "assignedMass": 1049328,
+            "assignedPointCount": 17758,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Люблин",
     "לובלין",

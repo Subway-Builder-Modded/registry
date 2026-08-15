@@ -24,14 +24,14 @@
   },
   "city_code": "SZZ",
   "country": "PL",
-  "population": 505150,
-  "residents_total": 505150,
-  "points_count": 12185,
-  "population_count": 18838,
+  "population": 505634,
+  "residents_total": 505634,
+  "points_count": 11627,
+  "population_count": 22124,
   "initial_view_state": {
-    "latitude": 53.43912,
-    "longitude": 14.734432,
-    "zoom": 12,
+    "latitude": 53.440279,
+    "longitude": 14.733453,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -45,66 +45,71 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 27.04,
+    ".railyard_map/regions/gmina.geojson.gz": 1.69,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 0.79,
+    ".railyard_map/regions/rejon.geojson.gz": 6.16,
     ".railyard_map/special_demand_points.json": 0.03,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "SZZ.pmtiles": 65.61,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "SZZ.pmtiles": 49.07,
     "buildings_index.bin.gz": 30.8,
     "buildings_index.json": 72.15,
     "config.json": 0.01,
-    "demand_data.json": 70.37,
+    "demand_data.json": 4.1,
+    "driving_paths.json.gz": 11.06,
     "ocean_depth_index.json": 83.63,
-    "roads.geojson": 12.03,
+    "roads.geojson": 13.09,
     "runways_taxiways.geojson": 0.19
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.09406957419035265,
-      "p25": 0.10130109074190674,
-      "p50": 0.12058601920945758,
-      "p75": 0.1583730750450866,
-      "p90": 0.22155372797959105,
-      "mean": 0.15704936841085795
+      "p10": 0.13252088650322996,
+      "p25": 0.14477581600783357,
+      "p50": 0.1581756049937995,
+      "p75": 0.18004670873844905,
+      "p90": 0.2304364322451851,
+      "mean": 0.18673308195056232
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.09191294900668566,
-      "p25": 0.10422856470810499,
-      "p50": 0.13093288167690698,
-      "p75": 0.18449575837415993,
-      "p90": 0.26391078900708603,
-      "mean": 0.16553117940981277
+      "p10": 0.13543184685766235,
+      "p25": 0.15032427751727456,
+      "p50": 0.16927931508478616,
+      "p75": 0.19988064679267648,
+      "p90": 0.2622567147878649,
+      "mean": 0.2008075010803809
     },
     "commuteDistanceKm": {
-      "p10": 1842,
-      "p25": 4326,
-      "p50": 9410,
-      "p75": 19935,
-      "p90": 43474,
-      "mean": 17497.614768022082
+      "p10": 1060,
+      "p25": 2890,
+      "p50": 7605,
+      "p75": 18655,
+      "p90": 43974,
+      "mean": 17095.94607665883
     },
     "residentCellDensity": {
       "p10": 13,
-      "p25": 20,
-      "p50": 40,
-      "p75": 93,
-      "p90": 263,
-      "mean": 161.0098820529168
+      "p25": 19,
+      "p50": 39,
+      "p75": 90,
+      "p90": 258,
+      "mean": 158.0059375
     },
     "workerCellDensity": {
       "p10": 13,
-      "p25": 21,
+      "p25": 20,
       "p50": 44,
-      "p75": 138,
-      "p90": 516,
-      "mean": 229.84920273348519
+      "p75": 143,
+      "p90": 519,
+      "mean": 227.12455035971223
     },
     "detail": {
-      "radiusKm": 0.12565299433376484,
-      "expectedPointSpacingKm": 0.5505993302635447,
-      "normalizedRadius": 0.2282113097987623,
-      "activityPerPoint": 41.45670906852688,
-      "playableAreaKm2": 9624,
-      "playableAreaPerPointKm2": 0.789823553549446,
-      "playableCatchmentRadiusKm": 0.501406666724328,
+      "radiusKm": 0.16363330368990311,
+      "expectedPointSpacingKm": 0.5694254043618956,
+      "normalizedRadius": 0.28736565393191826,
+      "activityPerPoint": 43.48791605745248,
+      "playableAreaKm2": 9596,
+      "playableAreaPerPointKm2": 0.8253203749892492,
+      "playableCatchmentRadiusKm": 0.5125501288927663,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +117,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.882348310930082,
+        "continuousScore": 0.8816586209264328,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 14.730186345352365,
-            "latitude": 53.440859550608614,
+            "longitude": 14.729748499163444,
+            "latitude": 53.44131688942802,
             "massShare": 1,
-            "assignedMass": 1010300,
-            "assignedPointCount": 12185,
+            "assignedMass": 1011268,
+            "assignedPointCount": 11627,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Stettin",
     "Stargard",

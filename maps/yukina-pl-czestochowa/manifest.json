@@ -24,14 +24,14 @@
   },
   "city_code": "CZE",
   "country": "PL",
-  "population": 296810,
-  "residents_total": 296810,
-  "points_count": 11646,
-  "population_count": 15411,
+  "population": 297079,
+  "residents_total": 297079,
+  "points_count": 11649,
+  "population_count": 17359,
   "initial_view_state": {
-    "latitude": 50.886762,
-    "longitude": 19.175002,
-    "zoom": 12,
+    "latitude": 50.887177,
+    "longitude": 19.175106,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "GUS NSP 2021 / BREC / BDL",
@@ -45,66 +45,71 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 19.38,
+    ".railyard_map/regions/gmina.geojson.gz": 1.97,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/powiat.geojson.gz": 0.84,
+    ".railyard_map/regions/rejon.geojson.gz": 5.49,
     ".railyard_map/special_demand_points.json": 0.02,
-    ".railyard_map/special_demand_types.json": 0.06,
-    "CZE.pmtiles": 59.23,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "CZE.pmtiles": 42.28,
     "buildings_index.bin.gz": 33.94,
     "buildings_index.json": 80.35,
-    "config.json": 0,
-    "demand_data.json": 35.52,
+    "config.json": 0.01,
+    "demand_data.json": 3.44,
+    "driving_paths.json.gz": 5.22,
     "ocean_depth_index.json": 15.76,
-    "roads.geojson": 6,
+    "roads.geojson": 6.18,
     "runways_taxiways.geojson": 0.06
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.08744912094865684,
-      "p25": 0.10392525478554751,
-      "p50": 0.13386952048183978,
-      "p75": 0.18739993313929101,
-      "p90": 0.2874852137681196,
-      "mean": 0.17405436221764814
+      "p10": 0.10772497679395718,
+      "p25": 0.11864797466771453,
+      "p50": 0.13560789927667136,
+      "p75": 0.18509220747533817,
+      "p90": 0.2829760060186133,
+      "mean": 0.1798070964714759
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.08080453142196406,
-      "p25": 0.10099383271897389,
-      "p50": 0.13954911805832057,
-      "p75": 0.19255500262122605,
-      "p90": 0.25483722724228497,
-      "mean": 0.1616757563524594
+      "p10": 0.10800599365489948,
+      "p25": 0.11937906079976292,
+      "p50": 0.14210228240206346,
+      "p75": 0.18931330948551586,
+      "p90": 0.2596502395240772,
+      "mean": 0.17111116843045146
     },
     "commuteDistanceKm": {
-      "p10": 2528,
-      "p25": 4922,
-      "p50": 8821,
-      "p75": 16626,
-      "p90": 30440,
-      "mean": 13290.466549866978
+      "p10": 1226,
+      "p25": 3420,
+      "p50": 7512,
+      "p75": 17481,
+      "p90": 40080,
+      "mean": 14400.743476006683
     },
     "residentCellDensity": {
       "p10": 13,
       "p25": 20,
-      "p50": 37,
+      "p50": 36,
       "p75": 76,
-      "p90": 147,
-      "mean": 91.08599508599508
+      "p90": 145,
+      "mean": 90.6806106870229
     },
     "workerCellDensity": {
-      "p10": 13,
+      "p10": 14,
       "p25": 22,
-      "p50": 47,
-      "p75": 118,
-      "p90": 323,
-      "mean": 157.66950053134963
+      "p50": 46,
+      "p75": 116,
+      "p90": 333,
+      "mean": 155.8420776495278
     },
     "detail": {
-      "radiusKm": 0.13667982118122274,
-      "expectedPointSpacingKm": 0.5471108134036697,
-      "normalizedRadius": 0.24982109260629348,
-      "activityPerPoint": 25.486003778121244,
+      "radiusKm": 0.1388171170964306,
+      "expectedPointSpacingKm": 0.5492329146861481,
+      "normalizedRadius": 0.25274726511202594,
+      "activityPerPoint": 25.502532406215124,
       "playableAreaKm2": 5092,
-      "playableAreaPerPointKm2": 0.4372316675253306,
-      "playableCatchmentRadiusKm": 0.3730618746614789,
+      "playableAreaPerPointKm2": 0.43711906601425016,
+      "playableCatchmentRadiusKm": 0.3730138337270628,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +117,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.9149009386042114,
+        "continuousScore": 0.9153426854700819,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 19.17321000781892,
-            "latitude": 50.88659158292268,
+            "longitude": 19.17324481798613,
+            "latitude": 50.88683356957752,
             "massShare": 1,
-            "assignedMass": 593620,
-            "assignedPointCount": 11646,
+            "assignedMass": 594158,
+            "assignedPointCount": 11649,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783555200,
+  "last_updated": 1786752000,
   "search_aliases": [
     "Czenstochau",
     "Ченстохова",
