@@ -2648,3 +2648,59 @@ test("download-only mode does not warn about repos only deprecated listings use"
     );
   });
 });
+
+test("download-only mode does not warn about retired custom versions, and names the real cause otherwise", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("mods", ["custom-mod"]);
+    writeIndex("maps", []);
+    writeManifest("mods", "custom-mod", {
+      ...makeBaseModManifest("custom-mod"),
+      update: { type: "custom", url: "https://example.com/retire-update.json" },
+    });
+
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://example.com/retire-update.json",
+        handle: () => jsonResponse({
+          schema_version: 1,
+          versions: [
+            // Withdrawn by the author: no download by design.
+            { version: "1.0.0", date: "2026-01-01", download: null, sha256: null, retired: true },
+            // Live, but pointed somewhere the pipeline cannot read counts from.
+            { version: "1.1.0", date: "2026-02-01", download: "https://cdn.example.com/mod.zip", sha256: "abc" },
+            // Live, and simply missing its download.
+            { version: "1.2.0", date: "2026-03-01", sha256: "def" },
+          ],
+        }),
+      },
+    ]);
+
+    const { warnings } = await generateDownloadsData({
+      repoRoot,
+      listingType: "mod",
+      mode: "download-only",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.equal(
+      warnings.some((warning) => warning.includes("version=1.0.0")),
+      false,
+      `retired version warned: ${JSON.stringify(warnings)}`,
+    );
+    assert.ok(
+      warnings.some((warning) =>
+        warning.includes("version=1.1.0") && warning.includes("skipped non-GitHub release download URL")
+      ),
+      `non-GitHub URL should still warn: ${JSON.stringify(warnings)}`,
+    );
+    // Previously this said "non-GitHub release download URL" for a version that
+    // has no URL at all.
+    assert.ok(
+      warnings.some((warning) =>
+        warning.includes("version=1.2.0") && warning.includes("skipped version with no download URL")
+      ),
+      `missing URL should name its own cause: ${JSON.stringify(warnings)}`,
+    );
+  });
+});

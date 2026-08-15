@@ -316,3 +316,65 @@ test("backfillDownloadHistorySnapshots is idempotent after normalization", () =>
     rmSync(repoRoot, { recursive: true, force: true });
   }
 });
+
+// Versions that cannot carry an asset are a design outcome, not a data defect:
+// a withdrawn version has no artifact, and a non-semver tag is recorded
+// incomplete on purpose. Neither should be re-reported every run.
+test("generateDownloadHistorySnapshot does not warn about versions that cannot carry an asset", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "railyard-download-history-"));
+  try {
+    setupBaseRepo(repoRoot);
+    writeJson(join(repoRoot, "maps", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-30T00:00:00.000Z",
+      listings: {
+        "map-a": {
+          versions: {
+            "1.0.0": {
+              is_complete: false,
+              availability: "retired",
+              source: { update_type: "custom" },
+            },
+            "2.0.0": {
+              is_complete: false,
+              availability: "removed",
+              source: { update_type: "github", repo: "example/map", tag: "2.0.0" },
+            },
+            "railyard": {
+              is_complete: false,
+              source: { update_type: "github", repo: "example/map", tag: "railyard" },
+            },
+            "3.0.0": {
+              is_complete: false,
+              source: { update_type: "github", repo: "example/map", tag: "3.0.0" },
+            },
+          },
+        },
+      },
+    });
+    writeJson(join(repoRoot, "mods", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-30T00:00:00.000Z",
+      listings: {},
+    });
+    writeJson(join(repoRoot, "maps", "downloads.json"), { "map-a": { "1.0.0": 10 } });
+    writeJson(join(repoRoot, "mods", "downloads.json"), {});
+
+    const result = generateDownloadHistorySnapshot({
+      repoRoot,
+      now: new Date("2026-03-30T08:00:00.000Z"),
+    });
+
+    const invalidSourceWarnings = result.warnings.filter((warning) =>
+      warning.includes("has invalid source metadata")
+    );
+    // Only 3.0.0 qualifies: a live semver version whose source really is short
+    // an asset_name.
+    assert.deepEqual(
+      invalidSourceWarnings.map((warning) => warning.replace(/^.*version='([^']+)'.*$/, "$1")),
+      ["3.0.0"],
+    );
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});

@@ -278,12 +278,18 @@ export async function generateDownloadsDataDownloadOnly(
       versionsChecked += 1;
 
       if (!candidate.parsed) {
-        warnListing(
-          warnings,
-          id,
-          "skipped non-GitHub release download URL",
-          candidate.version,
-        );
+        // A retired entry has no download by design, so reporting it every run
+        // just echoes the author's own decision back at them.
+        if (!candidate.retired) {
+          warnListing(
+            warnings,
+            id,
+            candidate.downloadUrl
+              ? "skipped non-GitHub release download URL"
+              : "skipped version with no download URL",
+            candidate.version,
+          );
+        }
         continue;
       }
 
