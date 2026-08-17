@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "vienna",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Residents: Statistik Austria INSPIRE register-based 100 m population grid\n(measured counts, ETRS89-LAEA mesh), aggregated to 300 m demand points placed at\nthe activity-weighted centroid of their constituent cells. Workplace: no free\nofficial grid exists for Austria - the Arbeitsstaetten/employment rasters are\npaywalled - so Vienna's published ~900k employment total is distributed over OSM\noffice, retail, industrial and institutional features using generic European\nper-type employment densities, i.e. a fine building-type dasymetric with\nnon-locally-calibrated weights. O/D: not observed. Flows come from a\ndoubly-constrained gravity model (Furness/IPF balancing, exponential distance\ndecay) calibrated so the modelled commute matches Vienna's published median -\nresult 6.7 km mean straight-line, 10.2 min median driving time. Driving times and\ndistances routed with OSRM over the OSM road network. Special demand hand-curated:\nairport, 18 university/FH campuses, 12 hospitals, venues, and 7\noutside-connection corridors for Umland in-commuters. Geometry built with depot;\nbuildings from Overture release 2026-07-22.0 with three-tier height imputation\nfilling the ~48% of footprints carrying neither a height nor a floor count.",
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "Rmerr1",
+    "reviewed_by": null,
+    "date": "2026-08-17"
+  }
+}
