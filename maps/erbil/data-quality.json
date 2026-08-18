@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "erbil",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm3",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Resident population from the 2024 Iraqi census by qadaa (district) — unlike Baghdad, Erbil city itself is NOT subdivided in this data: \"Markaz Erbil\" (Erbil Center) qadaa covers the whole city as a single unit, with three separate qadaas (Khabat, Erbil Plain, Qushtapa) covering surrounding rural/satellite areas outside the city proper. Districts only partially inside the map's bounding box are linearly prorated by area fraction. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor of any kind.",
+  "sources": [
+    "https://www.citypopulation.de/en/iraq/cities/ (aggregator citing Iraq's official \"Census 2024-11-25\" by qadha — no direct COSIT/KRSO table with this breakdown was found; disclosed as a secondary source, not primary)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "pierreggt",
+    "reviewed_by": null,
+    "date": "2026-08-18"
+  }
+}
