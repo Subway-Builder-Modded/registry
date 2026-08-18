@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "alexandria",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm4",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Updated August 2026: rebuilt on CAPMAS's real 1 July 2017 census population for Alexandria's 9 qism (districts) — 5,039,975 of the governorate's 5,599,387 total, sourced individually per qism from Arabic Wikipedia (each qism page cites its own CAPMAS figure). No official qism boundary polygons exist in OSM or GADM for Alexandria (verified directly against both sources) — population is instead assigned to buildings via nearest-neighbor to 9 qism anchor points, each anchor being the average location of several real, individually-verified OpenStreetMap localities whose qism membership is publicly documented (e.g. Sidi Gaber/Camp Caesar/Gleem -> Sharq qism; Karmouz/Qabbari/Wardian -> Gharb qism). This is a geographic approximation, not official boundaries, and buildings near a qism boundary may be misclassified — disclosed here rather than presented as precise. The remaining ~560k (Borg El Arab + rural governorate units) is not represented, rather than inventing a figure for it. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor. Note: Egypt's only other registry map, Cairo, is scored \"absent\" (weighted_score 0) under this same rubric.",
+  "sources": [
+    "https://ar.wikipedia.org/wiki/حي_أول_المنتزة",
+    "https://ar.wikipedia.org/wiki/حي_ثان_المنتزة",
+    "https://ar.wikipedia.org/wiki/حي_شرق_(الإسكندرية)",
+    "https://ar.wikipedia.org/wiki/حي_وسط_(الإسكندرية)",
+    "https://ar.wikipedia.org/wiki/حي_غرب_(الإسكندرية)",
+    "https://ar.wikipedia.org/wiki/حي_الجمرك",
+    "https://ar.wikipedia.org/wiki/حي_العجمي",
+    "https://ar.wikipedia.org/wiki/حي_أول_العامرية",
+    "https://ar.wikipedia.org/wiki/حي_ثان_العامرية"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "pierreggt",
+    "reviewed_by": null,
+    "date": "2026-08-18"
+  }
+}
