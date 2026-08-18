@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "kuwait-city",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm2",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm2",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Real population by governorate (all 6 of Kuwait's governorates — Al-Asimah, Hawalli, Farwaniya, Mubarak Al-Kabeer, Ahmadi, Jahra — fall at least partly inside this map), from the 2021 census; this is the most recent internally-consistent same-vintage table found — a 2025 PACI figure and a separate 2025 CSB figure disagree with each other by roughly 220,000 and were not used for this reason. Kuwait's governorates are the country's top administrative tier (no finer official breakdown exists at this scale), region/county-scale rather than municipality-scale. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor. Note: Kuwait's only proposed metro system was officially cancelled in 2023 with no revival signal — no rail network is modeled.",
+  "sources": [
+    "https://census.csb.gov.kw/Census_Gov_EN (Kuwait CSB census portal, 2021 population by governorate)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "pierreggt",
+    "reviewed_by": null,
+    "date": "2026-08-18"
+  }
+}
