@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "riyadh",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm2",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm2",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "GASTAT (Saudi Arabia's statistics authority) publishes population only at governorate level, not by any finer sub-city unit — Riyadh Governorate's entire 2022 census population is applied as a single figure covering the whole map. Because a literal single mega-district breaks distance-decay in the gravity model (residents and jobs would be equally likely to be matched regardless of actual distance), the governorate was re-split into a synthetic ~5km regular grid after the fact, weighted by building floor area per cell — this grid is our own construction, not a real sub-governorate statistical unit, so it does not raise the granularity answer above governorate-level. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor.",
+  "sources": [
+    "https://www.stats.gov.sa/en (GASTAT, General Authority for Statistics — 2022 mid-year population by administrative region)"
+  ],
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "pierreggt",
+    "reviewed_by": "Kronifer",
+    "date": "2026-08-14"
+  }
+}
