@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "doha",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm4",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Updated August 2026: rebuilt on Qatar PSA's real population by statistical zone (91 zones nationally, data.gov.qa \"Population, Area and Population Density Per Square Kilometers By Zone\", 2014-2019 vintage per zone) with official zone boundaries (HDX COD-AB Qatar, ADM2 level, sourced PSA) — 70 real zones with population fall inside this map's bounding box, replacing the previous municipality-level (5 units) figures. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only, using commercial-POI density as the spatial signal. Commute flows are an unconstrained gravity model — no real O/D data anchors it, though the model does allow (small, distance-penalized) cross-zone flows including between Doha and Lusail.",
+  "sources": [
+    "https://www.data.gov.qa/explore/dataset/population-area-and-population-density-per-square-kilometers-by-zone/",
+    "https://data.humdata.org/dataset/cod-ab-qat (HDX Qatar administrative boundaries, PSA-sourced, ADM2=zone level)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "pierreggt",
+    "reviewed_by": null,
+    "date": "2026-08-18"
+  }
+}
