@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "abu-dhabi",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm2",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm2",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Statistics Centre Abu Dhabi (SCAD) publishes population only at the Abu Dhabi Emirate's three top-level regions (Abu Dhabi Region, Al Ain Region, Al Dhafra Region) — no finer public breakdown exists. Abu Dhabi Region's entire 2024 register-based population figure is applied as a single figure, then re-split into a synthetic ~5km grid (our own construction) to restore distance-decay in the gravity model. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor. The Zayed International Airport special point's passenger figure does use a real, sourced correspondence/transfer-passenger split (47.5% origin-destination, from Abu Dhabi Airports' own Q3 2024 report) rather than raw total traffic, but this is one small special point, not a characterization of the map's overall workplace/resident/O-D methodology.",
+  "sources": [
+    "https://scad.gov.ae/web/guest/w/statistics-centre-abu-dhabi-reports-results-of-abu-dhabi-census-2023 (SCAD Census 2023/2024, region-level population)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "pierreggt",
+    "reviewed_by": null,
+    "date": "2026-08-18"
+  }
+}
