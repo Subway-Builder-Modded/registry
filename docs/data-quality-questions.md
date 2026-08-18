@@ -10,15 +10,15 @@ Every question has plain-language options, and **"Not sure" is always a safe ans
 
 Your answers are used to produce a provisional data-quality score. A reviewer from the [Subway Builder Modded](https://github.com/Subway-Builder-Modded) organization will then confirm it, after which the map receives one of seven quality tiers:
 
-| Tier          | Meaning (approximate)                                                                        |
-| :------------ | :------------------------------------------------------------------------------------------- |
-| **Very High** | Measured, government data on both sides of the commute (residence/workplace), at fine detail |
-| **High**      | Strong official data with minor gaps in coverage or at somewhat coarse granularity           |
-| **Medium**    | Real official data, but potentially coarse or partial (e.g. residence side only)             |
-| **Low**       | Weak or indirect anchoring in official data                                                  |
-| **Very Low**  | Mostly estimated, loosely anchored to real statistics                                        |
-| **Absent**    | No census or official statistics at all                                                      |
-| **Unscored**  | Not yet reviewed — the default for every map                                                 |
+| Tier          | Meaning (approximate)                                                                                     |
+| :------------ | :-------------------------------------------------------------------------------------------------------- |
+| **Very High** | Measured, government data on both sides of the commute (residence/workplace), at fine detail              |
+| **High**      | Strong official data with minor gaps in coverage or at somewhat coarse granularity                        |
+| **Medium**    | Real official data, but potentially coarse or partial (e.g. residence side only)                          |
+| **Low**       | Weak or indirect anchoring in official data                                                               |
+| **Very Low**  | Mostly estimated, loosely anchored to real statistics                                                     |
+| **Absent**    | No effective anchoring in official statistics — none at all, or too coarse or indirect to shape the model |
+| **Unscored**  | Not yet reviewed — the default for every map                                                              |
 
 Until a reviewer confirms a score, your map will show as **Unscored**. Answering nothing or
 answering "Not sure" to everything is not penalized, so there is no downside to

@@ -211,7 +211,7 @@ Every pipeline resolves to a single **weighted score** in [0, 1] and a named qua
 
 _Tiers apply to the **weighted** (player-facing) score, and refine the current three-level tag system: **very high** and **high** map to `high`, **medium** to `medium`, and **low** / **very low** / **absent** to `low`._
 
-_The **absent** tier (grade F) is reserved for pipelines with no usable census anchor — the granularity multiplier floors the score at ~0 by construction, categorically apart from a map that is weakly grounded in census data._
+_The **absent** tier (grade F) marks pipelines whose data does not effectively anchor the model. Most arrive with no usable census anchor at all — the granularity multiplier floors their score at ~0 by construction — but a pipeline with a real yet minimal anchor (a single region-wide total, an assumed employment ratio) can also fall below the very-low floor on score alone. Absent means the official data does not meaningfully constrain the model — not that none was consulted._
 
 _The **unknown** tier (grade U) is reserved for pipelines that have not been scored yet, to enable backwards compatibility for pipelines/maps that have yet to be scored._
 
