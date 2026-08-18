@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "damascus",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm3",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Resident population is a hand-assembled patchwork, not a single consistent source: central Damascus city itself uses an IOM Displacement Tracking Matrix figure from March 2025 (residents + IDPs + returnees, the most recent figure found, but a displacement survey rather than a census); most surrounding Rif Dimashq nahiyas (Jaramana, Sahnaya, Douma, Kafr Batna, etc.) fall back to Syria's last general census in 2004 — over two decades old and pre-dating the 2011-2024 conflict entirely; a handful of individual nahiyas (Darayya, Al-Tall, Saidnaya) were updated with 2023 or January-2025 local-authority estimates where a more recent figure could be found. Districts partially inside the bounding box are prorated by area fraction. This mixed-vintage assembly is disclosed explicitly rather than presented as one clean dataset. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor.",
+  "sources": [
+    "https://dtm.iom.int/sites/g/files/tmzbdl1461/files/reports/Syrian%20Arab%20Republic%20%20Population%20Mobility%20and%20Baseline%20Assessment%20—%20Round%202%20(01%20%2031%20March%202025)_1%20(1).pdf",
+    "https://en.wikipedia.org/wiki/Rif_Dimashq_Governorate"
+  ],
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "pierreggt",
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-18"
+  }
+}
