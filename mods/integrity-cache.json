@@ -4,7 +4,7 @@
     "advanced-analytics": {
       "target-1.1.0": {
         "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-18T12:01:22.014Z",
+        "last_checked_at": "2026-08-18T16:01:21.500Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -18,7 +18,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-18T12:01:22.014Z",
+          "checked_at": "2026-08-18T16:01:21.500Z",
           "released_at": "2026-03-02T23:15:42.000Z"
         }
       },
@@ -2588,7 +2588,7 @@
     "dantrains-abridged": {
       "v1.0": {
         "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.0:dantrains-abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-18T12:01:22.014Z",
+        "last_checked_at": "2026-08-18T16:01:21.500Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2602,13 +2602,13 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.0:dantrains-abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-18T12:01:22.014Z",
+          "checked_at": "2026-08-18T16:01:21.500Z",
           "released_at": "2026-07-18T05:05:08.000Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.1:danTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-18T12:01:22.014Z",
+        "last_checked_at": "2026-08-18T16:01:21.500Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2622,7 +2622,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.1:danTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-18T12:01:22.014Z",
+          "checked_at": "2026-08-18T16:01:21.500Z",
           "released_at": "2026-07-19T04:42:34.000Z"
         }
       },
@@ -5433,24 +5433,21 @@
       },
       "v1.1.0": {
         "fingerprint": "rules:v6:github:prodigious-penguin/penguin-approved-rolling-stock:v1.1.0:Penguin-Approved-Rolling-Stock-1.1.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-07-26T07:12:38.243Z",
+        "last_checked_at": "2026-08-18T16:01:21.500Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "asset 'Penguin-Approved-Rolling-Stock-1.1.0.zip': missing top-level manifest.json in ZIP",
-            "asset 'Penguin-Approved-Rolling-Stock-1.1.0.zip': manifest.json version '(missing)' does not match release tag 'v1.1.0' (expected '1.1.0')"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "release_manifest_asset": true,
-            "zip_manifest_json": false,
+            "zip_manifest_json": true,
             "security_scan_passed": true,
-            "manifest_version_matches_tag": false
+            "manifest_version_matches_tag": true
           },
           "matched_files": {
             "release_manifest_asset": "manifest.json",
-            "zip_manifest_json": null,
+            "zip_manifest_json": "manifest.json",
             "security_scan_passed": "passed",
-            "manifest_version_matches_tag": null
+            "manifest_version_matches_tag": "manifest.json"
           },
           "release_size": 0,
           "game_version": ">=1.0.0",
@@ -5462,10 +5459,16 @@
             "download_url": "https://github.com/prodigious-penguin/Penguin-Approved-Rolling-Stock/releases/download/v1.1.0/Penguin-Approved-Rolling-Stock-1.1.0.zip"
           },
           "fingerprint": "rules:v6:github:prodigious-penguin/penguin-approved-rolling-stock:v1.1.0:Penguin-Approved-Rolling-Stock-1.1.0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-07-26T07:12:38.243Z",
-          "released_at": "2026-07-25T18:44:33.000Z"
+          "checked_at": "2026-08-18T16:01:21.500Z",
+          "released_at": "2026-07-30T12:51:56.000Z"
         },
-        "manifest_asset_updated_at": "2026-07-30T12:51:32Z"
+        "asset_sizes": {
+          "Penguin-Approved-Rolling-Stock-1.1.0.zip": 2692
+        },
+        "asset_updated_at": {
+          "Penguin-Approved-Rolling-Stock-1.1.0.zip": "2026-08-18T13:41:28Z"
+        },
+        "manifest_asset_updated_at": "2026-08-18T13:41:22Z"
       }
     },
     "prospector-ghebeek": {},
@@ -7839,7 +7842,7 @@
       },
       "v1.0": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-18T12:01:22.014Z",
+        "last_checked_at": "2026-08-18T16:01:21.500Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -7853,13 +7856,13 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-18T12:01:22.014Z",
+          "checked_at": "2026-08-18T16:01:21.500Z",
           "released_at": "2026-03-01T14:52:46.000Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-18T12:01:22.014Z",
+        "last_checked_at": "2026-08-18T16:01:21.500Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -7873,7 +7876,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-18T12:01:22.014Z",
+          "checked_at": "2026-08-18T16:01:21.500Z",
           "released_at": "2026-03-08T08:01:18.000Z"
         }
       }
