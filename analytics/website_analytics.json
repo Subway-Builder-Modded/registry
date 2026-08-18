@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-08-18T20:06:56.730Z",
+  "generated_at": "2026-08-18T20:57:41.812Z",
   "valid_paths": [
     "/",
     "/community",
@@ -1213,6 +1213,7 @@
     "/registry/maps/vancouver/versions/1.0.1",
     "/registry/maps/vancouver/versions/2.0.1",
     "/registry/maps/vienna",
+    "/registry/maps/vienna/map",
     "/registry/maps/warsaw-val",
     "/registry/maps/waterloo",
     "/registry/maps/willamette-valley",
@@ -1747,8 +1748,8 @@
     "latest_hour": "2026-08-18T20:00:00.000Z",
     "total_days": 124,
     "total_hours": 1955,
-    "latest_day_visits": 225,
-    "latest_hour_visits": 12
+    "latest_day_visits": 284,
+    "latest_hour_visits": 71
   },
   "time_series": {
     "by_day": [
@@ -2246,7 +2247,7 @@
       },
       {
         "date": "2026-08-18",
-        "visits": 225
+        "visits": 284
       }
     ],
     "by_hour": [
@@ -10068,7 +10069,7 @@
       },
       {
         "hour": "2026-08-18T20:00:00.000Z",
-        "visits": 12
+        "visits": 71
       }
     ]
   },
@@ -28252,26 +28253,26 @@
       }
     },
     "2026-08-18": {
-      "captured_at": "2026-08-18T20:06:54.562Z",
+      "captured_at": "2026-08-18T20:57:39.631Z",
       "window_start": "2026-08-18T00:00:00.000Z",
       "window_end": "2026-08-18T21:00:00.000Z",
       "totals": {
-        "visits": 225
+        "visits": 284
       },
       "pages": {
-        "/": 53,
+        "/": 61,
         "/community": 2,
         "/contribute": 1,
         "/credits": 3,
         "/license": 2,
-        "/railyard": 26,
+        "/railyard": 31,
         "/railyard/docs": 3,
         "/railyard/docs/v0.2/game-version-incompatibility": 4,
         "/railyard/docs/v0.2/importing-local-assets": 1,
         "/railyard/docs/v0.2/installing-railyard": 1,
         "/railyard/docs/v0.2/listing-status-and-filters": 1,
         "/railyard/docs/v0.2/troubleshooting-railyard": 1,
-        "/railyard/updates": 3,
+        "/railyard/updates": 4,
         "/railyard/updates/v0.1.0": 1,
         "/registry": 4,
         "/registry/analytics": 1,
@@ -28279,14 +28280,14 @@
         "/registry/authors/ahkimn": 1,
         "/registry/authors/devenperez/subway-builder-canadian-maps": 1,
         "/registry/authors/rslurry": 1,
-        "/registry/docs": 5,
+        "/registry/docs": 6,
         "/registry/docs/data-quality/quality-floor": 1,
-        "/registry/maps": 2,
+        "/registry/maps": 3,
         "/registry/maps/amba": 1,
         "/registry/maps/barcelona": 1,
         "/registry/maps/bilbao": 1,
         "/registry/maps/bilbao/versions/1.1.0": 1,
-        "/registry/maps/busan-3": 1,
+        "/registry/maps/busan-3": 2,
         "/registry/maps/greater-newyork": 1,
         "/registry/maps/helsinki/versions/1.1.1": 1,
         "/registry/maps/ile-de-france": 2,
@@ -28303,12 +28304,14 @@
         "/registry/maps/valencia": 1,
         "/registry/maps/vancouver": 1,
         "/registry/maps/vienna": 1,
+        "/registry/maps/vienna/map": 4,
         "/registry/maps/yukina-akita": 2,
         "/registry/maps/yukina-kitakyushu-shimonoseki": 1,
         "/registry/maps/yukina-kobe-akashi": 2,
         "/registry/maps/yukina-kofu": 4,
         "/registry/maps/yukina-maebashi": 1,
         "/registry/maps/yukina-matsumoto": 1,
+        "/registry/maps/yukina-morioka": 1,
         "/registry/maps/yukina-nagoya": 7,
         "/registry/maps/yukina-pl-warszawa": 1,
         "/registry/maps/yukina-sendai": 1,
@@ -28325,18 +28328,20 @@
         "/registry/mods/distance-circles": 12,
         "/registry/mods/distance-circles/versions/0.6.0": 1,
         "/registry/mods/game-speedup": 1,
+        "/registry/mods/induced-demand/description": 1,
         "/registry/mods/japanese-trains": 1,
-        "/registry/mods/penguin-approved-rolling-stock": 3,
+        "/registry/mods/penguin-approved-rolling-stock": 36,
         "/registry/mods/scrollable-dropdowns": 1,
         "/registry/mods/station-dots": 1,
+        "/registry/mods/subwaybuilder-regions": 1,
         "/registry/mods/subwaybuilder-regions/versions": 1,
-        "/registry/world-map": 1,
+        "/registry/world-map": 2,
         "/template-mod": 3,
         "/template-mod/docs": 1,
         "/template-mod/docs/v1.0/debugging": 2,
         "/template-mod/docs/v1.0/getting-started": 2,
         "/template-mod/updates": 1,
-        "/terms-of-service": 11,
+        "/terms-of-service": 12,
         "/website/updates": 1
       },
       "countries": {
@@ -28344,12 +28349,14 @@
         "AU": 2,
         "AZ": 1,
         "BD": 1,
-        "BE": 1,
-        "CA": 4,
+        "BE": 3,
+        "BG": 1,
+        "CA": 5,
         "CH": 1,
-        "DE": 30,
+        "DE": 33,
+        "DK": 4,
         "DZ": 2,
-        "ES": 7,
+        "ES": 9,
         "FR": 6,
         "GA": 1,
         "GB": 1,
@@ -28365,37 +28372,39 @@
         "PK": 1,
         "PL": 5,
         "PR": 1,
+        "RS": 1,
         "RU": 7,
-        "SG": 7,
+        "SG": 8,
         "TR": 1,
         "TW": 2,
         "UA": 1,
-        "US": 118
+        "US": 162
       },
       "browsers": {
-        "BingBot": 9,
-        "Chrome": 49,
-        "ChromeMobile": 11,
-        "Edge": 5,
+        "BingBot": 10,
+        "Chrome": 63,
+        "ChromeMobile": 13,
+        "Edge": 6,
         "Firefox": 35,
         "GoogleBot": 17,
-        "MobileSafari": 5,
+        "MobileSafari": 36,
         "MobileSafariWebview": 2,
         "Opera": 3,
-        "Safari": 10,
-        "Unknown": 79
+        "Safari": 11,
+        "TwitterBot": 1,
+        "Unknown": 87
       },
       "operating_systems": {
-        "Android": 27,
+        "Android": 29,
         "Linux": 26,
-        "MacOSX": 16,
-        "Unknown": 89,
-        "Windows": 60,
-        "iOS": 7
+        "MacOSX": 18,
+        "Unknown": 99,
+        "Windows": 74,
+        "iOS": 38
       },
       "devices": {
-        "desktop": 185,
-        "mobile": 40
+        "desktop": 207,
+        "mobile": 77
       }
     }
   }
