@@ -3,17 +3,17 @@
   "id": "tehran",
   "answers": {
     "workplace_count": "estimated_proxy",
-    "workplace_granularity": "adm4",
+    "workplace_granularity": "adm3",
     "workplace_resolution": "osm_footprints",
-    "workplace_intensity": "size_only",
+    "workplace_intensity": "binary_split",
     "resident_count": "total_population",
-    "resident_granularity": "adm4",
+    "resident_granularity": "adm3",
     "resident_resolution": "osm_footprints",
     "resident_intensity": "size_only",
     "od_metric": "none",
     "od_granularity": null
   },
-  "notes": "Resident population from Iran's 2016 census by official municipal district (mantaqeh) — genuine intra-city subdivisions (Tehran's own 22 city districts, plus Karaj's districts and two satellite towns merged in when Karaj was folded into this map for its shared metro corridor). No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only, using OSM commercial/office POI density as the spatial signal for where those jobs concentrate. Commute flows are an unconstrained gravity model (distance-decay, 3km minimum trip distance) — no real O/D data of any kind anchors the flow directions or volumes.",
+  "notes": "Resident population from Iran's 2016 census by official municipal district (mantaqeh) — genuine intra-city subdivisions (Tehran's own 22 city districts, plus Karaj's districts and two satellite towns merged in when Karaj was folded into this map for its shared metro corridor). No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only, using OSM commercial/office POI density as the spatial signal for where those jobs concentrate. Commute flows are an unconstrained gravity model (distance-decay, 3km minimum trip distance) — no real O/D data of any kind anchors the flow directions or volumes. — Reviewer refinements (2026-08-18): granularity scored adm3, not adm4 — the rubric grades admin tiers by typical size and its §7 precedent scores ward-scale units (JP 市区町村, same ~400k scale as the 22 mantaqeh) as ADM3; bounds recorded per §2 rule 3 (adm4 by hierarchy / adm3 by size). Workplace intensity credited as binary_split: the OSM commercial/office POI-density signal routes jobs onto the workplace side of the building stock rather than plain size-spreading.",
   "sources": [
     "amar.org.ir (Statistical Center of Iran) — \"ویژگی‌های جمعیتی، اجتماعی و اقتصادی مناطق ۲۲‌گانه تهران در سرشماری‌های سال‌های ۱۳۹۰ و ۱۳۹۵\" (demographic/social/economic characteristics of Tehran's 22 mantaqeh, 2011 and 2016 censuses): amar.org.ir/news/ID/5053/"
   ],
