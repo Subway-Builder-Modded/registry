@@ -3,17 +3,17 @@
   "id": "alexandria",
   "answers": {
     "workplace_count": "estimated_proxy",
-    "workplace_granularity": "adm4",
+    "workplace_granularity": "adm3",
     "workplace_resolution": "osm_footprints",
     "workplace_intensity": "size_only",
     "resident_count": "total_population",
-    "resident_granularity": "adm4",
+    "resident_granularity": "adm3",
     "resident_resolution": "osm_footprints",
     "resident_intensity": "size_only",
     "od_metric": "none",
     "od_granularity": null
   },
-  "notes": "Updated August 2026: rebuilt on CAPMAS's real 1 July 2017 census population for Alexandria's 9 qism (districts) — 5,039,975 of the governorate's 5,599,387 total, sourced individually per qism from Arabic Wikipedia (each qism page cites its own CAPMAS figure). No official qism boundary polygons exist in OSM or GADM for Alexandria (verified directly against both sources) — population is instead assigned to buildings via nearest-neighbor to 9 qism anchor points, each anchor being the average location of several real, individually-verified OpenStreetMap localities whose qism membership is publicly documented (e.g. Sidi Gaber/Camp Caesar/Gleem -> Sharq qism; Karmouz/Qabbari/Wardian -> Gharb qism). This is a geographic approximation, not official boundaries, and buildings near a qism boundary may be misclassified — disclosed here rather than presented as precise. The remaining ~560k (Borg El Arab + rural governorate units) is not represented, rather than inventing a figure for it. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor. Note: Egypt's only other registry map, Cairo, is scored \"absent\" (weighted_score 0) under this same rubric.",
+  "notes": "Updated August 2026: rebuilt on CAPMAS's real 1 July 2017 census population for Alexandria's 9 qism (districts) — 5,039,975 of the governorate's 5,599,387 total, sourced individually per qism from Arabic Wikipedia (each qism page cites its own CAPMAS figure). No official qism boundary polygons exist in OSM or GADM for Alexandria (verified directly against both sources) — population is instead assigned to buildings via nearest-neighbor to 9 qism anchor points, each anchor being the average location of several real, individually-verified OpenStreetMap localities whose qism membership is publicly documented (e.g. Sidi Gaber/Camp Caesar/Gleem -> Sharq qism; Karmouz/Qabbari/Wardian -> Gharb qism). This is a geographic approximation, not official boundaries, and buildings near a qism boundary may be misclassified — disclosed here rather than presented as precise. The remaining ~560k (Borg El Arab + rural governorate units) is not represented, rather than inventing a figure for it. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor. Note: Egypt's only other registry map, Cairo, is scored \"absent\" (weighted_score 0) under this same rubric. — Reviewer refinement (2026-08-20): granularity scored adm3, not adm4 — Alexandria's 9 qism average ~560k people, ward-scale-plus; per the tehran/baghdad precedent (rubric grades admin tiers by typical size; JP ward-scale 市区町村 = ADM3) with bounds recorded (adm4 by intra-city function / adm3 by size). The anchor-point qism assignment (no official boundaries) is a disclosed spatial approximation on top of the OSM size-only dasymetric; no separate rung exists for it, noted here for auditability.",
   "sources": [
     "https://ar.wikipedia.org/wiki/حي_أول_المنتزة",
     "https://ar.wikipedia.org/wiki/حي_ثان_المنتزة",
