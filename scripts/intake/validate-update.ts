@@ -12,7 +12,7 @@ import {
 import { resolveCollaboratorUpdate } from "../lib/collaborators.js";
 import { getActiveCaretaker, resolveCaretakerUpdate } from "../lib/caretakers.js";
 import { isMaintainer } from "../lib/maintainers.js";
-import { loadVanillaCityCodeSet } from "../lib/map-constants.js";
+import { RESERVED_CITY_CODES, loadVanillaCityCodeSet } from "../lib/map-constants.js";
 import { isPresentIssueValue } from "../lib/map-field-utils.js";
 import { validateMapUpdateFields } from "../lib/map-update-logic.js";
 import { checkCityCodeUniqueness } from "../lib/registry-uniqueness.js";
@@ -179,6 +179,11 @@ async function main() {
           const cityCode = data["city-code"] as string;
           if (loadVanillaCityCodeSet(REPO_ROOT).has(cityCode)) {
             errors.push(`**city-code**: \`${cityCode}\` clashes with a vanilla city code.`);
+          } else if (RESERVED_CITY_CODES.includes(cityCode as (typeof RESERVED_CITY_CODES)[number])) {
+            errors.push(
+              `**city-code**: \`${cityCode}\` is reserved during a city-code migration ` +
+              "(stale installs still hold files under it) — contact a maintainer.",
+            );
           }
           errors.push(...checkCityCodeUniqueness({ repoRoot: REPO_ROOT, cityCode, currentMapId: id }));
         }

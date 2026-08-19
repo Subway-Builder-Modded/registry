@@ -91,16 +91,30 @@ test("publish validation rejects city codes that clash with vanilla maps", () =>
   assert.match(output, /\*\*city-code\*\*: `NYC` clashes with a vanilla city code\./);
 });
 
-test("publish validation rejects the 2026-08 French vanilla city codes", () => {
+test("publish validation rejects migration-reserved city codes with a reserved message", () => {
   const issue = basePublishMapIssue({ "city-code": "LYS" });
   const result = runScript("validate-publish", {
     LISTING_TYPE: "map",
     ISSUE_JSON: JSON.stringify(issue),
   });
 
-  assert.notEqual(result.status, 0, "Validation should fail for a French vanilla city code");
+  assert.notEqual(result.status, 0, "Validation should fail for a migration-reserved city code");
   const output = readValidationError();
-  assert.match(output, /\*\*city-code\*\*: `LYS` clashes with a vanilla city code\./);
+  assert.match(output, /\*\*city-code\*\*: `LYS` is reserved during a city-code migration/);
+  assert.doesNotMatch(output, /`LYS` clashes with a vanilla city code/);
+});
+
+test("publish validation no longer blocks MRS (released back to marseille, 2026-08-20)", () => {
+  const issue = basePublishMapIssue({ "city-code": "MRS" });
+  const result = runScript("validate-publish", {
+    LISTING_TYPE: "map",
+    ISSUE_JSON: JSON.stringify(issue),
+  });
+
+  // MRS may fail other rules in this fixture, but never the city-code rules.
+  const output = result.status === 0 ? "" : readValidationError();
+  assert.doesNotMatch(output, /`MRS` clashes with a vanilla city code/);
+  assert.doesNotMatch(output, /`MRS` is reserved/);
 });
 
 test("publish validation enforces ISO country code format (2 uppercase letters)", () => {

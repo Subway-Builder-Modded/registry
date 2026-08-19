@@ -12,6 +12,7 @@ import {
   DEFAULT_MAP_DATA_SOURCE,
   LEVEL_OF_DETAIL_VALUES,
   SOURCE_QUALITY_VALUES,
+  RESERVED_CITY_CODES,
   SPECIAL_DEMAND_TAG_SET,
   loadVanillaCityCodeSet,
   isOsmDataSource,
@@ -169,6 +170,11 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
 
   if (loadVanillaCityCodeSet(REPO_ROOT).has(parsed.data["city-code"])) {
     errors.push(`**city-code**: \`${parsed.data["city-code"]}\` clashes with a vanilla city code.`);
+  } else if (RESERVED_CITY_CODES.includes(parsed.data["city-code"] as (typeof RESERVED_CITY_CODES)[number])) {
+    errors.push(
+      `**city-code**: \`${parsed.data["city-code"]}\` is reserved during a city-code migration ` +
+      "(stale installs still hold files under it) — contact a maintainer.",
+    );
   }
   errors.push(...checkCityCodeUniqueness({ repoRoot: REPO_ROOT, cityCode: parsed.data["city-code"], currentMapId: null }));
 
