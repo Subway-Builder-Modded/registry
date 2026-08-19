@@ -60,11 +60,17 @@ export const VANILLA_CITY_CODES = [
   "KC",
   "NAS",
   "DUB",
-  // Reserved (never vanilla): pierreggt's pre-rename French codes; stale installs
-  // on user disks still hold them during the migration.
-  "LYS",
-  "MRS",
 ] as const;
+
+// Reserved (never vanilla): codes held back during a city-code migration because
+// stale installs on user disks still hold files under them — a NEW listing
+// claiming one would extract into those folders. Distinct from vanilla codes so
+// validation can explain the rejection honestly.
+// - LYS: lyon's pre-2026-08 code (now LSY). Release once the French city-code
+//   incident closes (old-version traffic back at allowance, v0.2.10 saturated).
+// - MRS was reserved here too, released 2026-08-20 back to marseille — the
+//   original holder reclaiming its own code is self-healing (issue #8327).
+export const RESERVED_CITY_CODES = ["LYS"] as const;
 
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
