@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-19T03:09:03.801Z",
+  "generated_at": "2026-08-19T06:58:15.455Z",
   "listings": {
     "akron-oh": {
       "has_complete_version": true,
@@ -12663,14 +12663,15 @@
     },
     "marseille": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.0.2",
+      "latest_semver_version": "v1.0.3",
       "latest_semver_complete": true,
       "complete_versions": [
+        "v1.0.3",
         "v1.0.2",
         "v1.0.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1786095539,
+      "last_updated": 1787110965,
       "versions": {
         "v1.0.0": {
           "is_complete": true,
@@ -12775,6 +12776,58 @@
           "fingerprint": "rules:v6:github:pierreggt/subway-builder-marseille:v1.0.2:marseille_v1.0.2.zip",
           "checked_at": "2026-08-07T16:02:39.951Z",
           "released_at": "2026-08-07T09:38:59.000Z"
+        },
+        "v1.0.3": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "MRS.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 59.8,
+          "file_sizes": {
+            "MRS.pmtiles": 33.47,
+            "buildings_index.bin.gz": 18.06,
+            "config.json": 0,
+            "demand_data.json.gz": 0.35,
+            "ocean_depth_index.json.gz": 3.12,
+            "ocean_depth_index_contours.json.gz": 2.64,
+            "roads.geojson.gz": 3.01,
+            "runways_taxiways.geojson.gz": 0.08
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-marseille",
+            "tag": "v1.0.3",
+            "asset_name": "marseille_v1.0.3.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-marseille/releases/download/v1.0.3/marseille_v1.0.3.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-marseille:v1.0.3:marseille_v1.0.3.zip",
+          "checked_at": "2026-08-19T06:58:15.455Z",
+          "released_at": "2026-08-19T03:42:45.000Z"
         }
       }
     },
