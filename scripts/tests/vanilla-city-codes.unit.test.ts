@@ -77,6 +77,32 @@ test("findListingCollisions reports listing, code, and author for colliding mani
   ]);
 });
 
+test("findListingCollisions skips deprecated listings", () => {
+  const repoRoot = mkdtempSync(join(tmpdir(), "vanilla-collisions-dep-"));
+  const write = (id: string, manifest: unknown): void => {
+    mkdirSync(join(repoRoot, "maps", id), { recursive: true });
+    writeFileSync(join(repoRoot, "maps", id, "manifest.json"), JSON.stringify(manifest), "utf-8");
+  };
+  // A deprecated listing is uninstallable regardless; its collision is not actionable.
+  write("deprecated-clash", {
+    id: "deprecated-clash",
+    city_code: "DUB",
+    author: "someone",
+    deprecation: { since: "2026-08-17T00:00:00.000Z", by_github_id: 1, reason: "test" },
+  });
+  write("live-clash", { id: "live-clash", city_code: "MAR", author: "other" });
+  writeFileSync(
+    join(repoRoot, "maps", "index.json"),
+    JSON.stringify({ maps: ["deprecated-clash", "live-clash"] }),
+    "utf-8",
+  );
+
+  const collisions = findListingCollisions(repoRoot, new Set(["DUB", "MAR"]));
+  assert.deepEqual(collisions, [
+    { listing_id: "live-clash", city_code: "MAR", author: "other" },
+  ]);
+});
+
 test("loadVanillaCityCodeSet degrades to the floor when the synced file is absent or malformed", () => {
   const missingRoot = mkdtempSync(join(tmpdir(), "vanilla-codes-missing-"));
   assert.deepEqual([...loadVanillaCityCodeSet(missingRoot)].sort(), [...VANILLA_CITY_CODE_SET].sort());
