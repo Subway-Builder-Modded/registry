@@ -80,12 +80,17 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.reactions.createForIssueComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: context.payload.comment.id,
-              content: 'eyes'
-            });
+            // Cosmetic ack; a deleted or edited trigger comment must never fail the run.
+            try {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                content: 'eyes'
+              });
+            } catch (error) {
+              core.warning(`Could not react to the trigger comment: ${error.message}`);
+            }
 
       - name: Detect maintainer overrides
         id: overrides
@@ -331,12 +336,17 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.reactions.createForIssueComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: context.payload.comment.id,
-              content: 'eyes'
-            });
+            // Cosmetic ack; a deleted or edited trigger comment must never fail the run.
+            try {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                content: 'eyes'
+              });
+            } catch (error) {
+              core.warning(`Could not react to the trigger comment: ${error.message}`);
+            }
 
       - name: Detect maintainer overrides
         id: overrides
