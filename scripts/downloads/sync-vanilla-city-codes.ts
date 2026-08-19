@@ -88,7 +88,13 @@ export function findListingCollisions(repoRoot: string, codes: Set<string>): Van
       const manifest = JSON.parse(readFileSync(manifestPath, "utf-8")) as {
         city_code?: unknown;
         author?: unknown;
+        deprecation?: unknown;
       };
+      // Deprecated listings are uninstallable regardless, so a code collision is
+      // not actionable — don't file (or keep open) conflict issues for them. If
+      // the listing is later undeprecated with the conflict intact, the next
+      // sync run files a fresh issue. Deleted listings drop out of the index.
+      if (manifest.deprecation !== undefined) continue;
       if (typeof manifest.city_code === "string" && codes.has(manifest.city_code)) {
         collisions.push({
           listing_id: listingId,
