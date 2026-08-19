@@ -80,12 +80,17 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            await github.rest.reactions.createForIssueComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: context.payload.comment.id,
-              content: 'eyes'
-            });
+            // Cosmetic ack; a deleted or edited trigger comment must never fail the run.
+            try {
+              await github.rest.reactions.createForIssueComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: context.payload.comment.id,
+                content: 'eyes'
+              });
+            } catch (error) {
+              core.warning(`Could not react to the trigger comment: ${error.message}`);
+            }
 
       - name: Parse issue body
         id: parser
@@ -105,7 +110,7 @@ jobs:
         # checking out the whole branch broke on "Missing script".
         id: target
         env:
-          MAP_ID: ${{ fromJson(steps.parser.outputs.jsonString).map-id }}
+          MAP_ID: ${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }}
         run: |
           set -euo pipefail
           if [ ! -f "maps/${MAP_ID}/manifest.json" ] \
@@ -126,7 +131,7 @@ jobs:
       - name: Commit and push to publish branch
         if: steps.target.outputs.mode == 'publish'
         env:
-          MAP_ID: ${{ fromJson(steps.parser.outputs.jsonString).map-id }}
+          MAP_ID: ${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }}
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -155,7 +160,7 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const branch = 'publish/map/${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
+            const branch = 'publish/map/${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }}';
             const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -199,10 +204,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B "dq/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+          git checkout -B "dq/${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }}"
           git add maps/
-          git commit -m "chore(data-quality): answers for ${{ fromJson(steps.parser.outputs.jsonString).map-id }} (self-reported)"
-          git push --force origin "dq/${{ fromJson(steps.parser.outputs.jsonString).map-id }}"
+          git commit -m "chore(data-quality): answers for ${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }} (self-reported)"
+          git push --force origin "dq/${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }}"
 
       - name: Create or update pull request
         if: steps.target.outputs.mode != 'publish'
@@ -210,7 +215,7 @@ jobs:
         with:
           github-token: ${{ steps.bot-token.outputs.token || github.token }}
           script: |
-            const branch = 'dq/${{ fromJson(steps.parser.outputs.jsonString).map-id }}';
+            const branch = 'dq/${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }}';
             const { data: existing } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -224,11 +229,11 @@ jobs:
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: 'chore(data-quality): answers for `${{ fromJson(steps.parser.outputs.jsonString).map-id }}`',
+              title: 'chore(data-quality): answers for `${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }}`',
               body: [
                 'Fixes #${{ github.event.issue.number }}',
                 '',
-                'Automated PR carrying self-reported data-quality answers for `${{ fromJson(steps.parser.outputs.jsonString).map-id }}`.',
+                'Automated PR carrying self-reported data-quality answers for `${{ fromJson(steps.parser.outputs.jsonString || '{}').map-id }}`.',
                 '',
                 'Submitted by @${{ github.event.issue.user.login }}',
                 '',
