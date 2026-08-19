@@ -16,9 +16,9 @@
   "notes": "GASTAT publishes population only at governorate level for both Mecca and Jeddah — each governorate's entire 2022 census population is applied as a single figure, then independently re-split into a synthetic ~5km grid (our own construction, not a real sub-governorate unit) to restore distance-decay in the gravity model. IMPORTANT — after this, the combined map's total population was increased by a further +300,000 by uniformly scaling every generated flow, at the map author's explicit request; this scaling is NOT derived from any source and is disclosed here as a deliberate deviation. No real employment data exists: jobs are a flat 40% of (census-derived + scaled) resident population, redistributed by OSM building floor area and commercial-POI density. Masjid al-Haram's own demand figure uses real Umrah visitor totals (GASTAT) but deliberately excludes the ~5-day annual Hajj peak, since this pipeline has no seasonal-spike mechanism — modeling Hajj-level attendance as a flat daily average would misrepresent every other day of the year. Commute flows are an unconstrained gravity model with no real O/D anchor. — Reviewer note (2026-08-20): answers inherited from riyadh and confirmed unchanged. The disclosed +300,000 uniform population scaling (author request, not source-derived) does not move any rubric factor — the census anchor, grain, and dasymetric are unaffected — but is recorded here as a known magnitude deviation of roughly +4-5% over the 2022 census totals.",
   "derived_from": "riyadh",
   "provenance": {
-    "method": "self-reported",
+    "method": "reviewed",
     "submitted_by": "pierreggt",
-    "reviewed_by": null,
-    "date": "2026-08-18"
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-19"
   }
 }
