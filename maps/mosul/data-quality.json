@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "mosul",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm3",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Entered by the maintainer on the author's behalf (no data-quality issue was filed for mosul): same methodology as the author's other 2024-Iraqi-census maps — resident population by qadaa (adm3 per the baghdad/erbil ruling: middle of adm4-function/adm2-hierarchy bounds), jobs as a flat 40% of resident population over OSM buildings by floor area, unconstrained gravity flows. Answers copied verbatim from the reviewed baghdad set; if the author's actual mosul pipeline differs (e.g. a POI signal or a different grain), a map-update with revised answers supersedes this.",
+  "sources": [
+    "cosit.gov.iq (Iraq Central Statistical Organisation, 2024 general census)"
+  ],
+  "provenance": {
+    "method": "backfill",
+    "submitted_by": "ahkimn",
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-20"
+  }
+}
