@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "shiraz",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "binary_split",
+    "resident_count": "total_population",
+    "resident_granularity": "adm3",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Resident population from Iran's 2016 census by official municipal district (mantaqeh) — genuine intra-city subdivisions. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor of any kind.",
+  "sources": [
+    "amar.org.ir (Statistical Center of Iran), 2016 census by mantaqeh"
+  ],
+  "derived_from": "mashhad",
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "pierreggt",
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-19"
+  }
+}
