@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "aleppo",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "adm3",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "size_only",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Resident population from Syria's 2004 general census (no more recent official figure found for most of this area) by nahiya — Aleppo city itself is one single nahiya figure (Jabal Saman, which per the source explicitly bundles the city with 23 satellite localities into one number), with separate surrounding nahiyas (Haritan, Nubl, As-Safira, Al-Zirbah, Banan) covering outlying towns. Districts partially inside the bounding box are prorated by area fraction. No real employment data exists: jobs are a flat 40% of resident population, redistributed across OSM buildings weighted by floor area only. Commute flows are an unconstrained gravity model with no real O/D anchor. Note: the airport special point's passenger figure was manually boosted by the map author beyond the real ~620/day 2025 traffic figure, for gameplay feel — disclosed here as a deliberate deviation, not a data source.",
+  "derived_from": "damascus",
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "pierreggt",
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-19"
+  }
+}
