@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-08-20T13:01:16.804Z",
+  "generated_at": "2026-08-20T13:31:59.823Z",
   "valid_paths": [
     "/",
     "/community",
@@ -11,7 +11,9 @@
     "/depot/updates",
     "/depot/updates/v1.0.0",
     "/depot/updates/v1.0.1",
+    "/depot/updates/v1.0.2",
     "/depot/updates/v1.0.3",
+    "/depot/updates/v1.0.4",
     "/depot/updates/v1.0.5",
     "/depot/updates/v1.0.6",
     "/depot/updates/v1.0.8",
@@ -1214,6 +1216,7 @@
     "/registry/maps/tromso-no",
     "/registry/maps/trondheim-no",
     "/registry/maps/trondheim-no/versions",
+    "/registry/maps/trondheim-no/versions/1.0.0",
     "/registry/maps/trondheim-val",
     "/registry/maps/trondheim-val/versions",
     "/registry/maps/trondheim-val/versions/1.0.0",
@@ -1424,6 +1427,7 @@
     "/registry/maps/yukina-pl-lodz",
     "/registry/maps/yukina-pl-lodz/versions/0.3.0",
     "/registry/maps/yukina-pl-lublin",
+    "/registry/maps/yukina-pl-lublin/versions",
     "/registry/maps/yukina-pl-lublin/versions/0.1.0",
     "/registry/maps/yukina-pl-olsztyn",
     "/registry/maps/yukina-pl-olsztyn/versions",
@@ -1779,8 +1783,8 @@
     "latest_hour": "2026-08-20T13:00:00.000Z",
     "total_days": 126,
     "total_hours": 1996,
-    "latest_day_visits": 36,
-    "latest_hour_visits": 0
+    "latest_day_visits": 117,
+    "latest_hour_visits": 81
   },
   "time_series": {
     "by_day": [
@@ -2286,7 +2290,7 @@
       },
       {
         "date": "2026-08-20",
-        "visits": 36
+        "visits": 117
       }
     ],
     "by_hour": [
@@ -10272,7 +10276,7 @@
       },
       {
         "hour": "2026-08-20T13:00:00.000Z",
-        "visits": 0
+        "visits": 81
       }
     ]
   },
@@ -28862,37 +28866,67 @@
       }
     },
     "2026-08-20": {
-      "captured_at": "2026-08-20T13:01:14.427Z",
+      "captured_at": "2026-08-20T13:31:57.592Z",
       "window_start": "2026-08-20T00:00:00.000Z",
       "window_end": "2026-08-20T14:00:00.000Z",
       "totals": {
-        "visits": 36
+        "visits": 117
       },
       "pages": {
-        "/": 4,
+        "/": 7,
+        "/depot": 2,
+        "/depot/updates/v1.0.0": 2,
+        "/depot/updates/v1.0.2": 1,
+        "/depot/updates/v1.0.4": 1,
         "/depot/updates/v1.0.6": 1,
-        "/railyard": 3,
+        "/depot/updates/v1.0.8": 2,
+        "/depot/updates/v1.1.1": 1,
+        "/railyard": 15,
+        "/railyard/docs/v0.2/troubleshooting-railyard": 1,
         "/railyard/docs/v0.2/using-railyard": 1,
+        "/railyard/updates/v0.1.0": 1,
         "/railyard/updates/v0.2.10": 1,
+        "/registry": 1,
+        "/registry/authors/Maximilian284/subwaybuilder-it-maps": 1,
+        "/registry/authors/bean1322": 1,
         "/registry/authors/giannons46": 1,
+        "/registry/authors/hsullivan1201": 1,
         "/registry/authors/martig7": 1,
         "/registry/authors/rslurry": 1,
+        "/registry/authors/rslurry/subwaybuilder-maps": 1,
+        "/registry/authors/ryandicicco/Subway-Builder-Maps": 1,
         "/registry/authors/soccerjonj": 1,
+        "/registry/docs": 1,
+        "/registry/docs/manifest-requirements": 1,
+        "/registry/docs/publishing-content": 1,
+        "/registry/maps": 2,
         "/registry/maps/bangkok": 1,
         "/registry/maps/barcelona/analytics": 3,
         "/registry/maps/barcelona/details": 3,
         "/registry/maps/chongqing": 1,
-        "/registry/maps/jelegend-tokyo": 1,
+        "/registry/maps/jelegend-tokyo": 2,
         "/registry/maps/madrid": 1,
         "/registry/maps/montreal": 1,
         "/registry/maps/puerto-rico/versions/1.1.0": 1,
+        "/registry/maps/rome": 1,
+        "/registry/maps/rotterdam-the-hague": 1,
+        "/registry/maps/trondheim-no/versions/1.0.0": 1,
         "/registry/maps/trondheim-val": 1,
         "/registry/maps/yukina-ee-tallinn/versions/0.3.1": 1,
+        "/registry/maps/yukina-lt-panevezys/versions": 1,
+        "/registry/maps/yukina-lt-siauliai": 1,
+        "/registry/maps/yukina-pl-lublin/versions": 1,
         "/registry/maps/yukina-pl-warszawa/versions/0.4.1": 1,
-        "/registry/mods": 3,
+        "/registry/mods": 4,
         "/registry/mods/chinese-trains/versions/v1.0.4": 1,
         "/registry/mods/orbital-surveyor/versions": 1,
+        "/registry/mods/penguin-approved-rolling-stock": 30,
         "/registry/mods/resizable-ui": 1,
+        "/registry/mods/station-dots/versions/v1.2.0": 1,
+        "/registry/mods/subwaybuilder-regions": 2,
+        "/registry/mods/tod": 1,
+        "/template-mod": 1,
+        "/template-mod/docs/v1.0/debugging": 1,
         "/website/updates": 1
       },
       "countries": {
@@ -28901,31 +28935,37 @@
         "CA": 2,
         "DE": 1,
         "ES": 1,
-        "GB": 3,
+        "GB": 4,
+        "ID": 1,
         "IN": 1,
-        "PL": 1,
-        "SG": 2,
+        "IT": 1,
+        "NL": 20,
+        "PL": 11,
+        "SG": 4,
         "TH": 1,
-        "US": 21
+        "US": 67
       },
       "browsers": {
-        "BingBot": 3,
-        "Chrome": 9,
-        "Firefox": 1,
-        "GoogleBot": 8,
+        "BingBot": 6,
+        "Chrome": 10,
+        "Edge": 1,
+        "Firefox": 11,
+        "GoogleBot": 14,
+        "MobileSafari": 30,
         "Safari": 1,
-        "Unknown": 14
+        "Unknown": 44
       },
       "operating_systems": {
-        "Android": 8,
-        "Linux": 1,
+        "Android": 14,
+        "Linux": 11,
         "MacOSX": 4,
-        "Unknown": 17,
-        "Windows": 6
+        "Unknown": 50,
+        "Windows": 8,
+        "iOS": 30
       },
       "devices": {
-        "desktop": 20,
-        "mobile": 16
+        "desktop": 63,
+        "mobile": 54
       }
     }
   }
