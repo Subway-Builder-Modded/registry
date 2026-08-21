@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "eurodistrict-bale",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "mesh_250",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "structured_marginals",
+    "od_granularity": "adm2"
+  },
+  "notes": "French internal flows: real MOBPRO commune-to-commune O-D table. Swiss internal flows: no fine O-D matrix, gravity model hard-constrained to real STATENT employment totals per canton minus real cross-border commuter counts. German internal flows: same gravity approach, constrained to a mix of real (Weil am Rhein, Lörrach) and estimated (other communes, via a jobs/population ratio derived from the two known communes) employment totals — this is the one genuinely estimated component of the pipeline, flagged explicitly rather than presented as sourced. Cross-border flows: real OFS quarterly cross-border commuter statistics, separately for French residents (by department) and German residents (by Landkreis), by canton of work.",
+  "sources": [
+    "https://www.data.gouv.fr/fr/datasets/base-flux-de-mobilite/ (MOBPRO 2021)",
+    "https://www.bfs.admin.ch/bfs/fr/home/services/geostat.html (STATPOP, STATENT)",
+    "https://www.pxweb-admin-a.bfs.admin.ch/pxweb/fr/px-x-0302010000_104 (frontaliers France)",
+    "https://www.pxweb-admin-a.bfs.admin.ch/pxweb/fr/px-x-0302010000_103 (frontaliers Allemagne)",
+    "https://www.zensus2022.de/ (population allemande, grille 100m)",
+    "https://www.statistik-bw.de/Arbeit/Erwerbstaetige/Pendler-Eckzahlen.jsp (emplois Weil am Rhein / Lörrach)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "pierreggt",
+    "reviewed_by": null,
+    "date": "2026-08-21"
+  }
+}
