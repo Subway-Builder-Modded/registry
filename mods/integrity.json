@@ -1,45 +1,46 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-21T16:04:36.408Z",
+  "generated_at": "2026-08-21T20:01:00.781Z",
   "listings": {
     "advanced-analytics": {
-      "has_complete_version": true,
+      "has_complete_version": false,
       "latest_semver_version": "v1.6.2",
-      "latest_semver_complete": true,
-      "complete_versions": [
-        "v1.6.2",
-        "v1.6.1",
-        "v1.6.0",
-        "v1.5.0",
-        "v1.4.7",
-        "v1.4.5",
-        "v1.4.2",
-        "v1.4.1",
-        "v1.4.0",
-        "v1.3.2",
-        "v1.3.1",
-        "v1.3.0",
-        "v1.2.9",
-        "v1.2.8",
-        "v1.2.7",
-        "v1.2.6",
-        "v1.2.5",
-        "v1.2.1",
-        "v1.2.0",
-        "v1.1.0"
-      ],
+      "latest_semver_complete": false,
+      "complete_versions": [],
       "incomplete_versions": [
-        "v1.0.1",
-        "v1.0.0",
+        "target-1.1.0",
+        "v0.9.1",
         "v0.9.2",
-        "v0.9.1"
+        "v1.0.0",
+        "v1.0.1",
+        "v1.1.0",
+        "v1.2.0",
+        "v1.2.1",
+        "v1.2.5",
+        "v1.2.6",
+        "v1.2.7",
+        "v1.2.8",
+        "v1.2.9",
+        "v1.3.0",
+        "v1.3.1",
+        "v1.3.2",
+        "v1.4.0",
+        "v1.4.1",
+        "v1.4.2",
+        "v1.4.5",
+        "v1.4.7",
+        "v1.5.0",
+        "v1.6.0",
+        "v1.6.1",
+        "v1.6.2"
       ],
       "last_updated": 1785700496,
       "versions": {
         "target-1.1.0": {
           "is_complete": false,
           "errors": [
-            "non-semver release tag 'target-1.1.0'"
+            "non-semver release tag 'target-1.1.0'",
+            "listing_deprecated"
           ],
           "required_checks": {},
           "matched_files": {},
@@ -49,7 +50,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-21T16:04:36.408Z",
+          "checked_at": "2026-08-21T20:01:00.781Z",
           "released_at": "2026-03-02T23:15:42.000Z"
         },
         "v0.9.1": {
@@ -57,7 +58,8 @@
           "errors": [
             "asset 'advanced_analytics-v0.9.1.zip': release asset manifest.json is missing",
             "asset 'advanced_analytics-v0.9.1.zip': missing top-level manifest.json in ZIP",
-            "asset 'advanced_analytics-v0.9.1.zip': manifest.json version '(missing)' does not match release tag 'v0.9.1' (expected '0.9.1')"
+            "asset 'advanced_analytics-v0.9.1.zip': manifest.json version '(missing)' does not match release tag 'v0.9.1' (expected '0.9.1')",
+            "listing_deprecated"
           ],
           "required_checks": {
             "release_manifest_asset": false,
@@ -88,7 +90,8 @@
           "errors": [
             "asset 'advanced_analytics-v0.9.2.zip': release asset manifest.json is missing",
             "asset 'advanced_analytics-v0.9.2.zip': missing top-level manifest.json in ZIP",
-            "asset 'advanced_analytics-v0.9.2.zip': manifest.json version '(missing)' does not match release tag 'v0.9.2' (expected '0.9.2')"
+            "asset 'advanced_analytics-v0.9.2.zip': manifest.json version '(missing)' does not match release tag 'v0.9.2' (expected '0.9.2')",
+            "listing_deprecated"
           ],
           "required_checks": {
             "release_manifest_asset": false,
@@ -118,7 +121,8 @@
           "is_complete": false,
           "errors": [
             "asset 'advanced_analytics-v1.0.0.zip': missing top-level manifest.json in ZIP",
-            "asset 'advanced_analytics-v1.0.0.zip': manifest.json version '(missing)' does not match release tag 'v1.0.0' (expected '1.0.0')"
+            "asset 'advanced_analytics-v1.0.0.zip': manifest.json version '(missing)' does not match release tag 'v1.0.0' (expected '1.0.0')",
+            "listing_deprecated"
           ],
           "required_checks": {
             "release_manifest_asset": true,
@@ -149,7 +153,8 @@
           "is_complete": false,
           "errors": [
             "asset 'advanced_analytics-v1.0.1.zip': missing top-level manifest.json in ZIP",
-            "asset 'advanced_analytics-v1.0.1.zip': manifest.json version '(missing)' does not match release tag 'v1.0.1' (expected '1.0.1')"
+            "asset 'advanced_analytics-v1.0.1.zip': manifest.json version '(missing)' does not match release tag 'v1.0.1' (expected '1.0.1')",
+            "listing_deprecated"
           ],
           "required_checks": {
             "release_manifest_asset": true,
@@ -177,8 +182,10 @@
           "released_at": "2026-03-07T19:40:07.000Z"
         },
         "v1.1.0": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -205,8 +212,10 @@
           "released_at": "2026-03-09T06:57:10.000Z"
         },
         "v1.2.0": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -233,8 +242,10 @@
           "released_at": "2026-03-15T22:16:51.000Z"
         },
         "v1.2.1": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -261,8 +272,10 @@
           "released_at": "2026-03-16T07:25:03.000Z"
         },
         "v1.2.5": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -289,8 +302,10 @@
           "released_at": "2026-03-22T10:15:41.000Z"
         },
         "v1.2.6": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -317,8 +332,10 @@
           "released_at": "2026-03-23T18:12:26.000Z"
         },
         "v1.2.7": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -345,8 +362,10 @@
           "released_at": "2026-03-23T18:40:45.000Z"
         },
         "v1.2.8": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -373,8 +392,10 @@
           "released_at": "2026-03-26T15:41:53.000Z"
         },
         "v1.2.9": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -401,8 +422,10 @@
           "released_at": "2026-03-28T13:38:08.000Z"
         },
         "v1.3.0": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -429,8 +452,10 @@
           "released_at": "2026-03-29T16:21:15.000Z"
         },
         "v1.3.1": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -457,8 +482,10 @@
           "released_at": "2026-03-30T05:41:20.000Z"
         },
         "v1.3.2": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -485,8 +512,10 @@
           "released_at": "2026-03-31T05:49:37.000Z"
         },
         "v1.4.0": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -513,8 +542,10 @@
           "released_at": "2026-04-04T23:09:09.000Z"
         },
         "v1.4.1": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -541,8 +572,10 @@
           "released_at": "2026-04-07T19:29:09.000Z"
         },
         "v1.4.2": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -569,8 +602,10 @@
           "released_at": "2026-04-09T20:31:41.000Z"
         },
         "v1.4.5": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -597,8 +632,10 @@
           "released_at": "2026-04-16T11:04:46.000Z"
         },
         "v1.4.7": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -625,8 +662,10 @@
           "released_at": "2026-04-18T16:02:02.000Z"
         },
         "v1.5.0": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -653,8 +692,10 @@
           "released_at": "2026-04-24T16:48:11.000Z"
         },
         "v1.6.0": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -681,8 +722,10 @@
           "released_at": "2026-07-17T17:26:41.000Z"
         },
         "v1.6.1": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -709,8 +752,10 @@
           "released_at": "2026-07-22T20:39:34.000Z"
         },
         "v1.6.2": {
-          "is_complete": true,
-          "errors": [],
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
           "required_checks": {
             "release_manifest_asset": true,
             "zip_manifest_json": true,
@@ -1066,9 +1111,10 @@
     },
     "basedgoat-trains": {
       "has_complete_version": true,
-      "latest_semver_version": "v0.6.1",
+      "latest_semver_version": "v0.6.2",
       "latest_semver_complete": true,
       "complete_versions": [
+        "v0.6.2",
         "v0.6.1",
         "v0.6.0",
         "v0.5.0",
@@ -1079,7 +1125,7 @@
         "v0.1.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1787025737,
+      "last_updated": 1787339716,
       "versions": {
         "v0.1.0": {
           "is_complete": true,
@@ -1328,6 +1374,37 @@
           "fingerprint": "rules:v6:github:arniber21/dantrains-abridged:v0.6.1:BasedGoatTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
           "checked_at": "2026-08-18T08:01:21.274Z",
           "released_at": "2026-08-18T04:02:17.000Z"
+        },
+        "v0.6.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.01,
+          "game_version": ">=1.4.12",
+          "dependencies": {
+            "scrollable-dropdowns": ">=v1.2.0"
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "arniber21/dantrains-abridged",
+            "tag": "v0.6.2",
+            "asset_name": "BasedGoatTrains-Abridged.zip",
+            "download_url": "https://github.com/arniber21/dantrains-abridged/releases/download/v0.6.2/BasedGoatTrains-Abridged.zip"
+          },
+          "fingerprint": "rules:v6:github:arniber21/dantrains-abridged:v0.6.2:BasedGoatTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-08-21T20:01:00.781Z",
+          "released_at": "2026-08-21T19:15:16.000Z"
         }
       }
     },
@@ -2349,7 +2426,7 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.0:dantrains-abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-21T16:04:36.408Z",
+          "checked_at": "2026-08-21T20:01:00.781Z",
           "released_at": "2026-07-18T05:05:08.000Z"
         },
         "v1.1": {
@@ -2365,7 +2442,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.1:danTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-21T16:04:36.408Z",
+          "checked_at": "2026-08-21T20:01:00.781Z",
           "released_at": "2026-07-19T04:42:34.000Z"
         },
         "v1.1.1": {
@@ -7234,7 +7311,7 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-21T16:04:36.408Z",
+          "checked_at": "2026-08-21T20:01:00.781Z",
           "released_at": "2026-03-01T14:52:46.000Z"
         },
         "v1.1": {
@@ -7250,7 +7327,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-21T16:04:36.408Z",
+          "checked_at": "2026-08-21T20:01:00.781Z",
           "released_at": "2026-03-08T08:01:18.000Z"
         }
       }
