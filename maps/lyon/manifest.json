@@ -1,47 +1,48 @@
 {
   "schema_version": 1,
   "id": "lyon",
-  "name": "Lyon",
+  "name": "Lyon - Vallée du Rhône & Alpes",
   "author": "pierreggt",
   "github_id": 301703453,
-  "description": "Map of the greater Lyon metropolitan area (France), from Lyon-Saint Exupery airport to Tassin-la-Demi-Lune and from Rillieux-la-Pape to Saint-Priest. 204k+ OSM buildings (binary format), 736k+ commuters with demand built from real INSEE census data. Lyon-Saint Exupery airport with runways and taxiways. The Rhone and Saone rivers fully modelled with depth data. Protomaps basemap with water, parks and forests.",
+  "description": "Regional map covering Lyon, Grenoble, Saint-Étienne, Valence and Clermont-Ferrand, France, spanning the Rhône valley and the Alpine foothills. 2.7M+ simulated commuters from real INSEE Filosofi/MOBPRO 2021 data. 4 airports, universities, hospitals and rail stations across the whole region.",
   "tags": [
     "west-europe",
     "airports",
-    "entertainment",
     "hospitals",
     "universities"
   ],
   "gallery": [
     "gallery/screenshot1.webp",
     "gallery/screenshot2.webp",
-    "gallery/screenshot3.webp"
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp",
+    "gallery/screenshot5.webp",
+    "gallery/screenshot6.webp"
   ],
   "is_test": false,
-  "source": "https://github.com/pierreggt/subway-builder-lyon",
+  "source": "https://github.com/pierreggt/subwaybuilder-maps-france",
   "update": {
-    "type": "github",
-    "repo": "pierreggt/subway-builder-lyon"
+    "type": "custom",
+    "url": "https://raw.githubusercontent.com/pierreggt/subwaybuilder-maps-france/main/updates/lsy-update.json"
   },
   "city_code": "LSY",
   "country": "FR",
-  "population": 736894,
-  "residents_total": 736894,
-  "points_count": 3608,
-  "population_count": 12984,
+  "population": 2719487,
+  "residents_total": 2719487,
+  "points_count": 57566,
+  "population_count": 95084,
   "initial_view_state": {
-    "latitude": 45.764,
-    "longitude": 4.8357,
-    "zoom": 12,
+    "latitude": 45.55,
+    "longitude": 4.55,
+    "zoom": 8,
     "bearing": 0
   },
-  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "data_source": "INSEE Filosofi/MOBPRO 2021",
   "source_quality": "medium-quality",
   "level_of_detail": "high-detail",
   "location": "west-europe",
   "special_demand": [
     "airports",
-    "entertainment",
     "hospitals",
     "universities"
   ],
@@ -56,16 +57,11 @@
     "runways_taxiways.geojson.gz": 0.08
   },
   "included_cities": [
-    "Villeurbanne",
-    "Vénissieux",
-    "Saint-Priest",
-    "Rillieux-la-Pape",
-    "Tassin-la-Demi-Lune",
-    "Bron",
-    "Vaulx-en-Velin",
-    "Écully",
-    "Caluire-et-Cuire",
-    "Meyzieu"
+    "Grenoble",
+    "Saint-Étienne",
+    "Valence",
+    "Clermont-Ferrand",
+    "Roanne"
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
