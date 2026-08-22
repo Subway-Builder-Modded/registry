@@ -50,11 +50,98 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "FDF.pmtiles": 18.78,
+    "buildings_index.bin.gz": 10,
+    "config.json": 0,
+    "demand_data.json.gz": 0.1,
+    "ocean_depth_index.json.gz": 8.63,
+    "ocean_depth_index_contours.json.gz": 5.58,
+    "roads.geojson.gz": 1.75,
+    "runways_taxiways.geojson.gz": 0.05
+  },
   "included_cities": [
     "Fort-de-France",
     "Le Robert",
     "Rivière-Salée",
     "Sainte-Luce"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.19905183668034604,
+      "p25": 0.19910171433921114,
+      "p50": 0.20013494449487243,
+      "p75": 0.20127459736218226,
+      "p90": 0.39936441316046045,
+      "mean": 0.24241886833530896
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1990506486010227,
+      "p25": 0.19907074123639232,
+      "p50": 0.20013494449487243,
+      "p75": 0.20127460680211479,
+      "p90": 0.44868400772725914,
+      "mean": 0.2790645900871713
+    },
+    "commuteDistanceKm": {
+      "p10": 2561,
+      "p25": 5257,
+      "p50": 12275,
+      "p75": 22286,
+      "p90": 35067,
+      "mean": 15908.946257197696
+    },
+    "residentCellDensity": {
+      "p10": 54,
+      "p25": 60,
+      "p50": 125,
+      "p75": 249,
+      "p90": 489,
+      "mean": 226.4265402843602
+    },
+    "workerCellDensity": {
+      "p10": 19,
+      "p25": 60,
+      "p50": 109,
+      "p75": 230,
+      "p90": 540,
+      "mean": 246.78657487091223
+    },
+    "detail": {
+      "radiusKm": 0.20013494449487243,
+      "expectedPointSpacingKm": 0.4902195094370466,
+      "normalizedRadius": 0.40825577244916544,
+      "activityPerPoint": 47.36080105055811,
+      "playableAreaKm2": 1144,
+      "playableAreaPerPointKm2": 0.3755745239658569,
+      "playableCatchmentRadiusKm": 0.345758707738653,
+      "localityScore": 0.8369857331184444,
+      "deaggregationScore": 1,
+      "score": 0.9148692437274544
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.7513077819387631,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -61.015418246719555,
+            "latitude": 14.625774961313168,
+            "massShare": 1,
+            "assignedMass": 288522,
+            "assignedPointCount": 3046,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787270400
 }
