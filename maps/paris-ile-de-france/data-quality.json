@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "paris-ile-de-france",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_calibrated",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_250",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm3"
+  },
+  "notes": "Residents: INSEE Filosofi 2021, a 200m uniform population grid covering all of metropolitan France (total population including children and retirees) -- already fine-grained, nothing further to place.\n\nJobs: total counts per commune come from INSEE MOBPRO 2021, a full national commune-to-commune commute survey covering where people actually work (place of work, not employer registration). For placement WITHIN each destination commune, we moved beyond population-density placement (used on our other France maps) to real establishment-level data: INSEE's SIRENE business register, specifically the official \"Géolocalisation des établissements du répertoire SIRENE\" dataset (INSEE, updated monthly) joined to \"StockEtablissement\" for employee-count brackets and activity codes. We kept only active employer establishments (excluding non-employing/closed units), weighted each by the midpoint of its employee-count bracket, and snapped each to the nearest real building footprint (Overture Maps buildings, open dataset -- not IGN's official cadastral layer, disclosed here for transparency) within 100m (99.7% of establishments snapped successfully; ~0.3% kept their raw geocoded SIRENE coordinate). Within each commune, MOBPRO's real job total is then distributed across these real building-anchored establishment points weighted by their SIRENE employee count, instead of being distributed across residential population cells -- densities are directly tuned to match MOBPRO's real per-commune statistics by construction, since MOBPRO fixes the total and SIRENE only decides the real-world spatial distribution within it. This eliminates the \"business district underrepresented\" bias documented in our own pipeline notes (e.g. La Defense, where population-based placement previously required a hand-curated correction we have now removed since SIRENE naturally places jobs on the real office towers).\n\nCommute flows: full MOBPRO commune-to-commune matrix (~219k origin-destination pairs kept for this map's extended bounding box), not estimated. Minimum-distance floor of 10km applied to synthetic pop generation with a spatial fallback for structurally small communes (median resulting commute: 27km / 32min, consistent with a large multi-department region). Routing via local OSRM, traffic congestion multiplier (1.55x, among the most congested metros in Europe) applied to trips >=3km.\n\nMap coverage: extended well beyond Ile-de-France's administrative boundary to include every town where an RER or Transilien line terminates, even outside the region (Creil and Crepy-en-Valois in Oise, Chateau-Thierry and La Ferte-Milon in Aisne, Gisors and Vernon in Eure, Dreux in Eure-et-Loir, Montargis in Loiret) -- verified against each line's actual current terminus, not assumed from the administrative region alone. — Reviewer refinements (2026-08-23): workplace resolution scored ml_hybrid_footprints, not exact_footprints — the author discloses (twice) that footprints are Overture, not the IGN cadastre, and 99.7% of SIRENE establishments are snapped ONTO those footprints, so the final placement geometry is Overture (the rubric R-ladder names Overture as the ml_hybrid example). The SIRENE contribution — employee-bracket weights constrained to MOBPRO per-commune totals by construction — is intensity-side and fully credited at fine_types_calibrated. Resident resolution pinned to mesh_250 (Filosofi is a 200m grid). Upgrade path noted for the author: re-snapping to IGN BD TOPO official footprints would lift R to exact_footprints and the map to high.",
+  "sources": [
+    "https://www.insee.fr/fr/statistiques/7655475 (Filosofi 2021)",
+    "https://www.insee.fr/fr/statistiques/6455490 (MOBPRO 2021)",
+    "https://www.data.gouv.fr/datasets/geolocalisation-des-etablissements-du-repertoire-sirene-pour-les-etudes-statistiques",
+    "https://www.data.gouv.fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret"
+  ],
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "pierreggt",
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-22"
+  }
+}
