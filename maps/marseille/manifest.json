@@ -1,14 +1,13 @@
 {
   "schema_version": 1,
   "id": "marseille",
-  "name": "Marseille",
+  "name": "Marseille - Provence",
   "author": "pierreggt",
   "github_id": 301703453,
-  "description": "Map of the greater Marseille - Aix-en-Provence metropolitan area (France), from Marseille-Provence airport to Aubagne and the Calanques to Aix-en-Provence. 333k+ OSM buildings (binary format), 681k+ commuters with demand built from real INSEE census data. Marseille-Provence airport with runways and taxiways. Mediterranean coastline and the Calanques fully modelled with depth data. Protomaps basemap with water, parks and forests.",
+  "description": "Regional map covering Marseille, Toulon, Aix-en-Provence and Istres, France. 1.15M+ simulated commuters from real INSEE Filosofi/MOBPRO 2021 data. Marseille-Provence and Toulon-Hyères airports, the Calanques, Toulon naval base, universities and hospitals across the whole region.",
   "tags": [
     "west-europe",
     "airports",
-    "entertainment",
     "hospitals",
     "universities"
   ],
@@ -18,30 +17,29 @@
     "gallery/screenshot3.webp"
   ],
   "is_test": false,
-  "source": "https://github.com/pierreggt/subway-builder-marseille",
+  "source": "https://github.com/pierreggt/subwaybuilder-maps-france",
   "update": {
-    "type": "github",
-    "repo": "pierreggt/subway-builder-marseille"
+    "type": "custom",
+    "url": "https://raw.githubusercontent.com/pierreggt/subwaybuilder-maps-france/main/updates/mrs-update.json"
   },
   "city_code": "MRS",
   "country": "FR",
-  "population": 681085,
-  "residents_total": 681085,
-  "points_count": 4874,
-  "population_count": 11992,
+  "population": 1146909,
+  "residents_total": 1146909,
+  "points_count": 15374,
+  "population_count": 21990,
   "initial_view_state": {
-    "latitude": 43.2965,
-    "longitude": 5.3698,
-    "zoom": 12,
+    "latitude": 43.35,
+    "longitude": 5.45,
+    "zoom": 9,
     "bearing": 0
   },
-  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "data_source": "INSEE Filosofi/MOBPRO 2021",
   "source_quality": "medium-quality",
   "level_of_detail": "high-detail",
   "location": "west-europe",
   "special_demand": [
     "airports",
-    "entertainment",
     "hospitals",
     "universities"
   ],
@@ -56,16 +54,9 @@
     "runways_taxiways.geojson.gz": 0.08
   },
   "included_cities": [
+    "Toulon",
     "Aix-en-Provence",
-    "Aubagne",
-    "Martigues",
-    "Istres",
-    "Vitrolles",
-    "La Ciotat",
-    "Cassis",
-    "Marignane",
-    "Salon-de-Provence",
-    "Gardanne"
+    "Istres"
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
