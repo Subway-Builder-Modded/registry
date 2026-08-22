@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "grand-geneve",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "mesh_250",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_250",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "structured_marginals",
+    "od_granularity": "adm2"
+  },
+  "notes": "French side: population from INSEE Filosofi 2021 200m grid, commute flows from real INSEE MOBPRO 2021 commune-to-commune totals, same pipeline as our other France maps (10km minimum origin-destination distance, with redirection to the nearest feasible commune when a real MOBPRO pair is structurally too close).\n\nSwiss side: population from the Swiss Federal Statistical Office's STATPOP 2023 100m hectare grid (real geocoded resident counts); employment from STATENT 2023 100m hectare grid (real geocoded workplace counts, by establishment location, not employer registration address). No fine-grained Swiss origin-destination matrix exists at this resolution, so internal Swiss commute flows are generated with a gravity model (distance-decay weighted by real STATENT job density), with total flow volume anchored to real STATENT employment totals per canton (Geneva and Vaud) minus the real cross-border commuter count for that canton, so the model never invents jobs beyond the measured total.\n\nCross-border flows: real official Swiss cross-border commuter statistics (OFS quarterly series, by canton of work and French department of residence) are used directly as hard totals, distributed geographically using real French Filosofi population (origin) and real Swiss STATENT job density (destination, restricted to the correct canton).\n\n10km minimum origin-destination distance is enforced project-wide with automatic redirection when a real flow's endpoints are structurally too close. — Reviewer refinements (2026-08-23), per the multi-nation conservative rule (score the lower-quality nation): the filed answers reflected the Swiss side (STATENT/STATPOP 100m measured grids), but the French half places MOBPRO commune-grain job totals (adm3) onto Filosofi 200m cells weighted by residents — mesh_250 × size_only per the réunion ruling — so the workplace pillar is scored at the French side. Resident resolution pinned to mesh_250 (FR Filosofi is the coarser of the two measured grids); resident intensity stays measured_per_unit (both nations publish measured per-cell counts). workplace_count stays physical_measured (MOBPRO and STATENT are both place-of-work measured). O/D confirmed as structured_marginals @ adm2 on the weaker Swiss side: real canton employment totals minus real OFS cross-border commuter series with department-of-residence pins (the French side internally has the full MOBPRO matrix).",
+  "sources": [
+    "https://www.data.gouv.fr/fr/datasets/base-flux-de-mobilite/ (MOBPRO 2021)",
+    "https://www.bfs.admin.ch/bfs/fr/home/services/geostat.html (STATPOP, STATENT)",
+    "https://www.pxweb-admin-a.bfs.admin.ch/pxweb/fr/px-x-0302010000_104 (frontaliers OFS)"
+  ],
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "pierreggt",
+    "reviewed_by": "ahkimn",
+    "date": "2026-08-22"
+  }
+}
