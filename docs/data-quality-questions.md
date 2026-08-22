@@ -67,6 +67,16 @@ uses, with examples:
 - **Grid ("mesh") data** means the office publishes a value for every square in a uniform grid laid
   over the country, regardless of admin boundaries.
 
+### Rule 3 — Cross-border maps: answer for the weakest country
+
+If your map spans a national border, answer every question for the **country with the weakest
+data**, whatever its share of the map — reviewers score multi-nation maps at the floor across the
+covered nations (see the
+[rubric](https://github.com/Subway-Builder-Modded/registry/blob/main/docs/data-quality.md#multi-nation-maps)).
+Describe each country's sources separately in Methodology so the per-country quality is auditable.
+One exception worth claiming: real cross-border commute statistics count in the flows question
+even when one side's internal flows are estimated.
+
 ---
 
 ## Workplace data

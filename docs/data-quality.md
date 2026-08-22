@@ -73,6 +73,17 @@ Granularity scores the grain at which a count's **magnitude** is measured — no
    - No independent finer signal (a coarse total spread by geometry alone) => score the **coarse** grain.
 3. **When it remains ambiguous, take the middle and record the bounds** so the call is auditable. _Example:_ Mexico's workplace magnitude is measurable at varying granularities: ~ADM2 (municipal) as a floor, with some industry counts available at ~ADM3/4 level. In addition, the establishment directory carries real employee-size bands at address level (ADM5). Within the rubric, it is thus scored at **~ADM4**, between the coarser ADM2 (total-only resolution floor) and the finer ADM5 (treat the establishments as measured units).
 
+### Multi-nation maps
+
+A map spanning national borders draws each pillar from more than one statistical system, and those systems rarely match in quality. **Each scored factor takes the floor across the nations covered** — the weakest count anchor, the coarsest measured grain, the weakest placement — regardless of each nation's population share. The tier is a single promise about the whole map: on its weaker side the map behaves like the weaker pipeline, and a blended or best-side score would overstate exactly the areas a player cannot distinguish.
+
+Two refinements:
+
+- **O/D is scored on what actually constrains the flows.** Real cross-border commuter series (e.g. the Swiss OFS frontalier statistics, by department/Landkreis of residence and canton of work) that bound a border map's defining flows can earn the structured-marginals rung even when one nation's internal flows are synthetic — the weak side's gravity model is why the pillar is not scored higher, not a reason to zero it.
+- **Record the per-nation bounds in the review notes** (same spirit as rule 3 above), so the discount is auditable and a data upgrade on the weak side can be re-scored without re-deriving the strong side.
+
+_Worked examples (2026-08): grand-geneve — the French MOBPRO commune-grain workplace side floors the Swiss 100 m STATENT side (medium); eurodistrict-bale — Germany's ratio-estimated employment totals floor two fully measured nations (low); pays-basque — the Spanish estimated-jobs side floors a full French Filosofi+MOBPRO pipeline (absent, floor exception recorded)._
+
 ## **3. Dasymetric**
 
 A **dasymetric** distributes a count in space _below_ the grain at which it is measured ([Granularity](#2-granularity)). It is shared by the Workplace and Resident pillars — scored identically for both — as the product of two independent factors:
