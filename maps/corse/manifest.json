@@ -55,10 +55,113 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "COR.pmtiles": 53.09,
+    "buildings_index.bin.gz": 10.3,
+    "config.json": 0,
+    "demand_data.json.gz": 0.27,
+    "ocean_depth_index.json.gz": 12.37,
+    "ocean_depth_index_contours.json.gz": 4.29,
+    "roads.geojson.gz": 2.93,
+    "runways_taxiways.geojson.gz": 0.1
+  },
   "included_cities": [
     "Ajaccio",
     "Bastia",
     "Corte"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1984421968232,
+      "p25": 0.19856153938774848,
+      "p50": 0.19869226008169016,
+      "p75": 0.19949541167846516,
+      "p90": 0.28280212005020877,
+      "mean": 0.23768708684436912
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.19843299751655447,
+      "p25": 0.1986079095342327,
+      "p50": 0.19903819338191722,
+      "p75": 0.39799353178694485,
+      "p90": 0.5045485634264726,
+      "mean": 0.3432555682236416
+    },
+    "commuteDistanceKm": {
+      "p10": 16155,
+      "p25": 22854,
+      "p50": 40589,
+      "p75": 75328,
+      "p90": 125828,
+      "mean": 55288.16876903001
+    },
+    "residentCellDensity": {
+      "p10": 1,
+      "p25": 4,
+      "p50": 21,
+      "p75": 71,
+      "p90": 193,
+      "mean": 92.00274423710209
+    },
+    "workerCellDensity": {
+      "p10": 1,
+      "p25": 3,
+      "p50": 58,
+      "p75": 80,
+      "p90": 197,
+      "mean": 101.44902912621359
+    },
+    "detail": {
+      "radiusKm": 0.19886515151134357,
+      "expectedPointSpacingKm": 0.5888931702594941,
+      "normalizedRadius": 0.33769308518846336,
+      "activityPerPoint": 25.663454183876397,
+      "playableAreaKm2": 5336,
+      "playableAreaPerPointKm2": 0.8162765794707052,
+      "playableCatchmentRadiusKm": 0.5097341514022914,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9516200227968552,
+        "continuousScore": 0.9075951534526694,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.735329629740169,
+        "largestCenterShare": 0.4777065127978923,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 8.893808197614213,
+            "latitude": 41.88787021836524,
+            "massShare": 0.4777065127978923,
+            "assignedMass": 160282,
+            "assignedPointCount": 3068,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 9.294172663918024,
+            "latitude": 42.45625281379494,
+            "massShare": 0.2833716813104279,
+            "assignedMass": 95078,
+            "assignedPointCount": 2391,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 9.38942116872909,
+            "latitude": 42.60532771418597,
+            "massShare": 0.23892180589167988,
+            "assignedMass": 80164,
+            "assignedPointCount": 1078,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787356800
 }
