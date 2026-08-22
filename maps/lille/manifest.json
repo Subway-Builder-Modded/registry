@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "id": "lille",
-  "name": "Lille",
+  "name": "Flandre & Hainaut",
   "author": "pierreggt",
   "github_id": 301703453,
-  "description": "Map of the greater Lille metropolitan area / Metropole Europeenne de Lille (France), from Lille-Lesquin airport to the Belgian border at Mouscron. 356k+ OSM buildings (binary format), 622k+ commuters with demand built from real INSEE census data, including a synthetic cross-border commuting model for Mouscron (Belgium). Lille-Lesquin airport with runways and taxiways. Protomaps basemap with water, parks and forests.",
+  "description": "Regional map covering Lille, Béthune, Lens, Douai and Arras, France, plus the Belgian border town of Mouscron. 1.06M+ simulated commuters. French side built from real INSEE Filosofi/MOBPRO 2021 data; Belgian side (Mouscron) from OSM building-weighted population with real INSEE cross-border commuter totals.",
   "tags": [
     "west-europe",
     "airports",
@@ -18,24 +18,24 @@
     "gallery/screenshot3.webp"
   ],
   "is_test": false,
-  "source": "https://github.com/pierreggt/subway-builder-lille",
+  "source": "https://github.com/pierreggt/subwaybuilder-maps-france",
   "update": {
-    "type": "github",
-    "repo": "pierreggt/subway-builder-lille"
+    "type": "custom",
+    "url": "https://raw.githubusercontent.com/pierreggt/subwaybuilder-maps-france/main/updates/lil-update.json"
   },
   "city_code": "LIL",
   "country": "FR",
-  "population": 622652,
-  "residents_total": 622652,
-  "points_count": 6472,
-  "population_count": 11676,
+  "population": 1060367,
+  "residents_total": 1060367,
+  "points_count": 18546,
+  "population_count": 32230,
   "initial_view_state": {
-    "latitude": 50.6292,
-    "longitude": 3.0573,
-    "zoom": 12,
+    "latitude": 50.5,
+    "longitude": 2.95,
+    "zoom": 9,
     "bearing": 0
   },
-  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "data_source": "INSEE Filosofi/MOBPRO 2021, OSM",
   "source_quality": "medium-quality",
   "level_of_detail": "high-detail",
   "location": "west-europe",
@@ -56,16 +56,11 @@
     "runways_taxiways.geojson.gz": 0.05
   },
   "included_cities": [
-    "Mouscron",
-    "Roubaix",
-    "Tourcoing",
-    "Villeneuve-d'Ascq",
-    "Wattrelos",
-    "Marcq-en-Barœul",
-    "Lambersart",
-    "Armentières",
-    "Seclin",
-    "Halluin"
+    "Béthune",
+    "Lens",
+    "Douai",
+    "Arras",
+    "Mouscron"
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
