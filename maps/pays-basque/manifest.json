@@ -49,7 +49,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "PYB.pmtiles": 17.27,
+    "buildings_index.bin.gz": 7.12,
+    "config.json": 0,
+    "demand_data.json.gz": 0.23,
+    "ocean_depth_index.json.gz": 1.35,
+    "ocean_depth_index_contours.json.gz": 0.72,
+    "roads.geojson.gz": 1.91,
+    "runways_taxiways.geojson.gz": 0.03
+  },
   "included_cities": [
     "Bayonne",
     "Biarritz",
@@ -57,5 +66,99 @@
     "Hendaye",
     "Donostia-San Sebastián",
     "Irun"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.025903983550326637,
+      "p25": 0.04453474073721589,
+      "p50": 0.10335104047744006,
+      "p75": 0.19963600162579298,
+      "p90": 0.2811334188461992,
+      "mean": 0.1430465430997003
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.02190315834672544,
+      "p25": 0.03914435648952621,
+      "p50": 0.11938313525488445,
+      "p75": 0.1999315764215827,
+      "p90": 0.4090315759467106,
+      "mean": 0.16876969719391693
+    },
+    "commuteDistanceKm": {
+      "p10": 14182,
+      "p25": 16447,
+      "p50": 19394,
+      "p75": 23233,
+      "p90": 28797,
+      "mean": 20402.798780487807
+    },
+    "residentCellDensity": {
+      "p10": 36,
+      "p25": 60,
+      "p50": 156,
+      "p75": 500,
+      "p90": 1150,
+      "mean": 475.03221083455344
+    },
+    "workerCellDensity": {
+      "p10": 50,
+      "p25": 60,
+      "p50": 150,
+      "p75": 394,
+      "p90": 850,
+      "mean": 458.7832167832168
+    },
+    "detail": {
+      "radiusKm": 0.11107822128595354,
+      "expectedPointSpacingKm": 0.3351327166268928,
+      "normalizedRadius": 0.33144547152529497,
+      "activityPerPoint": 44.72733423545331,
+      "playableAreaKm2": 968,
+      "playableAreaPerPointKm2": 0.13098782138024356,
+      "playableCatchmentRadiusKm": 0.20419284638548932,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9859149702341411,
+        "continuousScore": 0.8793785017906129,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.917805252339634,
+        "largestCenterShare": 0.40966917270485725,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -1.9788843673620853,
+            "latitude": 43.292547089919594,
+            "massShare": 0.40966917270485725,
+            "assignedMass": 270820,
+            "assignedPointCount": 3181,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": -1.7678192460673523,
+            "latitude": 43.34690561803608,
+            "massShare": 0.31318317273511126,
+            "assignedMass": 207036,
+            "assignedPointCount": 2578,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": -1.4964259959626414,
+            "latitude": 43.4642924748813,
+            "massShare": 0.2771476545600315,
+            "assignedMass": 183214,
+            "assignedPointCount": 1631,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787356800
 }

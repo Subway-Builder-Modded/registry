@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-22T22:44:51.514Z",
+  "generated_at": "2026-08-23T00:01:05.537Z",
   "listings": {
     "abu-dhabi": {
       "has_complete_version": true,
@@ -7599,6 +7599,70 @@
         }
       }
     },
+    "eurodistrict-bale": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1787270400,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "BSL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 67.89,
+          "file_sizes": {
+            "BSL.pmtiles": 40.75,
+            "buildings_index.bin.gz": 20.9,
+            "config.json": 0,
+            "demand_data.json.gz": 0.47,
+            "ocean_depth_index.json.gz": 1.86,
+            "ocean_depth_index_contours.json.gz": 1.37,
+            "roads.geojson.gz": 3.63,
+            "runways_taxiways.geojson.gz": 0.07
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "pierreggt/subwaybuilder-maps-france",
+            "tag": "bsl-v1.0.0",
+            "asset_name": "eurodistrictbale_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/bsl-v1.0.0/eurodistrictbale_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:sha256:f026c70e8ea5ebe414faa8a94df09d40b4d151c4bc366a7674616ec0370a9463",
+          "checked_at": "2026-08-23T00:01:05.537Z",
+          "released_at": "2026-08-21T00:00:00.000Z"
+        }
+      }
+    },
     "florence": {
       "has_complete_version": true,
       "latest_semver_version": "1.1.0",
@@ -7983,6 +8047,70 @@
           "fingerprint": "rules:v6:github:kronifer/sb-glasgow-edinburgh-map:v1.0.0:GLED.zip",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-03-26T01:15:52.000Z"
+        }
+      }
+    },
+    "grand-geneve": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1787270400,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "GVA.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 128.12,
+          "file_sizes": {
+            "GVA.pmtiles": 82.02,
+            "buildings_index.bin.gz": 30.02,
+            "config.json": 0,
+            "demand_data.json.gz": 0.86,
+            "ocean_depth_index.json.gz": 4.31,
+            "ocean_depth_index_contours.json.gz": 3.05,
+            "roads.geojson.gz": 9.26,
+            "runways_taxiways.geojson.gz": 0.13
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "pierreggt/subwaybuilder-maps-france",
+            "tag": "gva-v1.0.0",
+            "asset_name": "grandgeneve_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/gva-v1.0.0/grandgeneve_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:sha256:89b25617cfd7184df2c774d310c30ab040d3f5e502133d64bf34b12ae5e33919",
+          "checked_at": "2026-08-23T00:01:05.537Z",
+          "released_at": "2026-08-21T00:00:00.000Z"
         }
       }
     },
@@ -9610,6 +9738,70 @@
         }
       }
     },
+    "guadeloupe": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1787270400,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "PTP.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 54.1,
+          "file_sizes": {
+            "PTP.pmtiles": 25.4,
+            "buildings_index.bin.gz": 12.59,
+            "config.json": 0,
+            "demand_data.json.gz": 0.09,
+            "ocean_depth_index.json.gz": 8.9,
+            "ocean_depth_index_contours.json.gz": 6.17,
+            "roads.geojson.gz": 1.76,
+            "runways_taxiways.geojson.gz": 0.07
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "pierreggt/subwaybuilder-maps-france",
+            "tag": "ptp-v1.0.0",
+            "asset_name": "guadeloupe_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/ptp-v1.0.0/guadeloupe_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:sha256:8d6022d8cb0b57b515255e7fa91db6e051ad20d31f7a53f21b84cd7b71d8f539",
+          "checked_at": "2026-08-23T00:01:05.537Z",
+          "released_at": "2026-08-21T00:00:00.000Z"
+        }
+      }
+    },
     "guangzhou": {
       "has_complete_version": true,
       "latest_semver_version": "1.4.0",
@@ -9862,6 +10054,70 @@
           "fingerprint": "rules:v6:sha256:bc0e02ad97d841f28ff51738e577016f8e1e412c523514b183ccde023e1b3941",
           "checked_at": "2026-08-14T04:15:47.982Z",
           "released_at": "2026-08-13T00:00:00.000Z"
+        }
+      }
+    },
+    "guyane": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1787270400,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "CAY.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 39.6,
+          "file_sizes": {
+            "CAY.pmtiles": 21.46,
+            "buildings_index.bin.gz": 4.6,
+            "config.json": 0,
+            "demand_data.json.gz": 0.04,
+            "ocean_depth_index.json.gz": 9.06,
+            "ocean_depth_index_contours.json.gz": 4.97,
+            "roads.geojson.gz": 0.52,
+            "runways_taxiways.geojson.gz": 0.03
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "pierreggt/subwaybuilder-maps-france",
+            "tag": "cay-v1.0.0",
+            "asset_name": "guyane_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/cay-v1.0.0/guyane_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:sha256:8708bc9ac1a23a9f0f418deca3a2be69fd5d2ca42336eeb17dd31c0963ed0195",
+          "checked_at": "2026-08-23T00:01:05.537Z",
+          "released_at": "2026-08-21T00:00:00.000Z"
         }
       }
     },
@@ -18665,6 +18921,70 @@
         }
       }
     },
+    "pays-basque": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1787356800,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "PYB.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 28.19,
+          "file_sizes": {
+            "PYB.pmtiles": 17.27,
+            "buildings_index.bin.gz": 7.12,
+            "config.json": 0,
+            "demand_data.json.gz": 0.23,
+            "ocean_depth_index.json.gz": 1.35,
+            "ocean_depth_index_contours.json.gz": 0.72,
+            "roads.geojson.gz": 1.91,
+            "runways_taxiways.geojson.gz": 0.03
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "pierreggt/subwaybuilder-maps-france",
+            "tag": "pyb-v1.0.0",
+            "asset_name": "paysbasque_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/pyb-v1.0.0/paysbasque_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:sha256:82c6e2a96bd650bb65e41a8d48abe4893f0e0158cab8e1298a86618f96ccb02a",
+          "checked_at": "2026-08-23T00:01:05.537Z",
+          "released_at": "2026-08-22T00:00:00.000Z"
+        }
+      }
+    },
     "pianura-emiliana": {
       "has_complete_version": true,
       "latest_semver_version": "1.1.0",
@@ -25127,20 +25447,18 @@
       }
     },
     "toulouse": {
-      "has_complete_version": false,
+      "has_complete_version": true,
       "latest_semver_version": "1.0.1",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
+      "latest_semver_complete": true,
+      "complete_versions": [
         "1.0.1"
       ],
+      "incomplete_versions": [],
       "last_updated": 1787356800,
       "versions": {
         "1.0.1": {
-          "is_complete": false,
-          "errors": [
-            "config.json version '1.0.3' does not match release tag '1.0.1' (expected '1.0.1')"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -25151,7 +25469,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -25165,9 +25483,19 @@
             "roads_geojson": "roads.geojson.gz",
             "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
             "city_pmtiles": "TLS.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 41,
+          "file_sizes": {
+            "TLS.pmtiles": 22.05,
+            "buildings_index.bin.gz": 14.01,
+            "config.json": 0,
+            "demand_data.json.gz": 0.28,
+            "ocean_depth_index.json.gz": 1.53,
+            "ocean_depth_index_contours.json.gz": 1.33,
+            "roads.geojson.gz": 2.33,
+            "runways_taxiways.geojson.gz": 0.15
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -25176,8 +25504,8 @@
             "asset_name": "toulouse_v1.0.1.zip",
             "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/tls-v1.0.1/toulouse_v1.0.1.zip"
           },
-          "fingerprint": "rules:v6:sha256:b19d1e4a981b8d12891f676fd92497a2d94f1d51a0103ef9b571d0c6f1873c93",
-          "checked_at": "2026-08-22T22:44:51.514Z",
+          "fingerprint": "rules:v6:sha256:0f713b55f433d69f606b79f8173b604541af03ae15d588eb0b0cd8a3fa9e09e6",
+          "checked_at": "2026-08-23T00:01:05.537Z",
           "released_at": "2026-08-22T00:00:00.000Z"
         },
         "v1.0.0": {

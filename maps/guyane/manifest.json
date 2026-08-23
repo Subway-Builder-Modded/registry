@@ -50,10 +50,97 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "CAY.pmtiles": 21.46,
+    "buildings_index.bin.gz": 4.6,
+    "config.json": 0,
+    "demand_data.json.gz": 0.04,
+    "ocean_depth_index.json.gz": 9.06,
+    "ocean_depth_index_contours.json.gz": 4.97,
+    "roads.geojson.gz": 0.52,
+    "runways_taxiways.geojson.gz": 0.03
+  },
   "included_cities": [
     "Cayenne",
     "Kourou",
     "Saint-Laurent-du-Maroni"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.2768551279072489,
+      "p25": 0.2769566595039348,
+      "p50": 0.27696707024498796,
+      "p75": 0.277987700583777,
+      "p90": 0.5605483979031972,
+      "mean": 0.41177340629356096
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.27683204201942346,
+      "p25": 0.2769566595039348,
+      "p50": 0.2769763948280988,
+      "p75": 0.4226392811646728,
+      "p90": 1.0210411358401925,
+      "mean": 0.5260202737086614
+    },
+    "commuteDistanceKm": {
+      "p10": 2526,
+      "p25": 5051,
+      "p50": 15066,
+      "p75": 25541,
+      "p90": 61754,
+      "mean": 25117.693659281893
+    },
+    "residentCellDensity": {
+      "p10": 60,
+      "p25": 60,
+      "p50": 60,
+      "p75": 224,
+      "p90": 553,
+      "mean": 220.28496042216358
+    },
+    "workerCellDensity": {
+      "p10": 60,
+      "p25": 60,
+      "p50": 60,
+      "p75": 180,
+      "p90": 360,
+      "mean": 213.92820512820512
+    },
+    "detail": {
+      "radiusKm": 0.276971732497303,
+      "expectedPointSpacingKm": 0.6191297552364942,
+      "normalizedRadius": 0.4473565196224591,
+      "activityPerPoint": 58.687456201822,
+      "playableAreaKm2": 1532,
+      "playableAreaPerPointKm2": 1.0735809390329363,
+      "playableCatchmentRadiusKm": 0.5845779901028272,
+      "localityScore": 0.7401453876150765,
+      "deaggregationScore": 1,
+      "score": 0.8603170273887857
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.9368283414225964,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -52.65291110762709,
+            "latitude": 5.039453296721673,
+            "massShare": 1,
+            "assignedMass": 167494,
+            "assignedPointCount": 1427,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787270400
 }
