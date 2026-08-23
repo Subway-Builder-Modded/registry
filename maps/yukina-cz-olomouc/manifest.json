@@ -23,14 +23,14 @@
   },
   "city_code": "OLO",
   "country": "CZ",
-  "population": 270037,
-  "residents_total": 270037,
-  "points_count": 7588,
-  "population_count": 18737,
+  "population": 323163,
+  "residents_total": 323163,
+  "points_count": 9594,
+  "population_count": 22704,
   "initial_view_state": {
-    "latitude": 49.565103,
-    "longitude": 17.265005,
-    "zoom": 12,
+    "latitude": 49.619966,
+    "longitude": 17.218647,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "ČSÚ Sčítání 2021 | ČÚZK RUIAN | EU JRC GHS-POP 2023A / 2020",
@@ -42,67 +42,72 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 8.52,
-    ".railyard_map/special_demand_points.json": 0.03,
+    ".railyard_map/landuse_provenance.parquet": 13.08,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obce.geojson.gz": 4.84,
+    ".railyard_map/regions/okres.geojson.gz": 0.91,
+    ".railyard_map/regions/zsj.geojson.gz": 1.12,
+    ".railyard_map/special_demand_points.json": 0.04,
     ".railyard_map/special_demand_types.json": 0.07,
-    "OLO.pmtiles": 35.93,
-    "buildings_index.bin.gz": 18.79,
-    "buildings_index.json": 46.92,
+    "OLO.pmtiles": 44.8,
+    "buildings_index.bin.gz": 23.29,
+    "buildings_index.json": 57.83,
     "config.json": 0.01,
-    "demand_data.json": 63.52,
+    "demand_data.json": 3.99,
+    "driving_paths.json.gz": 11.94,
     "ocean_depth_index.json": 6.7,
-    "roads.geojson": 8.53,
-    "runways_taxiways.geojson": 0.53
+    "roads.geojson": 10.78,
+    "runways_taxiways.geojson": 0.54
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.0694620854851245,
-      "p25": 0.08621074555434628,
-      "p50": 0.1092642493068723,
-      "p75": 0.14217678014063104,
-      "p90": 0.18124374042474467,
-      "mean": 0.1219139337231328
+      "p10": 0.10309481659370114,
+      "p25": 0.1070384817650697,
+      "p50": 0.12011261751504326,
+      "p75": 0.1387076671596996,
+      "p90": 0.16787506528624097,
+      "mean": 0.1318779818619179
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.08066882284770113,
-      "p25": 0.1036657783296245,
-      "p50": 0.14180485817062052,
-      "p75": 0.2060493008914288,
-      "p90": 0.2652669345076204,
-      "mean": 0.16409395517027023
+      "p10": 0.10682343816566088,
+      "p25": 0.1223702772904879,
+      "p50": 0.14589986211757633,
+      "p75": 0.18407626531970497,
+      "p90": 0.26012878846103976,
+      "mean": 0.16939070193354042
     },
     "commuteDistanceKm": {
-      "p10": 1315,
-      "p25": 3033,
-      "p50": 8267,
-      "p75": 19901,
-      "p90": 32252,
-      "mean": 13026.267171905854
+      "p10": 1218,
+      "p25": 2745,
+      "p50": 7660,
+      "p75": 19030,
+      "p90": 32645,
+      "mean": 13163.43225863284
     },
     "residentCellDensity": {
       "p10": 13,
-      "p25": 32,
-      "p50": 73,
-      "p75": 163,
-      "p90": 354,
-      "mean": 195.75834542815676
+      "p25": 30,
+      "p50": 70,
+      "p75": 157,
+      "p90": 341,
+      "mean": 183.11451247165533
     },
     "workerCellDensity": {
       "p10": 10,
-      "p25": 12,
-      "p50": 28,
-      "p75": 91,
-      "p90": 491,
-      "mean": 249.77613320999075
+      "p25": 13,
+      "p50": 30,
+      "p75": 94,
+      "p90": 425,
+      "mean": 232.4726618705036
     },
     "detail": {
-      "radiusKm": 0.12447570596739088,
-      "expectedPointSpacingKm": 0.45775690178095296,
-      "normalizedRadius": 0.2719253505148794,
-      "activityPerPoint": 35.58737480231945,
-      "playableAreaKm2": 2956,
-      "playableAreaPerPointKm2": 0.38956246705324193,
-      "playableCatchmentRadiusKm": 0.35213858713465945,
+      "radiusKm": 0.13237981090040127,
+      "expectedPointSpacingKm": 0.4621374058260863,
+      "normalizedRadius": 0.2864511922893752,
+      "activityPerPoint": 33.68386491557223,
+      "playableAreaKm2": 3848,
+      "playableAreaPerPointKm2": 0.4010840108401084,
+      "playableCatchmentRadiusKm": 0.3573079985679766,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -110,7 +115,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.9446160090025785,
+        "continuousScore": 0.9786038268907343,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -120,18 +125,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 17.267249080969336,
-            "latitude": 49.56762574802021,
+            "longitude": 17.221541567263333,
+            "latitude": 49.62099519814641,
             "massShare": 1,
-            "assignedMass": 540074,
-            "assignedPointCount": 7588,
+            "assignedMass": 646326,
+            "assignedPointCount": 9594,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1784937600,
+  "last_updated": 1787443200,
   "search_aliases": [
     "Prostějov",
     "Přerov",

@@ -23,14 +23,14 @@
   },
   "city_code": "PLZ",
   "country": "CZ",
-  "population": 246595,
-  "residents_total": 246595,
-  "points_count": 7039,
-  "population_count": 17031,
+  "population": 328864,
+  "residents_total": 328864,
+  "points_count": 10295,
+  "population_count": 23403,
   "initial_view_state": {
-    "latitude": 49.733382,
-    "longitude": 13.37721,
-    "zoom": 12,
+    "latitude": 49.665047,
+    "longitude": 13.308138,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "ČSÚ Sčítání 2021 | ČÚZK RUIAN | EU JRC GHS-POP 2023A / 2020",
@@ -42,67 +42,72 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 12.96,
-    ".railyard_map/special_demand_points.json": 0.03,
+    ".railyard_map/landuse_provenance.parquet": 25.47,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obce.geojson.gz": 7.11,
+    ".railyard_map/regions/okres.geojson.gz": 1.06,
+    ".railyard_map/regions/zsj.geojson.gz": 2.18,
+    ".railyard_map/special_demand_points.json": 0.04,
     ".railyard_map/special_demand_types.json": 0.07,
-    "PLZ.pmtiles": 35.12,
-    "buildings_index.bin.gz": 17.47,
-    "buildings_index.json": 42.68,
+    "PLZ.pmtiles": 61.46,
+    "buildings_index.bin.gz": 26.2,
+    "buildings_index.json": 64.08,
     "config.json": 0.01,
-    "demand_data.json": 55.5,
+    "demand_data.json": 4.15,
+    "driving_paths.json.gz": 12.93,
     "ocean_depth_index.json": 8.28,
-    "roads.geojson": 7.19,
+    "roads.geojson": 11.9,
     "runways_taxiways.geojson": 0.42
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.0687848294367187,
-      "p25": 0.08258492718213505,
-      "p50": 0.10300854245725984,
-      "p75": 0.1322034058081702,
-      "p90": 0.17362331098123887,
-      "mean": 0.12279421548408063
+      "p10": 0.10298924137844451,
+      "p25": 0.10736350621365992,
+      "p50": 0.12067768085160224,
+      "p75": 0.13981737665964036,
+      "p90": 0.1671190759760686,
+      "mean": 0.14371046855090105
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.08476453297036342,
-      "p25": 0.10235271927617731,
-      "p50": 0.1379654051911541,
-      "p75": 0.2119661334018119,
-      "p90": 0.27638329982999243,
-      "mean": 0.17057286516168246
+      "p10": 0.10128894618959586,
+      "p25": 0.118772493563226,
+      "p50": 0.14720348077383646,
+      "p75": 0.19562661648299953,
+      "p90": 0.26744411449040445,
+      "mean": 0.17431511484849255
     },
     "commuteDistanceKm": {
-      "p10": 1436,
-      "p25": 3773,
-      "p50": 7764,
-      "p75": 18219,
-      "p90": 30082,
-      "mean": 12310.766073630439
+      "p10": 1123,
+      "p25": 3204,
+      "p50": 7669,
+      "p75": 18166,
+      "p90": 33215,
+      "mean": 13212.509293680298
     },
     "residentCellDensity": {
       "p10": 11,
-      "p25": 22,
-      "p50": 48,
-      "p75": 118,
-      "p90": 363,
-      "mean": 177.28561151079137
+      "p25": 20,
+      "p50": 42,
+      "p75": 103,
+      "p90": 286,
+      "mean": 143.9514010507881
     },
     "workerCellDensity": {
       "p10": 6,
-      "p25": 11,
-      "p50": 23,
-      "p75": 90,
-      "p90": 447,
-      "mean": 236.1772030651341
+      "p25": 10,
+      "p50": 21,
+      "p75": 71,
+      "p90": 367,
+      "mean": 190.8235635519443
     },
     "detail": {
-      "radiusKm": 0.1192124796246855,
-      "expectedPointSpacingKm": 0.48165670435441105,
-      "normalizedRadius": 0.24750507684611603,
-      "activityPerPoint": 35.032675095894305,
-      "playableAreaKm2": 3708,
-      "playableAreaPerPointKm2": 0.5267793720698963,
-      "playableCatchmentRadiusKm": 0.40948636359167984,
+      "radiusKm": 0.1332823119287402,
+      "expectedPointSpacingKm": 0.5156134329504526,
+      "normalizedRadius": 0.25849270676690816,
+      "activityPerPoint": 31.944050509956288,
+      "playableAreaKm2": 6528,
+      "playableAreaPerPointKm2": 0.6340942204953861,
+      "playableCatchmentRadiusKm": 0.44926435331070486,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -110,7 +115,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.728022562122081,
+        "continuousScore": 0.8983017791819791,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -120,18 +125,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 13.373413294817505,
-            "latitude": 49.732216888901725,
+            "longitude": 13.304775855124026,
+            "latitude": 49.666760218981175,
             "massShare": 1,
-            "assignedMass": 493190,
-            "assignedPointCount": 7039,
+            "assignedMass": 657728,
+            "assignedPointCount": 10295,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1784937600,
+  "last_updated": 1787443200,
   "search_aliases": [
     "Пльзень",
     "Pilsen",

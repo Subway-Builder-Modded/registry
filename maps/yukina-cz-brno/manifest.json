@@ -24,14 +24,14 @@
   },
   "city_code": "BRQ",
   "country": "CZ",
-  "population": 567152,
-  "residents_total": 567152,
-  "points_count": 12715,
-  "population_count": 40034,
+  "population": 713163,
+  "residents_total": 713163,
+  "points_count": 15975,
+  "population_count": 42377,
   "initial_view_state": {
-    "latitude": 49.200411,
-    "longitude": 16.614579,
-    "zoom": 12,
+    "latitude": 49.134435,
+    "longitude": 16.650047,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "ČSÚ Sčítání 2021 | ČÚZK RUIAN | EU JRC GHS-POP 2023A / 2020",
@@ -44,67 +44,72 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 13.94,
-    ".railyard_map/special_demand_points.json": 0.07,
+    ".railyard_map/landuse_provenance.parquet": 19.81,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obce.geojson.gz": 8.72,
+    ".railyard_map/regions/okres.geojson.gz": 1.69,
+    ".railyard_map/regions/zsj.geojson.gz": 1.69,
+    ".railyard_map/special_demand_points.json": 0.08,
     ".railyard_map/special_demand_types.json": 0.07,
-    "BRQ.pmtiles": 62.96,
-    "buildings_index.bin.gz": 33.56,
-    "buildings_index.json": 84.73,
+    "BRQ.pmtiles": 80.41,
+    "buildings_index.bin.gz": 48.03,
+    "buildings_index.json": 120.99,
     "config.json": 0.01,
-    "demand_data.json": 152.51,
+    "demand_data.json": 7.3,
+    "driving_paths.json.gz": 22.16,
     "ocean_depth_index.json": 8.26,
-    "roads.geojson": 11.6,
-    "runways_taxiways.geojson": 1
+    "roads.geojson": 15.51,
+    "runways_taxiways.geojson": 0.99
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.06987590299553396,
-      "p25": 0.0848107207533983,
-      "p50": 0.10449668772223161,
-      "p75": 0.13698192166934992,
-      "p90": 0.17206088517985466,
-      "mean": 0.11636142020992046
+      "p10": 0.10443657360002183,
+      "p25": 0.10972364385212283,
+      "p50": 0.12320189368830968,
+      "p75": 0.14397851232896722,
+      "p90": 0.17134824256017078,
+      "mean": 0.13409919794626948
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.0821358371514553,
-      "p25": 0.10325878682133567,
-      "p50": 0.13143392637573603,
-      "p75": 0.1951779131488412,
-      "p90": 0.2787352000000673,
-      "mean": 0.16433855374322062
+      "p10": 0.1075131940553261,
+      "p25": 0.12670784535266472,
+      "p50": 0.1616160625627436,
+      "p75": 0.19310559718355508,
+      "p90": 0.2564048605518588,
+      "mean": 0.17939203993613154
     },
     "commuteDistanceKm": {
-      "p10": 1787,
-      "p25": 4355,
-      "p50": 9325,
-      "p75": 21774,
-      "p90": 36423,
-      "mean": 14600.251636109308
+      "p10": 1442,
+      "p25": 3901,
+      "p50": 9059,
+      "p75": 21587,
+      "p90": 38719,
+      "mean": 15440.762701465417
     },
     "residentCellDensity": {
-      "p10": 16,
+      "p10": 17,
       "p25": 36,
-      "p50": 95,
-      "p75": 238,
-      "p90": 582,
-      "mean": 291.8008234688626
+      "p50": 94,
+      "p75": 232,
+      "p90": 563,
+      "mean": 268.4600903614458
     },
     "workerCellDensity": {
-      "p10": 10,
-      "p25": 14,
-      "p50": 32,
-      "p75": 112,
-      "p90": 564,
-      "mean": 348.3157248157248
+      "p10": 12,
+      "p25": 16,
+      "p50": 37,
+      "p75": 116,
+      "p90": 466,
+      "mean": 307.90932642487047
     },
     "detail": {
-      "radiusKm": 0.1171938989904853,
-      "expectedPointSpacingKm": 0.42503267205729256,
-      "normalizedRadius": 0.275729153768885,
-      "activityPerPoint": 44.60495477782147,
-      "playableAreaKm2": 4568,
-      "playableAreaPerPointKm2": 0.3592607156901298,
-      "playableCatchmentRadiusKm": 0.3381659910778025,
+      "radiusKm": 0.14110777780894412,
+      "expectedPointSpacingKm": 0.44770323280442903,
+      "normalizedRadius": 0.3151815029903625,
+      "activityPerPoint": 44.64244131455399,
+      "playableAreaKm2": 6748,
+      "playableAreaPerPointKm2": 0.42241001564945224,
+      "playableCatchmentRadiusKm": 0.3666841747393394,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +117,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.2446244537519734,
+        "continuousScore": 0.46808527927570537,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 16.613758822664803,
-            "latitude": 49.19868122950163,
+            "longitude": 16.646208743039818,
+            "latitude": 49.134801980285786,
             "massShare": 1,
-            "assignedMass": 1134304,
-            "assignedPointCount": 12715,
+            "assignedMass": 1426326,
+            "assignedPointCount": 15975,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1784937600,
+  "last_updated": 1787443200,
   "search_aliases": [
     "Brünn",
     "برنو",
