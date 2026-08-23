@@ -24,14 +24,14 @@
   },
   "city_code": "PRG",
   "country": "CZ",
-  "population": 1538021,
-  "residents_total": 1538021,
-  "points_count": 18766,
-  "population_count": 78484,
+  "population": 1714024,
+  "residents_total": 1714024,
+  "points_count": 26567,
+  "population_count": 87093,
   "initial_view_state": {
-    "latitude": 50.074973,
-    "longitude": 14.455987,
-    "zoom": 12,
+    "latitude": 50.073499,
+    "longitude": 14.487532,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "ČSÚ Sčítání 2021 | ČÚZK RUIAN | EU JRC GHS-POP 2023A / 2020",
@@ -44,67 +44,72 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 22.48,
-    ".railyard_map/special_demand_points.json": 0.14,
+    ".railyard_map/landuse_provenance.parquet": 35.69,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obce.geojson.gz": 13.86,
+    ".railyard_map/regions/okres.geojson.gz": 2.45,
+    ".railyard_map/regions/zsj.geojson.gz": 4.22,
+    ".railyard_map/special_demand_points.json": 0.16,
     ".railyard_map/special_demand_types.json": 0.07,
-    "PRG.pmtiles": 113.87,
-    "buildings_index.bin.gz": 70.13,
-    "buildings_index.json": 171.41,
+    "PRG.pmtiles": 116.56,
+    "buildings_index.bin.gz": 85.96,
+    "buildings_index.json": 209.97,
     "config.json": 0.01,
-    "demand_data.json": 248.92,
+    "demand_data.json": 14.49,
+    "driving_paths.json.gz": 42.16,
     "ocean_depth_index.json": 14.23,
-    "roads.geojson": 28.83,
-    "runways_taxiways.geojson": 1.51
+    "roads.geojson": 36.41,
+    "runways_taxiways.geojson": 2.15
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.09888415429736057,
-      "p25": 0.11304163672119594,
-      "p50": 0.12800054680638345,
-      "p75": 0.16885899136904253,
-      "p90": 0.21237225751433178,
-      "mean": 0.14864924615420347
+      "p10": 0.10525583285637005,
+      "p25": 0.11319554551742922,
+      "p50": 0.12392523885401512,
+      "p75": 0.14808888556544472,
+      "p90": 0.17940864862688155,
+      "mean": 0.1400846679945003
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.10334078556128319,
-      "p25": 0.1238802522799115,
-      "p50": 0.1544932077750868,
-      "p75": 0.18772637827659344,
-      "p90": 0.2585395438322786,
-      "mean": 0.17152558319664918
+      "p10": 0.10648382814948157,
+      "p25": 0.12548674415673225,
+      "p50": 0.15382222681733237,
+      "p75": 0.18809402345849807,
+      "p90": 0.23397503014734577,
+      "mean": 0.16653469517912992
     },
     "commuteDistanceKm": {
-      "p10": 2312,
-      "p25": 5632,
-      "p50": 11021,
-      "p75": 21970,
-      "p90": 39236,
-      "mean": 16398.43113246012
+      "p10": 1970,
+      "p25": 5297,
+      "p50": 11010,
+      "p75": 22470,
+      "p90": 43095,
+      "mean": 17377.555750749198
     },
     "residentCellDensity": {
-      "p10": 17,
-      "p25": 40,
-      "p50": 102,
-      "p75": 277,
-      "p90": 932,
-      "mean": 397.67261442979054
+      "p10": 16,
+      "p25": 32,
+      "p50": 80,
+      "p75": 215,
+      "p90": 646,
+      "mean": 315.0205882352941
     },
     "workerCellDensity": {
-      "p10": 7,
-      "p25": 16,
-      "p50": 35,
-      "p75": 134,
-      "p90": 703,
-      "mean": 506.0885159591971
+      "p10": 6,
+      "p25": 15,
+      "p50": 30,
+      "p75": 104,
+      "p90": 540,
+      "mean": 418.8712121212121
     },
     "detail": {
-      "radiusKm": 0.1406243758140221,
-      "expectedPointSpacingKm": 0.4905045285510032,
-      "normalizedRadius": 0.2866933282541546,
-      "activityPerPoint": 81.95784930192902,
-      "playableAreaKm2": 7492,
-      "playableAreaPerPointKm2": 0.39923265480123626,
-      "playableCatchmentRadiusKm": 0.3564823991596697,
+      "radiusKm": 0.13806685409392944,
+      "expectedPointSpacingKm": 0.4874299796835335,
+      "normalizedRadius": 0.28325474396049677,
+      "activityPerPoint": 64.51703240862724,
+      "playableAreaKm2": 11244,
+      "playableAreaPerPointKm2": 0.42323182896074074,
+      "playableCatchmentRadiusKm": 0.3670406997947924,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
@@ -112,7 +117,7 @@
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.7142438266171338,
+        "continuousScore": 0.726430724110133,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -122,18 +127,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 14.448066727269552,
-            "latitude": 50.07662034278776,
+            "longitude": 14.478561230351586,
+            "latitude": 50.07710664473223,
             "massShare": 1,
-            "assignedMass": 3076042,
-            "assignedPointCount": 18766,
+            "assignedMass": 3428048,
+            "assignedPointCount": 26567,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1784937600,
+  "last_updated": 1787443200,
   "search_aliases": [
     "Praga",
     "Prague",

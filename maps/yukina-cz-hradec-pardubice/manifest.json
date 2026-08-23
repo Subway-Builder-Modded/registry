@@ -23,14 +23,14 @@
   },
   "city_code": "HKP",
   "country": "CZ",
-  "population": 355592,
-  "residents_total": 355592,
-  "points_count": 11000,
-  "population_count": 25656,
+  "population": 579090,
+  "residents_total": 579090,
+  "points_count": 19446,
+  "population_count": 41771,
   "initial_view_state": {
-    "latitude": 50.137208,
-    "longitude": 15.847098,
-    "zoom": 12,
+    "latitude": 50.153173,
+    "longitude": 15.969169,
+    "zoom": 10,
     "bearing": 0
   },
   "data_source": "ČSÚ Sčítání 2021 | ČÚZK RUIAN | EU JRC GHS-POP 2023A / 2020",
@@ -42,104 +42,109 @@
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 14.12,
-    ".railyard_map/special_demand_points.json": 0.04,
+    ".railyard_map/landuse_provenance.parquet": 34.09,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obce.geojson.gz": 10.52,
+    ".railyard_map/regions/okres.geojson.gz": 1.59,
+    ".railyard_map/regions/zsj.geojson.gz": 2.77,
+    ".railyard_map/special_demand_points.json": 0.08,
     ".railyard_map/special_demand_types.json": 0.07,
-    "HKP.pmtiles": 53.11,
-    "buildings_index.bin.gz": 26.94,
-    "buildings_index.json": 65.83,
+    "HKP.pmtiles": 95.53,
+    "buildings_index.bin.gz": 48.19,
+    "buildings_index.json": 117.64,
     "config.json": 0.01,
-    "demand_data.json": 93.8,
+    "demand_data.json": 7.54,
+    "driving_paths.json.gz": 31.13,
     "ocean_depth_index.json": 14.3,
-    "roads.geojson": 11.13,
-    "runways_taxiways.geojson": 0.67
+    "roads.geojson": 19.87,
+    "runways_taxiways.geojson": 0.74
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.06988306277362882,
-      "p25": 0.08674817394627225,
-      "p50": 0.11170168974387072,
-      "p75": 0.1491047073386474,
-      "p90": 0.19596356148103622,
-      "mean": 0.13070859855740663
+      "p10": 0.10347444164901007,
+      "p25": 0.10820033697804325,
+      "p50": 0.12068691678037712,
+      "p75": 0.14676581396771674,
+      "p90": 0.1908211458629701,
+      "mean": 0.143722505658762
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.08078297253397962,
-      "p25": 0.10563531663793241,
-      "p50": 0.13776483568196532,
-      "p75": 0.18643254893822173,
-      "p90": 0.27231135096512427,
-      "mean": 0.16325702783414395
+      "p10": 0.10668999693229714,
+      "p25": 0.12012368443142014,
+      "p50": 0.14912381296407218,
+      "p75": 0.203866986320649,
+      "p90": 0.28768907713509023,
+      "mean": 0.18382659258113151
     },
     "commuteDistanceKm": {
-      "p10": 1185,
-      "p25": 3086,
-      "p50": 8472,
-      "p75": 21530,
-      "p90": 35967,
-      "mean": 14258.004599314001
+      "p10": 1014,
+      "p25": 2629,
+      "p50": 8101,
+      "p75": 20106,
+      "p90": 37475,
+      "mean": 14922.463766728113
     },
     "residentCellDensity": {
       "p10": 12,
       "p25": 23,
-      "p50": 52,
-      "p75": 112,
-      "p90": 286,
-      "mean": 149.10784725136384
+      "p50": 49,
+      "p75": 108,
+      "p90": 250,
+      "mean": 132.26799177518848
     },
     "workerCellDensity": {
-      "p10": 6,
+      "p10": 7,
       "p25": 11,
-      "p50": 22,
-      "p75": 70,
-      "p90": 410,
-      "mean": 200.96495195025437
+      "p50": 24,
+      "p75": 74,
+      "p90": 336,
+      "mean": 178.4649583204693
     },
     "detail": {
-      "radiusKm": 0.12405065470589915,
-      "expectedPointSpacingKm": 0.5008175134898757,
-      "normalizedRadius": 0.24769631924704427,
-      "activityPerPoint": 32.32654545454545,
-      "playableAreaKm2": 4404,
-      "playableAreaPerPointKm2": 0.40036363636363637,
-      "playableCatchmentRadiusKm": 0.3569869794867001,
+      "radiusKm": 0.13415399064197644,
+      "expectedPointSpacingKm": 0.5109618093216071,
+      "normalizedRadius": 0.262551893692583,
+      "activityPerPoint": 29.779389077445234,
+      "playableAreaKm2": 9004,
+      "playableAreaPerPointKm2": 0.46302581507765095,
+      "playableCatchmentRadiusKm": 0.38390844546261804,
       "localityScore": 1,
       "deaggregationScore": 1,
       "score": 1
     },
     "polycentrism": {
       "activity": {
-        "score": 0.9994678409410691,
-        "continuousScore": 0.9346457285449671,
+        "score": 0.9680930793003286,
+        "continuousScore": 0.9731184046408625,
         "detectedCenterCount": 2,
-        "effectiveCenterCount": 1.9989362479674189,
-        "largestCenterShare": 0.5115342864856353,
+        "effectiveCenterCount": 1.9381593047597019,
+        "largestCenterShare": 0.5893125420919028,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 15.878141525160292,
-            "latitude": 50.273545516591795,
-            "massShare": 0.5115342864856353,
-            "assignedMass": 363795,
-            "assignedPointCount": 5706,
+            "longitude": 15.963809364732725,
+            "latitude": 50.29434222920019,
+            "massShare": 0.5893125420919028,
+            "assignedMass": 682530,
+            "assignedPointCount": 11850,
             "prominenceRatio": 1
           },
           {
-            "longitude": 15.813519053855902,
-            "latitude": 49.99466594623326,
-            "massShare": 0.4884657135143648,
-            "assignedMass": 347389,
-            "assignedPointCount": 5294,
+            "longitude": 15.966920233215584,
+            "latitude": 49.96022657903708,
+            "massShare": 0.4106874579080972,
+            "assignedMass": 475650,
+            "assignedPointCount": 7596,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1784937600,
+  "last_updated": 1787443200,
   "search_aliases": [
     "Hradec Králové",
     "Chrudim",
