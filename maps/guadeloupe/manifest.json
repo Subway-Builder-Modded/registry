@@ -52,11 +52,114 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "PTP.pmtiles": 25.4,
+    "buildings_index.bin.gz": 12.59,
+    "config.json": 0,
+    "demand_data.json.gz": 0.09,
+    "ocean_depth_index.json.gz": 8.9,
+    "ocean_depth_index_contours.json.gz": 6.17,
+    "roads.geojson.gz": 1.76,
+    "runways_taxiways.geojson.gz": 0.07
+  },
   "included_cities": [
     "Pointe-à-Pitre",
     "Les Abymes",
     "Basse-Terre",
     "Le Gosier"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.2668327823493278,
+      "p25": 0.26687695961334457,
+      "p50": 0.2669346003149842,
+      "p75": 0.277987700583777,
+      "p90": 0.3855504156531914,
+      "mean": 0.30972577080644387
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.26685318252490914,
+      "p25": 0.26688374849441565,
+      "p50": 0.2672038783134694,
+      "p75": 0.4081590773463537,
+      "p90": 0.8399469972981206,
+      "mean": 0.39634752293717584
+    },
+    "commuteDistanceKm": {
+      "p10": 2736,
+      "p25": 5901,
+      "p50": 13156,
+      "p75": 22085,
+      "p90": 42387,
+      "mean": 17714.33077807589
+    },
+    "residentCellDensity": {
+      "p10": 56,
+      "p25": 60,
+      "p50": 120,
+      "p75": 248,
+      "p90": 464,
+      "mean": 204.05541237113403
+    },
+    "workerCellDensity": {
+      "p10": 21,
+      "p25": 60,
+      "p50": 78,
+      "p75": 180,
+      "p90": 420,
+      "mean": 222.14586255259468
+    },
+    "detail": {
+      "radiusKm": 0.2670692053760966,
+      "expectedPointSpacingKm": 0.5541918268488232,
+      "normalizedRadius": 0.481907513675675,
+      "activityPerPoint": 52.81312458361093,
+      "playableAreaKm2": 1528,
+      "playableAreaPerPointKm2": 0.5089940039973351,
+      "playableCatchmentRadiusKm": 0.402514376737805,
+      "localityScore": 0.6613742074626543,
+      "deaggregationScore": 1,
+      "score": 0.8132491668994529
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.810520653994624,
+        "continuousScore": 0.8100734161120864,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.1755546539436215,
+        "largestCenterShare": 0.6178119776719543,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": -61.47682247648167,
+            "latitude": 16.25304883469439,
+            "massShare": 0.6178119776719543,
+            "assignedMass": 195902,
+            "assignedPointCount": 1636,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": -61.64433981698609,
+            "latitude": 16.241463112284343,
+            "massShare": 0.2407297612665174,
+            "assignedMass": 76333,
+            "assignedPointCount": 814,
+            "prominenceRatio": 0.9999999987863047
+          },
+          {
+            "longitude": -61.685595112027706,
+            "latitude": 16.01070708393713,
+            "massShare": 0.14145826106152828,
+            "assignedMass": 44855,
+            "assignedPointCount": 552,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787270400
 }

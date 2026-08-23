@@ -49,11 +49,98 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "BSL.pmtiles": 40.75,
+    "buildings_index.bin.gz": 20.9,
+    "config.json": 0,
+    "demand_data.json.gz": 0.47,
+    "ocean_depth_index.json.gz": 1.86,
+    "ocean_depth_index_contours.json.gz": 1.37,
+    "roads.geojson.gz": 3.63,
+    "runways_taxiways.geojson.gz": 0.07
+  },
   "included_cities": [
     "Mulhouse",
     "Saint-Louis",
     "Weil am Rhein",
     "Lörrach"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.0947194789379247,
+      "p75": 0.1999018509363602,
+      "p90": 0.2553732742003978,
+      "mean": 0.11619148474914025
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.19927209139773397,
+      "p75": 0.4010456679290421,
+      "p90": 0.4092481383750573,
+      "mean": 0.20793622215057786
+    },
+    "commuteDistanceKm": {
+      "p10": 13107,
+      "p25": 16177,
+      "p50": 20745,
+      "p75": 27345,
+      "p90": 38362,
+      "mean": 23056.95034634557
+    },
+    "residentCellDensity": {
+      "p10": 20,
+      "p25": 60,
+      "p50": 141,
+      "p75": 437,
+      "p90": 1160,
+      "mean": 497.23604651162793
+    },
+    "workerCellDensity": {
+      "p10": 20,
+      "p25": 60,
+      "p50": 120,
+      "p75": 360,
+      "p90": 791,
+      "mean": 519.4791288566244
+    },
+    "detail": {
+      "radiusKm": 0.13738612980961312,
+      "expectedPointSpacingKm": 0.44681244703038336,
+      "normalizedRadius": 0.30748053399745784,
+      "activityPerPoint": 86.16497310221159,
+      "playableAreaKm2": 3108,
+      "playableAreaPerPointKm2": 0.30962343096234307,
+      "playableCatchmentRadiusKm": 0.3139366163247897,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.8198651641463316,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 7.573365452479082,
+            "latitude": 47.59198750253764,
+            "massShare": 1,
+            "assignedMass": 1729848,
+            "assignedPointCount": 10038,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787270400
 }

@@ -49,7 +49,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "GVA.pmtiles": 82.02,
+    "buildings_index.bin.gz": 30.02,
+    "config.json": 0,
+    "demand_data.json.gz": 0.86,
+    "ocean_depth_index.json.gz": 4.31,
+    "ocean_depth_index_contours.json.gz": 3.05,
+    "roads.geojson.gz": 9.26,
+    "runways_taxiways.geojson.gz": 0.13
+  },
   "included_cities": [
     "Lausanne",
     "Vevey",
@@ -59,5 +68,91 @@
     "Annecy",
     "Évian-les-Bains",
     "Thonon-les-Bains"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.19881001655599612,
+      "p75": 0.20032883225939868,
+      "p90": 0.2617155823412077,
+      "mean": 0.12982842573316133
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.19924660959140825,
+      "p75": 0.3805715402174979,
+      "p90": 0.435444984536034,
+      "mean": 0.20432753216310812
+    },
+    "commuteDistanceKm": {
+      "p10": 13726,
+      "p25": 19315,
+      "p50": 30119,
+      "p75": 51810,
+      "p90": 69319,
+      "mean": 37315.10404448168
+    },
+    "residentCellDensity": {
+      "p10": 10,
+      "p25": 60,
+      "p50": 109,
+      "p75": 290,
+      "p90": 750,
+      "mean": 388.8327956989247
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 51,
+      "p50": 89,
+      "p75": 240,
+      "p90": 662,
+      "mean": 434.7591481703659
+    },
+    "detail": {
+      "radiusKm": 0.19902819335861432,
+      "expectedPointSpacingKm": 0.4966593007415551,
+      "normalizedRadius": 0.4007338492633644,
+      "activityPerPoint": 82.69965850882186,
+      "playableAreaKm2": 5912,
+      "playableAreaPerPointKm2": 0.336482640865111,
+      "playableCatchmentRadiusKm": 0.32727015005434695,
+      "localityScore": 0.8566756619323851,
+      "deaggregationScore": 1,
+      "score": 0.9255677511302914
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8454157192526639,
+        "continuousScore": 0.9289752922974874,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.7322252115761057,
+        "largestCenterShare": 0.696586037619242,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 6.175418752710141,
+            "latitude": 46.172321912355976,
+            "massShare": 0.696586037619242,
+            "assignedMass": 2024325,
+            "assignedPointCount": 12604,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 6.661690046941241,
+            "latitude": 46.474706900711276,
+            "massShare": 0.303413962380758,
+            "assignedMass": 881741,
+            "assignedPointCount": 4966,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787270400
 }
