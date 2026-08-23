@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-23T00:01:05.537Z",
+  "generated_at": "2026-08-23T02:02:08.079Z",
   "listings": {
     "abu-dhabi": {
       "has_complete_version": true,
@@ -23934,15 +23934,15 @@
     },
     "strasbourg": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.0.0",
+      "latest_semver_version": "1.0.3",
       "latest_semver_complete": true,
       "complete_versions": [
-        "v1.0.0"
+        "1.0.3"
       ],
       "incomplete_versions": [],
-      "last_updated": 1784576716,
+      "last_updated": 1787443200,
       "versions": {
-        "v1.0.0": {
+        "1.0.3": {
           "is_complete": true,
           "errors": [],
           "required_checks": {
@@ -23971,17 +23971,36 @@
             "city_pmtiles": "STR.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 20.88,
+          "release_size": 19.99,
           "file_sizes": {
-            "STR.pmtiles": 12.45,
+            "STR.pmtiles": 12.25,
             "buildings_index.bin.gz": 6.28,
             "config.json": 0,
-            "demand_data.json.gz": 0.16,
-            "ocean_depth_index.json.gz": 0.65,
-            "ocean_depth_index_contours.json.gz": 0.55,
+            "demand_data.json.gz": 0.15,
+            "ocean_depth_index.json.gz": 0.31,
+            "ocean_depth_index_contours.json.gz": 0.22,
             "roads.geojson.gz": 1.03,
             "runways_taxiways.geojson.gz": 0.09
           },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "pierreggt/subwaybuilder-maps-france",
+            "tag": "str-v1.0.3",
+            "asset_name": "strasbourg_v1.0.3.zip",
+            "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/str-v1.0.3/strasbourg_v1.0.3.zip"
+          },
+          "fingerprint": "rules:v6:sha256:9756342c550ee1149e3812c9c1d429db6011fa80c334ff6bbe1a68e410d25bff",
+          "checked_at": "2026-08-23T02:02:08.079Z",
+          "released_at": "2026-08-23T00:00:00.000Z"
+        },
+        "v1.0.0": {
+          "is_complete": false,
+          "errors": [
+            "version is no longer enumerated upstream (release or update entry deleted)"
+          ],
+          "required_checks": {},
+          "matched_files": {},
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "github",
@@ -23992,7 +24011,8 @@
           },
           "fingerprint": "rules:v6:github:pierreggt/subway-builder-strasbourg:v1.0.0:strasbourg_flat_v1.0.0.zip|strasbourg_v1.0.0.zip",
           "checked_at": "2026-07-21T15:37:26.856Z",
-          "released_at": "2026-07-20T19:45:16.000Z"
+          "released_at": "2026-07-20T19:45:16.000Z",
+          "availability": "removed"
         }
       }
     },
