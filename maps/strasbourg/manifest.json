@@ -4,7 +4,7 @@
   "name": "Strasbourg",
   "author": "pierreggt",
   "github_id": 301703453,
-  "description": "Map of the greater Strasbourg metropolitan area (France), from Strasbourg-Entzheim airport to the European institutions and across the Rhine to Kehl (Germany). 122k+ OSM buildings (binary format), 371k+ commuters with demand built from real INSEE census data, including a synthetic cross-border commuting model for Kehl. Strasbourg-Entzheim airport with runways and taxiways. The Rhine and Ill rivers fully modelled with depth data. Protomaps basemap with water, parks and forests.",
+  "description": "Map of the Strasbourg metropolitan area, from Strasbourg-Entzheim airport to the European institutions and Kehl border. Cross-border demand data refreshed: Germany-to-Strasbourg commuter flow now sourced from official INSEE data (previously an unsourced estimate).",
   "tags": [
     "west-europe",
     "airports",
@@ -14,28 +14,27 @@
   ],
   "gallery": [
     "gallery/screenshot1.webp",
-    "gallery/screenshot2.webp",
-    "gallery/screenshot3.webp"
+    "gallery/screenshot2.webp"
   ],
   "is_test": false,
-  "source": "https://github.com/pierreggt/subway-builder-strasbourg",
+  "source": "https://github.com/pierreggt/subwaybuilder-maps-france",
   "update": {
-    "type": "github",
-    "repo": "pierreggt/subway-builder-strasbourg"
+    "type": "custom",
+    "url": "https://raw.githubusercontent.com/pierreggt/subwaybuilder-maps-france/main/updates/str-update.json"
   },
   "city_code": "STR",
   "country": "FR",
-  "population": 371948,
-  "residents_total": 371948,
-  "points_count": 2794,
-  "population_count": 5509,
+  "population": 372018,
+  "residents_total": 372018,
+  "points_count": 1968,
+  "population_count": 5510,
   "initial_view_state": {
     "latitude": 48.5734,
     "longitude": 7.7521,
     "zoom": 12,
     "bearing": 0
   },
-  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "data_source": "INSEE Filosofi/MOBPRO 2021, INSEE Flash Grand Est n110, OSM",
   "source_quality": "medium-quality",
   "level_of_detail": "high-detail",
   "location": "west-europe",
