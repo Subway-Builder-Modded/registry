@@ -82,3 +82,15 @@ test("computePlayableAreaDebugGeoJson exposes the final playable raster cells as
     && feature.properties?.cellSizeKm === 1
   )));
 });
+
+test("computePlayableAreaMetrics survives point counts beyond V8's argument limit", () => {
+  // paris V2 (~144k demand points) overflowed the former Math.min(...spread)
+  // projection-origin computation; 150k synthetic points lock the regression.
+  const locations = Array.from({ length: 150_000 }, (_, i) => ({
+    longitude: kmToLongitudeDegrees((i % 400) * 0.1),
+    latitude: kmToLatitudeDegrees(Math.floor(i / 400) * 0.1),
+  }));
+  const metrics = computePlayableAreaMetrics(locations);
+  assert.ok(Number.isFinite(metrics.playableAreaKm2), "metrics computed without stack overflow");
+  assert.ok(metrics.playableAreaKm2 > 0, "non-degenerate area");
+});

@@ -103,11 +103,20 @@ function projectLocations(
     yKm: location.latitude * latScaleKm,
   }));
 
+  // Reduce, not Math.min(...spread): spreading exceeds V8's argument limit
+  // (~65k) on large maps — paris V2's ~144k demand points overflowed the stack.
+  let originXKm = Infinity;
+  let originYKm = Infinity;
+  for (const point of points) {
+    if (point.xKm < originXKm) originXKm = point.xKm;
+    if (point.yKm < originYKm) originYKm = point.yKm;
+  }
+
   return {
     points,
     projection: {
-      originXKm: Math.min(...points.map((point) => point.xKm)),
-      originYKm: Math.min(...points.map((point) => point.yKm)),
+      originXKm,
+      originYKm,
       lonScaleKm,
       latScaleKm,
     },
