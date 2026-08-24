@@ -52,9 +52,136 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 21.66,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obec_sk.geojson.gz": 1.45,
+    ".railyard_map/regions/okres_sk.geojson.gz": 0.33,
+    ".railyard_map/regions/zsj_sk.geojson.gz": 2.44,
+    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "TRC.pmtiles": 41.3,
+    "buildings_index.bin.gz": 27.35,
+    "buildings_index.json": 69.83,
+    "config.json": 0.01,
+    "demand_data.json": 3.21,
+    "driving_paths.json.gz": 16.12,
+    "ocean_depth_index.json": 53.18,
+    "roads.geojson": 6.57,
+    "runways_taxiways.geojson": 0.18
+  },
   "included_cities": [
     "Prievidza",
     "Piešťany"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.11009515249433949,
+      "p25": 0.12003870224028984,
+      "p50": 0.13477241883682348,
+      "p75": 0.16378647498313106,
+      "p90": 0.2122542921220377,
+      "mean": 0.15619494355503236
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.11080308517609196,
+      "p25": 0.1228719311102444,
+      "p50": 0.14889703056976936,
+      "p75": 0.20141337021542174,
+      "p90": 0.2802194888329644,
+      "mean": 0.18087182121719048
+    },
+    "commuteDistanceKm": {
+      "p10": 2099,
+      "p25": 5513,
+      "p50": 13771,
+      "p75": 30844,
+      "p90": 61073,
+      "mean": 22735.15114471074
+    },
+    "residentCellDensity": {
+      "p10": 14,
+      "p25": 26,
+      "p50": 68,
+      "p75": 173,
+      "p90": 395,
+      "mean": 183.29241645244215
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 18,
+      "p50": 46,
+      "p75": 143,
+      "p90": 767,
+      "mean": 246.74653979238755
+    },
+    "detail": {
+      "radiusKm": 0.14165879064678008,
+      "expectedPointSpacingKm": 0.5021789658300866,
+      "normalizedRadius": 0.2820882599346279,
+      "activityPerPoint": 40.19202592279515,
+      "playableAreaKm2": 3156,
+      "playableAreaPerPointKm2": 0.4446322907861369,
+      "playableCatchmentRadiusKm": 0.3762058663468359,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9721121021245938,
+        "continuousScore": 0.966158013949706,
+        "detectedCenterCount": 5,
+        "effectiveCenterCount": 4.498216761351911,
+        "largestCenterShare": 0.3128665220149816,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 18.057897025426993,
+            "latitude": 48.89993098922753,
+            "massShare": 0.3128665220149816,
+            "assignedMass": 178511,
+            "assignedPointCount": 1877,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 17.773308150273838,
+            "latitude": 48.67452852549465,
+            "massShare": 0.21727021939617852,
+            "assignedMass": 123967,
+            "assignedPointCount": 1653,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 18.61230932700786,
+            "latitude": 48.76541385780254,
+            "massShare": 0.20383794337552535,
+            "assignedMass": 116303,
+            "assignedPointCount": 1400,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 18.308256856439723,
+            "latitude": 48.68694926206315,
+            "massShare": 0.14492626619882712,
+            "assignedMass": 82690,
+            "assignedPointCount": 1157,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 18.288945077994068,
+            "latitude": 49.08163318902957,
+            "massShare": 0.12109904901448737,
+            "assignedMass": 69095,
+            "assignedPointCount": 1011,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787616000
 }
