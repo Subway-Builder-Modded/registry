@@ -52,8 +52,127 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 59.5,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obec_sk.geojson.gz": 1.43,
+    ".railyard_map/regions/okres_sk.geojson.gz": 0.38,
+    ".railyard_map/regions/zsj_sk.geojson.gz": 2.41,
+    ".railyard_map/special_demand_points.json": 0.03,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "BAN.pmtiles": 49.34,
+    "buildings_index.bin.gz": 18.26,
+    "buildings_index.json": 47.16,
+    "config.json": 0.01,
+    "demand_data.json": 2.81,
+    "driving_paths.json.gz": 13.22,
+    "ocean_depth_index.json": 103.73,
+    "roads.geojson": 6.2,
+    "runways_taxiways.geojson": 0.41
+  },
   "included_cities": [
     "Zvolen"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.100136106158742,
+      "p25": 0.11367828087248652,
+      "p50": 0.13140151562804572,
+      "p75": 0.1596316419979947,
+      "p90": 0.20980984102157785,
+      "mean": 0.1502386757957069
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.09562958889357241,
+      "p25": 0.11315633836165637,
+      "p50": 0.1357273697362791,
+      "p75": 0.16989293667048258,
+      "p90": 0.23644996011196714,
+      "mean": 0.15791881468492114
+    },
+    "commuteDistanceKm": {
+      "p10": 2104,
+      "p25": 4827,
+      "p50": 12955,
+      "p75": 28992,
+      "p90": 51376,
+      "mean": 20649.2627367135
+    },
+    "residentCellDensity": {
+      "p10": 6,
+      "p25": 11,
+      "p50": 33,
+      "p75": 104,
+      "p90": 282,
+      "mean": 136.88661971830984
+    },
+    "workerCellDensity": {
+      "p10": 5,
+      "p25": 10,
+      "p50": 28,
+      "p75": 92,
+      "p90": 418,
+      "mean": 203.02609603340292
+    },
+    "detail": {
+      "radiusKm": 0.133546928439239,
+      "expectedPointSpacingKm": 0.512503908678028,
+      "normalizedRadius": 0.26057738522173424,
+      "activityPerPoint": 31.18028846153846,
+      "playableAreaKm2": 3276,
+      "playableAreaPerPointKm2": 0.525,
+      "playableCatchmentRadiusKm": 0.40879419057331295,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9490188052129115,
+        "continuousScore": 0.9604303375092672,
+        "detectedCenterCount": 4,
+        "effectiveCenterCount": 3.469380509382002,
+        "largestCenterShare": 0.387798422121142,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 19.15423811631899,
+            "latitude": 48.73704095207554,
+            "massShare": 0.387798422121142,
+            "assignedMass": 150904,
+            "assignedPointCount": 1397,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 19.180843088725123,
+            "latitude": 48.53872637950761,
+            "massShare": 0.2950273687456634,
+            "assignedMass": 114804,
+            "assignedPointCount": 2027,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 18.843045051068334,
+            "latitude": 48.542760076440395,
+            "massShare": 0.17451494359211575,
+            "assignedMass": 67909,
+            "assignedPointCount": 1502,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 19.64828885374598,
+            "latitude": 48.78705903121793,
+            "massShare": 0.14265926554107883,
+            "assignedMass": 55513,
+            "assignedPointCount": 1314,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787616000
 }
