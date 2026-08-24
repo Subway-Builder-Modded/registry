@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-24T18:23:07.563Z",
+  "generated_at": "2026-08-24T18:46:36.532Z",
   "listings": {
     "abu-dhabi": {
       "has_complete_version": true,
@@ -40449,6 +40449,78 @@
           "fingerprint": "rules:v6:sha256:6ca10870c40b671d25422f31af24f7785f8534b2fdb1eee0c23a27a0ba75d377",
           "checked_at": "2026-08-19T03:09:03.801Z",
           "released_at": "2026-08-19T00:00:00.000Z"
+        }
+      }
+    },
+    "yukina-sk-banska-bystrica": {
+      "has_complete_version": true,
+      "latest_semver_version": "0.1.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "0.1.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1787616000,
+      "versions": {
+        "0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "BAN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 190.39,
+          "file_sizes": {
+            ".railyard_map/landuse_provenance.parquet": 59.5,
+            ".railyard_map/regions/manifest.json": 0,
+            ".railyard_map/regions/obec_sk.geojson.gz": 1.43,
+            ".railyard_map/regions/okres_sk.geojson.gz": 0.38,
+            ".railyard_map/regions/zsj_sk.geojson.gz": 2.41,
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0.07,
+            "BAN.pmtiles": 49.34,
+            "buildings_index.bin.gz": 18.26,
+            "buildings_index.json": 47.16,
+            "config.json": 0.01,
+            "demand_data.json": 2.81,
+            "driving_paths.json.gz": 13.22,
+            "ocean_depth_index.json": 103.73,
+            "roads.geojson": 6.2,
+            "runways_taxiways.geojson": 0.41
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ahkimn/subwaybuilder-eu-maps",
+            "tag": "0.7.0",
+            "asset_name": "BAN.zip",
+            "download_url": "https://github.com/ahkimn/subwaybuilder-eu-maps/releases/download/0.7.0/BAN.zip"
+          },
+          "fingerprint": "rules:v6:sha256:e327d1fecab23adef4b750cac3aa2900f1b8a9a13d8609273c464f12fd6b9558",
+          "checked_at": "2026-08-24T18:46:36.532Z",
+          "released_at": "2026-08-25T00:00:00.000Z"
         }
       }
     },
