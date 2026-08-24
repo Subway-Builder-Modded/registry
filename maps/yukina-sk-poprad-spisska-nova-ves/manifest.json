@@ -54,9 +54,120 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 15.85,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obec_sk.geojson.gz": 1.14,
+    ".railyard_map/regions/okres_sk.geojson.gz": 0.35,
+    ".railyard_map/regions/zsj_sk.geojson.gz": 1.64,
+    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "TAT.pmtiles": 38.54,
+    "buildings_index.bin.gz": 14.72,
+    "buildings_index.json": 38.26,
+    "config.json": 0.01,
+    "demand_data.json": 2.24,
+    "driving_paths.json.gz": 9.82,
+    "ocean_depth_index.json": 97.29,
+    "roads.geojson": 4.33,
+    "runways_taxiways.geojson": 0.07
+  },
   "included_cities": [
     "Poprad",
     "Spišská Nová Ves"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.09669518309702056,
+      "p25": 0.11089612165426142,
+      "p50": 0.12959208425889135,
+      "p75": 0.1624601532925665,
+      "p90": 0.20129971327430632,
+      "mean": 0.14414077801553887
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.0942086168888274,
+      "p25": 0.11027313642147377,
+      "p50": 0.1294354697833441,
+      "p75": 0.17052174629141123,
+      "p90": 0.22980521004279972,
+      "mean": 0.16005089454778865
+    },
+    "commuteDistanceKm": {
+      "p10": 2069,
+      "p25": 5432,
+      "p50": 14140,
+      "p75": 28509,
+      "p90": 49629,
+      "mean": 20203.24773255378
+    },
+    "residentCellDensity": {
+      "p10": 8,
+      "p25": 16,
+      "p50": 53,
+      "p75": 172,
+      "p90": 376,
+      "mean": 166.73801916932908
+    },
+    "workerCellDensity": {
+      "p10": 8,
+      "p25": 16,
+      "p50": 40,
+      "p75": 117,
+      "p90": 466,
+      "mean": 204.74901960784314
+    },
+    "detail": {
+      "radiusKm": 0.12951375334786772,
+      "expectedPointSpacingKm": 0.49113723058099773,
+      "normalizedRadius": 0.26370176252909516,
+      "activityPerPoint": 33.775598189264926,
+      "playableAreaKm2": 2512,
+      "playableAreaPerPointKm2": 0.5414960120715672,
+      "playableCatchmentRadiusKm": 0.41516687484850845,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.8981513436481463,
+        "continuousScore": 0.9264148572142438,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.4923209251514358,
+        "largestCenterShare": 0.526454351086575,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 20.30129500086682,
+            "latitude": 49.08526092512807,
+            "massShare": 0.526454351086575,
+            "assignedMass": 164975,
+            "assignedPointCount": 1924,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 20.61688534951134,
+            "latitude": 48.95559065953105,
+            "massShare": 0.31408877684526276,
+            "assignedMass": 98426,
+            "assignedPointCount": 1637,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 20.64014920340611,
+            "latitude": 49.2931968938541,
+            "massShare": 0.15945687206816223,
+            "assignedMass": 49969,
+            "assignedPointCount": 1078,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787616000
 }

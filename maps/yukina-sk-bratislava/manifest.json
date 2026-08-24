@@ -54,9 +54,104 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/landuse_provenance.parquet": 27.22,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/obec_sk.geojson.gz": 2.24,
+    ".railyard_map/regions/okres_sk.geojson.gz": 0.6,
+    ".railyard_map/regions/zsj_sk.geojson.gz": 3.4,
+    ".railyard_map/special_demand_points.json": 0.09,
+    ".railyard_map/special_demand_types.json": 0.07,
+    "BTS.pmtiles": 80.8,
+    "buildings_index.bin.gz": 57.14,
+    "buildings_index.json": 146.55,
+    "config.json": 0.01,
+    "demand_data.json": 5.98,
+    "driving_paths.json.gz": 29.53,
+    "ocean_depth_index.json": 41.72,
+    "roads.geojson": 13.21,
+    "runways_taxiways.geojson": 0.28
+  },
   "included_cities": [
     "Trnava",
     "Komárno"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1469621507364703,
+      "p25": 0.15386736417353553,
+      "p50": 0.1708631030531633,
+      "p75": 0.20138523385188747,
+      "p90": 0.23822705553910398,
+      "mean": 0.18352477847846718
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.11974119823903139,
+      "p25": 0.15283817610156117,
+      "p50": 0.18024192711555292,
+      "p75": 0.22348368228759297,
+      "p90": 0.282891382897217,
+      "mean": 0.19755207561285856
+    },
+    "commuteDistanceKm": {
+      "p10": 2602,
+      "p25": 6843,
+      "p50": 18558,
+      "p75": 42590,
+      "p90": 69362,
+      "mean": 28190.829884221712
+    },
+    "residentCellDensity": {
+      "p10": 24,
+      "p25": 49,
+      "p50": 138,
+      "p75": 345,
+      "p90": 772,
+      "mean": 383.54123479044614
+    },
+    "workerCellDensity": {
+      "p10": 17,
+      "p25": 29,
+      "p50": 69,
+      "p75": 213,
+      "p90": 1105,
+      "mean": 466.60087719298247
+    },
+    "detail": {
+      "radiusKm": 0.17548987140927955,
+      "expectedPointSpacingKm": 0.4866642633922876,
+      "normalizedRadius": 0.36059740689819597,
+      "activityPerPoint": 75.43460925039872,
+      "playableAreaKm2": 5320,
+      "playableAreaPerPointKm2": 0.4713804713804714,
+      "playableCatchmentRadiusKm": 0.38735650787663223,
+      "localityScore": 0.9684169637968978,
+      "deaggregationScore": 1,
+      "score": 0.9840817871482521
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.9025820443694482,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 17.314281290235677,
+            "latitude": 48.21555970089557,
+            "massShare": 1,
+            "assignedMass": 1702710,
+            "assignedPointCount": 11286,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1787616000
 }
