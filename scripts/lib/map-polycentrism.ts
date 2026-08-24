@@ -291,7 +291,8 @@ function getNeighborIndexes(
     for (let dy = -cellRadius; dy <= cellRadius; dy += 1) {
       const bucket = index.get(`${cellX + dx}:${cellY + dy}`);
       if (!bucket) continue;
-      neighborIndexes.push(...bucket);
+      // Loop, not push(...bucket): a dense bucket can exceed V8's argument limit.
+      for (const bucketIndex of bucket) neighborIndexes.push(bucketIndex);
     }
   }
   return neighborIndexes;

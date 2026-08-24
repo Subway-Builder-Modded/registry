@@ -526,7 +526,8 @@ async function fetchRoadsFromOverpass(
     for (const quadrant of quadrants) {
       const result = await fetchRoadsFromOverpass(quadrant, options, depth + 1);
       selectedEndpoint = result.overpassUrl;
-      mergedRoads.push(...result.roads);
+      // Loop, not push(...roads): a metro quadrant's road list can exceed V8's argument limit.
+      for (const road of result.roads) mergedRoads.push(road);
     }
 
     const filteredRoads = dedupeRoads(mergedRoads).filter((road) => INCLUDED_ROAD_CLASSES.has(road.roadClass));
