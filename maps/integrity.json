@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-25T00:02:18.624Z",
+  "generated_at": "2026-08-25T04:01:57.123Z",
   "listings": {
     "abu-dhabi": {
       "has_complete_version": true,
@@ -18742,35 +18742,16 @@
     },
     "paris-ile-de-france": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.0.5",
+      "latest_semver_version": "2.0.1",
       "latest_semver_complete": true,
       "complete_versions": [
-        "v1.0.5"
+        "2.0.1",
+        "2.0.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1786095409,
+      "last_updated": 1787443200,
       "versions": {
-        "v1.0.0": {
-          "is_complete": false,
-          "errors": [
-            "version is no longer enumerated upstream (release or update entry deleted)"
-          ],
-          "required_checks": {},
-          "matched_files": {},
-          "game_version": ">=1.0.0",
-          "source": {
-            "update_type": "github",
-            "repo": "pierreggt/subway-builder-paris",
-            "tag": "v1.0.0",
-            "asset_name": "paris_v1.0.0.zip",
-            "download_url": "https://github.com/pierreggt/subway-builder-paris/releases/download/v1.0.0/paris_v1.0.0.zip"
-          },
-          "fingerprint": "rules:v6:github:pierreggt/subway-builder-paris:v1.0.0:paris_v1.0.0.zip",
-          "checked_at": "2026-07-19T03:59:19.466Z",
-          "released_at": "2026-07-18T14:35:39.000Z",
-          "availability": "removed"
-        },
-        "v1.0.5": {
+        "2.0.0": {
           "is_complete": true,
           "errors": [],
           "required_checks": {
@@ -18799,17 +18780,108 @@
             "city_pmtiles": "PRS.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 221.07,
+          "release_size": 421.16,
           "file_sizes": {
-            "PRS.pmtiles": 124.39,
-            "buildings_index.bin.gz": 78.91,
+            "PRS.pmtiles": 246.41,
+            "buildings_index.bin.gz": 144.35,
             "config.json": 0,
-            "demand_data.json.gz": 3.84,
-            "ocean_depth_index.json.gz": 3.24,
-            "ocean_depth_index_contours.json.gz": 2.83,
-            "roads.geojson.gz": 11.41,
-            "runways_taxiways.geojson.gz": 0.74
+            "demand_data.json.gz": 8.34,
+            "ocean_depth_index.json.gz": 4.51,
+            "ocean_depth_index_contours.json.gz": 3.11,
+            "roads.geojson.gz": 21.71,
+            "runways_taxiways.geojson.gz": 0.95
           },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "pierreggt/subwaybuilder-maps-france",
+            "tag": "prs-v2.0.0",
+            "asset_name": "paris_v2.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/prs-v2.0.0/paris_v2.0.0.zip"
+          },
+          "fingerprint": "rules:v6:sha256:086c3406929ffcc97fcc40410cb8de1dc05eb12c2a052377b13e8c73ddbe3418",
+          "checked_at": "2026-08-25T04:01:57.123Z",
+          "released_at": "2026-08-22T00:00:00.000Z"
+        },
+        "2.0.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "PRS.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 420.58,
+          "file_sizes": {
+            "PRS.pmtiles": 246.41,
+            "buildings_index.bin.gz": 144.35,
+            "config.json": 0,
+            "demand_data.json.gz": 7.76,
+            "ocean_depth_index.json.gz": 4.51,
+            "ocean_depth_index_contours.json.gz": 3.11,
+            "roads.geojson.gz": 21.71,
+            "runways_taxiways.geojson.gz": 0.95
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "pierreggt/subwaybuilder-maps-france",
+            "tag": "prs-v2.0.1",
+            "asset_name": "paris_v2.0.1.zip",
+            "download_url": "https://github.com/pierreggt/subwaybuilder-maps-france/releases/download/prs-v2.0.1/paris_v2.0.1.zip"
+          },
+          "fingerprint": "rules:v6:sha256:b172372e4472e23e887c00805b354ac841db1837adfc1e9906f808b3e1bcd491",
+          "checked_at": "2026-08-25T04:01:57.123Z",
+          "released_at": "2026-08-23T00:00:00.000Z"
+        },
+        "v1.0.0": {
+          "is_complete": false,
+          "errors": [
+            "version is no longer enumerated upstream (release or update entry deleted)"
+          ],
+          "required_checks": {},
+          "matched_files": {},
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "pierreggt/subway-builder-paris",
+            "tag": "v1.0.0",
+            "asset_name": "paris_v1.0.0.zip",
+            "download_url": "https://github.com/pierreggt/subway-builder-paris/releases/download/v1.0.0/paris_v1.0.0.zip"
+          },
+          "fingerprint": "rules:v6:github:pierreggt/subway-builder-paris:v1.0.0:paris_v1.0.0.zip",
+          "checked_at": "2026-07-19T03:59:19.466Z",
+          "released_at": "2026-07-18T14:35:39.000Z",
+          "availability": "removed"
+        },
+        "v1.0.5": {
+          "is_complete": false,
+          "errors": [
+            "version is no longer enumerated upstream (release or update entry deleted)"
+          ],
+          "required_checks": {},
+          "matched_files": {},
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "github",
@@ -18820,7 +18892,8 @@
           },
           "fingerprint": "rules:v6:github:pierreggt/subway-builder-paris:v1.0.5:paris_v1.0.5.zip",
           "checked_at": "2026-08-07T16:02:39.951Z",
-          "released_at": "2026-08-07T09:36:49.000Z"
+          "released_at": "2026-08-07T09:36:49.000Z",
+          "availability": "removed"
         }
       }
     },
