@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
   "id": "paris-ile-de-france",
-  "name": "Paris",
+  "name": "Paris - Ile de France",
   "author": "pierreggt",
   "github_id": 301703453,
-  "description": "Map of the greater Paris - Ile-de-France metropolitan area (France), from Roissy-Charles de Gaulle airport to Corbeil-Essonnes and from Versailles to Meaux. 1.53M+ OSM buildings (binary format), 5.76M+ commuters with demand built from real INSEE census data (Filosofi 2021, mobilites professionnelles 2021). Roissy-Charles de Gaulle airport with runways and taxiways. Full Seine river and waterway depth data. Protomaps basemap with water, parks and forests.",
+  "description": "Map of Paris and the whole Île-de-France region, extended to every town where an RER or Transilien line has its terminus, even outside the region's administrative boundary (Creil, Crépy-en-Valois, Château-Thierry, Gisors, Vernon, Dreux, Montargis).\n\n6.65M simulated commuters. Job locations placed on real buildings using INSEE SIRENE geolocated establishment data (not just population density), calibrated against MOBPRO commute totals the most detailed job-placement methodology across my map pack.",
   "tags": [
     "west-europe",
     "airports",
@@ -14,28 +14,27 @@
   ],
   "gallery": [
     "gallery/screenshot1.webp",
-    "gallery/screenshot2.webp",
-    "gallery/screenshot3.webp"
+    "gallery/screenshot2.webp"
   ],
   "is_test": false,
-  "source": "https://github.com/pierreggt/subway-builder-paris",
+  "source": "https://github.com/pierreggt/subwaybuilder-maps-france",
   "update": {
-    "type": "github",
-    "repo": "pierreggt/subway-builder-paris"
+    "type": "custom",
+    "url": "https://raw.githubusercontent.com/pierreggt/subwaybuilder-maps-france/main/updates/prs-update.json"
   },
   "city_code": "PRS",
   "country": "FR",
-  "population": 5758050,
-  "residents_total": 5758050,
-  "points_count": 26465,
-  "population_count": 137837,
+  "population": 6650825,
+  "residents_total": 6650825,
+  "points_count": 108933,
+  "population_count": 215781,
   "initial_view_state": {
-    "latitude": 48.8566,
-    "longitude": 2.3522,
-    "zoom": 12,
+    "latitude": 48.75,
+    "longitude": 2.35,
+    "zoom": 8,
     "bearing": 0
   },
-  "data_source": "INSEE Filosofi 2021 (donnees carroyees, revenus et population) - INSEE Recensement de la population 2021, mobilites professionnelles - OpenStreetMap contributors (ODbL) - Overture Maps Foundation (buildings)",
+  "data_source": "INSEE Filosofi/MOBPRO 2021, INSEE SIRENE",
   "source_quality": "medium-quality",
   "level_of_detail": "high-detail",
   "location": "west-europe",
@@ -56,21 +55,13 @@
     "runways_taxiways.geojson.gz": 0.74
   },
   "included_cities": [
-    "Roissy-en-France",
-    "Versailles",
-    "Meaux",
-    "Corbeil-Essonnes",
-    "Saint-Denis",
-    "Boulogne-Billancourt",
-    "Argenteuil",
-    "Montreuil",
-    "Nanterre",
-    "Creteil",
-    "Vitry-sur-Seine",
-    "Colombes",
-    "Aulnay-sous-Bois",
-    "Rueil-Malmaison",
-    "Aubervilliers"
+    "Creil",
+    "Crépy-en-Valois",
+    "Château-Thierry",
+    "Gisors",
+    "Vernon",
+    "Dreux",
+    "Montargis"
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
