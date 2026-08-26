@@ -42,7 +42,7 @@ style re-tag history (`vX.Y.Z` rows alongside `X.Y.Z`) remains as-is.
 
 ---
 
-## 2026-08-07 → ongoing — French-map re-download loop after city-code re-releases (correction applied, incident open)
+## 2026-08-07 → 2026-08-26 — French-map re-download loop after city-code re-releases (CLOSED; corrections applied throughout)
 
 **What happened:** the base game's 2026-08 update shipped vanilla Lyon/Marseille/Paris
 whose city codes collided with pierreggt's modded listings, so all three re-released
@@ -96,12 +96,24 @@ attributed for days 2026-08-07 → 2026-08-12 — old versions 595
 marseille v1.0.0: 13) and new versions 225 (lyon v1.0.2: 83 → display 127 → 44;
 marseille v1.0.2: 142 → display 177 → 35), 6 snapshots clamped.
 
-**While the incident is open:** re-run the repair (preview first, then `--apply`)
-every day or two to attribute new loop days — the app-side fix (PR #615) has to
-ship and saturate before the loop traffic stops. Then set `incident_end` in the
-spec, run one final `--apply`, and move this entry to closed. After any
-attribution-ledger rebuild, re-apply this spec like the manual-attribution specs
-(ops/README.md).
+**Closure (2026-08-26):** the repair was re-applied on cadence through the
+incident (Aug 13–18: 437 fetches; Aug 19–24: 216; final Aug 25–26 window: 34 —
+**~1,540 total spurious fetches attributed** across the incident). Each leg
+stopped when its structural cause was removed, not by client-update decay
+alone: lyon settled at allowance ~08-20 (app v0.2.10, released 08-17,
+covering its case); marseille's churn hit zero on 08-23, two days after its
+`MAR`→`MRS` revert + v2 release landed (the vanilla collision had made
+v1.0.2 uninstallable, so v0.2.10 alone could not stop it); paris v1.0.0
+looped at ~28-45/day until its V2 metadata cutover (`PAR`→`PRS`, pack update
+URL) merged 2026-08-25 — the old-manifest resolution the loop depended on
+disappeared and the counter went 31 → 0 overnight. A registry-side pipeline
+bug (V8 argument-limit stack overflow on the ~144k-point paris V2 map) had
+blocked that cutover for three days and was fixed in the same arc.
+`incident_end: 2026-08-26` is set in the spec and a final `--apply` ran.
+After any attribution-ledger rebuild, re-apply this spec like the
+manual-attribution specs (ops/README.md). With the incident closed, the
+migration-reserved `LYS` code was released (`RESERVED_CITY_CODES` is empty
+again); `LSY` remains lyon's code.
 
 **Prevention (registry side):** `VANILLA_CITY_CODES` in
 `scripts/lib/map-constants.ts` was missing the entire 2026-08 game update (per the
@@ -114,17 +126,16 @@ the live game list into `maps/vanilla-city-codes.json` (monotonic union — code
 never dropped), and intake validation unions that file with the hardcoded floor via
 `loadVanillaCityCodeSet`.
 
-**Two existing listings collide with the live vanilla list** (flagged by every sync
-run, need author-side renames):
+**Vanilla-collision epilogue (both resolved):**
 
-- **`marseille` → `MAR`** — the 2026-08-09 re-release renamed `MRS` directly onto
-  the vanilla Marseille code. On updated games the app's vanilla-conflict check
-  makes v1.0.2 **uninstallable** (download succeeds, extract is refused), so
-  marseille's re-download churn will NOT fully stop when the app fix (monorepo
-  PR #615) ships — the listing needs a second rename. Keep its `adoption_targets`
-  entry open until that lands.
-- **`dublin` → `DUB`** — collided silently when the game update shipped vanilla
-  Dublin; same uninstallable-on-updated-games consequence.
+- **`marseille`** — the 2026-08-09 re-release had renamed `MRS` directly onto
+  the vanilla `MAR`, making v1.0.2 uninstallable on updated games. Resolved
+  2026-08-20 by reverting to `MRS` (which was never vanilla; it had only been
+  maintainer-reserved during the migration and was released back to its
+  original holder) plus the v2 release.
+- **`dublin`** — collided with vanilla `DUB`; the listing was deprecated by
+  its author 2026-08-17, and the conflict scanner now skips deprecated
+  listings, so no rename is needed unless it is ever undeprecated.
 
 ---
 
