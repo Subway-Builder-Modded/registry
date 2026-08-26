@@ -65,12 +65,14 @@ export const VANILLA_CITY_CODES = [
 // Reserved (never vanilla): codes held back during a city-code migration because
 // stale installs on user disks still hold files under them — a NEW listing
 // claiming one would extract into those folders. Distinct from vanilla codes so
-// validation can explain the rejection honestly.
-// - LYS: lyon's pre-2026-08 code (now LSY). Release once the French city-code
-//   incident closes (old-version traffic back at allowance, v0.2.10 saturated).
-// - MRS was reserved here too, released 2026-08-20 back to marseille — the
-//   original holder reclaiming its own code is self-healing (issue #8327).
-export const RESERVED_CITY_CODES = ["LYS"] as const;
+// validation can explain the rejection honestly. Empty when no migration is in
+// flight; add codes here at the start of a migration and release them when the
+// corresponding incident closes.
+// History: LYS + MRS were reserved during the 2026-08 French city-code
+// migration (KNOWN_INCIDENTS.md). MRS was released 2026-08-20 back to
+// marseille (original holder reclaiming its own code, issue #8327); LYS was
+// released 2026-08-26 when the incident closed (lyon settled on LSY).
+export const RESERVED_CITY_CODES: readonly string[] = [];
 
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
