@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-08-29T07:09:19.838Z",
+  "generated_at": "2026-08-29T08:01:27.108Z",
   "listings": {
     "abu-dhabi": {
       "has_complete_version": true,
@@ -27372,14 +27372,15 @@
     },
     "vienna": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.0.1",
+      "latest_semver_version": "v1.1.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "v1.1.0",
         "v1.0.1",
         "v1.0.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1787079021,
+      "last_updated": 1787989343,
       "versions": {
         "v1.0.0": {
           "is_complete": true,
@@ -27486,6 +27487,59 @@
           "fingerprint": "rules:v6:github:rmerr1/sb-vienna-map:v1.0.1:VIEN-v1.0.1.zip",
           "checked_at": "2026-08-18T20:04:57.926Z",
           "released_at": "2026-08-18T18:50:21.000Z"
+        },
+        "v1.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "VIEN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 67.82,
+          "file_sizes": {
+            "VIEN.pmtiles": 23.63,
+            "VIEN_foundations.pmtiles": 15.84,
+            "buildings_index.bin.gz": 14.45,
+            "buildings_index.json": 58.32,
+            "config.json": 0,
+            "demand_data.json": 4.41,
+            "ocean_depth_index.json.gz": 1.61,
+            "roads.geojson": 10.23,
+            "runways_taxiways.geojson": 0.3
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "github",
+            "repo": "rmerr1/sb-vienna-map",
+            "tag": "v1.1.0",
+            "asset_name": "VIEN-v1.1.0.zip",
+            "download_url": "https://github.com/Rmerr1/sb-vienna-map/releases/download/v1.1.0/VIEN-v1.1.0.zip"
+          },
+          "fingerprint": "rules:v6:github:rmerr1/sb-vienna-map:v1.1.0:VIEN-v1.1.0.zip",
+          "checked_at": "2026-08-29T08:01:27.108Z",
+          "released_at": "2026-08-29T07:42:23.000Z"
         }
       }
     },
