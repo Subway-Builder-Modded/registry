@@ -4,7 +4,7 @@
   "name": "Vienna",
   "author": "Rmerr1",
   "github_id": 314586234,
-  "description": "Population groups are now capped at 200 people (previously up to 3,600).\n\nDemand moves through stations in finer increments, so ridership responds\nmore smoothly and a single large group no longer arrives as one indivisible\nlump. Total demand, routing, building geometry and map tiles are unchanged\nfrom v1.0.0 — this only changes how that demand is subdivided.",
+  "description": "Build the U-Bahn Vienna never got. All 23 districts plus Flughafen\nWien-Schwechat.\n\nBuild the U-Bahn Vienna never got. All 23 districts plus the metro area out to Baden, Klosterneuburg, Korneuburg and Schwechat.\n\n6,339 demand points carrying 1,959,635 modelled daily trips across 2,363 km2. Residents come from Statistik Austria's register based 100 m population grid. Jobs come from the published Abgestimmte Erwerbsstatistik 2024 employment figures for each of 138 separate areas (Vienna's 23 Gemeindebezirke and the 115 surrounding municipalities), so no part of the map is filled in from a city wide average. A further 126,109 in-commuters enter through seven corridors sized from the published commuter statistics.\n\nThe whole Südbahn axis is on the map, Wien to Mödling to Guntramsdorf to Traiskirchen to Baden, along with the airport, 18 university campuses, 12 hospitals and 23 venues. Commutes are routed with OSRM over the real road network, giving a 13.8 minute median drive that the train has to beat.",
   "tags": [
     "central-europe",
     "airports",
@@ -16,10 +16,11 @@
   "gallery": [
     "gallery/screenshot1.webp",
     "gallery/screenshot2.webp",
-    "gallery/screenshot3.webp"
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp"
   ],
   "is_test": false,
-  "source": "https://github.com/RMerr1/sb-vienna-map",
+  "source": "https://github.com/Rmerr1/sb-vienna-map",
   "update": {
     "type": "github",
     "repo": "Rmerr1/sb-vienna-map"
@@ -36,7 +37,7 @@
     "zoom": 12,
     "bearing": 0
   },
-  "data_source": "STAT Austria / OSM / Overture",
+  "data_source": "STATISTIK AUSTRIA (Abgestimmte Erwerbsstatistik 2024; INSPIRE register-based 100 m population grid; Gemeindegrenzen OGDEXT_GEM_1)",
   "source_quality": "low-quality",
   "level_of_detail": "low-detail",
   "data_quality": {
@@ -66,7 +67,16 @@
     "runways_taxiways.geojson": 0.33
   },
   "included_cities": [
-    "Schwechat"
+    "Baden",
+    "Mödling",
+    "Klosterneuburg",
+    "Korneuburg",
+    "Schwechat",
+    "Perchtoldsdorf",
+    "Brunn am Gebirge",
+    "Traiskirchen",
+    "Wiener Neudorf",
+    "Gerasdorf bei Wien"
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
