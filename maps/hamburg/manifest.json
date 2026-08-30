@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "id": "hamburg",
+  "name": "Hamburg",
+  "author": "pierreggt",
+  "github_id": 301703453,
+  "description": "Map of Hamburg, Germany, from the city center to Hamburg Airport, spanning the surrounding Schleswig-Holstein satellite towns (Norderstedt, Elmshorn, Pinneberg, Ahrensburg, and others). Residential population comes from the official 2022 census 100m population grid (Zensus 2022). Real German labor-market statistics (official employment counts and municipality-to-municipality commuter flows) anchor the smaller satellite towns; Hamburg city itself relies on a POI-density gravity model due to a persistent data-source access issue at build time (see Methodology).",
+  "tags": [
+    "central-europe",
+    "airports",
+    "hospitals",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/pierreggt/subwaybuilder-maps-deutschland",
+  "update": {
+    "type": "custom",
+    "url": "https://raw.githubusercontent.com/pierreggt/subwaybuilder-maps-deutschland/main/updates/ham-update.json"
+  },
+  "city_code": "HAM",
+  "country": "DE",
+  "population": 1263050,
+  "residents_total": 1263050,
+  "points_count": 11608,
+  "population_count": 12369,
+  "initial_view_state": {
+    "latitude": 53.5675,
+    "longitude": 10,
+    "zoom": 11,
+    "bearing": 0
+  },
+  "data_source": "Zensus 2022 (Destatis), Beschäftigtenstatistik BA + Pendlerrechnung der Länder (regionalstatistik.de/GENESIS-Online) for satellite towns, gravity model for Hamburg city, OSM, Overture Maps",
+  "source_quality": "low-quality",
+  "level_of_detail": "low-detail",
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  },
+  "location": "central-europe",
+  "special_demand": [
+    "airports",
+    "hospitals",
+    "universities"
+  ],
+  "file_sizes": {},
+  "included_cities": [
+    "Norderstedt",
+    "Elmshorn",
+    "Pinneberg",
+    "Wedel",
+    "Ahrensburg",
+    "Reinbek",
+    "Henstedt-Ulzburg",
+    "Kaltenkirchen",
+    "Quickborn",
+    "Schenefeld"
+  ]
+}
