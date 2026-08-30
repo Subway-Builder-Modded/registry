@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "leipzig-halle",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "admin_polygon",
+    "resident_intensity": "uniform",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm2"
+  },
+  "notes": "Population (residents): Zensus 2022 100 m × 100 m population grid (Destatis). Grid cells in the bounding box aggregated to 500 m cells; each non-empty cell becomes one demand point placed at the cell centroid. Cell population = sum of constituent 100 m cells.\n\nJobs: Bundesagentur für Arbeit, table 13111-01-03 (sozialversicherungspflichtig Beschäftigte, municipality level, 2023). Municipal totals distributed across OSM buildings within each municipality, weighted by building footprint area and type (commercial, office, industrial, retail). 15 special demand points (universities, hospital, industrial clusters, airport) assigned fixed job counts based on publicly known workforce sizes.\n\nCommute flows (pops): 69,325 origin-destination pairs generated to match Bundesagentur für Arbeit Pendlerstatistik at Kreis (county) level. Driving times and distances per O-D pair computed with OSRM on a local extract of the Saxony + Saxony-Anhalt OSM network. Pop sizes calibrated to reproduce observed Kreis-to-Kreis flow totals. Street geometries stored separately in driving_paths.json.gz (1-based positional index into pops list).\n\nSpecial demand: 15 demand points represent major non-residential destinations (Universität Leipzig, HTWK, Martin-Luther-Universität Halle, Universitätsklinikum, Messe Leipzig, Red Bull Arena, Zoo Leipzig, main stations, airport LEJ, BMW plant, DHL hub, chemical industry Leuna/Bitterfeld). These carry jobs but zero residents. Airport demand uses time-smoothed distribution; universities use commuter-style timing.\n\nData vintage: Zensus 2022, BA employment 2023, OSM extract 2024-Q4 (Geofabrik).",
+  "sources": [
+    "https://www.destatis.de/static/DE/zensus/gitterdaten/Zensus2022_Bevoelkerungszahl.zip",
+    "https://statistik.arbeitsagentur.de/",
+    "https://download.geofabrik.de/europe/germany/sachsen.html",
+    "https://download.geofabrik.de/europe/germany/sachsen-anhalt.html",
+    "https://project-osrm.org/"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "maxsaysyeah-cmyk",
+    "reviewed_by": null,
+    "date": "2026-08-30"
+  }
+}
