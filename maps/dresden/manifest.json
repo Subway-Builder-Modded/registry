@@ -49,7 +49,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "DRE.pmtiles": 20.98,
+    "buildings_index.bin.gz": 9.35,
+    "config.json": 0,
+    "demand_data.json.gz": 0.12,
+    "ocean_depth_index.json.gz": 0.53,
+    "ocean_depth_index_contours.json.gz": 0.37,
+    "roads.geojson.gz": 1.52,
+    "runways_taxiways.geojson.gz": 0.03
+  },
   "included_cities": [
     "Radebeul",
     "Coswig",
@@ -57,5 +66,83 @@
     "Bannewitz",
     "Heidenau",
     "Weinböhla"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.17474530075904635,
+      "p75": 0.17499045623239295,
+      "p90": 0.32831639218531405,
+      "mean": 0.16645929023694017
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.17444326224211243,
+      "p75": 0.17496218055043694,
+      "p90": 0.4382199133741676,
+      "mean": 0.14969186773699047
+    },
+    "commuteDistanceKm": {
+      "p10": 7794,
+      "p25": 13351,
+      "p50": 16965,
+      "p75": 22456,
+      "p90": 28972,
+      "mean": 18079.776855345914
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 300,
+      "p75": 650,
+      "p90": 1200,
+      "mean": 513.4394904458599
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 300,
+      "p75": 700,
+      "p90": 1500,
+      "mean": 698.3506944444445
+    },
+    "detail": {
+      "radiusKm": 0.17459421618681167,
+      "expectedPointSpacingKm": 0.4595748104097867,
+      "normalizedRadius": 0.3799037985374615,
+      "activityPerPoint": 99.84092021536955,
+      "playableAreaKm2": 948,
+      "playableAreaPerPointKm2": 0.23201174743024963,
+      "playableCatchmentRadiusKm": 0.2717565692266245,
+      "localityScore": 0.9131940317370579,
+      "deaggregationScore": 1,
+      "score": 0.9556118624928522
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.7832382714705238,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 13.725756220799118,
+            "latitude": 51.057444416350044,
+            "massShare": 1,
+            "assignedMass": 815900,
+            "assignedPointCount": 4086,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

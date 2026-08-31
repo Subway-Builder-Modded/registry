@@ -49,7 +49,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "ERF.pmtiles": 34.01,
+    "buildings_index.bin.gz": 15.39,
+    "config.json": 0,
+    "demand_data.json.gz": 0.13,
+    "ocean_depth_index.json.gz": 0.96,
+    "ocean_depth_index_contours.json.gz": 0.57,
+    "roads.geojson.gz": 2.1,
+    "runways_taxiways.geojson.gz": 0.02
+  },
   "included_cities": [
     "Weimar",
     "Gotha",
@@ -57,5 +66,83 @@
     "Sömmerda",
     "Apolda",
     "Bad Berka"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0.17446214961898512,
+      "p50": 0.17512236976203155,
+      "p75": 0.2779877005835794,
+      "p90": 0.35013168673193407,
+      "mean": 0.22485567342736587
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.17467925892334404,
+      "p75": 0.17569637254099987,
+      "p90": 0.3287783263224104,
+      "mean": 0.1627079499171782
+    },
+    "commuteDistanceKm": {
+      "p10": 15688,
+      "p25": 20297,
+      "p50": 28532,
+      "p75": 41423,
+      "p90": 55651,
+      "mean": 32614.790363269425
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 300,
+      "p90": 600,
+      "mean": 277.03081232492997
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 400,
+      "p90": 800,
+      "mean": 417.7028451001054
+    },
+    "detail": {
+      "radiusKm": 0.17490067401508635,
+      "expectedPointSpacingKm": 0.5926473654967351,
+      "normalizedRadius": 0.2951176098935175,
+      "activityPerPoint": 84.50764006791171,
+      "playableAreaKm2": 3872,
+      "playableAreaPerPointKm2": 0.8217317487266553,
+      "playableCatchmentRadiusKm": 0.5114345895721064,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.9537690769496315,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 11.082858924158712,
+            "latitude": 50.97447688071321,
+            "massShare": 1,
+            "assignedMass": 796400,
+            "assignedPointCount": 4712,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

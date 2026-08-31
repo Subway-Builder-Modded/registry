@@ -47,7 +47,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "KIL.pmtiles": 19.14,
+    "buildings_index.bin.gz": 8.33,
+    "config.json": 0,
+    "demand_data.json.gz": 0.1,
+    "ocean_depth_index.json.gz": 0.7,
+    "ocean_depth_index_contours.json.gz": 0.45,
+    "roads.geojson.gz": 1.14,
+    "runways_taxiways.geojson.gz": 0.01
+  },
   "included_cities": [
     "Preetz",
     "Schwentinental",
@@ -56,5 +65,83 @@
     "Heikendorf",
     "Schönkirchen",
     "Molfsee"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0.16184275032036127,
+      "p50": 0.16235515161618527,
+      "p75": 0.27798770058436956,
+      "p90": 0.42687454306621686,
+      "mean": 0.21692444640974698
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.16226652651374532,
+      "p75": 0.27798770058436956,
+      "p90": 0.6490880459393892,
+      "mean": 0.21696199946786351
+    },
+    "commuteDistanceKm": {
+      "p10": 10119,
+      "p25": 16476,
+      "p50": 23044,
+      "p75": 32385,
+      "p90": 40257,
+      "mean": 24419.671083140114
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 400,
+      "p90": 800,
+      "mean": 344.2696629213483
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 400,
+      "p90": 900,
+      "mean": 458.05970149253733
+    },
+    "detail": {
+      "radiusKm": 0.16231083301607094,
+      "expectedPointSpacingKm": 0.5893960618210751,
+      "normalizedRadius": 0.27538499750842277,
+      "activityPerPoint": 94.7143293614421,
+      "playableAreaKm2": 1716,
+      "playableAreaPerPointKm2": 0.5242896425297892,
+      "playableCatchmentRadiusKm": 0.40851753504714766,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.8186363163972565,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 10.161939280322581,
+            "latitude": 54.27112366637096,
+            "massShare": 1,
+            "assignedMass": 620000,
+            "assignedPointCount": 3273,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

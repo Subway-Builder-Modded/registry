@@ -49,7 +49,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "HB.pmtiles": 28.23,
+    "buildings_index.bin.gz": 14.17,
+    "config.json": 0,
+    "demand_data.json.gz": 0.12,
+    "ocean_depth_index.json.gz": 0.4,
+    "ocean_depth_index_contours.json.gz": 0.24,
+    "roads.geojson.gz": 1.5,
+    "runways_taxiways.geojson.gz": 0.03
+  },
   "included_cities": [
     "Achim",
     "Weyhe",
@@ -61,5 +70,83 @@
     "Lilienthal",
     "Ottersberg",
     "Oyten"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0.1666474280844351,
+      "p50": 0.1670355080482488,
+      "p75": 0.2779877005835794,
+      "p90": 0.3243790329096242,
+      "mean": 0.19982001713047606
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.16689973787861045,
+      "p75": 0.167481170905994,
+      "p90": 0.4349244045210115,
+      "mean": 0.20252709698169827
+    },
+    "commuteDistanceKm": {
+      "p10": 9603,
+      "p25": 14822,
+      "p50": 19838,
+      "p75": 26500,
+      "p90": 33582,
+      "mean": 20975.793164556962
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 600,
+      "p90": 1000,
+      "mean": 436.54266958424506
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 500,
+      "p90": 1100,
+      "mean": 584.4903988183161
+    },
+    "detail": {
+      "radiusKm": 0.16696760916319442,
+      "expectedPointSpacingKm": 0.5146188258169025,
+      "normalizedRadius": 0.32444908889244606,
+      "activityPerPoint": 96.3157894736842,
+      "playableAreaKm2": 1472,
+      "playableAreaPerPointKm2": 0.3521531100478469,
+      "playableCatchmentRadiusKm": 0.33480414629839644,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.756491244978621,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 8.775290936506458,
+            "latitude": 53.09133365132265,
+            "massShare": 1,
+            "assignedMass": 805200,
+            "assignedPointCount": 4180,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }
