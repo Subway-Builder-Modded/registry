@@ -6,6 +6,50 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 ---
 
+## 2026-07-27 → ongoing (list B) — Metronomic library re-fetcher: two fixed lists at ~6/day (list A corrected+closed; list B correction applied, ongoing)
+
+**What happened:** a single automated client fetches a fixed library of
+listings roughly every 4 hours (~6/day per listing), with day-level wobbles
+synchronized across every list member — the charleston faulty-client
+signature, at 8x the scale. Two lists, same 2026-07-27/28 onset:
+
+- **List A (closed):** kaicardenas0618's nine Peru maps + waterloo. Ran to
+  2026-08-19, all ten stopping in lockstep. **1,052 spurious fetches**
+  attributed.
+- **List B (ongoing):** 25 listings — small US metros (dayton-oh, daytonatti,
+  akron-oh, toledo-oh, louisville, nashville, providence, sacramento, albany,
+  buffalo-ny, syracuse-ny, anchorage-ak, charleston-sc, wilmington-nc,
+  piedmont-triad, connecticut-usa, colorado-ski-country, willamette-valley,
+  mfn-northwestar/-madisonwi/-rdu/-msy) plus johor-bahru, pulau-pinang, and
+  jerusalem. Still active as of 2026-08-31 (rate recently decayed to ~4/day,
+  still synchronized). **4,036 spurious fetches** attributed so far.
+
+The list shapes (one author's national set + one small-metro collection)
+suggest broken client subscription libraries re-downloading on an update-check
+cycle rather than a scraper; the registry's own pipeline is ruled out
+(integrity and demand caches untouched for every affected listing; our
+4-hourly cadence is coincidental).
+
+**Correction:** two committed specs sharing the loop-repair engine —
+`history/loop-repair-specs/2026_08_31_metronome_fetch_list_a.json` (closed,
+`incident_end` 2026-08-19) and `2026_08_31_metronome_fetch_list_b.json`
+(open). Allowance is the pre-incident baseline rate (2026-06-25 → 2026-07-26;
+near zero for most members). Idempotent per-day deltas, version-bucket
+ceilings lowered, 36 snapshots clamped per spec.
+
+**While list B is open:** re-run the B spec (preview, then `--apply`) every
+day or two; when the list goes quiet in lockstep, set `incident_end`, run one
+final `--apply`, and mark this entry closed. After any attribution-ledger
+rebuild, re-apply both specs like the other manual-attribution specs.
+
+**Detection:** found by a registry-wide correlation sweep (day-delta vectors
+with ≥90% ±1 agreement across listings) — the run-length screen alone missed
+16 of the 35 members. Yukina pack-update waves false-positive on correlation
+sweeps (event-shaped, synchronized by republish) — check the series shape
+before concluding.
+
+---
+
 ## 2026-08-12 — jp-maps only-latest asset retirement wiped 183 version counts (corrected, prevention shipped)
 
 **What happened:** jp-data's `publish_map_pack.py --only-latest-download`
