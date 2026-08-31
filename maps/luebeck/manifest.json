@@ -49,10 +49,105 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "LUB.pmtiles": 10.49,
+    "buildings_index.bin.gz": 5.66,
+    "config.json": 0,
+    "demand_data.json.gz": 0.04,
+    "ocean_depth_index.json.gz": 0.04,
+    "ocean_depth_index_contours.json.gz": 0.01,
+    "roads.geojson.gz": 0.56,
+    "runways_taxiways.geojson.gz": 0.01
+  },
   "included_cities": [
     "Bad Schwartau",
     "Stockelsdorf",
     "Ratekau"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0.16370112330600722,
+      "p50": 0.16396569929279284,
+      "p75": 0.2779877005835794,
+      "p90": 0.3228183851320721,
+      "mean": 0.20655284239428465
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.16354423030016832,
+      "p75": 0.16386773470126376,
+      "p90": 0.27798770058436956,
+      "mean": 0.14600232377571143
+    },
+    "commuteDistanceKm": {
+      "p10": 5572,
+      "p25": 10285,
+      "p50": 16256,
+      "p75": 21565,
+      "p90": 26241,
+      "mean": 16416.905542544886
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 500,
+      "p90": 800,
+      "mean": 352.5885558583106
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 500,
+      "p90": 1100,
+      "mean": 601.4018691588785
+    },
+    "detail": {
+      "radiusKm": 0.1637548292004503,
+      "expectedPointSpacingKm": 0.5628193125995365,
+      "normalizedRadius": 0.29095453111604036,
+      "activityPerPoint": 96.43916913946587,
+      "playableAreaKm2": 608,
+      "playableAreaPerPointKm2": 0.45103857566765576,
+      "playableCatchmentRadiusKm": 0.3789063706052863,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9714909763313608,
+        "continuousScore": 0.5797166428411148,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9445624238337764,
+        "largestCenterShare": 0.5844230769230769,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 10.711588515959198,
+            "latitude": 53.94337528792366,
+            "massShare": 0.5844230769230769,
+            "assignedMass": 151950,
+            "assignedPointCount": 756,
+            "prominenceRatio": 0.9999999989096232
+          },
+          {
+            "longitude": 10.683862904211013,
+            "latitude": 53.84280320592318,
+            "massShare": 0.41557692307692307,
+            "assignedMass": 108050,
+            "assignedPointCount": 592,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

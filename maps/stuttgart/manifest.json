@@ -49,7 +49,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "STU.pmtiles": 38.49,
+    "buildings_index.bin.gz": 20.91,
+    "config.json": 0,
+    "demand_data.json.gz": 0.24,
+    "ocean_depth_index.json.gz": 0.63,
+    "ocean_depth_index_contours.json.gz": 0.41,
+    "roads.geojson.gz": 3.49,
+    "runways_taxiways.geojson.gz": 0.04
+  },
   "included_cities": [
     "Ludwigsburg",
     "Esslingen am Neckar",
@@ -57,5 +66,83 @@
     "Waiblingen",
     "Leonberg",
     "Nürtingen"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.18309844181689552,
+      "p75": 0.1835452345467545,
+      "p90": 0.2779877005835794,
+      "mean": 0.15540042873054405
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0,
+      "p75": 0.18318056859486612,
+      "p90": 0.2779877005835794,
+      "mean": 0.10211842176272952
+    },
+    "commuteDistanceKm": {
+      "p10": 9172,
+      "p25": 15436,
+      "p50": 20979,
+      "p75": 29874,
+      "p90": 38099,
+      "mean": 22860.614346949067
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 200,
+      "p50": 400,
+      "p75": 850,
+      "p90": 1500,
+      "mean": 630.3613511390416
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 300,
+      "p75": 800,
+      "p90": 2100,
+      "mean": 988.0597014925373
+    },
+    "detail": {
+      "radiusKm": 0,
+      "expectedPointSpacingKm": 0.4390159937121229,
+      "normalizedRadius": 0,
+      "activityPerPoint": 115.1994301994302,
+      "playableAreaKm2": 1728,
+      "playableAreaPerPointKm2": 0.24615384615384617,
+      "playableCatchmentRadiusKm": 0.279916421013368,
+      "localityScore": 0,
+      "deaggregationScore": 1,
+      "score": 0
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.8068677613502335,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 9.186264139050328,
+            "latitude": 48.763876772907125,
+            "massShare": 1,
+            "assignedMass": 1617400,
+            "assignedPointCount": 7020,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

@@ -47,7 +47,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "CHZ.pmtiles": 27,
+    "buildings_index.bin.gz": 11.31,
+    "config.json": 0,
+    "demand_data.json.gz": 0.1,
+    "ocean_depth_index.json.gz": 0.97,
+    "ocean_depth_index_contours.json.gz": 0.69,
+    "roads.geojson.gz": 1.85,
+    "runways_taxiways.geojson.gz": 0
+  },
   "included_cities": [
     "Limbach-Oberfrohna",
     "Mittweida",
@@ -57,5 +66,91 @@
     "Flöha",
     "Zschopau",
     "Hainichen"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0.17528246261851382,
+      "p50": 0.17585611892863515,
+      "p75": 0.3285071748920785,
+      "p90": 0.44871169659512555,
+      "mean": 0.24270121735673927
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.17557414830642157,
+      "p75": 0.2779877005835794,
+      "p90": 0.5502786767694632,
+      "mean": 0.20020053129969273
+    },
+    "commuteDistanceKm": {
+      "p10": 15098,
+      "p25": 18586,
+      "p50": 24104,
+      "p75": 32164,
+      "p90": 40317,
+      "mean": 26054.780495759947
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 300,
+      "p90": 500,
+      "mean": 262.37157534246575
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 400,
+      "p90": 900,
+      "mean": 403.88157894736844
+    },
+    "detail": {
+      "radiusKm": 0.1757150770576273,
+      "expectedPointSpacingKm": 0.5935281938683291,
+      "normalizedRadius": 0.2960517779490837,
+      "activityPerPoint": 81.38647724283084,
+      "playableAreaKm2": 1984,
+      "playableAreaPerPointKm2": 0.5219679031833728,
+      "playableCatchmentRadiusKm": 0.40761200160678696,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.7833170480636507,
+        "continuousScore": 0.8343115104217591,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.6438136137413635,
+        "largestCenterShare": 0.7327460804913528,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 12.934891909010696,
+            "latitude": 50.850055740818355,
+            "massShare": 0.7327460804913528,
+            "assignedMass": 453350,
+            "assignedPointCount": 2705,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 12.756175536740248,
+            "latitude": 50.7298049591775,
+            "massShare": 0.2672539195086472,
+            "assignedMass": 165350,
+            "assignedPointCount": 1096,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

@@ -47,12 +47,99 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "MAG.pmtiles": 23.15,
+    "buildings_index.bin.gz": 10.76,
+    "config.json": 0,
+    "demand_data.json.gz": 0.08,
+    "ocean_depth_index.json.gz": 0.43,
+    "ocean_depth_index_contours.json.gz": 0.27,
+    "roads.geojson.gz": 1.52,
+    "runways_taxiways.geojson.gz": 0.01
+  },
   "included_cities": [
     "Schönebeck",
     "Haldensleben",
     "Wolmirstedt",
     "Barleben",
     "Burg"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0.17034228316721114,
+      "p50": 0.1708115821890806,
+      "p75": 0.3256590719062006,
+      "p90": 0.4407250835167864,
+      "mean": 0.25320849574635207
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.17055308529803664,
+      "p75": 0.2779877005835794,
+      "p90": 0.4393291897256286,
+      "mean": 0.19243832676295358
+    },
+    "commuteDistanceKm": {
+      "p10": 13245,
+      "p25": 17842,
+      "p50": 25056,
+      "p75": 33588,
+      "p90": 43363,
+      "mean": 26472.384139264992
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 300,
+      "p90": 650,
+      "mean": 294.8081264108352
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 500,
+      "p90": 800,
+      "mean": 469.42446043165467
+    },
+    "detail": {
+      "radiusKm": 0.17068228480714354,
+      "expectedPointSpacingKm": 0.5940202828903931,
+      "normalizedRadius": 0.2873341024259896,
+      "activityPerPoint": 90.55823569951757,
+      "playableAreaKm2": 2460,
+      "playableAreaPerPointKm2": 0.8476912474155754,
+      "playableCatchmentRadiusKm": 0.519450194420839,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.7755807293440986,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 11.605172296232878,
+            "latitude": 52.14756781126332,
+            "massShare": 1,
+            "assignedMass": 525600,
+            "assignedPointCount": 2902,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

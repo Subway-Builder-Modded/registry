@@ -47,7 +47,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "FRB.pmtiles": 25.61,
+    "buildings_index.bin.gz": 9.51,
+    "config.json": 0,
+    "demand_data.json.gz": 0.1,
+    "ocean_depth_index.json.gz": 1.07,
+    "ocean_depth_index_contours.json.gz": 0.67,
+    "roads.geojson.gz": 1.64,
+    "runways_taxiways.geojson.gz": 0.02
+  },
   "included_cities": [
     "Emmendingen",
     "Bad Krozingen",
@@ -55,5 +64,83 @@
     "Müllheim",
     "Denzlingen",
     "Kirchzarten"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.18591992117600986,
+      "p75": 0.1867031036811476,
+      "p90": 0.3346379500777069,
+      "mean": 0.18218598806613984
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.18554990567300225,
+      "p75": 0.2779877005835794,
+      "p90": 0.6019151527905544,
+      "mean": 0.19434809417079002
+    },
+    "commuteDistanceKm": {
+      "p10": 11530,
+      "p25": 16163,
+      "p50": 21638,
+      "p75": 29500,
+      "p90": 39827,
+      "mean": 23500.86693178342
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 500,
+      "p90": 900,
+      "mean": 417.48737373737373
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 600,
+      "p90": 1100,
+      "mean": 596.8354430379746
+    },
+    "detail": {
+      "radiusKm": 0.18573482128276497,
+      "expectedPointSpacingKm": 0.5317346500521622,
+      "normalizedRadius": 0.3492998270181278,
+      "activityPerPoint": 102.52447980416157,
+      "playableAreaKm2": 1660,
+      "playableAreaPerPointKm2": 0.5079559363525091,
+      "playableCatchmentRadiusKm": 0.40210371334613165,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.8459252383172862,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 7.787783875242501,
+            "latitude": 48.00221355372332,
+            "massShare": 1,
+            "assignedMass": 670100,
+            "assignedPointCount": 3268,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

@@ -47,12 +47,99 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "AUG.pmtiles": 13,
+    "buildings_index.bin.gz": 6.73,
+    "config.json": 0,
+    "demand_data.json.gz": 0.07,
+    "ocean_depth_index.json.gz": 0.26,
+    "ocean_depth_index_contours.json.gz": 0.17,
+    "roads.geojson.gz": 1.07,
+    "runways_taxiways.geojson.gz": 0.03
+  },
   "included_cities": [
     "Neusäß",
     "Gersthofen",
     "Stadtbergen",
     "Friedberg",
     "Königsbrunn"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.18468120694229062,
+      "p75": 0.18500734952130732,
+      "p90": 0.3336751520896186,
+      "mean": 0.1719335015905962
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.18449074661622716,
+      "p75": 0.1850345074753118,
+      "p90": 0.46733309046195415,
+      "mean": 0.16887297980525517
+    },
+    "commuteDistanceKm": {
+      "p10": 5460,
+      "p25": 9589,
+      "p50": 15456,
+      "p75": 19536,
+      "p90": 23691,
+      "mean": 15120.126201420811
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 300,
+      "p75": 700,
+      "p90": 1450,
+      "mean": 561.600928074246
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 300,
+      "p75": 800,
+      "p90": 1300,
+      "mean": 714.4117647058823
+    },
+    "detail": {
+      "radiusKm": 0.18458595221405436,
+      "expectedPointSpacingKm": 0.458174272654126,
+      "normalizedRadius": 0.40287280022245503,
+      "activityPerPoint": 103.98642917726887,
+      "playableAreaKm2": 772,
+      "playableAreaPerPointKm2": 0.3273960983884648,
+      "playableCatchmentRadiusKm": 0.32282102598041745,
+      "localityScore": 0.8510392332291631,
+      "deaggregationScore": 1,
+      "score": 0.9225178769157609
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.6388261402701731,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 10.896797636623166,
+            "latitude": 48.35407103588907,
+            "massShare": 1,
+            "assignedMass": 490400,
+            "assignedPointCount": 2358,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

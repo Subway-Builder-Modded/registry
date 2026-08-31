@@ -50,7 +50,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "HBS.pmtiles": 48.99,
+    "buildings_index.bin.gz": 26.55,
+    "config.json": 0,
+    "demand_data.json.gz": 0.26,
+    "ocean_depth_index.json.gz": 1.01,
+    "ocean_depth_index_contours.json.gz": 0.61,
+    "roads.geojson.gz": 3.12,
+    "runways_taxiways.geojson.gz": 0.11
+  },
   "included_cities": [
     "Braunschweig",
     "Wolfsburg",
@@ -59,5 +68,91 @@
     "Laatzen",
     "Lehrte",
     "Burgdorf"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.16981459154398662,
+      "p75": 0.17053392795922348,
+      "p90": 0.3257892277787045,
+      "mean": 0.1775417409712773
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.16948789282597854,
+      "p75": 0.17047644815122662,
+      "p90": 0.41873986693339177,
+      "mean": 0.16427565132369945
+    },
+    "commuteDistanceKm": {
+      "p10": 13001,
+      "p25": 16641,
+      "p50": 23654,
+      "p75": 35113,
+      "p90": 55099,
+      "mean": 28591.018963807634
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 300,
+      "p75": 500,
+      "p90": 950,
+      "mean": 427.45512143611404
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 300,
+      "p75": 700,
+      "p90": 1200,
+      "mean": 622.4178403755868
+    },
+    "detail": {
+      "radiusKm": 0.16965116354418122,
+      "expectedPointSpacingKm": 0.5021526050260219,
+      "normalizedRadius": 0.33784782125224616,
+      "activityPerPoint": 98.9872962607862,
+      "playableAreaKm2": 3376,
+      "playableAreaPerPointKm2": 0.4046021093000959,
+      "playableCatchmentRadiusKm": 0.3588716363284164,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9239657517796063,
+        "continuousScore": 0.8159848918457473,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.8586768992787293,
+        "largestCenterShare": 0.6378715418608875,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 9.750362615545221,
+            "latitude": 52.36118973332068,
+            "massShare": 0.6378715418608875,
+            "assignedMass": 1053700,
+            "assignedPointCount": 5176,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 10.431790618522234,
+            "latitude": 52.297204065279175,
+            "massShare": 0.36212845813911254,
+            "assignedMass": 598200,
+            "assignedPointCount": 3168,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }

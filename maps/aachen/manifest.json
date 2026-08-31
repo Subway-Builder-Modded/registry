@@ -47,7 +47,16 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "AAC.pmtiles": 22.62,
+    "buildings_index.bin.gz": 13.68,
+    "config.json": 0,
+    "demand_data.json.gz": 0.06,
+    "ocean_depth_index.json.gz": 0.32,
+    "ocean_depth_index_contours.json.gz": 0.22,
+    "roads.geojson.gz": 1,
+    "runways_taxiways.geojson.gz": 0.02
+  },
   "included_cities": [
     "Würselen",
     "Eschweiler",
@@ -55,5 +64,83 @@
     "Herzogenrath",
     "Alsdorf",
     "Baesweiler"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0.1752259702654167,
+      "p50": 0.17573396862664387,
+      "p75": 0.2779877005835794,
+      "p90": 0.35096018239285015,
+      "mean": 0.20473897167105
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0,
+      "p25": 0,
+      "p50": 0.1756399683780149,
+      "p75": 0.4714160373721682,
+      "p90": 0.6061467473659855,
+      "mean": 0.23959524592098722
+    },
+    "commuteDistanceKm": {
+      "p10": 3030,
+      "p25": 9724,
+      "p50": 16909,
+      "p75": 22457,
+      "p90": 27861,
+      "mean": 16534.445046821093
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 500,
+      "p90": 800,
+      "mean": 412.6195028680688
+    },
+    "workerCellDensity": {
+      "p10": 100,
+      "p25": 100,
+      "p50": 200,
+      "p75": 500,
+      "p90": 1100,
+      "mean": 661.6564417177914
+    },
+    "detail": {
+      "radiusKm": 0.1756869622155463,
+      "expectedPointSpacingKm": 0.5339299961306674,
+      "normalizedRadius": 0.3290449375175222,
+      "activityPerPoint": 106.9423929098966,
+      "playableAreaKm2": 756,
+      "playableAreaPerPointKm2": 0.3722304283604136,
+      "playableCatchmentRadiusKm": 0.3442159573371736,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.6511625538279552,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 6.132040385819522,
+            "latitude": 50.80850472651933,
+            "massShare": 1,
+            "assignedMass": 434400,
+            "assignedPointCount": 2031,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788048000
 }
