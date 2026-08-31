@@ -4,7 +4,7 @@
     "advanced-analytics": {
       "target-1.1.0": {
         "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-31T00:00:48.631Z",
+        "last_checked_at": "2026-08-31T04:00:51.182Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -18,7 +18,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-31T00:00:48.631Z",
+          "checked_at": "2026-08-31T04:00:51.182Z",
           "released_at": "2026-03-02T23:15:42.000Z"
         }
       },
@@ -2630,7 +2630,7 @@
     "dantrains-abridged": {
       "v1.0": {
         "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.0:dantrains-abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-31T00:00:48.631Z",
+        "last_checked_at": "2026-08-31T04:00:51.182Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2644,13 +2644,13 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.0:dantrains-abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-31T00:00:48.631Z",
+          "checked_at": "2026-08-31T04:00:51.182Z",
           "released_at": "2026-07-18T05:05:08.000Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.1:danTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-31T00:00:48.631Z",
+        "last_checked_at": "2026-08-31T04:00:51.182Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2664,7 +2664,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.1:danTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-31T00:00:48.631Z",
+          "checked_at": "2026-08-31T04:00:51.182Z",
           "released_at": "2026-07-19T04:42:34.000Z"
         }
       },
@@ -5394,25 +5394,47 @@
       }
     },
     "noah-great-society": {
-      "Tag": {
-        "fingerprint": "rules:v6:github:noahgarrf/great-society-subway-train:Tag:Noah.s.Great.Society.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-31T00:00:48.631Z",
+      "1.0.0": {
+        "fingerprint": "rules:v6:github:noahgarrf/great-society-subway-train:1.0.0:Noah.s.Great.Society.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-08-31T04:00:51.182Z",
         "result": {
           "is_complete": false,
           "errors": [
-            "non-semver release tag 'Tag'"
+            "asset 'Noah.s.Great.Society.zip': missing top-level manifest.json in ZIP",
+            "asset 'Noah.s.Great.Society.zip': manifest.json version '(missing)' does not match release tag '1.0.0' (expected '1.0.0')"
           ],
-          "required_checks": {},
-          "matched_files": {},
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": false,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": false
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": null,
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": null
+          },
+          "release_size": 0,
+          "game_version": "<=1.6.13",
           "source": {
             "update_type": "github",
             "repo": "noahgarrf/great-society-subway-train",
-            "tag": "Tag"
+            "tag": "1.0.0",
+            "asset_name": "Noah.s.Great.Society.zip",
+            "download_url": "https://github.com/NoahGarrf/Great-Society-Subway-Train/releases/download/1.0.0/Noah.s.Great.Society.zip"
           },
-          "fingerprint": "rules:v6:github:noahgarrf/great-society-subway-train:Tag:Noah.s.Great.Society.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-31T00:00:48.631Z",
+          "fingerprint": "rules:v6:github:noahgarrf/great-society-subway-train:1.0.0:Noah.s.Great.Society.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-08-31T04:00:51.182Z",
           "released_at": "2026-08-30T15:47:00.000Z"
-        }
+        },
+        "asset_sizes": {
+          "Noah.s.Great.Society.zip": 1486
+        },
+        "asset_updated_at": {
+          "Noah.s.Great.Society.zip": "2026-08-30T16:19:11Z"
+        },
+        "manifest_asset_updated_at": "2026-08-30T16:19:15Z"
       }
     },
     "orbital-surveyor": {
@@ -8149,7 +8171,7 @@
       },
       "v1.0": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-31T00:00:48.631Z",
+        "last_checked_at": "2026-08-31T04:00:51.182Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -8163,13 +8185,13 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-31T00:00:48.631Z",
+          "checked_at": "2026-08-31T04:00:51.182Z",
           "released_at": "2026-03-01T14:52:46.000Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-08-31T00:00:48.631Z",
+        "last_checked_at": "2026-08-31T04:00:51.182Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -8183,7 +8205,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-08-31T00:00:48.631Z",
+          "checked_at": "2026-08-31T04:00:51.182Z",
           "released_at": "2026-03-08T08:01:18.000Z"
         }
       }
