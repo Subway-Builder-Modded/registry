@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "magdeburg",
+  "answers": {
+    "workplace_count": "physical_inferred",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "binary_split",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_125",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "structured_marginals",
+    "od_granularity": "adm3"
+  },
+  "notes": "Maintainer backfill (2026-09-01) from pierreggt's declared shared DE pipeline (data-quality issue #9459, 'muenchen + german maps'; the author confirmed the wave shares the muenchen methodology — leipzig-halle explicitly excluded). Answers copied from the reviewed muenchen anchor (confirmed low 0.41, reviewed 2026-08-30): Zensus 2022 100 m population grid (Destatis) aggregated to Bezirk/Gemeinde zones and respread onto Overture residential footprints with generic weights; real Beschaeftigte-am-Arbeitsort totals (Statistik 13111, regionalstatistik.de) anchoring the map's core municipalities, with OSM economic-POI density routing inside each municipality (binary_split per the muenchen/tehran POI-signal ruling); real Pendlerrechnung O-D tables (Statistik 19321) covering the defining core-municipality flows only (structured_marginals per the bale partial-coverage precedent). See maps/muenchen/data-quality.json for the anchor's full reviewed notes; the per-map core-municipality anchor lists live with the author's #9459 declaration.",
+  "sources": [
+    "https://www.regionalstatistik.de/genesis/online",
+    "https://www.zensus2022.de/DE/Ergebnisse-des-Zensus/_inhalt.html",
+    "https://overturemaps.org",
+    "https://www.openstreetmap.org"
+  ],
+  "provenance": {
+    "method": "backfill",
+    "submitted_by": "pierreggt",
+    "reviewed_by": "ahkimn",
+    "date": "2026-09-01"
+  }
+}
