@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "delhi",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "synthetic_measured_marginals",
+    "od_granularity": null
+  },
+  "notes": "Population disaggregated from WorldPop 2020 raster, calibrated to SHRUG (2013 Economic Census) and Census 2011 population and employment totals. Job counts originate from India's 2013 Economic Census (an establishment-level enumeration at each unit's physical location, not a registered-address business register), aggregated via SHRUG; spatial placement within SHRUG's reporting units uses OSM landuse polygons (industrial, retail, commercial, education) weighted by category with standard priors. Commute flows are estimated via a gravity model, then rebalanced so each area's flows sum to its measured SHRUG population/employment totals; the real 2011 Census B-28 distance-band distribution (state-level) was used to fit the gravity decay exponent, though it does not provide per-area origin-destination totals. Gravity model validated at 0% drop rate; residence/job points disaggregated to fine grid preserving total population exactly.",
+  "sources": [
+    "https://hub.worldpop.org/geodata/summary?id=41746",
+    "https://www.devdatalab.org/shrug",
+    "https://shrug-assets-ddl.s3.amazonaws.com/static/main/assets/other/shrug-codebook.pdf",
+    "https://censusindia.gov.in/nada/index.php/catalog/13954",
+    "https://download.geofabrik.de/asia/india.html"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "ryandicicco",
+    "reviewed_by": null,
+    "date": "2026-09-01"
+  }
+}
