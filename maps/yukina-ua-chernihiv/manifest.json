@@ -24,10 +24,10 @@
   },
   "city_code": "CEJ",
   "country": "UA",
-  "population": 312359,
-  "residents_total": 312359,
-  "points_count": 10516,
-  "population_count": 16579,
+  "population": 312603,
+  "residents_total": 312603,
+  "points_count": 10548,
+  "population_count": 16595,
   "initial_view_state": {
     "latitude": 51.472829,
     "longitude": 31.418574,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 12,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.24,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.64,
+    ".railyard_map/regions/ua-raions.geojson.gz": 1.11,
     ".railyard_map/special_demand_points.json": 0.04,
     ".railyard_map/special_demand_types.json": 0.07,
     "CEJ.pmtiles": 47.01,
     "buildings_index.bin.gz": 32.62,
     "buildings_index.json": 83.29,
     "config.json": 0.01,
-    "demand_data.json": 3.39,
-    "driving_paths.json.gz": 5.71,
+    "demand_data.json": 3.24,
+    "driving_paths.json.gz": 5.61,
     "ocean_depth_index.json": 33.43,
     "roads.geojson": 5.66,
     "runways_taxiways.geojson": 0.19
@@ -108,5 +112,83 @@
     "Нежын",
     "Nižyn",
     "Նեժին"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.10843281772742212,
+      "p25": 0.11572578769399594,
+      "p50": 0.13844544926664293,
+      "p75": 0.17642349338064114,
+      "p90": 0.2545992717825311,
+      "mean": 0.17509521529345384
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.10868919914042534,
+      "p25": 0.12111792309905037,
+      "p50": 0.14368289030913703,
+      "p75": 0.17519467194535543,
+      "p90": 0.24895806066456402,
+      "mean": 0.1720094672087154
+    },
+    "commuteDistanceKm": {
+      "p10": 1410,
+      "p25": 4019,
+      "p50": 13770,
+      "p75": 41101,
+      "p90": 69867,
+      "mean": 26867.28930400723
+    },
+    "residentCellDensity": {
+      "p10": 12,
+      "p25": 17,
+      "p50": 32,
+      "p75": 68,
+      "p90": 168,
+      "mean": 117.32507507507508
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 15,
+      "p50": 27,
+      "p75": 69,
+      "p90": 253,
+      "mean": 186.07321428571427
+    },
+    "detail": {
+      "radiusKm": 0.14103986068051205,
+      "expectedPointSpacingKm": 0.525063876425418,
+      "normalizedRadius": 0.2686146714961563,
+      "activityPerPoint": 29.63623435722412,
+      "playableAreaKm2": 6892,
+      "playableAreaPerPointKm2": 0.6533940083428138,
+      "playableCatchmentRadiusKm": 0.4560501863049415,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.7845905185436447,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 31.401306852184728,
+            "latitude": 51.461610239308534,
+            "massShare": 1,
+            "assignedMass": 625206,
+            "assignedPointCount": 10548,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

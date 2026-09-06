@@ -25,10 +25,10 @@
   },
   "city_code": "KBP",
   "country": "UA",
-  "population": 2511639,
-  "residents_total": 2511639,
-  "points_count": 29293,
-  "population_count": 70307,
+  "population": 2513143,
+  "residents_total": 2513143,
+  "points_count": 29373,
+  "population_count": 70347,
   "initial_view_state": {
     "latitude": 50.397557,
     "longitude": 30.519476,
@@ -47,14 +47,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 32.58,
-    ".railyard_map/special_demand_points.json": 0.23,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 4.24,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 5.93,
+    ".railyard_map/regions/ua-raions.geojson.gz": 3.79,
+    ".railyard_map/special_demand_points.json": 0.28,
     ".railyard_map/special_demand_types.json": 0.07,
     "KBP.pmtiles": 130.71,
     "buildings_index.bin.gz": 112.16,
     "buildings_index.json": 286.13,
     "config.json": 0.02,
-    "demand_data.json": 12.9,
-    "driving_paths.json.gz": 15.36,
+    "demand_data.json": 12.51,
+    "driving_paths.json.gz": 15.18,
     "ocean_depth_index.json": 81.88,
     "roads.geojson": 22.57,
     "runways_taxiways.geojson": 1.52
@@ -69,61 +73,61 @@
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.11441385242432797,
-      "p25": 0.11984541247224204,
-      "p50": 0.13254033688497072,
-      "p75": 0.16402263513601742,
-      "p90": 0.20127810220982428,
-      "mean": 0.1551808074585624
+      "p10": 0.16517777194691796,
+      "p25": 0.18169547589842489,
+      "p50": 0.2097280380427031,
+      "p75": 0.2439007711599693,
+      "p90": 0.28299996689459284,
+      "mean": 0.22648241630845242
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.11378752385235795,
-      "p25": 0.12255091829187262,
-      "p50": 0.14282167101924098,
-      "p75": 0.18597075518610803,
-      "p90": 0.25355807365051936,
-      "mean": 0.17021436095251596
+      "p10": 0.14825616665725969,
+      "p25": 0.1777101247697398,
+      "p50": 0.2024431492462412,
+      "p75": 0.23279116447761095,
+      "p90": 0.2707515217790753,
+      "mean": 0.20960254775448178
     },
     "commuteDistanceKm": {
-      "p10": 5825,
-      "p25": 10089,
-      "p50": 16952,
-      "p75": 30885,
-      "p90": 51175,
-      "mean": 23258.925123303216
+      "p10": 3936,
+      "p25": 8400,
+      "p50": 16526,
+      "p75": 33812,
+      "p90": 66705,
+      "mean": 26849.20673234111
     },
     "residentCellDensity": {
       "p10": 19,
-      "p25": 31,
-      "p50": 67,
-      "p75": 222,
-      "p90": 1245,
-      "mean": 498.51760644418874
+      "p25": 28,
+      "p50": 54,
+      "p75": 139,
+      "p90": 598,
+      "mean": 351.1393041777281
     },
     "workerCellDensity": {
-      "p10": 19,
-      "p25": 32,
-      "p50": 78,
-      "p75": 418,
-      "p90": 1817,
-      "mean": 662.6390333435302
+      "p10": 17,
+      "p25": 28,
+      "p50": 75,
+      "p75": 321,
+      "p90": 1533,
+      "mean": 590.7639868359191
     },
     "detail": {
-      "radiusKm": 0.13758500060458864,
-      "expectedPointSpacingKm": 0.4674342464380719,
-      "normalizedRadius": 0.29434086537948306,
-      "activityPerPoint": 95.11596557477826,
-      "playableAreaKm2": 8320,
-      "playableAreaPerPointKm2": 0.3653288838148766,
-      "playableCatchmentRadiusKm": 0.34100996382329457,
-      "localityScore": 1,
+      "radiusKm": 0.2060534020748027,
+      "expectedPointSpacingKm": 0.5250345908813034,
+      "normalizedRadius": 0.3924568126624365,
+      "activityPerPoint": 85.559629591802,
+      "playableAreaKm2": 15680,
+      "playableAreaPerPointKm2": 0.5338235794777517,
+      "playableCatchmentRadiusKm": 0.4122151414319795,
+      "localityScore": 0.8787739552565426,
       "deaggregationScore": 1,
-      "score": 1
+      "score": 0.9374294401481866
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.6890621682413937,
+        "continuousScore": 0.6935263724920784,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -133,18 +137,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 30.50451742275013,
-            "latitude": 50.43554296215493,
+            "longitude": 30.524430801297203,
+            "latitude": 50.399699996158226,
             "massShare": 1,
-            "assignedMass": 4332342,
-            "assignedPointCount": 22774,
+            "assignedMass": 5026286,
+            "assignedPointCount": 29373,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783468800,
+  "last_updated": 1788652800,
   "search_aliases": [
     "Kijev",
     "Kyiv",

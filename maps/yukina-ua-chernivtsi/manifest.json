@@ -24,10 +24,10 @@
   },
   "city_code": "CWC",
   "country": "UA",
-  "population": 405298,
-  "residents_total": 405298,
-  "points_count": 13291,
-  "population_count": 18690,
+  "population": 405624,
+  "residents_total": 405624,
+  "points_count": 13331,
+  "population_count": 18710,
   "initial_view_state": {
     "latitude": 48.286308,
     "longitude": 25.887668,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 36.51,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.22,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.6,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.31,
     ".railyard_map/special_demand_points.json": 0.04,
     ".railyard_map/special_demand_types.json": 0.07,
     "CWC.pmtiles": 71.95,
     "buildings_index.bin.gz": 50.11,
     "buildings_index.json": 127.58,
     "config.json": 0.01,
-    "demand_data.json": 3.99,
-    "driving_paths.json.gz": 10.34,
+    "demand_data.json": 3.78,
+    "driving_paths.json.gz": 10.19,
     "ocean_depth_index.json": 54.38,
     "roads.geojson": 9.23,
     "runways_taxiways.geojson": 0.14
@@ -96,5 +100,83 @@
     "Čerņivci",
     "Chernovsi",
     "Cernovizza"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1441248303851529,
+      "p25": 0.14973071482392777,
+      "p50": 0.1810187984881207,
+      "p75": 0.2298315283803959,
+      "p90": 0.3109331363323644,
+      "mean": 0.21602099241229594
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.12018843944534557,
+      "p25": 0.1502022772655509,
+      "p50": 0.17793482224554716,
+      "p75": 0.21211292281387126,
+      "p90": 0.26029162075980855,
+      "mean": 0.19613029911901028
+    },
+    "commuteDistanceKm": {
+      "p10": 1143,
+      "p25": 3657,
+      "p50": 10599,
+      "p75": 32436,
+      "p90": 51990,
+      "mean": 20382.587814003207
+    },
+    "residentCellDensity": {
+      "p10": 20,
+      "p25": 32,
+      "p50": 67,
+      "p75": 135,
+      "p90": 252,
+      "mean": 131.26707672385885
+    },
+    "workerCellDensity": {
+      "p10": 18,
+      "p25": 25,
+      "p50": 45,
+      "p75": 104,
+      "p90": 266,
+      "mean": 203.65409753645048
+    },
+    "detail": {
+      "radiusKm": 0.17947018619282223,
+      "expectedPointSpacingKm": 0.49926808631120373,
+      "normalizedRadius": 0.35946656939124866,
+      "activityPerPoint": 30.427124746830696,
+      "playableAreaKm2": 5608,
+      "playableAreaPerPointKm2": 0.42067361788312957,
+      "playableCatchmentRadiusKm": 0.3659297356445666,
+      "localityScore": 0.9717426032501281,
+      "deaggregationScore": 1,
+      "score": 0.9857700559715374
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 25.89443901926904,
+            "latitude": 48.28847594522636,
+            "massShare": 1,
+            "assignedMass": 811248,
+            "assignedPointCount": 13331,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

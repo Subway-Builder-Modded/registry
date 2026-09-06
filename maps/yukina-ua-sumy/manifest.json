@@ -23,10 +23,10 @@
   },
   "city_code": "UMY",
   "country": "UA",
-  "population": 306821,
-  "residents_total": 306821,
-  "points_count": 10786,
-  "population_count": 16026,
+  "population": 307184,
+  "residents_total": 307184,
+  "points_count": 10818,
+  "population_count": 16042,
   "initial_view_state": {
     "latitude": 50.778988,
     "longitude": 34.785639,
@@ -43,14 +43,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 36.04,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.13,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.54,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.97,
     ".railyard_map/special_demand_points.json": 0.03,
     ".railyard_map/special_demand_types.json": 0.07,
     "UMY.pmtiles": 49.56,
     "buildings_index.bin.gz": 32.9,
     "buildings_index.json": 84.62,
     "config.json": 0.01,
-    "demand_data.json": 3.33,
-    "driving_paths.json.gz": 4.87,
+    "demand_data.json": 3.18,
+    "driving_paths.json.gz": 4.78,
     "ocean_depth_index.json": 31.7,
     "roads.geojson": 5.29,
     "runways_taxiways.geojson": 0.06
@@ -102,5 +106,83 @@
     "Łebedyn",
     "列別金",
     "Lebedin"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1082778396393771,
+      "p25": 0.11798073505951624,
+      "p50": 0.14094622019303002,
+      "p75": 0.18144376980137178,
+      "p90": 0.27129980538822174,
+      "mean": 0.17762278452374688
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.10702024623295432,
+      "p25": 0.11972232613159238,
+      "p50": 0.14527305352246625,
+      "p75": 0.18414013563219914,
+      "p90": 0.25272342439092466,
+      "mean": 0.1736884223493628
+    },
+    "commuteDistanceKm": {
+      "p10": 842,
+      "p25": 2920,
+      "p50": 7139,
+      "p75": 21850,
+      "p90": 53025,
+      "mean": 17545.231454930807
+    },
+    "residentCellDensity": {
+      "p10": 11,
+      "p25": 17,
+      "p50": 32,
+      "p75": 66,
+      "p90": 164,
+      "mean": 112.21856725146199
+    },
+    "workerCellDensity": {
+      "p10": 9,
+      "p25": 14,
+      "p50": 27,
+      "p75": 76,
+      "p90": 285,
+      "mean": 172.0918767507003
+    },
+    "detail": {
+      "radiusKm": 0.14309328352473907,
+      "expectedPointSpacingKm": 0.526870857726085,
+      "normalizedRadius": 0.2715908109670622,
+      "activityPerPoint": 28.395636901460527,
+      "playableAreaKm2": 6912,
+      "playableAreaPerPointKm2": 0.6389351081530782,
+      "playableCatchmentRadiusKm": 0.45097600995511317,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.5533130732916401,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 34.78981738820391,
+            "latitude": 50.79862956919953,
+            "massShare": 1,
+            "assignedMass": 614368,
+            "assignedPointCount": 10818,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

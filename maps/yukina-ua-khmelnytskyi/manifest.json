@@ -23,10 +23,10 @@
   },
   "city_code": "HMJ",
   "country": "UA",
-  "population": 352753,
-  "residents_total": 352753,
-  "points_count": 9242,
-  "population_count": 14114,
+  "population": 353052,
+  "residents_total": 353052,
+  "points_count": 9270,
+  "population_count": 14128,
   "initial_view_state": {
     "latitude": 49.421991,
     "longitude": 26.956737,
@@ -43,14 +43,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 13.78,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 2.41,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 3.03,
+    ".railyard_map/regions/ua-raions.geojson.gz": 1.73,
     ".railyard_map/special_demand_points.json": 0.03,
     ".railyard_map/special_demand_types.json": 0.07,
     "HMJ.pmtiles": 48.53,
     "buildings_index.bin.gz": 33.31,
     "buildings_index.json": 84.61,
     "config.json": 0.01,
-    "demand_data.json": 2.92,
-    "driving_paths.json.gz": 5.39,
+    "demand_data.json": 2.77,
+    "driving_paths.json.gz": 5.31,
     "ocean_depth_index.json": 37.13,
     "roads.geojson": 8.49,
     "runways_taxiways.geojson": 0.2
@@ -80,5 +84,83 @@
     "Khmel'nyts'kyy",
     "フメリニツキー",
     "Chmel'nyc'kyj"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1459136665670555,
+      "p25": 0.1551707154695062,
+      "p50": 0.18789866367475755,
+      "p75": 0.23616174384972444,
+      "p90": 0.35900428293478737,
+      "mean": 0.23537595303864206
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.14599218579540973,
+      "p25": 0.15962247493957252,
+      "p50": 0.18482047578410368,
+      "p75": 0.2275528115891168,
+      "p90": 0.28225550500681656,
+      "mean": 0.21358022595856532
+    },
+    "commuteDistanceKm": {
+      "p10": 939,
+      "p25": 3060,
+      "p50": 8333,
+      "p75": 26837,
+      "p90": 56234,
+      "mean": 19528.11940826727
+    },
+    "residentCellDensity": {
+      "p10": 18,
+      "p25": 25,
+      "p50": 42,
+      "p75": 84,
+      "p90": 197,
+      "mean": 124.2718309859155
+    },
+    "workerCellDensity": {
+      "p10": 15,
+      "p25": 22,
+      "p50": 36,
+      "p75": 81,
+      "p90": 265,
+      "mean": 183.85052083333332
+    },
+    "detail": {
+      "radiusKm": 0.1863532141380072,
+      "expectedPointSpacingKm": 0.5854215973142277,
+      "normalizedRadius": 0.3183230939769741,
+      "activityPerPoint": 38.085436893203884,
+      "playableAreaKm2": 8956,
+      "playableAreaPerPointKm2": 0.9661272923408846,
+      "playableCatchmentRadiusKm": 0.5545519528989875,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.5898869535017983,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 26.963071992157037,
+            "latitude": 49.43600996960223,
+            "massShare": 1,
+            "assignedMass": 706104,
+            "assignedPointCount": 9270,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

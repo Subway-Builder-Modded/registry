@@ -25,10 +25,10 @@
   },
   "city_code": "DNK",
   "country": "UA",
-  "population": 1007294,
-  "residents_total": 1007294,
-  "points_count": 17943,
-  "population_count": 32866,
+  "population": 1007876,
+  "residents_total": 1007876,
+  "points_count": 17997,
+  "population_count": 32893,
   "initial_view_state": {
     "latitude": 48.505128,
     "longitude": 35.012791,
@@ -47,14 +47,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 21.81,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.34,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.81,
+    ".railyard_map/regions/ua-raions.geojson.gz": 1.15,
     ".railyard_map/special_demand_points.json": 0.1,
     ".railyard_map/special_demand_types.json": 0.07,
     "DNK.pmtiles": 89.46,
     "buildings_index.bin.gz": 70.98,
     "buildings_index.json": 183.58,
-    "config.json": 0.01,
-    "demand_data.json": 6.47,
-    "driving_paths.json.gz": 7.63,
+    "config.json": 0.02,
+    "demand_data.json": 6.21,
+    "driving_paths.json.gz": 7.52,
     "ocean_depth_index.json": 62.28,
     "roads.geojson": 10.66,
     "runways_taxiways.geojson": 0.54
@@ -67,82 +71,98 @@
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.10519972582103325,
-      "p25": 0.11145521629520999,
-      "p50": 0.13191762250809982,
-      "p75": 0.1712594863275423,
-      "p90": 0.21296023910202858,
-      "mean": 0.15659078857667985
+      "p10": 0.16442867165067723,
+      "p25": 0.17387578918697535,
+      "p50": 0.2034903732293366,
+      "p75": 0.24013141786476394,
+      "p90": 0.2830999942600336,
+      "mean": 0.22712569614617845
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.10814790016709297,
-      "p25": 0.11584772039615383,
-      "p50": 0.13857505135911924,
-      "p75": 0.19223946786951293,
-      "p90": 0.28299964785866255,
-      "mean": 0.17219532505625504
+      "p10": 0.14729389451537683,
+      "p25": 0.17458669593645082,
+      "p50": 0.1994652831975742,
+      "p75": 0.23737831430014375,
+      "p90": 0.28271038812113264,
+      "mean": 0.2127066181312362
     },
     "commuteDistanceKm": {
-      "p10": 2723,
-      "p25": 5436,
-      "p50": 11011,
-      "p75": 27484,
-      "p90": 48120,
-      "mean": 19061.620362229645
+      "p10": 1356,
+      "p25": 3577,
+      "p50": 8748,
+      "p75": 26330,
+      "p90": 55594,
+      "mean": 19772.050436263034
     },
     "residentCellDensity": {
-      "p10": 20,
-      "p25": 34,
-      "p50": 79,
-      "p75": 250,
-      "p90": 970,
-      "mean": 353.23707817172146
+      "p10": 18,
+      "p25": 28,
+      "p50": 54,
+      "p75": 156,
+      "p90": 548,
+      "mean": 250.63044018900771
     },
     "workerCellDensity": {
-      "p10": 17,
-      "p25": 28,
-      "p50": 73,
-      "p75": 362,
-      "p90": 1645,
-      "mean": 530.4669660038486
+      "p10": 14,
+      "p25": 26,
+      "p50": 72,
+      "p75": 298,
+      "p90": 1181,
+      "mean": 466.2966219342897
     },
     "detail": {
-      "radiusKm": 0.1352053671798307,
-      "expectedPointSpacingKm": 0.4371275776109898,
-      "normalizedRadius": 0.3093041347763082,
-      "activityPerPoint": 59.29576252957625,
-      "playableAreaKm2": 4732,
-      "playableAreaPerPointKm2": 0.3392844339284434,
-      "playableCatchmentRadiusKm": 0.3286298670962435,
-      "localityScore": 1,
+      "radiusKm": 0.201467776391585,
+      "expectedPointSpacingKm": 0.5014841561182009,
+      "normalizedRadius": 0.40174305396021054,
+      "activityPerPoint": 56.00244485191976,
+      "playableAreaKm2": 9544,
+      "playableAreaPerPointKm2": 0.5303106073234428,
+      "playableCatchmentRadiusKm": 0.41085655533188464,
+      "localityScore": 0.8540125302755026,
       "deaggregationScore": 1,
-      "score": 1
+      "score": 0.9241279837097796
     },
     "polycentrism": {
       "activity": {
-        "score": 0,
-        "continuousScore": 0.7161097469887172,
-        "detectedCenterCount": 1,
-        "effectiveCenterCount": 1,
-        "largestCenterShare": 1,
+        "score": 0.898918178775143,
+        "continuousScore": 0.7301582701790776,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.495500524276993,
+        "largestCenterShare": 0.5367808143065218,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 34.96847130113698,
-            "latitude": 48.487274121781766,
-            "massShare": 1,
-            "assignedMass": 1653996,
-            "assignedPointCount": 13947,
+            "longitude": 35.10306673382041,
+            "latitude": 48.4432891009939,
+            "massShare": 0.5367808143065218,
+            "assignedMass": 1082017,
+            "assignedPointCount": 6276,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 35.1937812185946,
+            "latitude": 48.56815356853579,
+            "massShare": 0.2830953410935472,
+            "assignedMass": 570650,
+            "assignedPointCount": 6271,
+            "prominenceRatio": 0.9999113326915358
+          },
+          {
+            "longitude": 34.5237989405263,
+            "latitude": 48.54347116337225,
+            "massShare": 0.18012384459993094,
+            "assignedMass": 363085,
+            "assignedPointCount": 5450,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783468800,
+  "last_updated": 1788652800,
   "search_aliases": [
     "Дніпро",
     "Dnipro",
