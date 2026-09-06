@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "yukina-ua-kropyvnytskyi",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm1",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "adm3",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "prior_informed_synthetic",
+    "od_granularity": null
+  },
+  "notes": "Same-methodology inheritance (2026-09-01): answers and score inherited from the UA wave anchors (yukina-ua-kyiv / yukina-ua-zaporizhzhia et al., reviewed calibration backfilled 2026-07-23) — all 22 eu-maps UA bundles share one pipeline: pre-Feb-2022 Держстат population statistics anchored at hromada/raion grain, GHS GULU R2025A + Overture/OSM building dasymetrics for placement, and gravity O/D under an informed prior (no observed flows). The eu-maps 0.7.3 methodology updates (expanded coverage + demand recalibration) were reviewed and move no rubric factor. Maintainer-authored backfill on the maintainer's own listings; scores stamped via rescore_data on the wave PR.",
+  "provenance": {
+    "method": "backfill",
+    "submitted_by": "ahkimn",
+    "reviewed_by": "ahkimn",
+    "date": "2026-09-01"
+  }
+}
