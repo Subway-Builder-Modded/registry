@@ -25,10 +25,10 @@
   },
   "city_code": "OZH",
   "country": "UA",
-  "population": 712877,
-  "residents_total": 712877,
-  "points_count": 12786,
-  "population_count": 23686,
+  "population": 713557,
+  "residents_total": 713557,
+  "points_count": 12824,
+  "population_count": 23705,
   "initial_view_state": {
     "latitude": 47.719969,
     "longitude": 34.990536,
@@ -47,14 +47,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 13.33,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.03,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.51,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.87,
     ".railyard_map/special_demand_points.json": 0.07,
     ".railyard_map/special_demand_types.json": 0.07,
     "OZH.pmtiles": 62.7,
     "buildings_index.bin.gz": 50.82,
     "buildings_index.json": 132.01,
     "config.json": 0.01,
-    "demand_data.json": 4.66,
-    "driving_paths.json.gz": 7.07,
+    "demand_data.json": 4.46,
+    "driving_paths.json.gz": 6.88,
     "ocean_depth_index.json": 25.96,
     "roads.geojson": 5.47,
     "runways_taxiways.geojson": 0.37
@@ -69,82 +73,106 @@
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.08108635114552269,
-      "p25": 0.09229191659942437,
-      "p50": 0.1122124537236867,
-      "p75": 0.14770735731735957,
-      "p90": 0.18616175170788535,
-      "mean": 0.131422802561953
+      "p10": 0.1644671224596866,
+      "p25": 0.17286677909872636,
+      "p50": 0.19762118163770884,
+      "p75": 0.23147700220761028,
+      "p90": 0.27849352498636387,
+      "mean": 0.22337140650514456
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.08404543104476128,
-      "p25": 0.1000800488908546,
-      "p50": 0.132699747705733,
-      "p75": 0.19209332865015455,
-      "p90": 0.25950145505058353,
-      "mean": 0.16025742853365363
+      "p10": 0.15696784609924683,
+      "p25": 0.17932239899319644,
+      "p50": 0.2009973391435088,
+      "p75": 0.23827172814464,
+      "p90": 0.28049185601711146,
+      "mean": 0.21453965242478318
     },
     "commuteDistanceKm": {
-      "p10": 4758,
-      "p25": 8522,
-      "p50": 14558,
-      "p75": 28506,
-      "p90": 47238,
-      "mean": 22543.777641636036
+      "p10": 3234,
+      "p25": 7431,
+      "p50": 17872,
+      "p75": 48129,
+      "p90": 148094,
+      "mean": 45975.65876397384
     },
     "residentCellDensity": {
-      "p10": 13,
-      "p25": 22,
-      "p50": 56,
-      "p75": 188,
-      "p90": 785,
-      "mean": 292.68849332485695
+      "p10": 19,
+      "p25": 29,
+      "p50": 63,
+      "p75": 170,
+      "p90": 613,
+      "mean": 251.47162495593938
     },
     "workerCellDensity": {
-      "p10": 10,
-      "p25": 20,
-      "p50": 64,
-      "p75": 393,
-      "p90": 1772,
-      "mean": 515.7368421052631
+      "p10": 6,
+      "p25": 21,
+      "p50": 58,
+      "p75": 290,
+      "p90": 1348,
+      "mean": 450.74162981680354
     },
     "detail": {
-      "radiusKm": 0.12202689989741797,
-      "expectedPointSpacingKm": 0.4180681935560642,
-      "normalizedRadius": 0.2918827640521134,
-      "activityPerPoint": 46.91006314931758,
-      "playableAreaKm2": 3424,
-      "playableAreaPerPointKm2": 0.34874719902220414,
-      "playableCatchmentRadiusKm": 0.33318115377024793,
-      "localityScore": 1,
+      "radiusKm": 0.19930211154821095,
+      "expectedPointSpacingKm": 0.49749842082903756,
+      "normalizedRadius": 0.40060853101019184,
+      "activityPerPoint": 55.64231129132876,
+      "playableAreaKm2": 7088,
+      "playableAreaPerPointKm2": 0.5527136618839675,
+      "playableCatchmentRadiusKm": 0.41944513682543977,
+      "localityScore": 0.8570068250107405,
       "deaggregationScore": 1,
-      "score": 1
+      "score": 0.925746631109582
     },
     "polycentrism": {
       "activity": {
-        "score": 0,
-        "continuousScore": 0.384362130274601,
-        "detectedCenterCount": 1,
-        "effectiveCenterCount": 1,
-        "largestCenterShare": 1,
+        "score": 0.9406555619759306,
+        "continuousScore": 0.7075713539508081,
+        "detectedCenterCount": 4,
+        "effectiveCenterCount": 3.3954897134214814,
+        "largestCenterShare": 0.3653744550190104,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 35.16093071091242,
-            "latitude": 47.828484042469185,
-            "massShare": 1,
-            "assignedMass": 921126,
-            "assignedPointCount": 9818,
+            "longitude": 35.27429021944234,
+            "latitude": 47.79046936727396,
+            "massShare": 0.3653744550190104,
+            "assignedMass": 521431,
+            "assignedPointCount": 4668,
+            "prominenceRatio": 0.9963724368214699
+          },
+          {
+            "longitude": 35.095485832957,
+            "latitude": 47.852710193842235,
+            "massShare": 0.3450067759127862,
+            "assignedMass": 492364,
+            "assignedPointCount": 3065,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 34.762750511692055,
+            "latitude": 47.45434969552261,
+            "massShare": 0.14931743364580546,
+            "assignedMass": 213093,
+            "assignedPointCount": 2494,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 34.33406191325797,
+            "latitude": 47.598835371635076,
+            "massShare": 0.14030133542239792,
+            "assignedMass": 200226,
+            "assignedPointCount": 2597,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783468800,
+  "last_updated": 1788652800,
   "search_aliases": [
     "Запоріжжя",
     "Zaporizhzhya",

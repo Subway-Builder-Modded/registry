@@ -24,10 +24,10 @@
   },
   "city_code": "KGO",
   "country": "UA",
-  "population": 252684,
-  "residents_total": 252684,
-  "points_count": 9763,
-  "population_count": 14456,
+  "population": 252898,
+  "residents_total": 252898,
+  "points_count": 9793,
+  "population_count": 14471,
   "initial_view_state": {
     "latitude": 48.521774,
     "longitude": 32.166809,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 22.86,
-    ".railyard_map/special_demand_points.json": 0.03,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.01,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.37,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.9,
+    ".railyard_map/special_demand_points.json": 0.04,
     ".railyard_map/special_demand_types.json": 0.07,
     "KGO.pmtiles": 51.8,
     "buildings_index.bin.gz": 29.63,
     "buildings_index.json": 76.53,
     "config.json": 0.01,
-    "demand_data.json": 3,
-    "driving_paths.json.gz": 4.12,
+    "demand_data.json": 2.87,
+    "driving_paths.json.gz": 4.07,
     "ocean_depth_index.json": 35.57,
     "roads.geojson": 5.32,
     "runways_taxiways.geojson": 0.29
@@ -78,5 +82,83 @@
     "Kropywnyzkyj",
     "Kropyvnytskyi",
     "Kropivnicki"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1093156947154029,
+      "p25": 0.11463074174402423,
+      "p50": 0.13510856330162435,
+      "p75": 0.18204194980437793,
+      "p90": 0.2889100727245253,
+      "mean": 0.18223506674100712
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.10729955522913208,
+      "p25": 0.1177789268396232,
+      "p50": 0.13884657402506337,
+      "p75": 0.18125377809732343,
+      "p90": 0.24726851490834373,
+      "mean": 0.1705679951584438
+    },
+    "commuteDistanceKm": {
+      "p10": 1131,
+      "p25": 3331,
+      "p50": 10884,
+      "p75": 45173,
+      "p90": 79884,
+      "mean": 27927.040702093844
+    },
+    "residentCellDensity": {
+      "p10": 11,
+      "p25": 17,
+      "p50": 30,
+      "p75": 62,
+      "p90": 157,
+      "mean": 107.72688538559864
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 16,
+      "p50": 33,
+      "p75": 82,
+      "p90": 207,
+      "mean": 143.99487471526197
+    },
+    "detail": {
+      "radiusKm": 0.13696481714615233,
+      "expectedPointSpacingKm": 0.519407874389227,
+      "normalizedRadius": 0.2636941484709095,
+      "activityPerPoint": 25.82436434187685,
+      "playableAreaKm2": 6436,
+      "playableAreaPerPointKm2": 0.6572041253956908,
+      "playableCatchmentRadiusKm": 0.45737792945683337,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.7654808005833648,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 32.1638212281494,
+            "latitude": 48.518401961646575,
+            "massShare": 1,
+            "assignedMass": 505796,
+            "assignedPointCount": 9793,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

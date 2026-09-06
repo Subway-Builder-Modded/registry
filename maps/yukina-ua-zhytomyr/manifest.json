@@ -23,10 +23,10 @@
   },
   "city_code": "ZTR",
   "country": "UA",
-  "population": 399016,
-  "residents_total": 399016,
-  "points_count": 10664,
-  "population_count": 15502,
+  "population": 399447,
+  "residents_total": 399447,
+  "points_count": 10696,
+  "population_count": 15518,
   "initial_view_state": {
     "latitude": 50.212578,
     "longitude": 28.694359,
@@ -43,14 +43,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 25.87,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.58,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 2.17,
+    ".railyard_map/regions/ua-raions.geojson.gz": 1.42,
     ".railyard_map/special_demand_points.json": 0.03,
     ".railyard_map/special_demand_types.json": 0.07,
     "ZTR.pmtiles": 56.58,
     "buildings_index.bin.gz": 42.45,
     "buildings_index.json": 107.95,
     "config.json": 0.01,
-    "demand_data.json": 3.24,
-    "driving_paths.json.gz": 4.1,
+    "demand_data.json": 3.09,
+    "driving_paths.json.gz": 4.02,
     "ocean_depth_index.json": 47.77,
     "roads.geojson": 7.26,
     "runways_taxiways.geojson": 0.28
@@ -107,5 +111,83 @@
     "Բերդիչև",
     "베르디치우",
     "Berdyčivas"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.14535710402330307,
+      "p25": 0.15429284586147332,
+      "p50": 0.18542065724844292,
+      "p75": 0.24160873752122186,
+      "p90": 0.38121317800462867,
+      "mean": 0.23922091101183854
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.14364119914389814,
+      "p25": 0.15480346285083083,
+      "p50": 0.18155938655151063,
+      "p75": 0.22084259008346416,
+      "p90": 0.28985664656023424,
+      "mean": 0.2066098449918052
+    },
+    "commuteDistanceKm": {
+      "p10": 1230,
+      "p25": 3320,
+      "p50": 9584,
+      "p75": 32690,
+      "p90": 64629,
+      "mean": 22349.73482407527
+    },
+    "residentCellDensity": {
+      "p10": 17,
+      "p25": 25,
+      "p50": 42,
+      "p75": 81,
+      "p90": 184,
+      "mean": 119.71043165467626
+    },
+    "workerCellDensity": {
+      "p10": 9,
+      "p25": 20,
+      "p50": 40,
+      "p75": 113,
+      "p90": 412,
+      "mean": 220.5554942020983
+    },
+    "detail": {
+      "radiusKm": 0.1834798647917673,
+      "expectedPointSpacingKm": 0.5871982587368385,
+      "normalizedRadius": 0.31246663637331473,
+      "activityPerPoint": 37.34545624532536,
+      "playableAreaKm2": 9332,
+      "playableAreaPerPointKm2": 0.8724756918474196,
+      "playableCatchmentRadiusKm": 0.5269892201649633,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.7388064064743941,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 28.685816529211717,
+            "latitude": 50.20650878453195,
+            "massShare": 1,
+            "assignedMass": 798894,
+            "assignedPointCount": 10696,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

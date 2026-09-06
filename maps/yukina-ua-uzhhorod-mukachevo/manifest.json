@@ -24,10 +24,10 @@
   },
   "city_code": "UDJ",
   "country": "UA",
-  "population": 377065,
-  "residents_total": 377065,
-  "points_count": 13741,
-  "population_count": 20650,
+  "population": 377339,
+  "residents_total": 377339,
+  "points_count": 13783,
+  "population_count": 20671,
   "initial_view_state": {
     "latitude": 48.440468,
     "longitude": 22.666178,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 24.72,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.39,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.76,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.97,
     ".railyard_map/special_demand_points.json": 0.03,
     ".railyard_map/special_demand_types.json": 0.07,
     "UDJ.pmtiles": 48.16,
     "buildings_index.bin.gz": 31.66,
     "buildings_index.json": 81.28,
     "config.json": 0.01,
-    "demand_data.json": 4.29,
-    "driving_paths.json.gz": 7.91,
+    "demand_data.json": 4.08,
+    "driving_paths.json.gz": 7.71,
     "ocean_depth_index.json": 32.2,
     "roads.geojson": 5.08,
     "runways_taxiways.geojson": 0.06
@@ -111,5 +115,91 @@
     "Munkatsch",
     "ムカチェヴォ",
     "Виноградов"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.10518672710762707,
+      "p25": 0.11154008395472846,
+      "p50": 0.12448433956481837,
+      "p75": 0.1537808436211277,
+      "p90": 0.19429291817438682,
+      "mean": 0.14520359512383177
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.10651518874619277,
+      "p25": 0.11817125025416199,
+      "p50": 0.130883562341667,
+      "p75": 0.16332128853105907,
+      "p90": 0.21208192844558552,
+      "mean": 0.15191614861500707
+    },
+    "commuteDistanceKm": {
+      "p10": 768,
+      "p25": 2903,
+      "p50": 7742,
+      "p75": 29947,
+      "p90": 63967,
+      "mean": 20489.03966910164
+    },
+    "residentCellDensity": {
+      "p10": 15,
+      "p25": 28,
+      "p50": 66,
+      "p75": 151,
+      "p90": 332,
+      "mean": 170.78542326844726
+    },
+    "workerCellDensity": {
+      "p10": 13,
+      "p25": 22,
+      "p50": 50,
+      "p75": 135,
+      "p90": 404,
+      "mean": 241.40818937939858
+    },
+    "detail": {
+      "radiusKm": 0.12764385538674844,
+      "expectedPointSpacingKm": 0.4156308923441885,
+      "normalizedRadius": 0.30710868161610366,
+      "activityPerPoint": 27.37713124863963,
+      "playableAreaKm2": 3964,
+      "playableAreaPerPointKm2": 0.28760066748893565,
+      "playableCatchmentRadiusKm": 0.30256591965187574,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9756696916523642,
+        "continuousScore": 0.9995222609165988,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9524951899804988,
+        "largestCenterShare": 0.5779908782288605,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 22.831058970712714,
+            "latitude": 48.35657742185987,
+            "massShare": 0.5779908782288605,
+            "assignedMass": 436197,
+            "assignedPointCount": 10130,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 22.313196368847695,
+            "latitude": 48.615311241982994,
+            "massShare": 0.4220091217711395,
+            "assignedMass": 318481,
+            "assignedPointCount": 3653,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

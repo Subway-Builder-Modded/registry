@@ -23,10 +23,10 @@
   },
   "city_code": "CKC",
   "country": "UA",
-  "population": 407800,
-  "residents_total": 407800,
-  "points_count": 10615,
-  "population_count": 16258,
+  "population": 408157,
+  "residents_total": 408157,
+  "points_count": 10647,
+  "population_count": 16274,
   "initial_view_state": {
     "latitude": 49.433833,
     "longitude": 31.964373,
@@ -43,14 +43,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 23.37,
-    ".railyard_map/special_demand_points.json": 0.04,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.21,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.54,
+    ".railyard_map/regions/ua-raions.geojson.gz": 1.02,
+    ".railyard_map/special_demand_points.json": 0.05,
     ".railyard_map/special_demand_types.json": 0.07,
     "CKC.pmtiles": 59.6,
     "buildings_index.bin.gz": 34.9,
     "buildings_index.json": 89.37,
     "config.json": 0.01,
-    "demand_data.json": 3.36,
-    "driving_paths.json.gz": 4.99,
+    "demand_data.json": 3.2,
+    "driving_paths.json.gz": 4.94,
     "ocean_depth_index.json": 44.76,
     "roads.geojson": 7.41,
     "runways_taxiways.geojson": 0.28
@@ -107,5 +111,83 @@
     "Smiła",
     "斯米拉",
     "Канев"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.14551709629202397,
+      "p25": 0.1551559297948561,
+      "p50": 0.18451830428657337,
+      "p75": 0.23224807113619525,
+      "p90": 0.3301872744154137,
+      "mean": 0.223542620731424
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1454778115593974,
+      "p25": 0.15630824426103926,
+      "p50": 0.18214290081227744,
+      "p75": 0.22532291649160827,
+      "p90": 0.2904462762417942,
+      "mean": 0.2133534995632864
+    },
+    "commuteDistanceKm": {
+      "p10": 931,
+      "p25": 2955,
+      "p50": 8231,
+      "p75": 27426,
+      "p90": 60677,
+      "mean": 20526.42902789726
+    },
+    "residentCellDensity": {
+      "p10": 18,
+      "p25": 27,
+      "p50": 50,
+      "p75": 98,
+      "p90": 232,
+      "mean": 145.83452466047177
+    },
+    "workerCellDensity": {
+      "p10": 18,
+      "p25": 27,
+      "p50": 55,
+      "p75": 142,
+      "p90": 401,
+      "mean": 227.89335566722502
+    },
+    "detail": {
+      "radiusKm": 0.18332675526425204,
+      "expectedPointSpacingKm": 0.5436692180482005,
+      "normalizedRadius": 0.3372027497205088,
+      "activityPerPoint": 38.335399643091954,
+      "playableAreaKm2": 6824,
+      "playableAreaPerPointKm2": 0.6409317178547947,
+      "playableCatchmentRadiusKm": 0.4516800882947367,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.7751729383737288,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 31.965103753126893,
+            "latitude": 49.44352855591354,
+            "massShare": 1,
+            "assignedMass": 816314,
+            "assignedPointCount": 10647,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

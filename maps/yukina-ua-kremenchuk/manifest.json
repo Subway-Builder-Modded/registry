@@ -23,10 +23,10 @@
   },
   "city_code": "KHU",
   "country": "UA",
-  "population": 278818,
-  "residents_total": 278818,
-  "points_count": 11040,
-  "population_count": 15460,
+  "population": 279020,
+  "residents_total": 279020,
+  "points_count": 11072,
+  "population_count": 15476,
   "initial_view_state": {
     "latitude": 49.035928,
     "longitude": 33.42926,
@@ -43,14 +43,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 14.62,
-    ".railyard_map/special_demand_points.json": 0.02,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 0.9,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.26,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.78,
+    ".railyard_map/special_demand_points.json": 0.03,
     ".railyard_map/special_demand_types.json": 0.07,
     "KHU.pmtiles": 51.49,
     "buildings_index.bin.gz": 34.33,
     "buildings_index.json": 88.59,
     "config.json": 0.01,
-    "demand_data.json": 3.28,
-    "driving_paths.json.gz": 4.62,
+    "demand_data.json": 3.13,
+    "driving_paths.json.gz": 4.53,
     "ocean_depth_index.json": 36.9,
     "roads.geojson": 5.39,
     "runways_taxiways.geojson": 0.63
@@ -108,5 +112,83 @@
     "콤소몰시크",
     "共青城",
     "Горишние Плавни"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1085313103774008,
+      "p25": 0.11483649322921075,
+      "p50": 0.1333401076072973,
+      "p75": 0.1775544699545937,
+      "p90": 0.2667755679306569,
+      "mean": 0.18042314792102776
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.11063711412152462,
+      "p25": 0.12133772374438827,
+      "p50": 0.14644751627587707,
+      "p75": 0.1918294587361552,
+      "p90": 0.2539208863855082,
+      "mean": 0.17897671501034254
+    },
+    "commuteDistanceKm": {
+      "p10": 1253,
+      "p25": 3985,
+      "p50": 12567,
+      "p75": 37184,
+      "p90": 85338,
+      "mean": 29259.9035926596
+    },
+    "residentCellDensity": {
+      "p10": 12,
+      "p25": 18,
+      "p50": 34,
+      "p75": 74,
+      "p90": 187,
+      "mean": 112.99756888168558
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 16,
+      "p50": 34,
+      "p75": 102,
+      "p90": 350,
+      "mean": 163.63284457478005
+    },
+    "detail": {
+      "radiusKm": 0.1397402146092773,
+      "expectedPointSpacingKm": 0.5031511971243138,
+      "normalizedRadius": 0.2777300648551406,
+      "activityPerPoint": 25.20050578034682,
+      "playableAreaKm2": 6560,
+      "playableAreaPerPointKm2": 0.5924855491329479,
+      "playableCatchmentRadiusKm": 0.43427411586467984,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.8675266787394526,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 33.42679104708439,
+            "latitude": 49.04004152368636,
+            "massShare": 1,
+            "assignedMass": 558040,
+            "assignedPointCount": 11072,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

@@ -24,10 +24,10 @@
   },
   "city_code": "PLV",
   "country": "UA",
-  "population": 316998,
-  "residents_total": 316998,
-  "points_count": 11640,
-  "population_count": 17167,
+  "population": 317278,
+  "residents_total": 317278,
+  "points_count": 11674,
+  "population_count": 17184,
   "initial_view_state": {
     "latitude": 49.63754,
     "longitude": 34.514132,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 12.3,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.24,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.73,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.24,
     ".railyard_map/special_demand_points.json": 0.04,
     ".railyard_map/special_demand_types.json": 0.07,
     "PLV.pmtiles": 49,
     "buildings_index.bin.gz": 32.2,
     "buildings_index.json": 82.95,
     "config.json": 0.01,
-    "demand_data.json": 3.58,
-    "driving_paths.json.gz": 4.93,
+    "demand_data.json": 3.41,
+    "driving_paths.json.gz": 4.87,
     "ocean_depth_index.json": 23.92,
     "roads.geojson": 6.95,
     "runways_taxiways.geojson": 0.22
@@ -81,5 +85,83 @@
     "Πολτάβα",
     "ปอลตาวา",
     "Балтавар"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.10706206339448908,
+      "p25": 0.11804816728053397,
+      "p50": 0.13711424119129093,
+      "p75": 0.17977377326479405,
+      "p90": 0.27912612025194233,
+      "mean": 0.1827842531411966
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.10604766700848436,
+      "p25": 0.12078419797620778,
+      "p50": 0.14053344910388169,
+      "p75": 0.17788447910194005,
+      "p90": 0.22909064094051823,
+      "mean": 0.16810630683072145
+    },
+    "commuteDistanceKm": {
+      "p10": 958,
+      "p25": 3144,
+      "p50": 8001,
+      "p75": 22771,
+      "p90": 50539,
+      "mean": 17890.935754189944
+    },
+    "residentCellDensity": {
+      "p10": 11,
+      "p25": 16,
+      "p50": 31,
+      "p75": 68,
+      "p90": 167,
+      "mean": 110.74266759776536
+    },
+    "workerCellDensity": {
+      "p10": 10,
+      "p25": 16,
+      "p50": 32,
+      "p75": 80,
+      "p90": 235,
+      "mean": 166.7159389794845
+    },
+    "detail": {
+      "radiusKm": 0.1388133179341004,
+      "expectedPointSpacingKm": 0.5238037759994119,
+      "normalizedRadius": 0.26501015130951683,
+      "activityPerPoint": 27.178173719376392,
+      "playableAreaKm2": 7808,
+      "playableAreaPerPointKm2": 0.668836731197533,
+      "playableCatchmentRadiusKm": 0.4614080014293481,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.08573152493145896,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 34.51792648010245,
+            "latitude": 49.629087224963534,
+            "massShare": 1,
+            "assignedMass": 634556,
+            "assignedPointCount": 11674,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

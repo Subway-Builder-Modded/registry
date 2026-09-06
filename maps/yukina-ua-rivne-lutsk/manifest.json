@@ -24,10 +24,10 @@
   },
   "city_code": "RWN",
   "country": "UA",
-  "population": 582340,
-  "residents_total": 582340,
-  "points_count": 14581,
-  "population_count": 23515,
+  "population": 582799,
+  "residents_total": 582799,
+  "points_count": 14625,
+  "population_count": 23537,
   "initial_view_state": {
     "latitude": 50.632083,
     "longitude": 25.825954,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 31.73,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.89,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 2.57,
+    ".railyard_map/regions/ua-raions.geojson.gz": 1.61,
     ".railyard_map/special_demand_points.json": 0.06,
     ".railyard_map/special_demand_types.json": 0.07,
     "RWN.pmtiles": 74.82,
     "buildings_index.bin.gz": 52.04,
     "buildings_index.json": 132.8,
     "config.json": 0.01,
-    "demand_data.json": 4.79,
-    "driving_paths.json.gz": 9.57,
+    "demand_data.json": 4.57,
+    "driving_paths.json.gz": 9.42,
     "ocean_depth_index.json": 31.75,
     "roads.geojson": 7.91,
     "runways_taxiways.geojson": 0.29
@@ -109,5 +113,91 @@
     "דובנו",
     "Dubnas",
     "杜布諾"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.1449895951064012,
+      "p25": 0.15355398847522564,
+      "p50": 0.18424522013102815,
+      "p75": 0.2273348343292981,
+      "p90": 0.32668547519600594,
+      "mean": 0.22357175192284293
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.133425869467135,
+      "p25": 0.15236746052790903,
+      "p50": 0.17571197437112598,
+      "p75": 0.2160117020670186,
+      "p90": 0.26027106895217833,
+      "mean": 0.194718165573265
+    },
+    "commuteDistanceKm": {
+      "p10": 1307,
+      "p25": 3641,
+      "p50": 10920,
+      "p75": 43086,
+      "p90": 83160,
+      "mean": 27802.508900879468
+    },
+    "residentCellDensity": {
+      "p10": 19,
+      "p25": 26,
+      "p50": 46,
+      "p75": 90,
+      "p90": 204,
+      "mean": 134.97243456103774
+    },
+    "workerCellDensity": {
+      "p10": 15,
+      "p25": 22,
+      "p50": 44,
+      "p75": 126,
+      "p90": 403,
+      "mean": 237.28827361563518
+    },
+    "detail": {
+      "radiusKm": 0.17992801726708846,
+      "expectedPointSpacingKm": 0.5738459247037878,
+      "normalizedRadius": 0.31354760837582857,
+      "activityPerPoint": 39.84950427350427,
+      "playableAreaKm2": 10484,
+      "playableAreaPerPointKm2": 0.7168547008547008,
+      "playableCatchmentRadiusKm": 0.4776839313179533,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9809873672093912,
+        "continuousScore": 0.9999969028340848,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.962684205909122,
+        "largestCenterShare": 0.5689431519271653,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 26.195467805007414,
+            "latitude": 50.58335678185909,
+            "massShare": 0.5689431519271653,
+            "assignedMass": 663159,
+            "assignedPointCount": 8097,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 25.319377456628626,
+            "latitude": 50.71681427349582,
+            "massShare": 0.43105684807283473,
+            "assignedMass": 502439,
+            "assignedPointCount": 6528,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

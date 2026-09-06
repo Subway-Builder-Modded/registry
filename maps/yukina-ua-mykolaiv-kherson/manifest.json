@@ -24,10 +24,10 @@
   },
   "city_code": "NLV",
   "country": "UA",
-  "population": 779864,
-  "residents_total": 779864,
-  "points_count": 17160,
-  "population_count": 28230,
+  "population": 780623,
+  "residents_total": 780623,
+  "points_count": 17212,
+  "population_count": 28256,
   "initial_view_state": {
     "latitude": 46.812582,
     "longitude": 32.457466,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 29.45,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.14,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.5,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.9,
     ".railyard_map/special_demand_points.json": 0.07,
     ".railyard_map/special_demand_types.json": 0.07,
     "NLV.pmtiles": 84.27,
     "buildings_index.bin.gz": 49.02,
     "buildings_index.json": 126.9,
     "config.json": 0.01,
-    "demand_data.json": 5.71,
-    "driving_paths.json.gz": 61.96,
+    "demand_data.json": 5.47,
+    "driving_paths.json.gz": 62.22,
     "ocean_depth_index.json": 245.42,
     "roads.geojson": 8.03,
     "runways_taxiways.geojson": 0.59
@@ -109,5 +113,91 @@
     "Նովայա Կախովկա",
     "노바카호우카",
     "Naujoji Kachovka"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.14549037075223864,
+      "p25": 0.15432633088342768,
+      "p50": 0.17732978245193726,
+      "p75": 0.21166531847500683,
+      "p90": 0.2540856567103661,
+      "mean": 0.2025755947590138
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.14663062586923392,
+      "p25": 0.1594138782464325,
+      "p50": 0.182418660013219,
+      "p75": 0.21918725555153834,
+      "p90": 0.2697668411797784,
+      "mean": 0.20982355404913575
+    },
+    "commuteDistanceKm": {
+      "p10": 1043,
+      "p25": 3746,
+      "p50": 11872,
+      "p75": 48031,
+      "p90": 504703,
+      "mean": 93022.53733720272
+    },
+    "residentCellDensity": {
+      "p10": 20,
+      "p25": 32,
+      "p50": 66,
+      "p75": 166,
+      "p90": 421,
+      "mean": 222.30569800569802
+    },
+    "workerCellDensity": {
+      "p10": 17,
+      "p25": 28,
+      "p50": 62,
+      "p75": 177,
+      "p90": 550,
+      "mean": 302.20100697134006
+    },
+    "detail": {
+      "radiusKm": 0.17985622395490802,
+      "expectedPointSpacingKm": 0.4829777301276011,
+      "normalizedRadius": 0.37239030442954507,
+      "activityPerPoint": 45.353416221241,
+      "playableAreaKm2": 9156,
+      "playableAreaPerPointKm2": 0.5319544503834535,
+      "playableCatchmentRadiusKm": 0.4114928438703619,
+      "localityScore": 0.934344228888021,
+      "deaggregationScore": 1,
+      "score": 0.9666148296441666
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9635189965745306,
+        "continuousScore": 0.9774902742683895,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9296060356052773,
+        "largestCenterShare": 0.5955000044835984,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 32.270636976480155,
+            "latitude": 46.912512486487465,
+            "massShare": 0.5955000044835984,
+            "assignedMass": 929722,
+            "assignedPointCount": 11182,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 32.71361593398995,
+            "latitude": 46.65794070171696,
+            "massShare": 0.40449999551640164,
+            "assignedMass": 631524,
+            "assignedPointCount": 6030,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

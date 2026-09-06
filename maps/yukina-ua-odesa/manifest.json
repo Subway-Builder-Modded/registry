@@ -26,10 +26,10 @@
   },
   "city_code": "ODS",
   "country": "UA",
-  "population": 938057,
-  "residents_total": 938057,
-  "points_count": 13096,
-  "population_count": 28693,
+  "population": 938521,
+  "residents_total": 938521,
+  "points_count": 13134,
+  "population_count": 28712,
   "initial_view_state": {
     "latitude": 46.482973,
     "longitude": 30.638166,
@@ -49,14 +49,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 13.38,
-    ".railyard_map/special_demand_points.json": 0.1,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 0.96,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 1.19,
+    ".railyard_map/regions/ua-raions.geojson.gz": 0.54,
+    ".railyard_map/special_demand_points.json": 0.11,
     ".railyard_map/special_demand_types.json": 0.07,
     "ODS.pmtiles": 68.57,
     "buildings_index.bin.gz": 50.9,
     "buildings_index.json": 130.21,
-    "config.json": 0.01,
-    "demand_data.json": 5.37,
-    "driving_paths.json.gz": 8.29,
+    "config.json": 0.02,
+    "demand_data.json": 5.17,
+    "driving_paths.json.gz": 8.14,
     "ocean_depth_index.json": 126.21,
     "roads.geojson": 8.01,
     "runways_taxiways.geojson": 0.55
@@ -67,61 +71,61 @@
   ],
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.11014028173573398,
-      "p25": 0.11522914484571935,
-      "p50": 0.1272566395193534,
-      "p75": 0.1568408214930239,
-      "p90": 0.19235189220349827,
-      "mean": 0.14657286122884253
+      "p10": 0.16372034320852205,
+      "p25": 0.1776725380846634,
+      "p50": 0.20475501726965417,
+      "p75": 0.2451454390891497,
+      "p90": 0.2810237784242476,
+      "mean": 0.2207087727865331
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.11161859041205391,
-      "p25": 0.11896329473512096,
-      "p50": 0.1333816347498248,
-      "p75": 0.1697239804701193,
-      "p90": 0.2511427104696057,
-      "mean": 0.16148254953446536
+      "p10": 0.14711985132764815,
+      "p25": 0.17625846948552218,
+      "p50": 0.2025704128202569,
+      "p75": 0.2443978103795061,
+      "p90": 0.28959067642293373,
+      "mean": 0.21523010223524772
     },
     "commuteDistanceKm": {
-      "p10": 3893,
-      "p25": 7623,
-      "p50": 15599,
-      "p75": 37495,
-      "p90": 76720,
-      "mean": 27768.628591033852
+      "p10": 2817,
+      "p25": 6351,
+      "p50": 16137,
+      "p75": 43029,
+      "p90": 87702,
+      "mean": 30775.861347171915
     },
     "residentCellDensity": {
-      "p10": 21,
-      "p25": 35,
-      "p50": 89,
-      "p75": 257,
-      "p90": 887,
-      "mean": 452.4157894736842
+      "p10": 19,
+      "p25": 31,
+      "p50": 68,
+      "p75": 188,
+      "p90": 549,
+      "mean": 345.98856932153393
     },
     "workerCellDensity": {
-      "p10": 17,
-      "p25": 29,
-      "p50": 72,
-      "p75": 283,
-      "p90": 1373,
-      "mean": 561.449379490529
+      "p10": 16,
+      "p25": 25,
+      "p50": 60,
+      "p75": 228,
+      "p90": 1093,
+      "mean": 517.0914600550964
     },
     "detail": {
-      "radiusKm": 0.13028314784292142,
-      "expectedPointSpacingKm": 0.4191184251738196,
-      "normalizedRadius": 0.31085044230372244,
-      "activityPerPoint": 70.07670361917182,
-      "playableAreaKm2": 4156,
-      "playableAreaPerPointKm2": 0.3387675252689925,
-      "playableCatchmentRadiusKm": 0.3283794335995137,
-      "localityScore": 1,
+      "radiusKm": 0.20365978585703332,
+      "expectedPointSpacingKm": 0.48433666071613785,
+      "normalizedRadius": 0.42049219556476053,
+      "activityPerPoint": 71.4573625704279,
+      "playableAreaKm2": 6744,
+      "playableAreaPerPointKm2": 0.5134764732754683,
+      "playableCatchmentRadiusKm": 0.40428286850467526,
+      "localityScore": 0.8057170739963107,
       "deaggregationScore": 1,
-      "score": 1
+      "score": 0.8976174430102786
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.639322116183891,
+        "continuousScore": 0.6036053917871163,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -131,18 +135,18 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 30.68166103236919,
-            "latitude": 46.467765984837186,
+            "longitude": 30.664212434434628,
+            "latitude": 46.48279482821218,
             "massShare": 1,
-            "assignedMass": 1719402,
-            "assignedPointCount": 12268,
+            "assignedMass": 1877042,
+            "assignedPointCount": 13134,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1783468800,
+  "last_updated": 1788652800,
   "search_aliases": [
     "Odesa",
     "Одесса",

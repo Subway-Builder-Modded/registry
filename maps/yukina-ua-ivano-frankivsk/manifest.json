@@ -24,10 +24,10 @@
   },
   "city_code": "IFO",
   "country": "UA",
-  "population": 582815,
-  "residents_total": 582815,
-  "points_count": 15372,
-  "population_count": 24776,
+  "population": 583382,
+  "residents_total": 583382,
+  "points_count": 15418,
+  "population_count": 24799,
   "initial_view_state": {
     "latitude": 48.866361,
     "longitude": 24.702723,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 30.29,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 3.52,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 5.09,
+    ".railyard_map/regions/ua-raions.geojson.gz": 3.14,
     ".railyard_map/special_demand_points.json": 0.06,
     ".railyard_map/special_demand_types.json": 0.07,
     "IFO.pmtiles": 81.32,
     "buildings_index.bin.gz": 53.42,
     "buildings_index.json": 136.18,
     "config.json": 0.01,
-    "demand_data.json": 5.06,
-    "driving_paths.json.gz": 17.12,
+    "demand_data.json": 4.82,
+    "driving_paths.json.gz": 16.89,
     "ocean_depth_index.json": 88.17,
     "roads.geojson": 11.81,
     "runways_taxiways.geojson": 0.22
@@ -96,5 +100,83 @@
     "קולומיאה",
     "Kolomija",
     "Коломија"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.14523781943422034,
+      "p25": 0.15509642589285813,
+      "p50": 0.1841555221596664,
+      "p75": 0.22596021398234492,
+      "p90": 0.2945561042298094,
+      "mean": 0.21388560871589835
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.14319210981812072,
+      "p25": 0.15480094862557311,
+      "p50": 0.1773046389035873,
+      "p75": 0.21364276967908455,
+      "p90": 0.2626396030806692,
+      "mean": 0.1977579068758731
+    },
+    "commuteDistanceKm": {
+      "p10": 2851,
+      "p25": 7929,
+      "p50": 24087,
+      "p75": 47930,
+      "p90": 72833,
+      "mean": 31870.64470341546
+    },
+    "residentCellDensity": {
+      "p10": 20,
+      "p25": 31,
+      "p50": 59,
+      "p75": 116,
+      "p90": 217,
+      "mean": 148.28063040162684
+    },
+    "workerCellDensity": {
+      "p10": 17,
+      "p25": 26,
+      "p50": 53,
+      "p75": 142,
+      "p90": 426,
+      "mean": 252.38295110341843
+    },
+    "detail": {
+      "radiusKm": 0.18069761580779428,
+      "expectedPointSpacingKm": 0.5274289966224291,
+      "normalizedRadius": 0.34260083720264317,
+      "activityPerPoint": 37.8377221429498,
+      "playableAreaKm2": 8264,
+      "playableAreaPerPointKm2": 0.5359968867557401,
+      "playableCatchmentRadiusKm": 0.41305339608588837,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.9999263766818993,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 24.690395506916527,
+            "latitude": 48.865930854336504,
+            "massShare": 1,
+            "assignedMass": 1166764,
+            "assignedPointCount": 15418,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }

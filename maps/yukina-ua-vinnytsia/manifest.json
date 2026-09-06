@@ -24,10 +24,10 @@
   },
   "city_code": "VIN",
   "country": "UA",
-  "population": 521710,
-  "residents_total": 521710,
-  "points_count": 14085,
-  "population_count": 21443,
+  "population": 522171,
+  "residents_total": 522171,
+  "points_count": 14127,
+  "population_count": 21464,
   "initial_view_state": {
     "latitude": 49.262821,
     "longitude": 28.513652,
@@ -45,14 +45,18 @@
   ],
   "file_sizes": {
     ".railyard_map/landuse_provenance.parquet": 28.47,
+    ".railyard_map/regions/manifest.json": 0,
+    ".railyard_map/regions/ua-hromadas.geojson.gz": 1.74,
+    ".railyard_map/regions/ua-naseleni-punkty.geojson.gz": 2.24,
+    ".railyard_map/regions/ua-raions.geojson.gz": 1.57,
     ".railyard_map/special_demand_points.json": 0.05,
     ".railyard_map/special_demand_types.json": 0.07,
     "VIN.pmtiles": 93.23,
     "buildings_index.bin.gz": 56.9,
     "buildings_index.json": 144.7,
     "config.json": 0.01,
-    "demand_data.json": 4.45,
-    "driving_paths.json.gz": 8.38,
+    "demand_data.json": 4.23,
+    "driving_paths.json.gz": 8.27,
     "ocean_depth_index.json": 83.3,
     "roads.geojson": 10.24,
     "runways_taxiways.geojson": 0.23
@@ -90,5 +94,83 @@
     "Şmerinca",
     "Žmerinka",
     "Schmerynka"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.14629435294299828,
+      "p25": 0.16047420225125397,
+      "p50": 0.18979890378937628,
+      "p75": 0.2401047232804725,
+      "p90": 0.36537767296202384,
+      "mean": 0.23257687811407582
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.14493491766318306,
+      "p25": 0.1549253800370894,
+      "p50": 0.18278624572160837,
+      "p75": 0.22199517073246602,
+      "p90": 0.2750704848281751,
+      "mean": 0.20547143191197234
+    },
+    "commuteDistanceKm": {
+      "p10": 1334,
+      "p25": 4358,
+      "p50": 13534,
+      "p75": 38053,
+      "p90": 66784,
+      "mean": 25127.655283265
+    },
+    "residentCellDensity": {
+      "p10": 18,
+      "p25": 26,
+      "p50": 44,
+      "p75": 82,
+      "p90": 169,
+      "mean": 122.93807393454203
+    },
+    "workerCellDensity": {
+      "p10": 16,
+      "p25": 23,
+      "p50": 42,
+      "p75": 90,
+      "p90": 237,
+      "mean": 179.24476484723652
+    },
+    "detail": {
+      "radiusKm": 0.18625957442702598,
+      "expectedPointSpacingKm": 0.5763071784204297,
+      "normalizedRadius": 0.3231949581775732,
+      "activityPerPoint": 36.962624761095775,
+      "playableAreaKm2": 10920,
+      "playableAreaPerPointKm2": 0.7729878955192185,
+      "playableCatchmentRadiusKm": 0.49603395956745777,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.3490450730973852,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 28.51107222420153,
+            "latitude": 49.26474013409783,
+            "massShare": 1,
+            "assignedMass": 1044342,
+            "assignedPointCount": 14127,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1788652800
 }
