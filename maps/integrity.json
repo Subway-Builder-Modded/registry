@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-10T20:01:30.989Z",
+  "generated_at": "2026-09-10T22:39:01.666Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -4900,20 +4900,18 @@
       }
     },
     "cancun-riviera-maya": {
-      "has_complete_version": false,
-      "latest_semver_version": "v1.0.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
-        "v1.0.0"
+      "has_complete_version": true,
+      "latest_semver_version": "v1.0.1",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v1.0.1"
       ],
-      "last_updated": 1788939098,
+      "incomplete_versions": [],
+      "last_updated": 1789079310,
       "versions": {
-        "v1.0.0": {
-          "is_complete": false,
-          "errors": [
-            "asset 'CUR.zip': config.json version '7.1.0' does not match release tag 'v1.0.0' (expected '1.0.0')"
-          ],
+        "v1.0.1": {
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -4924,7 +4922,7 @@
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
             "city_pmtiles": true,
-            "config_version_matches_tag": false
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -4938,20 +4936,32 @@
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
             "city_pmtiles": "CUR.pmtiles",
-            "config_version_matches_tag": null
+            "config_version_matches_tag": "config.json"
           },
-          "release_size": 56.79,
+          "release_size": 62.5,
+          "file_sizes": {
+            "CUR.pmtiles": 25.79,
+            "buildings_index.bin.gz": 15.88,
+            "config.json": 0,
+            "demand_data.json": 26.04,
+            "manifest.json": 0,
+            "ocean_depth_index.json.gz": 10.74,
+            "ocean_depth_index_contours.json.gz": 5.82,
+            "roads.geojson": 9.47,
+            "runways_taxiways.geojson": 0.45,
+            "special_demand_points.json": 0.01
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "github",
             "repo": "meszier83/subway-builder-mexico-maps",
-            "tag": "v1.0.0",
+            "tag": "v1.0.1",
             "asset_name": "CUR.zip",
-            "download_url": "https://github.com/Meszier83/subway-builder-mexico-maps/releases/download/v1.0.0/CUR.zip"
+            "download_url": "https://github.com/Meszier83/subway-builder-mexico-maps/releases/download/v1.0.1/CUR.zip"
           },
-          "fingerprint": "rules:v6:github:meszier83/subway-builder-mexico-maps:v1.0.0:CUR.zip",
-          "checked_at": "2026-09-09T19:18:56.639Z",
-          "released_at": "2026-09-09T07:31:38.000Z"
+          "fingerprint": "rules:v6:github:meszier83/subway-builder-mexico-maps:v1.0.1:CUR.zip",
+          "checked_at": "2026-09-10T22:39:01.666Z",
+          "released_at": "2026-09-10T22:28:30.000Z"
         }
       }
     },
