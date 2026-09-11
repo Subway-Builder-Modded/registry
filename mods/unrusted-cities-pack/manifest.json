@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "id": "unrusted-cities-pack",
+  "name": "Unrusted: An Alternative Rust Belt",
+  "author": "NoahGarrf",
+  "github_id": 217513664,
+  "description": "Back at again, this time I put multiple cities in one mod (Cleveland, STL, Baltimore, Milwaukee) and I'll keep updating and adding more as I go. How does this work? Well it increases demand akin to pre rust (post de industrialization) decline of various rust belt cities:\n\nStep 1. Download the mod and turn it on (duh)\nStep 2. Pick a supported city, open the city and press the lightning button\nStep 3. Wait around 10-30 seconds for demand to generate (game will appear to freeze)\nStep 4. Play the damn game\nStep 5. Make a save so the demand data persists with your save!\nStep 6. idk have fun ig?\n\nYou're a nerd and want technical data? Weirdo but okay, the mod works in 5 stages: First we identify a CBD or CBD corridor, this is where the majority of jobs of our newly generated or modified pops go. Second we identify polygons, basically sections of the city we modify. These are based off census tracts from the 1950s to approximate density. Then we identify special demand points usually just old factories that no longer exist or various universities. Some maps also have \"spoke\" corridors with additional density. Everything is shuffled around to make sure these new points get workers from the whole map and not just the polygons, though the majority are from the polygons (as factory workers generally did infact live in the inner cities). The generation code is shared between all cities but each city has specific config controls to make sure each city has a personal and realistic touch, by that I mean I painstakingly stared at census maps for hours. All in all cool stuff I think?\n \nAnyways this works pretty much the same as my other unrusted mods, Detroit and Chicago (more like chicago really), Detroit was my first and thus very janky in how I did it, I may redo it and put in this mod later. Chicago will probably stay seperate since it is kind of its own beast with a lot of specific codes to it.\n\nTodo list of cities I plan to do or am considering doing in no particular order:\nKansas City, Saint Paul, North Philadelphia and the industrial suburbs (I.E Camden), Pittsburgh, Cincinnati",
+  "tags": [
+    "gameplay",
+    "ui"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/NoahGarrf/Unrusted-An-Alternate-Rust-Belt",
+  "update": {
+    "type": "github",
+    "repo": "NoahGarrf/Unrusted-An-Alternate-Rust-Belt"
+  }
+}
