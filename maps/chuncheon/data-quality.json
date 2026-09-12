@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "chuncheon",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "mesh_250",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "mesh_250"
+  },
+  "notes": "The KTDB (Korea Transport Database) national passenger O/D update rebuilds the base-year (2023) trip matrix and forecasts demand to 2050. Two zone systems are reconciled: 250 si-gun-gu zones nationwide, and finer eup-myeon-dong zones inside six metro areas (Seoul Capital Area, Busan-Ulsan, Daegu, Gwangju, Daejeon-Sejong-Chungcheong, Jeju). Base-year O/D is built mode by mode: bus/rail use actual ridership statistics; private-car and other personal modes go through a five-step expansion combining travel-survey samples, telecom big data, and card/TCS data, with bidirectional and zero-cell corrections. The draft O/D is validated against observed traffic counts via cordon-line/screenline %ERROR checks and FHWA-style assignment validation, iterating until errors meet tolerance. Socioeconomic indicators (population, employment, enrollment, land-use plans) are projected per target year, then a standard four-step model (generation/attraction, distribution, mode split, assignment) is applied consistently across national and regional models to produce future O/D matrices.",
+  "sources": [
+    "- Korean Transportation Database (Korea Transport Institute, KOTI) (ktdb.go.kr)",
+    "- Actual Passenger O/D Download link(wrote in Korean) (https://www.ktdb.go.kr/www/newAddPbldataReqstData.do?key=202&clTy=1)",
+    "- V-world (Ministry of Land, Infrastructure and Transport, MOLIT) (vworld.kr)",
+    "- Statistical Geographic Information System (SGIS) plus (Ministry of Data and Statistics, MODS) (sgis.mods.go.kr)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "budhakr",
+    "reviewed_by": null,
+    "date": "2026-09-12"
+  }
+}
