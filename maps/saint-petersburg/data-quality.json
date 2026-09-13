@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "id": "saint-petersburg",
+  "answers": {
+    "workplace_count": "registered_self_declared",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "working_age",
+    "resident_granularity": "adm4",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "synthetic_measured_marginals",
+    "od_granularity": null
+  },
+  "notes": "Workplace count. Rosstat municipal indicators database (BD PMO), average headcount of organisation employees by OKVED section, 2025. This is P-4 statistical reporting filed by the organisation at the address it declares, so it is filed at the registered rung rather than physical: there is no place-of-work census in Russia. One argument for physical_inferred is offered for the reviewer to weigh: separate subdivisions (obosoblennye podrazdeleniya) file P-4 for their own territory, so Rosstat does allocate multi-site firms to the sites where the work happens. The survey covers large and medium organisations only: 1,565,088 jobs in the city against 2,561,555 in the 2020 census. The remaining ~39% (small business, sole traders, self-employed) is a modelled tier, split across units half by population and half by commercial floor area, with a generic Russian SME sector profile. That tier is the weakest part of this pillar and is the reason the count is not claimed higher. Confidentiality-suppressed sections are scaled back to the published unit total.\n\nWorkplace granularity. Filed at adm3 as the middle of a split grain, bounds recorded per the rubric: employment is published per intra-city municipal okrug for Saint Petersburg (111 units, adm4) but only per municipal rayon for Leningrad oblast (18 units, adm2). Population is available for 283 units; employment for 129.\n\nResident count. Filed at working_age, not employed_residents. Population per unit is real, but the employed share is derived: Petrostat age-sex bulletins give the age structure of each of the 36 districts, and the employed-per-working-age ratio comes from the 2020 census per region (74.2% city, 71.2% oblast). That yields 39.0%-49.8% per district instead of one citywide rate, but it is a proxy, not a measured employed-resident count. Same construction as the TW pipeline.\n\nDasymetric, both pillars. Footprints are OSM only (441,154 in frame): the residential weights depend on building:levels and building:flats, which Overture does not carry. Overture is used for drawing the map, not for placing demand. Intensity for workplaces is a 19 OKVED section x 12 carrier class affinity matrix with m2-per-job norms from SP 118.13330, with per-unit sums constrained to the BD PMO total for that unit and the citywide sector structure checked against Petrostat RAB2540 (1,552,800). Intensity for residents is floor area x per-type density, calibrated against the Petrostat housing stock (158.8 M m2, 2,697,100 flats, 2.10 persons per flat), with building:flats entering as a direct weight where tagged (3,616 buildings of 210,660) - too few to claim measured_per_unit.\n\nO/D. Doubly-constrained gravity with Tanner deterrence, IPF-balanced to both marginals, plus an asymmetric city-oblast border friction fitted to the 2020 census cross-region flow (154,675 inbound, 13,026 outbound); without it the modelled outbound flow overshot the census sevenfold. Both marginals are real and independent of each other: jobs from BD PMO, employed residents from population x age structure. No observed matrix exists at any grain below the region - VPN-2020 volume 10 publishes commuting by subject only - so od_granularity is null.\n\nValidation. Residents against Petrostat by district: 5,689,116 modelled against 5,652,922 published. Jobs inside the city limits: 2,536,953 against 2,561,555 in the census; 1.01 jobs per employed resident against 1.03. Cross-region flow 191,737 modelled against 154,675 in the census, the overshoot explained by the five years between the 2020 census and the 2025 population (Murino 74k to 117k, Kudrovo nearly doubled). Metro ridership per station cross-checked against published figures. Full write-up in docs/spb-demand-model.md; the scoring analysis behind these answers is in docs/DATA_QUALITY.md.\n\nForm mapping. The dropdowns offer no option for OSM footprints combined with locally calibrated per-type densities, so both placement questions are answered with the \"standard assumptions\" wording. That understates the calibration: the per-type densities are not taken from a reference table, they are constrained to each unit's own published total and cross-checked against Petrostat RAB2540 for jobs and the Petrostat housing stock for residents. The option naming \"Official building footprints\" was deliberately not taken, because the footprints are OpenStreetMap and not an authoritative cadastre. Filed rubric values: workplace_resolution osm_footprints, workplace_intensity fine_types_calibrated, resident_resolution osm_footprints, resident_intensity fine_types_calibrated.",
+  "sources": [
+    "https://rosstat.gov.ru/scripts/db_inet2/passport/munr.aspx - Rosstat municipal indicators database (BD PMO): population per municipal unit and average headcount of organisation employees by OKVED section",
+    "https://78.rosstat.gov.ru/folder/27595 - Petrostat: population per municipal unit at 01.01.2024 and 01.01.2025, and age-sex composition bulletins for 2024",
+    "https://rosstat.gov.ru/vpn/2020 - Russian census 2020, volume 10 'Labour force', tables 1-12: commuting marginals",
+    "https://download.geofabrik.de/russia/northwestern-fed-district-latest.osm.pbf - OpenStreetMap via Geofabrik: building footprints, tags, land use and the drive network",
+    "https://monitoring.miccedu.ru/?m=vpo - Ministry of Education monitoring of higher education: full-time enrolment per institution",
+    "https://opendata.mkrf.ru/opendata/7705851331-stat_museum_svod - Ministry of Culture open data, museum returns",
+    "https://opendata.mkrf.ru/opendata/7705851331-stat_theaters_svod - Ministry of Culture open data, theatre returns",
+    "https://pulkovoairport.ru/about/press_center/news/ - Pulkovo airport passenger figures",
+    "https://ru.wikipedia.org/wiki/Пассажиропоток_Петербургского_метрополитена - Saint Petersburg Metro ridership per station, used as an end-to-end cross-check"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "SindieFox",
+    "reviewed_by": null,
+    "date": "2026-09-12"
+  }
+}

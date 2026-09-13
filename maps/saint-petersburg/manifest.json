@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "saint-petersburg",
+  "name": "Санкт-Петербург (Saint Petersburg)",
+  "author": "SindieFox",
+  "github_id": 43078949,
+  "description": "Saint Petersburg and its agglomeration: 5,887 km² from Kronstadt and Peterhof in the west to Vsevolozhsk and Gatchina in the east, 6.79 million people on a river delta that decides where you can dig.\n\nThis is my hometown, and I wanted the map to be as accurate as I could make it. Petersburg runs six metro lines and about seventy stations for five million people. Everyone here agrees that is too small; most of the network was planned in the 1980s and never built.\n\n![Map Coverage](https://raw.githubusercontent.com/SindieFox/subway-builder-saint-petersburg/main/gallery/preview.webp)\n\n## Coverage\n\n<table style=\"width: auto\">\n<tr><td><strong>Region</strong></td><td align=\"right\">Saint Petersburg and the inner ring of Leningrad oblast</td></tr>\n<tr><td><strong>Playable Area</strong></td><td align=\"right\">5,887 km² (73 × 81 km)</td></tr>\n<tr><td><strong>Municipalities</strong></td><td align=\"right\">283</td></tr>\n<tr><td><strong>Residents</strong></td><td align=\"right\">6,790,069</td></tr>\n<tr><td><strong>Jobs</strong></td><td align=\"right\">2,773,251</td></tr>\n<tr><td><strong>Demand points</strong></td><td align=\"right\">30,815</td></tr>\n<tr><td><strong>Demand links</strong></td><td align=\"right\">152,778</td></tr>\n<tr><td><strong>Median commute</strong></td><td align=\"right\">16.3 min / 9.4 km at 35 km/h</td></tr>\n</table>\n\nAlso inside the frame: Kronstadt, Peterhof, Lomonosov, Sestroretsk, Zelenogorsk, Pushkin, Pavlovsk, Kolpino, Gatchina, Vsevolozhsk, Murino, Kudrovo, Sertolovo, Toksovo.\n\n## Data and methodology\n\nEvery layer is built from an official source and then checked against a different one, so a mistake in the source cannot validate itself.\n\nResidents and jobs come from the Rosstat municipal database, per municipal unit, and land on individual OSM footprints: by flat count where `building:flats` is tagged, by floor area and building type everywhere else, and for jobs through a 19-section OKVED profile weighted per building class. The employed share is computed per district from Petrostat age-sex bulletins, which gives 39.0% to 49.8% instead of one citywide rate. Ten mass-housing units are corrected for unregistered residents where apartment stock per registered resident exceeds 45 m², adding 121,638 people.\n\nCommuting is a doubly-constrained gravity model with Tanner deterrence, IPF-balanced against the 2020 census, with an asymmetric friction term on the city and oblast border fitted to the real cross-border flow. Of the 152,778 demand links, 121,967 run home to work and the rest lead to attraction points. Travel times are Dijkstra over the 877,210-node OSM drive network.\n\n| layer | check | result |\n|---|---|---|\n| Residents | per district against Petrostat | 5,689,116 modelled against 5,652,922 published |\n| Residents | persons per flat, 3,616 buildings with `building:flats` | 2.10 against a household size of ~2.1 |\n| Jobs | total inside the city limits | 2,536,953 against 2,561,555 in the 2020 census |\n| Jobs | jobs per employed resident | 1.01 against 1.03 in the census |\n| Travel times | median door-to-door speed | 35 km/h, against 33 in vanilla Paris |\n\nSources: Rosstat municipal database, the 2020 Russian census volume 10, Petrostat, OpenStreetMap, Overture Maps, GEBCO 2026 and Wikidata. The full list with addresses and licences is in the map repository.\n\n## Special demand\n\n2,150 attraction points carrying 1,386,495 trips a day.\n\n| | points | daily |\n|---|---:|---:|\n| Schools | 1,177 | 644,625 |\n| Universities | 214 | 220,995 |\n| Parks | 244 | 99,990 |\n| Museums | 33 | 74,700 |\n| Hospitals | 135 | 64,845 |\n| Pulkovo airport | 1 | 60,120 |\n| Railway terminals | 5 | 58,500 |\n| Shopping centres | 11 | 51,795 |\n| Theatres and concert halls | 71 | 36,990 |\n\nThe demand model has no time axis, so the map picks a day: a weekday in late September, with universities and schools in session, tourism still high and the dacha season over. The five railway terminals are in as external demand, which matters here more than it sounds, since Baltiysky is the second-busiest terminal in the city and runs suburban trains only.\n\n## Water\n\nThe Neva runs 24 m deep at Liteyny Bridge, the Winter Canal 2 m, and the dredged fairways of the Neva Bay cut 13 m channels through 3 m shallows. Those depths come off navigation charts, because GEBCO steps every 450 m or so and cannot see a river 400 m wide. A tunnel under the river and a tunnel under a canal cost differently here.\n\n## Buildings\n\nHeights come from the OSM `height` tag, or from `building:levels` at a measured 3.88 m per storey, or from the nearest neighbours that carry either. On 6,463 surveyed buildings held back from the model the mean error is 3.8 m, against 11.6 m if everything is flattened to one default. Volumes are stepped: 21,126 `building:part` polygons sit on their outlines, so St Isaac's is a dome at 18 m with a cross at 102 m.\n\n## Credits\n\nMap by **SindieFox**, built with [depot](https://github.com/Subway-Builder-Modded). Sources, licences and the full write-up are in the [map repository](https://github.com/SindieFox/subway-builder-saint-petersburg) ([на русском](https://github.com/SindieFox/subway-builder-saint-petersburg/blob/main/README.ru.md)).",
+  "tags": [
+    "east-europe",
+    "airports",
+    "entertainment",
+    "schools",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp",
+    "gallery/screenshot5.webp",
+    "gallery/screenshot6.webp",
+    "gallery/screenshot7.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/SindieFox/subway-builder-saint-petersburg",
+  "update": {
+    "type": "github",
+    "repo": "SindieFox/subway-builder-saint-petersburg"
+  },
+  "city_code": "SPB",
+  "country": "RU",
+  "population": 6790069,
+  "residents_total": 6790069,
+  "points_count": 30815,
+  "population_count": 152778,
+  "initial_view_state": {
+    "latitude": 59.9386,
+    "longitude": 30.3141,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "Rosstat BD PMO | VPN-2020 | Petrostat | OSM | GEBCO",
+  "source_quality": "low-quality",
+  "level_of_detail": "low-detail",
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  },
+  "location": "east-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "schools",
+    "universities"
+  ],
+  "file_sizes": {},
+  "included_cities": [
+    "Kronstadt",
+    "Peterhof",
+    "Pushkin",
+    "Pavlovsk",
+    "Kolpino",
+    "Gatchina",
+    "Vsevolozhsk",
+    "Murino",
+    "Kudrovo",
+    "Sestroretsk",
+    "Zelenogorsk",
+    "Lomonosov",
+    "Sertolovo",
+    "Toksovo"
+  ]
+}
