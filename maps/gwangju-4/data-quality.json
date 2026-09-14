@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "gwangju-4",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "mesh_500",
+    "workplace_intensity": "size_only",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_500",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "structured_marginals",
+    "od_granularity": "adm4"
+  },
+  "notes": "Original submission methodology (2026-04, verbatim across all KMP listings): \"Using RAW Data of KTDB, which is already analyzed by KOTI.\" Backfilled from the 2026-09 wave triage: the 2026-09 submissions attest \"the same pipeline as prior KMP releases\", and every KMP submission since 2026-04 declares the identical KTDB methodology and the same four sources. Metro-region profile applied.\n\nReviewer triage (2026-09-15, applies wave-wide to the 2026-09 KMP submissions): the submitted answers mirrored the seoul listing's data profile but are contradicted by the stated methodology and the shipped bundles. Workplace totals are KTDB all-purpose attraction trip-ends (jobs run 2–3× residents on every map in the wave; commuterPopulation = population/1.2 exactly on all six), not a census of workplace employment — scored estimated_proxy; this listing sits inside one of the six KTDB regional models, so zone counts and the O/D matrix carry eup-myeon-dong grain (adm4). Within-zone placement carries no workplace-specific signal: job/resident ratios are flat across functionally opposite districts (Changwon National Industrial Complex 2.08 vs citywide 1.95 vs a residential new town 2.18; in suwon, Samsung Digital City 2.71 vs the Yeongtong residential district 2.44), so workplace intensity is size_only on the ~400 m demand-node lattice (mesh_500). The resident side keeps the SGIS grid claim: total_population at mesh_250 source grain (scaled by the fixed 1/1.2 constant), aggregated to the same lattice (mesh_500, measured_per_unit). The O/D is the KTDB expansion-built all-purpose matrix (travel-survey samples + telecom + card/TCS data, assignment-validated) — priced structured_marginals under the sampled/constructed-blend rule at the zone grain. Parity anchor: the seoul listing's observed telecom commuting matrix scores structured_marginals @ adm4; an expansion-built all-purpose matrix cannot outrank it.",
+  "sources": [
+    "- Korean Transportation Database (Korea Transport Institute, KOTI) (ktdb.go.kr)",
+    "- Actual Passenger O/D Download link(wrote in Korean) (https://www.ktdb.go.kr/www/newAddPbldataReqstData.do?key=202&clTy=1)",
+    "- V-world (Ministry of Land, Infrastructure and Transport, MOLIT) (vworld.kr)",
+    "- Statistical Geographic Information System (SGIS) plus (Ministry of Data and Statistics, MODS) (sgis.mods.go.kr)"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "budhakr",
+    "reviewed_by": null,
+    "date": "2026-09-15"
+  }
+}
