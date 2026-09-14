@@ -4,9 +4,12 @@
   "name": "Ulsan",
   "author": "kimth9",
   "github_id": 242454095,
-  "description": "# Ulsan (40km×40km)\r\n\r\n### USN4 · v0.1.0\r\n\r\nCustom map of Ulsan, Korea made with official Korean traffic volume data from official soures.\r\nWith 3,651 Pops and 565,157 population\r\n\r\n## Coverage\r\n\r\n<table style=\"width: auto\">\r\n<tr><td><strong>Region</strong></td><td>Ulsan </td></tr>\r\n<tr><td><strong>Playable Area</strong></td><td>1,600 km²</td></tr>\r\n</table>\r\n\r\n## Population Summary\r\n\r\n<table style=\"width: auto\">\r\n<tr><td><strong>Total Modeled Demand</strong></td><td align=\"right\">565,157</td></tr>\r\n</table>\r\n\r\n## Additional Features\r\n\r\n- **Neighborhood Labels** — The map includes municipal and neighborhood labels derived from administrative boundary data.\r\n\t- 시도 (Si, Do - Metropolitan / Provincial level)\r\n\t- 시군구 (Si, Gun, Gu - City / County / District level)\r\n\t- 읍면동 (Eup, Myeon, Dong - Neighborhood level)\r\n\r\n## Data Sources\r\n\r\n- Korean Transportation Database (Korea Transport Institute, KOTI) (ktdb.go.kr)\r\n- V-world (Ministry of Land, Infrastructure and Transport, MOLIT) (vworld.kr)\r\n- Statistical Geographic Information System (SGIS) plus (Ministry of Data and Statistics, MODS) (sgis.mods.go.kr)\r\n- Address-based Industry Support Service (Ministry of the Interior and Safety, MOIS) (business.juso.go.kr)\r\n\r\n## Credits\r\n\r\nMap authored by Budha",
+  "description": "# Ulsan\n\n## USN · v0.3.1\n\nCustom map of Ulsan, Korea, built from official Korean government transport and demographic data.\n\n## Coverage\n\n<table style=\"width: auto\">\n<tr><td><strong>Region</strong></td><td>울산광역시, 경상남도, 경상북도</td></tr>\n<tr><td><strong>Playable Area</strong></td><td>1,609 km²</td></tr>\n</table>\n\n<details>\n<summary>District list (7)</summary>\n\n<table style=\"width: auto\">\n<tr><th align=\"left\">시군구</th><th align=\"left\">District</th><th align=\"right\">Population</th></tr>\n<tr><td colspan=\"3\"><strong>울산광역시</strong></td></tr>\n<tr><td>남구</td><td>Nam-gu</td><td align=\"right\">484,302</td></tr>\n<tr><td>동구</td><td>Dong-gu</td><td align=\"right\">156,190</td></tr>\n<tr><td>북구</td><td>Buk-gu</td><td align=\"right\">312,441</td></tr>\n<tr><td>울주군</td><td>Ulju-gun</td><td align=\"right\">214,245</td></tr>\n<tr><td>중구</td><td>Jung-gu</td><td align=\"right\">586,225</td></tr>\n<tr><td colspan=\"3\"><strong>경상남도</strong></td></tr>\n<tr><td>양산시</td><td>Yangsan-si</td><td align=\"right\">101,405</td></tr>\n<tr><td colspan=\"3\"><strong>경상북도</strong></td></tr>\n<tr><td>경주시</td><td>Gyeongju-si</td><td align=\"right\">27,634</td></tr>\n</table>\n</details>\n\n## Population Summary\n\n<table style=\"width: auto\">\n<tr><td><strong>Total Modeled Demand</strong></td><td align=\"right\">624,255</td></tr>\n<tr><td><strong>Pops</strong></td><td align=\"right\">12,002</td></tr>\n</table>\n\n## Additional Features\n\n- **Neighborhood Labels** — The map includes municipal and neighborhood labels derived from administrative boundary data.\n\t- 시도 (Si, Do - Metropolitan / Provincial level)\n\t- 시군구 (Si, Gun, Gu - City / County / District level)\n\t- 읍면동 (Eup, Myeon, Dong - Neighborhood level)\n\n## Data Sources\n\n- Korean Transportation Database (Korea Transport Institute, KOTI) (ktdb.go.kr)\n- V-world (Ministry of Land, Infrastructure and Transport, MOLIT) (vworld.kr)\n- Statistical Geographic Information System (SGIS) plus (Ministry of Data and Statistics, MODS) (sgis.mods.go.kr)\n- Address-based Industry Support Service (Ministry of the Interior and Safety, MOIS) (business.juso.go.kr)\n- Aviation statistics 2025 (Korea Civil Aviation Association, KCAA) (airportal.go.kr)\n- Korean railroad statistics 2024 (Korea Railroad, KORAIL) (railstat.korail.com)\n- Korean Public Transportation Database (Korea Transportation Safety Authority, KTSA) (kotsa.or.kr)\n- Korean Hospital and Pharmacy Status (Health Insurance Review and Assessment Service, HIRA) (data.go.kr)\n- Health Insurance Medical Statistics (HIRA) (opendata.hira.or.kr)\n- Academy Information System (Ministry of Education, MOE) (academyinfo.go.kr)\n\n## Credits\n\nMap authored by budhakr",
   "tags": [
-    "east-asia"
+    "east-asia",
+    "airports",
+    "hospitals",
+    "universities"
   ],
   "gallery": [
     "gallery/screenshot1.webp"
@@ -33,7 +36,11 @@
   "source_quality": "high-quality",
   "level_of_detail": "low-detail",
   "location": "east-asia",
-  "special_demand": [],
+  "special_demand": [
+    "airports",
+    "hospitals",
+    "universities"
+  ],
   "file_sizes": {
     "USN4.pmtiles": 31.71,
     "buildings_index.json": 68.51,
