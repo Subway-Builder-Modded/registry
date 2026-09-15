@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-15T16:01:25.786Z",
+  "generated_at": "2026-09-15T19:43:37.344Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -7911,19 +7911,58 @@
       }
     },
     "delhi": {
-      "has_complete_version": false,
-      "latest_semver_version": null,
-      "latest_semver_complete": null,
-      "complete_versions": [],
+      "has_complete_version": true,
+      "latest_semver_version": "1.1.2",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.1.2",
+        "1.1.1",
+        "1.1.0",
+        "1.0.0"
+      ],
       "incomplete_versions": [],
+      "last_updated": 1789430400,
       "versions": {
         "1.0.0": {
-          "is_complete": false,
-          "errors": [
-            "version is no longer enumerated upstream (release or update entry deleted)"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DEL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 228.11,
+          "file_sizes": {
+            "DEL.pmtiles": 81.58,
+            "buildings_index.bin": 240.19,
+            "buildings_index.json": 304.95,
+            "config.json": 0,
+            "demand_data.json": 64.59,
+            "ocean_depth_index.json": 3.69,
+            "roads.geojson": 68.01,
+            "runways_taxiways.geojson": 0.95
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -7933,17 +7972,49 @@
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.0.0-del/DEL.zip"
           },
           "fingerprint": "rules:v6:sha256:db2d72b60e56a4de78d652bc9816efe429032e33abfffece75e8f7f0b2d5f420",
-          "checked_at": "2026-09-14T16:31:24.445Z",
-          "released_at": "2026-08-31T00:00:00.000Z",
-          "availability": "removed"
+          "checked_at": "2026-09-15T19:43:37.344Z",
+          "released_at": "2026-08-31T00:00:00.000Z"
         },
         "1.1.0": {
-          "is_complete": false,
-          "errors": [
-            "version is no longer enumerated upstream (release or update entry deleted)"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DEL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 222.74,
+          "file_sizes": {
+            "DEL.pmtiles": 81.58,
+            "buildings_index.bin": 240.19,
+            "buildings_index.json": 304.95,
+            "config.json": 0,
+            "demand_data.json": 31.94,
+            "ocean_depth_index.json": 3.69,
+            "roads.geojson": 68.01,
+            "runways_taxiways.geojson": 0.95
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -7953,17 +8024,49 @@
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.1.0-del/DEL.zip"
           },
           "fingerprint": "rules:v6:sha256:d74cebd758ba1bc483af2b00ff0dc368d9e7a2af3c9690f83bb220ca4350d71e",
-          "checked_at": "2026-09-14T16:31:24.445Z",
-          "released_at": "2026-09-03T00:00:00.000Z",
-          "availability": "removed"
+          "checked_at": "2026-09-15T19:43:37.344Z",
+          "released_at": "2026-09-03T00:00:00.000Z"
         },
         "1.1.1": {
-          "is_complete": false,
-          "errors": [
-            "version is no longer enumerated upstream (release or update entry deleted)"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DEL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 228.1,
+          "file_sizes": {
+            "DEL.pmtiles": 81.58,
+            "buildings_index.bin": 240.19,
+            "buildings_index.json": 304.95,
+            "config.json": 0,
+            "demand_data.json": 64.66,
+            "ocean_depth_index.json": 3.69,
+            "roads.geojson": 68.01,
+            "runways_taxiways.geojson": 0.95
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -7972,10 +8075,62 @@
             "asset_name": "DEL.zip",
             "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.1.1-del/DEL.zip"
           },
-          "fingerprint": "rules:v6:sha256:sha256:3460e7d89959a1a2cc3a74e691cc1c1189b79f141372191d155cbc88c7cddf35",
-          "checked_at": "2026-09-14T16:31:24.445Z",
-          "released_at": "2026-09-11T00:00:00.000Z",
-          "availability": "removed"
+          "fingerprint": "rules:v6:sha256:3460e7d89959a1a2cc3a74e691cc1c1189b79f141372191d155cbc88c7cddf35",
+          "checked_at": "2026-09-15T19:43:37.344Z",
+          "released_at": "2026-09-11T00:00:00.000Z"
+        },
+        "1.1.2": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DEL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 304.1,
+          "file_sizes": {
+            "DEL.pmtiles": 81.58,
+            "DEL_foundations.pmtiles": 77.09,
+            "buildings_index.bin": 240.19,
+            "buildings_index.json": 304.95,
+            "config.json": 0,
+            "demand_data.json": 57.33,
+            "ocean_depth_index.json": 3.69,
+            "roads.geojson": 68.01,
+            "runways_taxiways.geojson": 0.95
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "ryandicicco/subway-builder-maps",
+            "tag": "v1.1.2-del",
+            "asset_name": "DEL.zip",
+            "download_url": "https://github.com/ryandicicco/Subway-Builder-Maps/releases/download/v1.1.2-del/DEL.zip"
+          },
+          "fingerprint": "rules:v6:sha256:8226bad5490472a8e5ab3931bf8741f8a0111387bbd8d629875824236f9148ea",
+          "checked_at": "2026-09-15T19:43:37.344Z",
+          "released_at": "2026-09-15T00:00:00.000Z"
         }
       }
     },
