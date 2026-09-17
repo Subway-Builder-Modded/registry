@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T12:01:09.275Z",
+  "generated_at": "2026-09-17T16:01:04.581Z",
   "listings": {
     "advanced-analytics": {
       "has_complete_version": false,
@@ -50,7 +50,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-09-17T12:01:09.275Z",
+          "checked_at": "2026-09-17T16:01:04.581Z",
           "released_at": "2026-03-02T23:15:42.000Z"
         },
         "v0.9.1": {
@@ -2461,7 +2461,7 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.0:dantrains-abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-09-17T12:01:09.275Z",
+          "checked_at": "2026-09-17T16:01:04.581Z",
           "released_at": "2026-07-18T05:05:08.000Z"
         },
         "v1.1": {
@@ -2477,7 +2477,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.1:danTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-09-17T12:01:09.275Z",
+          "checked_at": "2026-09-17T16:01:04.581Z",
           "released_at": "2026-07-19T04:42:34.000Z"
         },
         "v1.1.1": {
@@ -5124,16 +5124,17 @@
     },
     "mtr-trains": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.0.2",
+      "latest_semver_version": "v1.0.3",
       "latest_semver_complete": true,
       "complete_versions": [
+        "v1.0.3",
         "v1.0.2"
       ],
       "incomplete_versions": [
         "v1.0.1",
         "v1.0.0"
       ],
-      "last_updated": 1789571129,
+      "last_updated": 1789653936,
       "versions": {
         "v1.0.0": {
           "is_complete": false,
@@ -5224,6 +5225,34 @@
           "fingerprint": "rules:v6:github:maxcheng95/mtr-trains-for-subway-builder:v1.0.2:mtr-trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
           "checked_at": "2026-09-16T23:00:03.087Z",
           "released_at": "2026-09-16T15:05:29.000Z"
+        },
+        "v1.0.3": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0,
+          "game_version": ">=1.7.16",
+          "source": {
+            "update_type": "github",
+            "repo": "maxcheng95/mtr-trains-for-subway-builder",
+            "tag": "v1.0.3",
+            "asset_name": "mtr-trains.zip",
+            "download_url": "https://github.com/MaxCheng95/MTR-Trains-for-Subway-Builder/releases/download/v1.0.3/mtr-trains.zip"
+          },
+          "fingerprint": "rules:v6:github:maxcheng95/mtr-trains-for-subway-builder:v1.0.3:mtr-trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-09-17T16:01:04.581Z",
+          "released_at": "2026-09-17T14:05:36.000Z"
         }
       }
     },
@@ -6784,13 +6813,14 @@
     },
     "taiwan-trains": {
       "has_complete_version": true,
-      "latest_semver_version": "v1.0.0",
+      "latest_semver_version": "v1.0.1",
       "latest_semver_complete": true,
       "complete_versions": [
+        "v1.0.1",
         "v1.0.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789577147,
+      "last_updated": 1789653831,
       "versions": {
         "v1.0.0": {
           "is_complete": true,
@@ -6819,6 +6849,34 @@
           "fingerprint": "rules:v6:github:maxcheng95/taiwanese-trains-for-subway-builder:v1.0.0:taiwan-trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
           "checked_at": "2026-09-16T23:00:03.087Z",
           "released_at": "2026-09-16T16:45:47.000Z"
+        },
+        "v1.0.1": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0.01,
+          "game_version": ">=1.7.16",
+          "source": {
+            "update_type": "github",
+            "repo": "maxcheng95/taiwanese-trains-for-subway-builder",
+            "tag": "v1.0.1",
+            "asset_name": "taiwan-trains.zip",
+            "download_url": "https://github.com/MaxCheng95/Taiwanese-Trains-for-Subway-Builder/releases/download/v1.0.1/taiwan-trains.zip"
+          },
+          "fingerprint": "rules:v6:github:maxcheng95/taiwanese-trains-for-subway-builder:v1.0.1:taiwan-trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-09-17T16:01:04.581Z",
+          "released_at": "2026-09-17T14:03:51.000Z"
         }
       }
     },
@@ -8726,7 +8784,7 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-09-17T12:01:09.275Z",
+          "checked_at": "2026-09-17T16:01:04.581Z",
           "released_at": "2026-03-01T14:52:46.000Z"
         },
         "v1.1": {
@@ -8742,7 +8800,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-09-17T12:01:09.275Z",
+          "checked_at": "2026-09-17T16:01:04.581Z",
           "released_at": "2026-03-08T08:01:18.000Z"
         }
       }
