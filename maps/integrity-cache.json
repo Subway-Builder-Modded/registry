@@ -4959,14 +4959,10 @@
       },
       "v1.1.1": {
         "fingerprint": "rules:v6:github:meszier83/subway-builder-mexico-maps:v1.1.1:CUR.zip",
-        "last_checked_at": "2026-09-17T16:01:05.350Z",
+        "last_checked_at": "2026-09-17T22:53:19.456Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "asset 'CUR.zip': top-level config.json is not valid JSON",
-            "asset 'CUR.zip': missing code in config.json for PMTiles validation (registry city_code 'CUR')",
-            "asset 'CUR.zip': config.json version '(missing)' does not match release tag 'v1.1.1' (expected '1.1.1')"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -4976,8 +4972,8 @@
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
-            "city_pmtiles": false,
-            "config_version_matches_tag": false
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
           },
           "matched_files": {
             "config_json": "config.json",
@@ -4990,10 +4986,20 @@
             "buildings_index_bin": "buildings_index.bin.gz",
             "roads_geojson": "roads.geojson",
             "runways_taxiways_geojson": "runways_taxiways.geojson",
-            "city_pmtiles": null,
-            "config_version_matches_tag": null
+            "city_pmtiles": "CUR.pmtiles",
+            "config_version_matches_tag": "config.json"
           },
           "release_size": 54.73,
+          "file_sizes": {
+            "CUR.pmtiles": 26.36,
+            "buildings_index.bin.gz": 14.66,
+            "config.json": 0,
+            "demand_data.json": 3.21,
+            "ocean_depth_index.json.gz": 14.1,
+            "roads.geojson": 9.07,
+            "runways_taxiways.geojson": 0.45,
+            "special_demand_points.json": 0.02
+          },
           "game_version": ">=1.7.0",
           "source": {
             "update_type": "github",
@@ -5003,14 +5009,14 @@
             "download_url": "https://github.com/Meszier83/subway-builder-mexico-maps/releases/download/v1.1.1/CUR.zip"
           },
           "fingerprint": "rules:v6:github:meszier83/subway-builder-mexico-maps:v1.1.1:CUR.zip",
-          "checked_at": "2026-09-17T16:01:05.350Z",
+          "checked_at": "2026-09-17T22:53:19.456Z",
           "released_at": "2026-09-17T12:15:34.000Z"
         },
         "asset_sizes": {
-          "CUR.zip": 57388319
+          "CUR.zip": 57388033
         },
         "asset_updated_at": {
-          "CUR.zip": "2026-09-17T12:15:27Z"
+          "CUR.zip": "2026-09-17T20:13:49Z"
         },
         "manifest_asset_updated_at": "2026-09-17T12:15:27Z"
       }
@@ -22570,6 +22576,69 @@
           "RIO.zip": "2026-09-13T02:06:19Z"
         },
         "manifest_asset_updated_at": "2026-09-13T01:25:15Z"
+      },
+      "v2.2.0": {
+        "fingerprint": "rules:v6:github:jguylherme/rio_metro:v2.2.0:RIO.zip",
+        "last_checked_at": "2026-09-17T22:53:19.456Z",
+        "result": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "RIO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 765.81,
+          "file_sizes": {
+            "RIO.pmtiles": 416.18,
+            "RIO_foundations.pmtiles": 213.93,
+            "buildings_index.bin": 456.99,
+            "config.json": 0,
+            "demand_data.json": 52.16,
+            "ocean_depth_index.json.gz": 6.28,
+            "roads.geojson": 51.85,
+            "runways_taxiways.geojson": 0.71
+          },
+          "game_version": ">=1.7.0 <1.7.2",
+          "source": {
+            "update_type": "github",
+            "repo": "jguylherme/rio_metro",
+            "tag": "v2.2.0",
+            "asset_name": "RIO.zip",
+            "download_url": "https://github.com/JGuylherme/rio_metro/releases/download/v2.2.0/RIO.zip"
+          },
+          "fingerprint": "rules:v6:github:jguylherme/rio_metro:v2.2.0:RIO.zip",
+          "checked_at": "2026-09-17T22:53:19.456Z",
+          "released_at": "2026-09-17T22:48:49.000Z"
+        },
+        "asset_sizes": {
+          "RIO.zip": 803015101
+        },
+        "asset_updated_at": {
+          "RIO.zip": "2026-09-17T22:48:28Z"
+        },
+        "manifest_asset_updated_at": "2026-09-17T22:46:36Z"
       }
     },
     "riviera-romagnola": {
