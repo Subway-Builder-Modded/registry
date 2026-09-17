@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-17T04:01:03.993Z",
+  "generated_at": "2026-09-17T08:01:12.487Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -27012,15 +27012,16 @@
     },
     "sydney": {
       "has_complete_version": false,
-      "latest_semver_version": "1.2.0",
+      "latest_semver_version": "2.0.0",
       "latest_semver_complete": false,
       "complete_versions": [],
       "incomplete_versions": [
         "1.0.0",
         "1.1.0",
-        "1.2.0"
+        "1.2.0",
+        "2.0.0"
       ],
-      "last_updated": 1774149736,
+      "last_updated": 1789619414,
       "versions": {
         "1.0.0": {
           "is_complete": false,
@@ -27162,6 +27163,63 @@
           "fingerprint": "rules:v6:github:willbarouch/subwaybuilder-sydney:1.2.0:syd.zip",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-03-22T03:22:16.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "no game_version found (declare a \"subway-builder\" dependency range in the release manifest.json)",
+            "listing_deprecated"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true,
+            "game_version_valid": false
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SYD.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 240.68,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.33,
+            ".railyard_map/special_demand_types.json": 0.03,
+            "SYD.pmtiles": 109.23,
+            "SYD_foundations.pmtiles": 61.19,
+            "buildings_index.bin.gz": 51.4,
+            "config.json": 0,
+            "demand_data.json": 12.06,
+            "ocean_depth_index.json.gz": 11.17,
+            "roads.geojson": 51.25,
+            "runways_taxiways.geojson": 1.46
+          },
+          "source": {
+            "update_type": "github",
+            "repo": "willbarouch/subwaybuilder-sydney",
+            "tag": "2.0.0",
+            "asset_name": "SYD.zip",
+            "download_url": "https://github.com/WillBarouch/subwaybuilder-sydney/releases/download/2.0.0/SYD.zip"
+          },
+          "fingerprint": "rules:v6:github:willbarouch/subwaybuilder-sydney:2.0.0:SYD.zip",
+          "checked_at": "2026-09-17T08:01:12.487Z",
+          "released_at": "2026-09-17T04:30:14.000Z"
         }
       }
     },
