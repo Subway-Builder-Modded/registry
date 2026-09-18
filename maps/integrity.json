@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-18T16:01:42.193Z",
+  "generated_at": "2026-09-18T19:03:48.969Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -4114,17 +4114,17 @@
     },
     "busan-4": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "0.4.0",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
+        "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
-      "incomplete_versions": [
-        "0.3.1"
-      ],
-      "last_updated": 1789171200,
+      "incomplete_versions": [],
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -4268,16 +4268,14 @@
           "released_at": "2026-04-23T00:00:00.000Z"
         },
         "0.3.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data resident totals mismatch (points=2746603, pops=2749869, delta=-3266)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
             "demand_phantom_points": true,
-            "demand_residents_match": false,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -4298,7 +4296,20 @@
             "city_pmtiles": "PUS.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 134.73,
+          "release_size": 134.74,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0,
+            "PUS.pmtiles": 142.4,
+            "buildings_index.bin.gz": 29.49,
+            "buildings_index.json": 109.53,
+            "config.json": 0.01,
+            "demand_data.json": 6.5,
+            "driving_paths.json.gz": 2.69,
+            "ocean_depth_index.json": 11.41,
+            "roads.geojson": 21.66,
+            "runways_taxiways.geojson": 0.73
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -4307,9 +4318,64 @@
             "asset_name": "PUS.zip",
             "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.3.1/PUS.zip"
           },
-          "fingerprint": "rules:v6:sha256:e941677432ea5d185c95d1181e2934f2094d28352cfb5482a81ddb140bd517b7",
-          "checked_at": "2026-09-15T21:32:17.735Z",
+          "fingerprint": "rules:v6:sha256:c90d17a5bccca9a1806607a7582320c49b17637607418801a345f8c4ae93e0d5",
+          "checked_at": "2026-09-18T19:03:48.969Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "PUS.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 136.84,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.45,
+            ".railyard_map/special_demand_types.json": 0,
+            "PUS.pmtiles": 142.4,
+            "buildings_index.bin.gz": 29.49,
+            "buildings_index.json": 109.53,
+            "config.json": 0.06,
+            "demand_data.json": 10.36,
+            "driving_paths.json.gz": 4.27,
+            "ocean_depth_index.json": 11.41,
+            "roads.geojson": 21.66,
+            "runways_taxiways.geojson": 0.73
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "PUS.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/PUS.zip"
+          },
+          "fingerprint": "rules:v6:sha256:0747b1fd499382024bfa56babffe2a3c0d5296982abb38e6f78cc753c3c2993c",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -5662,13 +5728,14 @@
     },
     "changwon": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
+      "latest_semver_version": "0.4.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
         "0.3.1"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789171200,
+      "last_updated": 1789776000,
       "versions": {
         "0.3.1": {
           "is_complete": true,
@@ -5724,6 +5791,61 @@
           "fingerprint": "rules:v6:sha256:1b3aaeab704bc3e5bbd9ffa8f82b06dd67149c171c159c98df5a2ed2385d6380",
           "checked_at": "2026-09-14T16:01:11.543Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CWN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 111.08,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.28,
+            ".railyard_map/special_demand_types.json": 0,
+            "CWN.pmtiles": 126.16,
+            "buildings_index.bin.gz": 20.05,
+            "buildings_index.json": 71.37,
+            "config.json": 0.04,
+            "demand_data.json": 6.42,
+            "driving_paths.json.gz": 2.73,
+            "ocean_depth_index.json": 13.46,
+            "roads.geojson": 20.98,
+            "runways_taxiways.geojson": 0.76
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "CWN.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/CWN.zip"
+          },
+          "fingerprint": "rules:v6:sha256:75160363386955e401114914b5fff9141e354d9f813d2f9d4a1589cd979ead00",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -5915,13 +6037,14 @@
     },
     "cheongju": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
+      "latest_semver_version": "0.4.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
         "0.3.1"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789171200,
+      "last_updated": 1789776000,
       "versions": {
         "0.3.1": {
           "is_complete": true,
@@ -5976,6 +6099,60 @@
           "fingerprint": "rules:v6:sha256:26bacbcf7cddae64bd7e592459df8cccbb71ea220aab3d3312bd15a7df26c657",
           "checked_at": "2026-09-14T16:01:11.543Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CJJ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 93.91,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.16,
+            ".railyard_map/special_demand_types.json": 0,
+            "CJJ.pmtiles": 110.79,
+            "buildings_index.bin.gz": 15.53,
+            "buildings_index.json": 59.75,
+            "config.json": 0.02,
+            "demand_data.json": 2.53,
+            "driving_paths.json.gz": 1.15,
+            "roads.geojson": 20.25,
+            "runways_taxiways.geojson": 1.16
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "CJJ.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/CJJ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:4c4dfc943ec92674cb0c687bcf4a5ad815356789e3eef6b6d8d7fd202eeba1e7",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -6260,13 +6437,14 @@
     },
     "chuncheon": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
+      "latest_semver_version": "0.4.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
         "0.3.1"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789171200,
+      "last_updated": 1789776000,
       "versions": {
         "0.3.1": {
           "is_complete": true,
@@ -6321,6 +6499,60 @@
           "fingerprint": "rules:v6:sha256:9a4c26702d5a58fb7ad7a44e48c1c2e171e50e0b1cfd756dc67de39556438738",
           "checked_at": "2026-09-14T16:01:11.543Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "QCN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 49.54,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.05,
+            ".railyard_map/special_demand_types.json": 0,
+            "QCN.pmtiles": 64.96,
+            "buildings_index.bin.gz": 4.41,
+            "buildings_index.json": 17.23,
+            "config.json": 0.01,
+            "demand_data.json": 0.7,
+            "driving_paths.json.gz": 0.33,
+            "roads.geojson": 12.31,
+            "runways_taxiways.geojson": 0.04
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "QCN.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/QCN.zip"
+          },
+          "fingerprint": "rules:v6:sha256:a255113a1acd048097466d8753fff06d043bb69ee2063228d87cdd8bc73d38c4",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -7242,17 +7474,17 @@
     },
     "daegu-4": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "0.4.0",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
+        "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
-      "incomplete_versions": [
-        "0.3.1"
-      ],
-      "last_updated": 1789171200,
+      "incomplete_versions": [],
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -7396,16 +7628,14 @@
           "released_at": "2026-04-23T00:00:00.000Z"
         },
         "0.3.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data resident totals mismatch (points=1228696, pops=1232523, delta=-3827)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
             "demand_phantom_points": true,
-            "demand_residents_match": false,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -7426,7 +7656,19 @@
             "city_pmtiles": "TAE.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 104.84,
+          "release_size": 104.85,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.02,
+            ".railyard_map/special_demand_types.json": 0,
+            "TAE.pmtiles": 117.43,
+            "buildings_index.bin.gz": 18.27,
+            "buildings_index.json": 68.77,
+            "config.json": 0.01,
+            "demand_data.json": 3.65,
+            "driving_paths.json.gz": 1.55,
+            "roads.geojson": 22.87,
+            "runways_taxiways.geojson": 1.07
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -7435,9 +7677,63 @@
             "asset_name": "TAE.zip",
             "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.3.1/TAE.zip"
           },
-          "fingerprint": "rules:v6:sha256:adeb91c155cea419c237f3806ee68febd08500c5ec606ee247b06cd852aeca27",
-          "checked_at": "2026-09-15T21:32:17.735Z",
+          "fingerprint": "rules:v6:sha256:50140e23ae12be28b4f579b05378faafcadbf43b0fd0b19f451c12a1875c487b",
+          "checked_at": "2026-09-18T19:03:48.969Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "TAE.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 106.68,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.3,
+            ".railyard_map/special_demand_types.json": 0,
+            "TAE.pmtiles": 117.42,
+            "buildings_index.bin.gz": 18.27,
+            "buildings_index.json": 68.77,
+            "config.json": 0.04,
+            "demand_data.json": 7.5,
+            "driving_paths.json.gz": 2.84,
+            "roads.geojson": 22.87,
+            "runways_taxiways.geojson": 1.07
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "TAE.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/TAE.zip"
+          },
+          "fingerprint": "rules:v6:sha256:04634835b3c537368ae8d8c3e2d1be462d42449f195e091bb246c6a2e0ef63b4",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -7604,16 +7900,17 @@
     },
     "daejeon-4": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
+      "latest_semver_version": "0.4.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
         "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789171200,
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -7809,6 +8106,60 @@
           "fingerprint": "rules:v6:sha256:c6fd03d09ffe187677e59fe2620c52aeb59c51a73c28fdd522ff281b1188d665",
           "checked_at": "2026-09-15T21:32:17.735Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "DAJ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 104.09,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.36,
+            ".railyard_map/special_demand_types.json": 0,
+            "DAJ.pmtiles": 119.51,
+            "buildings_index.bin.gz": 17.06,
+            "buildings_index.json": 62.94,
+            "config.json": 0.04,
+            "demand_data.json": 7.98,
+            "driving_paths.json.gz": 3.02,
+            "roads.geojson": 22.38,
+            "runways_taxiways.geojson": 0.19
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "DAJ.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/DAJ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:8316babd6a791762a8ee8c118aec42ec47eb8f4d41a8a5cd0a9e24e4fcaf5560",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -9437,13 +9788,14 @@
     },
     "gangneung": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
+      "latest_semver_version": "0.4.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
         "0.3.1"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789171200,
+      "last_updated": 1789776000,
       "versions": {
         "0.3.1": {
           "is_complete": true,
@@ -9499,6 +9851,61 @@
           "fingerprint": "rules:v6:sha256:6a4e90687a34fa7e25dd9fc7462b7df1c726d4149e047ffa59665674abb867ad",
           "checked_at": "2026-09-14T16:01:11.543Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "KAG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 44.82,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0,
+            "KAG.pmtiles": 56.68,
+            "buildings_index.bin.gz": 3.72,
+            "buildings_index.json": 14.39,
+            "config.json": 0.01,
+            "demand_data.json": 0.43,
+            "driving_paths.json.gz": 0.22,
+            "ocean_depth_index.json": 15.61,
+            "roads.geojson": 8.54,
+            "runways_taxiways.geojson": 0.22
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "KAG.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/KAG.zip"
+          },
+          "fingerprint": "rules:v6:sha256:270c82edbea0e5b6e4969b1d27601b6f9afc996363f7a9d4429d2770e9151f9a",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -12021,17 +12428,17 @@
     },
     "gwangju-4": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "0.4.0",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
+        "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
-      "incomplete_versions": [
-        "0.3.1"
-      ],
-      "last_updated": 1789171200,
+      "incomplete_versions": [],
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -12187,16 +12594,14 @@
           "released_at": "2026-04-23T00:00:00.000Z"
         },
         "0.3.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data resident totals mismatch (points=383664, pops=383704, delta=-40)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
             "demand_phantom_points": true,
-            "demand_residents_match": false,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -12218,6 +12623,18 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 93.97,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.01,
+            ".railyard_map/special_demand_types.json": 0,
+            "KWJ.pmtiles": 109.5,
+            "buildings_index.bin.gz": 17.14,
+            "buildings_index.json": 63.18,
+            "config.json": 0.01,
+            "demand_data.json": 1.11,
+            "driving_paths.json.gz": 0.62,
+            "roads.geojson": 17.39,
+            "runways_taxiways.geojson": 0.66
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -12226,21 +12643,76 @@
             "asset_name": "KWJ.zip",
             "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.3.1/KWJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:43cabe1bf595caef2784678313a1c59bf360e7f760604bc22921130bc1a00406",
-          "checked_at": "2026-09-15T21:32:17.735Z",
+          "fingerprint": "rules:v6:sha256:50e481d8fd254c9c0b7af7de98f8ca39be9f7092f73f2a6d615246bbc94525b0",
+          "checked_at": "2026-09-18T19:03:48.969Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "KWJ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 97.41,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.36,
+            ".railyard_map/special_demand_types.json": 0,
+            "KWJ.pmtiles": 109.49,
+            "buildings_index.bin.gz": 17.14,
+            "buildings_index.json": 63.18,
+            "config.json": 0.04,
+            "demand_data.json": 7.75,
+            "driving_paths.json.gz": 3.25,
+            "roads.geojson": 17.39,
+            "runways_taxiways.geojson": 0.66
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "KWJ.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/KWJ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:7f478ee8c0f8ec9b9443f3010dca7ea4958d68928c6696b30c900a83d35fe857",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
     "gyeongju-pohang": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
+      "latest_semver_version": "0.4.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
         "0.3.1"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789171200,
+      "last_updated": 1789776000,
       "versions": {
         "0.3.1": {
           "is_complete": true,
@@ -12296,6 +12768,61 @@
           "fingerprint": "rules:v6:sha256:17a3cfcd121c2351767afc99e7464589aacacfed3d7f2a31f315674d571e9619",
           "checked_at": "2026-09-14T16:01:11.543Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "KPO.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 112.31,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.1,
+            ".railyard_map/special_demand_types.json": 0,
+            "KPO.pmtiles": 132.14,
+            "buildings_index.bin.gz": 16.2,
+            "buildings_index.json": 58.52,
+            "config.json": 0.02,
+            "demand_data.json": 2.33,
+            "driving_paths.json.gz": 1.13,
+            "ocean_depth_index.json": 15.19,
+            "roads.geojson": 26.67,
+            "runways_taxiways.geojson": 0.45
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "KPO.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/KPO.zip"
+          },
+          "fingerprint": "rules:v6:sha256:885a762fa09d8dffd9ae4219e766e29f5d3d43914bfb7bb1d6ca4f36a3cd3977",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -13119,17 +13646,17 @@
     },
     "incheon-4": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "0.4.0",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
+        "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
-      "incomplete_versions": [
-        "0.3.1"
-      ],
-      "last_updated": 1789171200,
+      "incomplete_versions": [],
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -13270,16 +13797,14 @@
           "released_at": "2026-04-23T00:00:00.000Z"
         },
         "0.3.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data resident totals mismatch (points=3146184, pops=3149230, delta=-3046)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
             "demand_phantom_points": true,
-            "demand_residents_match": false,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -13300,7 +13825,20 @@
             "city_pmtiles": "ICN.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 174.98,
+          "release_size": 174.99,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.03,
+            ".railyard_map/special_demand_types.json": 0,
+            "ICN.pmtiles": 171.75,
+            "buildings_index.bin.gz": 40.18,
+            "buildings_index.json": 149.86,
+            "config.json": 0.01,
+            "demand_data.json": 9.2,
+            "driving_paths.json.gz": 3.66,
+            "ocean_depth_index.json": 10.43,
+            "roads.geojson": 26.85,
+            "runways_taxiways.geojson": 5.11
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -13309,9 +13847,64 @@
             "asset_name": "ICN.zip",
             "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.3.1/ICN.zip"
           },
-          "fingerprint": "rules:v6:sha256:d13527bd5295cbda4d2ddc88fe69d48a93c33b12ea623c9a52bd3f5b9ae65f81",
-          "checked_at": "2026-09-15T21:32:17.735Z",
+          "fingerprint": "rules:v6:sha256:4b8911750984e3bbec98bbf9fb2ca2095a621d3042f0fd0e0fc015e5e4c5a3b7",
+          "checked_at": "2026-09-18T19:03:48.969Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "ICN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 179.5,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 1,
+            ".railyard_map/special_demand_types.json": 0,
+            "ICN.pmtiles": 171.65,
+            "buildings_index.bin.gz": 40.18,
+            "buildings_index.json": 149.86,
+            "config.json": 0.11,
+            "demand_data.json": 19.3,
+            "driving_paths.json.gz": 7.3,
+            "ocean_depth_index.json": 10.43,
+            "roads.geojson": 26.78,
+            "runways_taxiways.geojson": 4.02
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "ICN.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/ICN.zip"
+          },
+          "fingerprint": "rules:v6:sha256:239729364454b65f4c9b6eff41a45d9e544f86d3e56dbe6d2cd7c83c26ab80ed",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -14013,16 +14606,17 @@
     },
     "jeju-f": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
+      "latest_semver_version": "0.4.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
         "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789171200,
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -14219,6 +14813,61 @@
           "fingerprint": "rules:v6:sha256:69071cb5006a87661b7de468ddca361f415ab91deb46bae8750a8b6e548eb132",
           "checked_at": "2026-09-15T21:32:17.735Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "CJU.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 112.64,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.09,
+            ".railyard_map/special_demand_types.json": 0,
+            "CJU.pmtiles": 128.74,
+            "buildings_index.bin.gz": 20.26,
+            "buildings_index.json": 76.7,
+            "config.json": 0.01,
+            "demand_data.json": 1.79,
+            "driving_paths.json.gz": 0.76,
+            "ocean_depth_index.json": 27.8,
+            "roads.geojson": 17.83,
+            "runways_taxiways.geojson": 0.58
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "CJU.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/CJU.zip"
+          },
+          "fingerprint": "rules:v6:sha256:b248e66e0c5dd32c5ae096a2419ae54e36a82cb939848dda9e2f16fe74193101",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -24965,17 +25614,17 @@
     },
     "sejong-4": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "0.4.0",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
+        "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
-      "incomplete_versions": [
-        "0.3.1"
-      ],
-      "last_updated": 1789171200,
+      "incomplete_versions": [],
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -25119,16 +25768,14 @@
           "released_at": "2026-04-23T00:00:00.000Z"
         },
         "0.3.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data resident totals mismatch (points=667233, pops=667264, delta=-31)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
             "demand_phantom_points": true,
-            "demand_residents_match": false,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -25150,6 +25797,18 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 126.27,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.02,
+            ".railyard_map/special_demand_types.json": 0,
+            "SEJ.pmtiles": 144.54,
+            "buildings_index.bin.gz": 23.7,
+            "buildings_index.json": 89.24,
+            "config.json": 0.01,
+            "demand_data.json": 1.99,
+            "driving_paths.json.gz": 1.03,
+            "roads.geojson": 25.64,
+            "runways_taxiways.geojson": 1.19
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -25158,9 +25817,63 @@
             "asset_name": "SEJ.zip",
             "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.3.1/SEJ.zip"
           },
-          "fingerprint": "rules:v6:sha256:83754439c235d8692d8031755c17a3ec86dc5020c497921f26fe716d45bfb52b",
-          "checked_at": "2026-09-15T21:32:17.735Z",
+          "fingerprint": "rules:v6:sha256:1aad9666808707242f890c62d44e94e562145cfa9240393c95f3b81eafc1a017",
+          "checked_at": "2026-09-18T19:03:48.969Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SEJ.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 129.64,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.41,
+            ".railyard_map/special_demand_types.json": 0,
+            "SEJ.pmtiles": 144.49,
+            "buildings_index.bin.gz": 23.71,
+            "buildings_index.json": 89.28,
+            "config.json": 0.05,
+            "demand_data.json": 9.2,
+            "driving_paths.json.gz": 3.78,
+            "roads.geojson": 25.64,
+            "runways_taxiways.geojson": 0.28
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "SEJ.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/SEJ.zip"
+          },
+          "fingerprint": "rules:v6:sha256:ef7b71a6db0ac40cea0886edbe1a11847728c728df5c5d0626f8bd891b9b833e",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -25458,17 +26171,17 @@
     },
     "seoul-4": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "0.4.0",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
+        "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
-      "incomplete_versions": [
-        "0.3.1"
-      ],
-      "last_updated": 1789171200,
+      "incomplete_versions": [],
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -25612,16 +26325,14 @@
           "released_at": "2026-04-23T00:00:00.000Z"
         },
         "0.3.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data resident totals mismatch (points=4745021, pops=4765982, delta=-20961)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
             "demand_phantom_points": true,
-            "demand_residents_match": false,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -25642,7 +26353,19 @@
             "city_pmtiles": "SEL.pmtiles",
             "config_version_matches_tag": "config.json"
           },
-          "release_size": 293.66,
+          "release_size": 293.67,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.08,
+            ".railyard_map/special_demand_types.json": 0,
+            "SEL.pmtiles": 284.61,
+            "buildings_index.bin.gz": 70.02,
+            "buildings_index.json": 260.33,
+            "config.json": 0.01,
+            "demand_data.json": 12.44,
+            "driving_paths.json.gz": 5.6,
+            "roads.geojson": 57.37,
+            "runways_taxiways.geojson": 2.25
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -25651,9 +26374,63 @@
             "asset_name": "SEL.zip",
             "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.3.1/SEL.zip"
           },
-          "fingerprint": "rules:v6:sha256:abf638001d4c451fd570e6e53f2702f85194a8150d3ed45af6879c0e35793653",
-          "checked_at": "2026-09-15T21:32:17.735Z",
+          "fingerprint": "rules:v6:sha256:9d52d3df514e260631a15d63848766a6906ea861219001348a088d081135a9a2",
+          "checked_at": "2026-09-18T19:03:48.969Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SEL.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 301.54,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 1.47,
+            ".railyard_map/special_demand_types.json": 0,
+            "SEL.pmtiles": 284.61,
+            "buildings_index.bin.gz": 70.02,
+            "buildings_index.json": 260.33,
+            "config.json": 0.17,
+            "demand_data.json": 26.14,
+            "driving_paths.json.gz": 11.66,
+            "roads.geojson": 57.36,
+            "runways_taxiways.geojson": 2.22
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "SEL.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/SEL.zip"
+          },
+          "fingerprint": "rules:v6:sha256:2b43aa00b03a46ec2e26eac9dd675a8f25f95447a2fa3e5cd6dcc9db7e78e326",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -27051,13 +27828,14 @@
     },
     "suwon": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
+      "latest_semver_version": "0.4.0",
       "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
         "0.3.1"
       ],
       "incomplete_versions": [],
-      "last_updated": 1789171200,
+      "last_updated": 1789776000,
       "versions": {
         "0.3.1": {
           "is_complete": true,
@@ -27113,6 +27891,60 @@
           "fingerprint": "rules:v6:sha256:4bb52672ac22bab5c112c1193d7d49dceb781837e354f159e991f4b27d6eedb2",
           "checked_at": "2026-09-14T16:01:11.543Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SWU.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 133.59,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.81,
+            ".railyard_map/special_demand_types.json": 0,
+            "SWU.pmtiles": 144.77,
+            "buildings_index.bin.gz": 22.31,
+            "buildings_index.json": 81.87,
+            "config.json": 0.11,
+            "demand_data.json": 15.36,
+            "driving_paths.json.gz": 6.42,
+            "roads.geojson": 28.65,
+            "runways_taxiways.geojson": 1.86
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "SWU.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/SWU.zip"
+          },
+          "fingerprint": "rules:v6:sha256:02ad54f95ab4ccbf8848a2eec9be6afd38eee042cc7b0555351c335a5e7f2751",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
@@ -29826,17 +30658,17 @@
     },
     "ulsan-4": {
       "has_complete_version": true,
-      "latest_semver_version": "0.3.1",
-      "latest_semver_complete": false,
+      "latest_semver_version": "0.4.0",
+      "latest_semver_complete": true,
       "complete_versions": [
+        "0.4.0",
+        "0.3.1",
         "0.2.0",
         "0.1.1",
         "0.1.0"
       ],
-      "incomplete_versions": [
-        "0.3.1"
-      ],
-      "last_updated": 1789171200,
+      "incomplete_versions": [],
+      "last_updated": 1789776000,
       "versions": {
         "0.1.0": {
           "is_complete": true,
@@ -29980,16 +30812,14 @@
           "released_at": "2026-04-23T00:00:00.000Z"
         },
         "0.3.1": {
-          "is_complete": false,
-          "errors": [
-            "demand_data resident totals mismatch (points=624212, pops=624255, delta=-43)"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
             "demand_point_spacing": true,
             "demand_phantom_points": true,
-            "demand_residents_match": false,
+            "demand_residents_match": true,
             "buildings_index": true,
             "roads_geojson": true,
             "runways_taxiways_geojson": true,
@@ -30011,6 +30841,19 @@
             "config_version_matches_tag": "config.json"
           },
           "release_size": 87.79,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0,
+            ".railyard_map/special_demand_types.json": 0,
+            "USN.pmtiles": 95.52,
+            "buildings_index.bin.gz": 16.57,
+            "buildings_index.json": 58.48,
+            "config.json": 0,
+            "demand_data.json": 1.76,
+            "driving_paths.json.gz": 1,
+            "ocean_depth_index.json": 12.51,
+            "roads.geojson": 13.23,
+            "runways_taxiways.geojson": 0.09
+          },
           "game_version": ">=1.0.0",
           "source": {
             "update_type": "custom",
@@ -30019,9 +30862,64 @@
             "asset_name": "USN.zip",
             "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.3.1/USN.zip"
           },
-          "fingerprint": "rules:v6:sha256:7ae93fa67e4f238135f0220653cfb2f3d3d31e157f8beb89caf9a1f103616229",
-          "checked_at": "2026-09-15T21:32:17.735Z",
+          "fingerprint": "rules:v6:sha256:cb0a9b784771ea40119b0dbc2a68647383d8c40a4ed83786c25a0190eecb7ec4",
+          "checked_at": "2026-09-18T19:03:48.969Z",
           "released_at": "2026-09-12T00:00:00.000Z"
+        },
+        "0.4.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "USN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 89.89,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.19,
+            ".railyard_map/special_demand_types.json": 0,
+            "USN.pmtiles": 95.52,
+            "buildings_index.bin.gz": 16.57,
+            "buildings_index.json": 58.48,
+            "config.json": 0.03,
+            "demand_data.json": 5.32,
+            "driving_paths.json.gz": 2.61,
+            "ocean_depth_index.json": 12.51,
+            "roads.geojson": 13.23,
+            "runways_taxiways.geojson": 0.08
+          },
+          "game_version": ">=1.0.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "budhakr/sb_korean_map_pack",
+            "tag": "v0.4.0",
+            "asset_name": "USN.zip",
+            "download_url": "https://github.com/budhakr/sb_korean_map_pack/releases/download/v0.4.0/USN.zip"
+          },
+          "fingerprint": "rules:v6:sha256:51cb4000b934b37fd229746ddeb95949dee7acdbff93c0bcc9405f9d2a8c0775",
+          "checked_at": "2026-09-18T19:03:48.969Z",
+          "released_at": "2026-09-19T00:00:00.000Z"
         }
       }
     },
