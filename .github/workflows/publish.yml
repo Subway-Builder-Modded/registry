@@ -147,12 +147,19 @@ jobs:
             core.setOutput('quality_exempt', qualityExempt ? 'true' : 'false');
             console.log(`Maintainer overrides: admin_author=${adminAuthor} quality_exempt=${qualityExempt}`);
 
+      - name: Sanitize issue body
+        id: sanitize
+        env:
+          TEMPLATE_PATH: .github/ISSUE_TEMPLATE/publish-mod.yml
+          RAW_BODY: ${{ github.event.issue.body }}
+        run: pnpm --dir scripts run sanitize-issue-body
+
       - name: Parse issue body
         id: parser
         uses: stefanbuck/github-issue-parser@v3
         with:
           template-path: .github/ISSUE_TEMPLATE/publish-mod.yml
-          issue-body: ${{ github.event.issue.body }}
+          issue-body: ${{ steps.sanitize.outputs.body }}
 
       - name: Validate submission
         id: validate
@@ -403,12 +410,19 @@ jobs:
             core.setOutput('quality_exempt', qualityExempt ? 'true' : 'false');
             console.log(`Maintainer overrides: admin_author=${adminAuthor} quality_exempt=${qualityExempt}`);
 
+      - name: Sanitize issue body
+        id: sanitize
+        env:
+          TEMPLATE_PATH: .github/ISSUE_TEMPLATE/publish-map.yml
+          RAW_BODY: ${{ github.event.issue.body }}
+        run: pnpm --dir scripts run sanitize-issue-body
+
       - name: Parse issue body
         id: parser
         uses: stefanbuck/github-issue-parser@v3
         with:
           template-path: .github/ISSUE_TEMPLATE/publish-map.yml
-          issue-body: ${{ github.event.issue.body }}
+          issue-body: ${{ steps.sanitize.outputs.body }}
 
       - name: Validate submission
         id: validate
