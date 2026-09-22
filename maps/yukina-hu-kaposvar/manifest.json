@@ -65,20 +65,20 @@
     "Nagybajom"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 11.04,
-    ".railyard_map/regions/hu-jaras.geojson.gz": 0.15,
+    ".railyard_map/landuse_provenance.parquet": 10.53,
+    ".railyard_map/regions/hu-jaras.geojson.gz": 0.14,
     ".railyard_map/regions/hu-telepulesek.geojson.gz": 0.08,
     ".railyard_map/regions/manifest.json": 0,
-    ".railyard_map/special_demand_points.json": 2.66,
+    ".railyard_map/special_demand_points.json": 2.54,
     ".railyard_map/special_demand_types.json": 0.07,
-    "KAP.pmtiles": 24.41,
-    "buildings_index.bin.gz": 16.47,
-    "buildings_index.json": 42.42,
+    "KAP.pmtiles": 23.28,
+    "buildings_index.bin.gz": 15.71,
+    "buildings_index.json": 40.45,
     "config.json": 0.01,
-    "demand_data.json": 2.58,
-    "driving_paths.json.gz": 12.27,
-    "ocean_depth_index.json": 11.68,
-    "roads.geojson": 3.4,
+    "demand_data.json": 2.46,
+    "driving_paths.json.gz": 11.7,
+    "ocean_depth_index.json": 11.14,
+    "roads.geojson": 3.25,
     "runways_taxiways.geojson": 0.08
   },
   "data_quality": {
@@ -87,5 +87,83 @@
     "weighted_score": 0.59,
     "rubric_version": 1,
     "provenance": "backfill"
-  }
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.09996891009907985,
+      "p25": 0.11090368702904897,
+      "p50": 0.1289058553275299,
+      "p75": 0.16583710409790714,
+      "p90": 0.22418987901721837,
+      "mean": 0.14892219946943527
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.08990900500081284,
+      "p25": 0.10829254012150667,
+      "p50": 0.1252128740954072,
+      "p75": 0.16339823218402244,
+      "p90": 0.23414305565891466,
+      "mean": 0.16144792535851404
+    },
+    "commuteDistanceKm": {
+      "p10": 1115,
+      "p25": 3166,
+      "p50": 19584,
+      "p75": 45529,
+      "p90": 73191,
+      "mean": 28657.902396101257
+    },
+    "residentCellDensity": {
+      "p10": 9,
+      "p25": 18,
+      "p50": 39,
+      "p75": 82,
+      "p90": 181,
+      "mean": 90.32506203473946
+    },
+    "workerCellDensity": {
+      "p10": 7,
+      "p25": 14,
+      "p50": 33,
+      "p75": 81,
+      "p90": 235,
+      "mean": 124.94736842105263
+    },
+    "detail": {
+      "radiusKm": 0.12704594693766022,
+      "expectedPointSpacingKm": 0.48725445517057175,
+      "normalizedRadius": 0.2607383998021847,
+      "activityPerPoint": 17.289648622981957,
+      "playableAreaKm2": 3568,
+      "playableAreaPerPointKm2": 0.564735675846787,
+      "playableCatchmentRadiusKm": 0.4239822504571587,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.9997910670575311,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 17.742773737563606,
+            "latitude": 46.46085705038181,
+            "massShare": 1,
+            "assignedMass": 218472,
+            "assignedPointCount": 6318,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1790035200
 }

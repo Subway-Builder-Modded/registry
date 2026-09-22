@@ -65,21 +65,21 @@
     "Jánoshalma"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 18.71,
+    ".railyard_map/landuse_provenance.parquet": 17.84,
     ".railyard_map/regions/hu-jaras.geojson.gz": 0.14,
     ".railyard_map/regions/hu-telepulesek.geojson.gz": 0.08,
     ".railyard_map/regions/manifest.json": 0,
-    ".railyard_map/special_demand_points.json": 4.17,
+    ".railyard_map/special_demand_points.json": 3.98,
     ".railyard_map/special_demand_types.json": 0.07,
-    "SZB.pmtiles": 38.62,
-    "buildings_index.bin.gz": 26.38,
-    "buildings_index.json": 68.23,
+    "SZB.pmtiles": 36.83,
+    "buildings_index.bin.gz": 25.16,
+    "buildings_index.json": 65.07,
     "config.json": 0.01,
-    "demand_data.json": 3.57,
-    "driving_paths.json.gz": 17.31,
-    "ocean_depth_index.json": 14.1,
-    "roads.geojson": 4.92,
-    "runways_taxiways.geojson": 0.24
+    "demand_data.json": 3.41,
+    "driving_paths.json.gz": 16.51,
+    "ocean_depth_index.json": 13.45,
+    "roads.geojson": 4.69,
+    "runways_taxiways.geojson": 0.23
   },
   "data_quality": {
     "tier": "medium",
@@ -87,5 +87,115 @@
     "weighted_score": 0.59,
     "rubric_version": 1,
     "provenance": "backfill"
-  }
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.09616832487526916,
+      "p25": 0.10997985293234536,
+      "p50": 0.12740601990769046,
+      "p75": 0.16158391197056426,
+      "p90": 0.20341843261829345,
+      "mean": 0.1512402092387319
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.09063605640554266,
+      "p25": 0.10543118513652315,
+      "p50": 0.12481389696796602,
+      "p75": 0.16129659980464914,
+      "p90": 0.23558519673383224,
+      "mean": 0.1670462533724422
+    },
+    "commuteDistanceKm": {
+      "p10": 949,
+      "p25": 2334,
+      "p50": 16667,
+      "p75": 45676,
+      "p90": 71874,
+      "mean": 27573.00207284572
+    },
+    "residentCellDensity": {
+      "p10": 7,
+      "p25": 13,
+      "p50": 41,
+      "p75": 132,
+      "p90": 310,
+      "mean": 123.10361958836054
+    },
+    "workerCellDensity": {
+      "p10": 7,
+      "p25": 13,
+      "p50": 32,
+      "p75": 89,
+      "p90": 267,
+      "mean": 133.28439661798618
+    },
+    "detail": {
+      "radiusKm": 0.12610329829888314,
+      "expectedPointSpacingKm": 0.47393274788607903,
+      "normalizedRadius": 0.26607846548134095,
+      "activityPerPoint": 19.639533567304426,
+      "playableAreaKm2": 4700,
+      "playableAreaPerPointKm2": 0.532095550775501,
+      "playableCatchmentRadiusKm": 0.41154741428692165,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9768723160841764,
+        "continuousScore": 0.98208118417777,
+        "detectedCenterCount": 5,
+        "effectiveCenterCount": 4.5766140659152015,
+        "largestCenterShare": 0.2890342179898084,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 18.661781697081253,
+            "latitude": 46.35595216183526,
+            "massShare": 0.2890342179898084,
+            "assignedMass": 100281,
+            "assignedPointCount": 2257,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 18.77443667188928,
+            "latitude": 46.60227330327351,
+            "massShare": 0.22663653761903663,
+            "assignedMass": 78632,
+            "assignedPointCount": 1896,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 19.022079306165132,
+            "latitude": 46.16710261338838,
+            "massShare": 0.21790622333925153,
+            "assignedMass": 75603,
+            "assignedPointCount": 2007,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 19.450957919303082,
+            "latitude": 46.36789624690511,
+            "massShare": 0.15086813161474785,
+            "assignedMass": 52344,
+            "assignedPointCount": 1464,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 19.293758710889957,
+            "latitude": 46.60429166192754,
+            "massShare": 0.11555488943715557,
+            "assignedMass": 40092,
+            "assignedPointCount": 1209,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1790035200
 }

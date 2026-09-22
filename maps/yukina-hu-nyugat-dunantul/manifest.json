@@ -70,21 +70,21 @@
     "Zalaszentgrót"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 30.82,
-    ".railyard_map/regions/hu-jaras.geojson.gz": 0.28,
-    ".railyard_map/regions/hu-telepulesek.geojson.gz": 0.16,
+    ".railyard_map/landuse_provenance.parquet": 29.39,
+    ".railyard_map/regions/hu-jaras.geojson.gz": 0.27,
+    ".railyard_map/regions/hu-telepulesek.geojson.gz": 0.15,
     ".railyard_map/regions/manifest.json": 0,
-    ".railyard_map/special_demand_points.json": 3.22,
+    ".railyard_map/special_demand_points.json": 3.07,
     ".railyard_map/special_demand_types.json": 0.07,
-    "NYD.pmtiles": 47.38,
-    "buildings_index.bin.gz": 32,
-    "buildings_index.json": 82.04,
+    "NYD.pmtiles": 45.19,
+    "buildings_index.bin.gz": 30.52,
+    "buildings_index.json": 78.24,
     "config.json": 0.01,
-    "demand_data.json": 4.89,
-    "driving_paths.json.gz": 42.14,
-    "ocean_depth_index.json": 28.11,
-    "roads.geojson": 8.5,
-    "runways_taxiways.geojson": 0.34
+    "demand_data.json": 4.67,
+    "driving_paths.json.gz": 40.19,
+    "ocean_depth_index.json": 26.81,
+    "roads.geojson": 8.11,
+    "runways_taxiways.geojson": 0.32
   },
   "data_quality": {
     "tier": "medium",
@@ -92,5 +92,107 @@
     "weighted_score": 0.59,
     "rubric_version": 1,
     "provenance": "backfill"
-  }
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.10875125048451698,
+      "p25": 0.11632502684870757,
+      "p50": 0.1319171993809643,
+      "p75": 0.1695958041772594,
+      "p90": 0.23599309460887563,
+      "mean": 0.15731790532080137
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.1045786725174521,
+      "p25": 0.11658557911649088,
+      "p50": 0.14047009152507983,
+      "p75": 0.1777781210214155,
+      "p90": 0.2461593370835216,
+      "mean": 0.17180778843292846
+    },
+    "commuteDistanceKm": {
+      "p10": 1342,
+      "p25": 5277,
+      "p50": 21533,
+      "p75": 45983,
+      "p90": 72308,
+      "mean": 29851.058185168753
+    },
+    "residentCellDensity": {
+      "p10": 14,
+      "p25": 24,
+      "p50": 55,
+      "p75": 120,
+      "p90": 242,
+      "mean": 130.63264274886305
+    },
+    "workerCellDensity": {
+      "p10": 11,
+      "p25": 17,
+      "p50": 36,
+      "p75": 91,
+      "p90": 304,
+      "mean": 169.9796052631579
+    },
+    "detail": {
+      "radiusKm": 0.1361264892325379,
+      "expectedPointSpacingKm": 0.5015459173237734,
+      "normalizedRadius": 0.2714138118378129,
+      "activityPerPoint": 26.698905862923205,
+      "playableAreaKm2": 5848,
+      "playableAreaPerPointKm2": 0.6036333608587944,
+      "playableCatchmentRadiusKm": 0.4383405826428827,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9022489195586388,
+        "continuousScore": 0.9924184747635788,
+        "detectedCenterCount": 4,
+        "effectiveCenterCount": 3.0929750432364216,
+        "largestCenterShare": 0.45992793600841264,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 16.699168835749333,
+            "latitude": 47.22605592174975,
+            "massShare": 0.45992793600841264,
+            "assignedMass": 237929,
+            "assignedPointCount": 3777,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 16.802218959010087,
+            "latitude": 46.84184440954006,
+            "massShare": 0.2745603284633436,
+            "assignedMass": 142035,
+            "assignedPointCount": 3064,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 16.959299489509156,
+            "latitude": 46.472261214441595,
+            "massShare": 0.15671405209175016,
+            "assignedMass": 81071,
+            "assignedPointCount": 1628,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 17.212672118170662,
+            "latitude": 46.79028514553244,
+            "massShare": 0.10879768343649361,
+            "assignedMass": 56283,
+            "assignedPointCount": 1219,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1790035200
 }

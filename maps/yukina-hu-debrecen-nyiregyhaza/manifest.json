@@ -70,21 +70,21 @@
     "Hajdúsámson"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 20.71,
-    ".railyard_map/regions/hu-jaras.geojson.gz": 0.29,
-    ".railyard_map/regions/hu-telepulesek.geojson.gz": 0.13,
+    ".railyard_map/landuse_provenance.parquet": 19.75,
+    ".railyard_map/regions/hu-jaras.geojson.gz": 0.27,
+    ".railyard_map/regions/hu-telepulesek.geojson.gz": 0.12,
     ".railyard_map/regions/manifest.json": 0,
-    ".railyard_map/special_demand_points.json": 6.24,
+    ".railyard_map/special_demand_points.json": 5.95,
     ".railyard_map/special_demand_types.json": 0.07,
-    "DEB.pmtiles": 68.41,
-    "buildings_index.bin.gz": 55.56,
-    "buildings_index.json": 144.61,
+    "DEB.pmtiles": 65.24,
+    "buildings_index.bin.gz": 52.98,
+    "buildings_index.json": 137.91,
     "config.json": 0.01,
-    "demand_data.json": 6.61,
-    "driving_paths.json.gz": 33.6,
-    "ocean_depth_index.json": 24.49,
-    "roads.geojson": 10.21,
-    "runways_taxiways.geojson": 0.53
+    "demand_data.json": 6.31,
+    "driving_paths.json.gz": 32.05,
+    "ocean_depth_index.json": 23.35,
+    "roads.geojson": 9.73,
+    "runways_taxiways.geojson": 0.5
   },
   "data_quality": {
     "tier": "medium",
@@ -92,5 +92,91 @@
     "weighted_score": 0.59,
     "rubric_version": 1,
     "provenance": "backfill"
-  }
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.10863563386671035,
+      "p25": 0.11884464470308369,
+      "p50": 0.13699335718942993,
+      "p75": 0.17225930316489443,
+      "p90": 0.23329129815476196,
+      "mean": 0.15968283208433834
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.09620955324722558,
+      "p25": 0.11401440985078119,
+      "p50": 0.13722440467930178,
+      "p75": 0.17624660642918313,
+      "p90": 0.2605934447530538,
+      "mean": 0.19227928548108472
+    },
+    "commuteDistanceKm": {
+      "p10": 1199,
+      "p25": 3160,
+      "p50": 17766,
+      "p75": 46018,
+      "p90": 81418,
+      "mean": 30627.32920666328
+    },
+    "residentCellDensity": {
+      "p10": 17,
+      "p25": 35,
+      "p50": 90,
+      "p75": 219,
+      "p90": 458,
+      "mean": 209.1493376154155
+    },
+    "workerCellDensity": {
+      "p10": 14,
+      "p25": 24,
+      "p50": 57,
+      "p75": 153,
+      "p90": 426,
+      "mean": 237.2440801457195
+    },
+    "detail": {
+      "radiusKm": 0.1371088322659721,
+      "expectedPointSpacingKm": 0.457465968567729,
+      "normalizedRadius": 0.2997137310459254,
+      "activityPerPoint": 32.095830510562294,
+      "playableAreaKm2": 7232,
+      "playableAreaPerPointKm2": 0.4454024758268153,
+      "playableCatchmentRadiusKm": 0.376531554303769,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9819779911026312,
+        "continuousScore": 0.9940947091059098,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.9645940682227712,
+        "largestCenterShare": 0.567123037955252,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 21.492637063997538,
+            "latitude": 47.491028649176656,
+            "massShare": 0.567123037955252,
+            "assignedMass": 591101,
+            "assignedPointCount": 7960,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 21.848821434229034,
+            "latitude": 47.97418252060048,
+            "massShare": 0.43287696204474807,
+            "assignedMass": 451179,
+            "assignedPointCount": 8277,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1790035200
 }

@@ -66,20 +66,20 @@
     "Sándorfalva"
   ],
   "file_sizes": {
-    ".railyard_map/landuse_provenance.parquet": 14.75,
-    ".railyard_map/regions/hu-jaras.geojson.gz": 0.07,
+    ".railyard_map/landuse_provenance.parquet": 14.07,
+    ".railyard_map/regions/hu-jaras.geojson.gz": 0.06,
     ".railyard_map/regions/hu-telepulesek.geojson.gz": 0.05,
     ".railyard_map/regions/manifest.json": 0,
-    ".railyard_map/special_demand_points.json": 3.65,
+    ".railyard_map/special_demand_points.json": 3.48,
     ".railyard_map/special_demand_types.json": 0.07,
-    "SZE.pmtiles": 34.84,
-    "buildings_index.bin.gz": 28.32,
-    "buildings_index.json": 72.76,
+    "SZE.pmtiles": 33.23,
+    "buildings_index.bin.gz": 27.01,
+    "buildings_index.json": 69.39,
     "config.json": 0.01,
-    "demand_data.json": 2.6,
-    "driving_paths.json.gz": 6.06,
-    "ocean_depth_index.json": 9.5,
-    "roads.geojson": 4.72,
+    "demand_data.json": 2.48,
+    "driving_paths.json.gz": 5.78,
+    "ocean_depth_index.json": 9.06,
+    "roads.geojson": 4.5,
     "runways_taxiways.geojson": 0.04
   },
   "data_quality": {
@@ -88,5 +88,83 @@
     "weighted_score": 0.59,
     "rubric_version": 1,
     "provenance": "backfill"
-  }
+  },
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.10930954987765962,
+      "p25": 0.11735894906578512,
+      "p50": 0.1313064190851934,
+      "p75": 0.16486343608567777,
+      "p90": 0.24193686389943445,
+      "mean": 0.17715525249077288
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.07798646471175828,
+      "p25": 0.1107825254648178,
+      "p50": 0.13107175778337665,
+      "p75": 0.1757203624294243,
+      "p90": 0.2681881643299727,
+      "mean": 0.1777564211394191
+    },
+    "commuteDistanceKm": {
+      "p10": 960,
+      "p25": 2383,
+      "p50": 7484,
+      "p75": 31295,
+      "p90": 59071,
+      "mean": 20042.370545480208
+    },
+    "residentCellDensity": {
+      "p10": 12,
+      "p25": 17,
+      "p50": 32,
+      "p75": 144,
+      "p90": 433,
+      "mean": 177.33220108695653
+    },
+    "workerCellDensity": {
+      "p10": 14,
+      "p25": 25,
+      "p50": 55,
+      "p75": 143,
+      "p90": 390,
+      "mean": 250.68618042226487
+    },
+    "detail": {
+      "radiusKm": 0.1311890359661851,
+      "expectedPointSpacingKm": 0.49983270317730233,
+      "normalizedRadius": 0.2624658913517495,
+      "activityPerPoint": 34.978188143985015,
+      "playableAreaKm2": 3964,
+      "playableAreaPerPointKm2": 0.5304429278736785,
+      "playableCatchmentRadiusKm": 0.4109078096099748,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.9943747809359527,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 20.148407332833457,
+            "latitude": 46.39436664553051,
+            "massShare": 1,
+            "assignedMass": 522784,
+            "assignedPointCount": 7473,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1790035200
 }
