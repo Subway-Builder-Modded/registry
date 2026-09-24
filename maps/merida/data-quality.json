@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "merida",
+  "answers": {
+    "workplace_count": "size_bands",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm5",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "synthetic_measured_marginals",
+    "od_granularity": null
+  },
+  "notes": "Origin demographics are sourced from universal Mexican Census microdata (INEGI CPV 2020 RESAGEBURB) at the individual urban block level (manzanas), tracking both occupied population (POCUPADA) and economically active population (PEA). Population totals are updated to 2026 using official CONAPO municipal demographic projection factors. Zero bounding-box centroid imputation is applied; only verified residential manzanas within the contiguous urban envelope are processed.\n\nWorkplace destinations are 100% derived from physical establishment coordinates in the National Directory of Economic Units (INEGI DENUE 2024–2026) classified down to 6-digit SCIAN industry codes. The establishment employment tiers are calibrated against municipal Censos Económicos (CE) macro-totals. No synthetic employment corridors or unanchored job approximations are used.\n\nTrip distribution is synthesized via a double-constrained Furness entropy gravity model (beta = 0.12) with strict mass conservation (sum T_ij = sum PEA_i and sum_i T_ij = jobs_j). Baseline free-flow travel times (~40 km/h) are computed using Open Source Routing Machine (OSRM) on OpenStreetMap road networks. In addition, 23 dedicated university campuses are explicitly modeled with student-commuter dampening (0.3).",
+  "sources": [
+    "https://www.inegi.org.mx/programas/ccpv/2020/",
+    "https://www.inegi.org.mx/app/descarga/ficha.html?tit=denue",
+    "https://www.gob.mx/conapo/acciones-y-programas/conciliacion-demografica-de-mexico-1950-2019-y-proyecciones-de-la-poblacion-de-mexico-y-de-las-entidades-federativas-2020-2070",
+    "https://www.inegi.org.mx/programas/ce/2019/"
+  ],
+  "derived_from": "cancun-riviera-maya",
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "Meszier83",
+    "reviewed_by": null,
+    "date": "2026-09-23"
+  }
+}
