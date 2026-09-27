@@ -4,10 +4,13 @@
   "name": "Changwon",
   "author": "budhakr",
   "github_id": 242454095,
-  "description": "# Changwon",
+  "description": "# Changwon\n\n**CWN · v0.4.0**\n\nCustom map of Changwon, Korea, built from official Korean government transport and demographic data.\n\n## Coverage\n\n<table style=\"width: auto\">\n<tr><td><strong>Region</strong></td><td>경상남도, 부산광역시</td></tr>\n<tr><td><strong>Playable Area</strong></td><td>1,609 km²</td></tr>\n</table>\n\n<details>\n<summary>District list (11)</summary>\n\n<table style=\"width: auto\">\n<tr><th align=\"left\">시군구</th><th align=\"left\">District</th><th align=\"right\">Population</th></tr>\n<tr><td colspan=\"3\"><strong>경상남도 (Gyeongsangnam-do)</strong></td></tr>\n<tr><td>김해시</td><td>Gimhae-si</td><td align=\"right\">503,357</td></tr>\n<tr><td>밀양시</td><td>Miryang-si</td><td align=\"right\">6,452</td></tr>\n<tr><td>진주시</td><td>Jinju-si</td><td align=\"right\">361,984</td></tr>\n<tr><td>창녕군</td><td>Changnyeong-gun</td><td align=\"right\">1,420</td></tr>\n<tr><td>창원시 마산합포구</td><td>Masanhappo-gu Changwon-si</td><td align=\"right\">205,056</td></tr>\n<tr><td>창원시 마산회원구</td><td>Masanhoewon-gu Changwon-si</td><td align=\"right\">174,912</td></tr>\n<tr><td>창원시 성산구</td><td>seongsan-gu Changwon-si</td><td align=\"right\">202,282</td></tr>\n<tr><td>창원시 의창구</td><td>Uichang-gu Changwon-si</td><td align=\"right\">244,067</td></tr>\n<tr><td>창원시 진해구</td><td>Jinhae-gu Changwon-si</td><td align=\"right\">218,203</td></tr>\n<tr><td>함안군</td><td>Haman-gun</td><td align=\"right\">23,976</td></tr>\n<tr><td colspan=\"3\"><strong>부산광역시 (Busan)</strong></td></tr>\n<tr><td>강서구</td><td>Gangseo-gu</td><td align=\"right\">18,897</td></tr>\n</table>\n</details>\n\n## Population Summary\n\n<table style=\"width: auto\">\n<tr><td><strong>Total Modeled Demand</strong></td><td align=\"right\">3,966,826</td></tr>\n<tr><td><strong>Pops</strong></td><td align=\"right\">43,776</td></tr>\n</table>\n\n## Additional Features\n\n- **Neighborhood Labels** — The map includes municipal and neighborhood labels derived from administrative boundary data.\n\t- 시도 (Si, Do - Metropolitan / Provincial level)\n\t- 시군구 (Si, Gun, Gu - City / County / District level)\n\t- 읍면동 (Eup, Myeon, Dong - Neighborhood level)\n- **Special Demand POIs** — Airport, HSR station, Bus terminal, University, Hospital, School, Park, Shopping Center, Tourist Attraction, Ferry Terminal (where applicable); each modeled with real ridership, catchment gravity, or enrollment/visitor data.\n\n## Data Sources\n\n- Korean Transportation Database (Korea Transport Institute, KOTI) (ktdb.go.kr)\n- V-world (Ministry of Land, Infrastructure and Transport, MOLIT) (vworld.kr)\n- Statistical Geographic Information System (SGIS) plus (Ministry of Data and Statistics, MODS) (sgis.mods.go.kr)\n- Address-based Industry Support Service (Ministry of the Interior and Safety, MOIS) (business.juso.go.kr)\n- Aviation statistics 2025 (Korea Civil Aviation Association, KCAA) (airportal.go.kr)\n- Korean railroad statistics 2024 (Korea Railroad, KORAIL) (railstat.korail.com)\n- Korean Public Transportation Database (Korea Transportation Safety Authority, KTSA) (kotsa.or.kr)\n- Korean Hospital and Pharmacy Status (Health Insurance Review and Assessment Service, HIRA) (data.go.kr)\n- Health Insurance Medical Statistics (HIRA) (opendata.hira.or.kr)\n- Academy Information System (Ministry of Education, MOE) (academyinfo.go.kr)\n- School Info Disclosure (schoolinfo.go.kr) and Korea National Standard Data (data.go.kr) — schools, parks, shopping centers, tourist attractions\n- Korea Transport Safety Authority (KOMSA) coastal ferry statistics (komsa.or.kr)\n\n## Credits\n\nMap authored by budhakr",
   "tags": [
     "east-asia",
+    "entertainment",
     "hospitals",
+    "parks",
+    "schools",
     "universities"
   ],
   "gallery": [
@@ -21,10 +24,10 @@
   },
   "city_code": "CWN",
   "country": "KR",
-  "population": 1257053,
-  "residents_total": 1257053,
-  "points_count": 645,
-  "population_count": 24166,
+  "population": 3966826,
+  "residents_total": 3966826,
+  "points_count": 1952,
+  "population_count": 43776,
   "initial_view_state": {
     "latitude": 35.228,
     "longitude": 128.6811,
@@ -43,114 +46,117 @@
   },
   "location": "east-asia",
   "special_demand": [
+    "entertainment",
     "hospitals",
+    "parks",
+    "schools",
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/special_demand_points.json": 0.01,
+    ".railyard_map/special_demand_points.json": 0.28,
     ".railyard_map/special_demand_types.json": 0,
-    "CWN.pmtiles": 115.44,
+    "CWN.pmtiles": 126.16,
     "buildings_index.bin.gz": 20.05,
     "buildings_index.json": 71.37,
-    "config.json": 0,
-    "demand_data.json": 5.27,
-    "driving_paths.json.gz": 1.6,
+    "config.json": 0.04,
+    "demand_data.json": 6.42,
+    "driving_paths.json.gz": 2.73,
     "ocean_depth_index.json": 13.46,
     "roads.geojson": 20.98,
-    "runways_taxiways.geojson": 0
+    "runways_taxiways.geojson": 0.76
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.4083418525754571,
-      "p25": 0.40861423297819893,
-      "p50": 0.4088182801000673,
-      "p75": 0.40906739362207845,
-      "p90": 0.5003778610509171,
-      "mean": 0.4296505416797715
+      "p10": 0.08399700859121281,
+      "p25": 0.13719625031127547,
+      "p50": 0.21355449647886832,
+      "p75": 0.3660456110425907,
+      "p90": 0.6458850078009905,
+      "mean": 0.2895376477386803
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.4083418525754571,
-      "p25": 0.4086142329756182,
-      "p50": 0.4087956182826733,
-      "p75": 0.40904475955213276,
-      "p90": 0.4094517866298692,
-      "mean": 0.42754152012315916
+      "p10": 0.07803917608151349,
+      "p25": 0.1312164541514853,
+      "p50": 0.20685193895654586,
+      "p75": 0.3440873970184397,
+      "p90": 0.40931620182335904,
+      "mean": 0.2543414656432669
     },
     "commuteDistanceKm": {
-      "p10": 2915,
-      "p25": 4556,
-      "p50": 8420,
-      "p75": 13465,
-      "p90": 18946,
-      "mean": 9841.095423322022
+      "p10": 2211,
+      "p25": 3616,
+      "p50": 5937,
+      "p75": 10306,
+      "p90": 15741,
+      "mean": 7868.018823099415
     },
     "residentCellDensity": {
-      "p10": 65,
-      "p25": 570,
-      "p50": 2334,
-      "p75": 5956,
-      "p90": 11386,
-      "mean": 4275.340579710145
+      "p10": 50,
+      "p25": 313,
+      "p50": 3333,
+      "p75": 12001,
+      "p90": 30168,
+      "mean": 11100.627507163324
     },
     "workerCellDensity": {
-      "p10": 722,
-      "p25": 1863,
-      "p50": 5786,
-      "p75": 11922,
-      "p90": 19240,
-      "mean": 8331.609318996416
+      "p10": 404,
+      "p25": 1015,
+      "p50": 3751,
+      "p75": 15617,
+      "p90": 34737,
+      "mean": 11962.260787992494
     },
     "detail": {
-      "radiusKm": 0.40880694903434084,
-      "expectedPointSpacingKm": 0.6576915230827319,
-      "normalizedRadius": 0.6215785587720224,
-      "activityPerPoint": 2719.8850447739605,
-      "playableAreaKm2": 644,
-      "playableAreaPerPointKm2": 0.9984496124031008,
-      "playableCatchmentRadiusKm": 0.5637520576319708,
-      "localityScore": 0.39189783365579217,
+      "radiusKm": 0.21017650123061513,
+      "expectedPointSpacingKm": 0.5225450015917524,
+      "normalizedRadius": 0.4022170350694872,
+      "activityPerPoint": 2639.800981675249,
+      "playableAreaKm2": 1184,
+      "playableAreaPerPointKm2": 0.6065573770491803,
+      "playableCatchmentRadiusKm": 0.4394009668315071,
+      "localityScore": 0.8527640770368975,
       "deaggregationScore": 1,
-      "score": 0.626017438779298
+      "score": 0.9234522602911844
     },
     "polycentrism": {
       "activity": {
-        "score": 0.981055703566307,
-        "continuousScore": 0.7806977821331071,
+        "score": 0.9842480840087044,
+        "continuousScore": 0.7671165590313331,
         "detectedCenterCount": 3,
-        "effectiveCenterCount": 2.890483642094831,
-        "largestCenterShare": 0.41319696893640195,
+        "effectiveCenterCount": 2.908375041354798,
+        "largestCenterShare": 0.403757565842671,
         "bandwidthKm": 1.3,
         "reliabilityScore": 1,
         "supportLevel": "high",
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 128.71123963417165,
-            "latitude": 35.19949086970283,
-            "massShare": 0.41319696893640195,
-            "assignedMass": 1531046,
-            "assignedPointCount": 281,
+            "longitude": 128.6816062802709,
+            "latitude": 35.21993399997743,
+            "massShare": 0.403757565842671,
+            "assignedMass": 4304222,
+            "assignedPointCount": 736,
             "prominenceRatio": 1
           },
           {
-            "longitude": 128.57510243292083,
-            "latitude": 35.22709747818326,
-            "massShare": 0.33253098344401066,
-            "assignedMass": 1232149,
-            "assignedPointCount": 241,
+            "longitude": 128.84302067340434,
+            "latitude": 35.20249835467384,
+            "massShare": 0.33724869170159655,
+            "assignedMass": 3595210,
+            "assignedPointCount": 684,
             "prominenceRatio": 1
           },
           {
-            "longitude": 128.85306758364143,
-            "latitude": 35.22379798291288,
-            "massShare": 0.2542720476195874,
-            "assignedMass": 942171,
-            "assignedPointCount": 123,
-            "prominenceRatio": 1
+            "longitude": 128.56897254459886,
+            "latitude": 35.22215404817379,
+            "massShare": 0.2589937424557325,
+            "assignedMass": 2760980,
+            "assignedPointCount": 532,
+            "prominenceRatio": 0.9999999976948486
           }
         ]
       }
     }
   },
-  "last_updated": 1789171200
+  "last_updated": 1789776000
 }

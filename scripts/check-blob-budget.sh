@@ -3,9 +3,12 @@
 # Fail a change that re-introduces relocated/raster blobs or exceeds the size budget.
 #
 # Budget is empirical, from the post-WebP / post-relocation tip:
-#   - non-history legit max = 1.77 MB (gallery preview.webp); everything else < 0.6 MB
+#   - non-history legit max = 2.94 MB (yukina-hu-budapest gallery preview.webp,
+#     the largest metro coverage art; previous max 1.77 MB); everything else < 0.6 MB
 #   - the gallery PNGs we purged were 4-7.3 MB
-# So the cap sits in the 1.77 -> 4 MB gap. history/ is exempt from the size cap:
+# So the cap sits in the 2.94 -> 4 MB gap (raised 2.5 MiB -> 3 MiB for the HU
+# wave, 2026-09-22 — the guard targets runaway webp inflation, not legit
+# large-metro previews). history/ is exempt from the size cap:
 # append-only analytics, compresses ~14x (~0.9 MB packed total), read monolithically.
 #
 # Usage: check-blob-budget.sh <base-ref> [head-ref]   (checks added/modified files in the range)
@@ -14,7 +17,7 @@ set -euo pipefail
 BASE_REF="${1:?usage: check-blob-budget.sh <base-ref> [head-ref]}"
 HEAD_REF="${2:-HEAD}"
 
-SIZE_CAP=$((5 * 512 * 1024))   # 2.5 MiB — > 1.77 MB WebP max, < 4 MB raster range
+SIZE_CAP=$((3 * 1024 * 1024))  # 3 MiB — > 2.94 MB WebP max (BUD), < 4 MB raster range
 RASTER_RE='\.(png|jpe?g|bmp|tiff?|gif)$'
 
 fail=0

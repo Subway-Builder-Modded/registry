@@ -4,10 +4,13 @@
   "name": "Gangneung",
   "author": "budhakr",
   "github_id": 242454095,
-  "description": "# Gangneung",
+  "description": "# Gangneung\n\n**KAG · v0.4.0**\n\nCustom map of Gangneung, Korea, built from official Korean government transport and demographic data.\n\n## Coverage\n\n<table style=\"width: auto\">\n<tr><td><strong>Region</strong></td><td>강원특별자치도</td></tr>\n<tr><td><strong>Playable Area</strong></td><td>1,607 km²</td></tr>\n</table>\n\n<details>\n<summary>District list (4)</summary>\n\n<table style=\"width: auto\">\n<tr><th align=\"left\">시군구</th><th align=\"left\">District</th><th align=\"right\">Population</th></tr>\n<tr><td colspan=\"3\"><strong>강원특별자치도 (Gangwon State)</strong></td></tr>\n<tr><td>강릉시</td><td>Gangneung-si</td><td align=\"right\">318,185</td></tr>\n<tr><td>원주시</td><td>Wonju-si</td><td align=\"right\">361,984</td></tr>\n<tr><td>춘천시</td><td>Chuncheon-si</td><td align=\"right\">50,789</td></tr>\n<tr><td>평창군</td><td>Pyeongchang-gun</td><td align=\"right\">5,805</td></tr>\n</table>\n</details>\n\n## Population Summary\n\n<table style=\"width: auto\">\n<tr><td><strong>Total Modeled Demand</strong></td><td align=\"right\">259,957</td></tr>\n<tr><td><strong>Pops</strong></td><td align=\"right\">2,737</td></tr>\n</table>\n\n## Additional Features\n\n- **Neighborhood Labels** — The map includes municipal and neighborhood labels derived from administrative boundary data.\n\t- 시도 (Si, Do - Metropolitan / Provincial level)\n\t- 시군구 (Si, Gun, Gu - City / County / District level)\n\t- 읍면동 (Eup, Myeon, Dong - Neighborhood level)\n- **Special Demand POIs** — Airport, HSR station, Bus terminal, University, Hospital, School, Park, Shopping Center, Tourist Attraction, Ferry Terminal (where applicable); each modeled with real ridership, catchment gravity, or enrollment/visitor data.\n\n## Data Sources\n\n- Korean Transportation Database (Korea Transport Institute, KOTI) (ktdb.go.kr)\n- V-world (Ministry of Land, Infrastructure and Transport, MOLIT) (vworld.kr)\n- Statistical Geographic Information System (SGIS) plus (Ministry of Data and Statistics, MODS) (sgis.mods.go.kr)\n- Address-based Industry Support Service (Ministry of the Interior and Safety, MOIS) (business.juso.go.kr)\n- Aviation statistics 2025 (Korea Civil Aviation Association, KCAA) (airportal.go.kr)\n- Korean railroad statistics 2024 (Korea Railroad, KORAIL) (railstat.korail.com)\n- Korean Public Transportation Database (Korea Transportation Safety Authority, KTSA) (kotsa.or.kr)\n- Korean Hospital and Pharmacy Status (Health Insurance Review and Assessment Service, HIRA) (data.go.kr)\n- Health Insurance Medical Statistics (HIRA) (opendata.hira.or.kr)\n- Academy Information System (Ministry of Education, MOE) (academyinfo.go.kr)\n- School Info Disclosure (schoolinfo.go.kr) and Korea National Standard Data (data.go.kr) — schools, parks, shopping centers, tourist attractions\n- Korea Transport Safety Authority (KOMSA) coastal ferry statistics (komsa.or.kr)\n\n## Credits\n\nMap authored by budhakr",
   "tags": [
     "east-asia",
+    "entertainment",
     "hospitals",
+    "parks",
+    "schools",
     "universities"
   ],
   "gallery": [
@@ -21,10 +24,10 @@
   },
   "city_code": "KAG",
   "country": "KR",
-  "population": 144804,
-  "residents_total": 144804,
-  "points_count": 214,
-  "population_count": 2995,
+  "population": 259957,
+  "residents_total": 259957,
+  "points_count": 314,
+  "population_count": 2737,
   "initial_view_state": {
     "latitude": 37.7519,
     "longitude": 128.8761,
@@ -43,79 +46,82 @@
   },
   "location": "east-asia",
   "special_demand": [
+    "entertainment",
     "hospitals",
+    "parks",
+    "schools",
     "universities"
   ],
   "file_sizes": {
-    ".railyard_map/special_demand_points.json": 0,
+    ".railyard_map/special_demand_points.json": 0.03,
     ".railyard_map/special_demand_types.json": 0,
-    "KAG.pmtiles": 52.44,
+    "KAG.pmtiles": 56.68,
     "buildings_index.bin.gz": 3.72,
     "buildings_index.json": 14.39,
-    "config.json": 0,
-    "demand_data.json": 0.4,
-    "driving_paths.json.gz": 0.24,
+    "config.json": 0.01,
+    "demand_data.json": 0.43,
+    "driving_paths.json.gz": 0.22,
     "ocean_depth_index.json": 15.61,
     "roads.geojson": 8.54,
-    "runways_taxiways.geojson": 0
+    "runways_taxiways.geojson": 0.22
   },
   "grid_statistics": {
     "residentWeightedNearestNeighborKm": {
-      "p10": 0.3949903709899595,
-      "p25": 0.3955205530067755,
-      "p50": 0.39559275909595065,
-      "p75": 0.39561682291544154,
-      "p90": 0.3957130537782924,
-      "mean": 0.40336037792913676
+      "p10": 0.1569201050170428,
+      "p25": 0.23730803497306405,
+      "p50": 0.23730803497306405,
+      "p75": 0.246926238217371,
+      "p90": 0.5003778610509171,
+      "mean": 0.3217759660387077
     },
     "workerWeightedNearestNeighborKm": {
-      "p10": 0.3949421141250157,
-      "p25": 0.3955205530067755,
-      "p50": 0.39559275909595065,
-      "p75": 0.39568899972364435,
-      "p90": 0.5003778610509171,
-      "mean": 0.4418701007818006
+      "p10": 0.10084576487506544,
+      "p25": 0.14521669825121886,
+      "p50": 0.19177469598322577,
+      "p75": 0.3949903709899595,
+      "p90": 0.702598159943555,
+      "mean": 0.32589956517343277
     },
     "commuteDistanceKm": {
-      "p10": 2786,
-      "p25": 3890,
-      "p50": 5889,
-      "p75": 11822,
-      "p90": 20080,
-      "mean": 8818.89716193656
+      "p10": 1818,
+      "p25": 2922,
+      "p50": 4378,
+      "p75": 6591,
+      "p90": 15572,
+      "mean": 6561.431494336865
     },
     "residentCellDensity": {
-      "p10": 22,
-      "p25": 31,
-      "p50": 101,
-      "p75": 1352,
-      "p90": 4667,
-      "mean": 1214.6554621848738
+      "p10": 21,
+      "p25": 32,
+      "p50": 137,
+      "p75": 1370,
+      "p90": 5051,
+      "mean": 2735.863157894737
     },
     "workerCellDensity": {
-      "p10": 343,
-      "p25": 489,
-      "p50": 976,
-      "p75": 2662,
-      "p90": 7940,
-      "mean": 2884.258333333333
+      "p10": 100,
+      "p25": 344,
+      "p50": 652,
+      "p75": 2774,
+      "p90": 9168,
+      "mean": 2875.8507462686566
     },
     "detail": {
-      "radiusKm": 0.39559275909595065,
-      "expectedPointSpacingKm": 0.7488308644489767,
-      "normalizedRadius": 0.528280520845045,
-      "activityPerPoint": 1051.2507268311115,
-      "playableAreaKm2": 268,
-      "playableAreaPerPointKm2": 1.2523364485981308,
-      "playableCatchmentRadiusKm": 0.6313723722313827,
-      "localityScore": 0.5640963340764644,
-      "deaggregationScore": 0.9002278640408594,
-      "score": 0.712611561749411
+      "radiusKm": 0.21332997037766652,
+      "expectedPointSpacingKm": 0.6532622691972099,
+      "normalizedRadius": 0.32656098543671663,
+      "activityPerPoint": 1009.9443933325432,
+      "playableAreaKm2": 332,
+      "playableAreaPerPointKm2": 1.0573248407643312,
+      "playableCatchmentRadiusKm": 0.5801352857075571,
+      "localityScore": 1,
+      "deaggregationScore": 1,
+      "score": 1
     },
     "polycentrism": {
       "activity": {
         "score": 0,
-        "continuousScore": 0.21388650962181596,
+        "continuousScore": 0.07100775957232718,
         "detectedCenterCount": 1,
         "effectiveCenterCount": 1,
         "largestCenterShare": 1,
@@ -125,16 +131,16 @@
         "usedFallback": false,
         "topCenters": [
           {
-            "longitude": 128.88739153449427,
-            "latitude": 37.769979169867725,
+            "longitude": 128.88642859762126,
+            "latitude": 37.762791538012365,
             "massShare": 1,
-            "assignedMass": 494314,
-            "assignedPointCount": 214,
+            "assignedMass": 646816,
+            "assignedPointCount": 314,
             "prominenceRatio": 1
           }
         ]
       }
     }
   },
-  "last_updated": 1789171200
+  "last_updated": 1789776000
 }

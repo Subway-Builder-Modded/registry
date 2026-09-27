@@ -78,12 +78,19 @@ jobs:
               core.warning(`Could not react to the trigger comment: ${error.message}`);
             }
 
+      - name: Sanitize issue body
+        id: sanitize
+        env:
+          TEMPLATE_PATH: .github/ISSUE_TEMPLATE/deprecate-asset.yml
+          RAW_BODY: ${{ github.event.issue.body }}
+        run: pnpm --dir scripts run sanitize-issue-body
+
       - name: Parse issue body
         id: parser
         uses: stefanbuck/github-issue-parser@v3
         with:
           template-path: .github/ISSUE_TEMPLATE/deprecate-asset.yml
-          issue-body: ${{ github.event.issue.body }}
+          issue-body: ${{ steps.sanitize.outputs.body }}
 
       - name: Validate deprecation request
         env:
@@ -256,12 +263,19 @@ jobs:
               core.warning(`Could not react to the trigger comment: ${error.message}`);
             }
 
+      - name: Sanitize issue body
+        id: sanitize
+        env:
+          TEMPLATE_PATH: .github/ISSUE_TEMPLATE/delete-asset.yml
+          RAW_BODY: ${{ github.event.issue.body }}
+        run: pnpm --dir scripts run sanitize-issue-body
+
       - name: Parse issue body
         id: parser
         uses: stefanbuck/github-issue-parser@v3
         with:
           template-path: .github/ISSUE_TEMPLATE/delete-asset.yml
-          issue-body: ${{ github.event.issue.body }}
+          issue-body: ${{ steps.sanitize.outputs.body }}
 
       - name: Validate deletion request
         env:
@@ -434,12 +448,19 @@ jobs:
               core.warning(`Could not react to the trigger comment: ${error.message}`);
             }
 
+      - name: Sanitize issue body
+        id: sanitize
+        env:
+          TEMPLATE_PATH: .github/ISSUE_TEMPLATE/undeprecate-asset.yml
+          RAW_BODY: ${{ github.event.issue.body }}
+        run: pnpm --dir scripts run sanitize-issue-body
+
       - name: Parse issue body
         id: parser
         uses: stefanbuck/github-issue-parser@v3
         with:
           template-path: .github/ISSUE_TEMPLATE/undeprecate-asset.yml
-          issue-body: ${{ github.event.issue.body }}
+          issue-body: ${{ steps.sanitize.outputs.body }}
 
       - name: Validate un-deprecation request
         env:
