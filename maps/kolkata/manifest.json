@@ -46,11 +46,107 @@
   "special_demand": [
     "airports"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "CCU.pmtiles": 98.71,
+    "CCU_foundations.pmtiles": 93.34,
+    "buildings_index.bin": 316.4,
+    "buildings_index.json": 403.84,
+    "config.json": 0,
+    "demand_data.json": 97.16,
+    "ocean_depth_index.json": 7.78,
+    "roads.geojson": 60.1,
+    "runways_taxiways.geojson": 0.14
+  },
   "included_cities": [
     "Dakshineswar",
     "Howrah",
     "Garia",
     "Baruipur"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.2140482762822983,
+      "p25": 0.23173054720667974,
+      "p50": 0.2565890030206122,
+      "p75": 0.25686349168332656,
+      "p90": 0.2571623887916301,
+      "mean": 0.252053016132144
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.21393742066786228,
+      "p25": 0.23161935212633183,
+      "p50": 0.25646438350087514,
+      "p75": 0.2568016097844847,
+      "p90": 0.2572544165870134,
+      "mean": 0.25490031999848395
+    },
+    "commuteDistanceKm": {
+      "p10": 13183,
+      "p25": 22427,
+      "p50": 35888,
+      "p75": 50604,
+      "p90": 63474,
+      "mean": 37400.41209167232
+    },
+    "residentCellDensity": {
+      "p10": 27,
+      "p25": 121,
+      "p50": 618,
+      "p75": 1946,
+      "p90": 4821,
+      "mean": 1651.9573770491804
+    },
+    "workerCellDensity": {
+      "p10": 16,
+      "p25": 123,
+      "p50": 726,
+      "p75": 1828,
+      "p90": 3500,
+      "mean": 2173.3062136790345
+    },
+    "detail": {
+      "radiusKm": 0.25652668569329296,
+      "expectedPointSpacingKm": 0.43899421512784514,
+      "normalizedRadius": 0.584350947810523,
+      "activityPerPoint": 264.99630593132156,
+      "playableAreaKm2": 4160,
+      "playableAreaPerPointKm2": 0.21644120707596254,
+      "playableCatchmentRadiusKm": 0.26247928678246574,
+      "localityScore": 0.45729018407152283,
+      "deaggregationScore": 1,
+      "score": 0.6762323447392344
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.6458995887036434,
+        "continuousScore": 0.7731561260699463,
+        "detectedCenterCount": 2,
+        "effectiveCenterCount": 1.4769953419372255,
+        "largestCenterShare": 0.7975316837314795,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 88.32587244322715,
+            "latitude": 22.521017938470738,
+            "massShare": 0.7975316837314795,
+            "assignedMass": 8124023,
+            "assignedPointCount": 13565,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 88.34644059947712,
+            "latitude": 22.841479647391036,
+            "massShare": 0.2024683162685204,
+            "assignedMass": 2062435,
+            "assignedPointCount": 5655,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1789430400
 }
