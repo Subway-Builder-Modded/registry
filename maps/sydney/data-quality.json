@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "id": "sydney",
+  "answers": {
+    "workplace_count": "physical_inferred",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm4",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm4"
+  },
+  "notes": "Resident + job totals are TfNSW Travel Zone Projections 2024 (2026 horizon, 2021 census base) per travel zone (~2,500 in box), placed to ABS 2021 mesh blocks with TfNSW's published TZ21–MB21 population/employment concordance, then onto one demand point per SA1. Commute flows are O/D: the 2021 Census place-of-work matrix from ABS TableBuilder, SA2 (Usual residence) x SA2 (Place of work) carrying the pair magnitudes and SA1 (UR) x SA2 (POW) giving each SA1 its own destination pattern (the SA1 table loses 16.7% of cells to ABS perturbation, hence SA2 for magnitudes), fitted to the 2026 point and SA2-pair margins. Usual home-workers, whose place of work is coded to their home, are removed using JTW 2011 travel-mode rates; only commuters both living and working in the box are modelled (2.89M of 3.00M employed residents).",
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "WillBarouch",
+    "reviewed_by": null,
+    "date": "2026-09-20"
+  }
+}
