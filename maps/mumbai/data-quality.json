@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "mumbai",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm2",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "coarse_sector",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_1km",
+    "resident_resolution": "admin_polygon",
+    "resident_intensity": "uniform",
+    "od_metric": "prior_informed_synthetic",
+    "od_granularity": null
+  },
+  "notes": "Employment demand uses SHRUG's 2013 Economic Census city-wide workplace total for Mumbai, redistributed using real 2011 Census worker counts. Mumbai's worker counts are published at 97 fine-ward codes, but the only available public ward-boundary file is the coarser 24-ward BMC administrative map, so the fine-ward counts are aggregated up to admin wards via a public crosswalk table (the only non-government source used anywhere in this project's ward-level work) before being used as weights. All 97 fine-ward codes and all 24 admin wards matched cleanly, with 0 left unmatched. (The same lat/lon coordinate-order bug found in Kolkata's boundary file was also present here and fixed the same way.) Jobs placed within wards via OSM building footprints by type; population and commute data follow the standard project pipeline. — Reviewer refinements (2026-09-10): workplace_granularity re-ruled adm2 — the measured workplace content is a single SHRUG EC13 city-wide total spanning the whole map (single units of ~4.5M-19M population: KMC ~4.5M, GHMC/Chennai Corp ~7M, BBMP ~8.4M, BMC ~12.4M, NCT Delhi ~19M — at or beyond the riyadh single-governorate scale, and NCT is simultaneously ADM1, the vienna middle-rule shape); the ward-level weights are residence-based Census PCA-TV worker counts, which are not measured workplace grain. Workplace placement re-priced osm_footprints x coarse_sector — the between-ward pattern is residence-weighted (reunion workers-land-where-people-live precedent, softened by a genuine within-ward signal) and the within-ward split is an OSM landuse/type sector prior. od_metric re-ruled prior_informed_synthetic — no per-area in/out commuter totals exist; only the origin marginal is measured (ward residence workers), the destination marginal is the single respread total, and the gravity decay is calibrated to Census 2011 Table B-28 distance bands — a genuinely domestic prior, better than the rung's analogue-country baseline, recorded as such. resident_granularity re-ruled mesh_1km — WorldPop is a modeled disaggregation, not a published census mesh: magnitudes are anchored over large areas but effective resolution after smoothing is on the order of a kilometre (the WorldPop rung, now on record). The honest 'spread evenly' placement answer stands as filed. workplace_count physical_measured CONFIRMED — the Economic Census is a real establishment enumeration (2013 vintage on record). Mumbai's 97 fine-ward Census counts are crosswalked to the 24 BMC admin wards via a third-party table (the project's only non-government source) — on record.",
+  "sources": [
+    "https://hub.worldpop.org/geodata/summary?id=41746",
+    "https://www.devdatalab.org/shrug",
+    "https://shrug-assets-ddl.s3.amazonaws.com/static/main/assets/other/shrug-codebook.pdf",
+    "https://censusindia.gov.in/nada/index.php/catalog/13954",
+    "https://censusindia.gov.in/census.website/data/census-tables",
+    "https://download.geofabrik.de/asia/india.html"
+  ],
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "ryandicicco",
+    "reviewed_by": "ahkimn",
+    "date": "2026-09-11"
+  }
+}
