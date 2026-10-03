@@ -115,8 +115,12 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
   if (!isObject(value)) {
     throw new Error("Expected loop repair spec to be an object.");
   }
-  if (!Array.isArray(value.targets) || value.targets.length === 0) {
-    throw new Error("Expected spec.targets to be a non-empty array.");
+  if (!Array.isArray(value.targets)) {
+    throw new Error("Expected spec.targets to be an array.");
+  }
+  const hasAdoptionTargets = Array.isArray(value.adoption_targets) && value.adoption_targets.length > 0;
+  if (value.targets.length === 0 && !hasAdoptionTargets) {
+    throw new Error("Expected spec.targets to be non-empty when the spec has no adoption_targets.");
   }
 
   const targets: LoopRepairTarget[] = value.targets.map((entry, index) => {
