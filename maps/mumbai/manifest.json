@@ -48,12 +48,116 @@
     "airports",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    "BOM.pmtiles": 42.58,
+    "BOM_foundations.pmtiles": 37.72,
+    "buildings_index.bin": 113.88,
+    "buildings_index.json": 143.89,
+    "config.json": 0,
+    "demand_data.json": 52.04,
+    "ocean_depth_index.json": 6.73,
+    "roads.geojson": 28.47,
+    "runways_taxiways.geojson": 0.43
+  },
   "included_cities": [
     "Colaba",
     "Dahisar",
     "Thane",
     "Kalyan",
     "Navi Mumbai"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.2188011275650648,
+      "p25": 0.21898339406847178,
+      "p50": 0.23173054720667974,
+      "p75": 0.26264114904985075,
+      "p90": 0.2628181726061965,
+      "mean": 0.2429491152919684
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.21874480312190833,
+      "p25": 0.21894759917069914,
+      "p50": 0.23161935212633183,
+      "p75": 0.26256952871835104,
+      "p90": 0.26282607573600925,
+      "mean": 0.2485450470149601
+    },
+    "commuteDistanceKm": {
+      "p10": 10621,
+      "p25": 19096,
+      "p50": 31672,
+      "p75": 44561,
+      "p90": 54857,
+      "mean": 32346.574552075144
+    },
+    "residentCellDensity": {
+      "p10": 50,
+      "p25": 367,
+      "p50": 1759,
+      "p75": 7153,
+      "p90": 15796,
+      "mean": 5185.496751329002
+    },
+    "workerCellDensity": {
+      "p10": 21,
+      "p25": 167,
+      "p50": 858,
+      "p75": 8695,
+      "p90": 26821,
+      "mean": 8431.705656759348
+    },
+    "detail": {
+      "radiusKm": 0.23167494299533456,
+      "expectedPointSpacingKm": 0.3964095987293666,
+      "normalizedRadius": 0.5844332320355888,
+      "activityPerPoint": 708.7045308997758,
+      "playableAreaKm2": 2708,
+      "playableAreaPerPointKm2": 0.21677873839257125,
+      "playableCatchmentRadiusKm": 0.2626838699745477,
+      "localityScore": 0.45714110113240003,
+      "deaggregationScore": 1,
+      "score": 0.6761221051943207
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0.9300707369084708,
+        "continuousScore": 0.8273062356340364,
+        "detectedCenterCount": 3,
+        "effectiveCenterCount": 2.63190556642659,
+        "largestCenterShare": 0.4698280959619172,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 72.89557950909948,
+            "latitude": 19.028732656882166,
+            "massShare": 0.4698280959619172,
+            "assignedMass": 8318905,
+            "assignedPointCount": 4526,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 72.90596054033458,
+            "latitude": 19.213666282451168,
+            "massShare": 0.36171223827215143,
+            "assignedMass": 6404576,
+            "assignedPointCount": 4560,
+            "prominenceRatio": 1
+          },
+          {
+            "longitude": 73.12237785024067,
+            "latitude": 19.21430921656445,
+            "massShare": 0.16845966576593133,
+            "assignedMass": 2982793,
+            "assignedPointCount": 3406,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1789430400
 }
