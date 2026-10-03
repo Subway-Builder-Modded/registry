@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "kolkata",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm2",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "coarse_sector",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_1km",
+    "resident_resolution": "admin_polygon",
+    "resident_intensity": "uniform",
+    "od_metric": "prior_informed_synthetic",
+    "od_granularity": null
+  },
+  "notes": "Same methodology as MAA (Chennai): SHRUG's 2013 Economic Census city-wide workplace total for Kolkata, redistributed across all 141 KMC (pre-2012) wards using real 2011 Census worker counts. All 141 wards matched a Census figure directly, no modeled proxy weighting needed. (Note: the ward boundary source stored coordinates in [lat, lon] order instead of GeoJSON's [lon, lat], so this was corrected on load; this affected geometry alignment only, not the underlying data or its granularity.) Jobs placed within wards via OSM building footprints by type; population and commute data follow the standard project pipeline.",
+  "sources": [
+    "https://hub.worldpop.org/geodata/summary?id=41746",
+    "https://www.devdatalab.org/shrug",
+    "https://shrug-assets-ddl.s3.amazonaws.com/static/main/assets/other/shrug-codebook.pdf",
+    "https://censusindia.gov.in/nada/index.php/catalog/13954",
+    "https://censusindia.gov.in/census.website/data/census-tables",
+    "https://download.geofabrik.de/asia/india.html"
+  ],
+  "derived_from": "delhi",
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "ryandicicco",
+    "reviewed_by": null,
+    "date": "2026-10-03"
+  }
+}
