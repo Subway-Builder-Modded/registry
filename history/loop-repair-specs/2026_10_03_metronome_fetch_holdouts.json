@@ -8,8 +8,23 @@
   "peers": [],
   "note": "Metronome v2, holdout cohort: jerusalem and mfn-lasvegas (the catalog's two remaining pre-1.4 listings) carried a synchronized ~3/day re-download residual in the same fixed slots as the UA cohort, at 94-97% of their total post-onset traffic and in week-by-week lockstep with each other. incident_start is 2026-09-10 so as not to overlap list-B's closed corrections for jerusalem (incident_end 2026-09-09); mfn-lasvegas was never a list-B member, and its pre-09-10 participation (~4.9/day observed 08-25..09-05) is accepted as uncorrected residual, consistent with the v1 allowance-floor decision. Baseline window is list-B's vetted clean window. KILL: both listings were deprecated 2026-10-03 (#12195) - the proven kill-switch; close incident_end once their counters flatline. Their grandfathered-downloads freezes (taken at deprecation, pre-correction) are adjusted alongside this spec's application.",
   "targets": [
-    { "listing_type": "map", "listing_id": "jerusalem", "version": "v0.3.2", "note": "primary live version carrying the loop" },
-    { "listing_type": "map", "listing_id": "jerusalem", "version": "v0.3.1", "note": "older live version; near-zero incident deltas expected" },
-    { "listing_type": "map", "listing_id": "mfn-lasvegas", "version": "1.1.0", "note": "single version; ~97% loop share post-onset" }
+    {
+      "listing_type": "map",
+      "listing_id": "jerusalem",
+      "version": "v0.3.2",
+      "note": "primary live version carrying the loop"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "jerusalem",
+      "version": "v0.3.1",
+      "note": "older live version; near-zero incident deltas expected"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "mfn-lasvegas",
+      "version": "1.1.0",
+      "note": "single version; ~97% loop share post-onset"
+    }
   ]
 }
