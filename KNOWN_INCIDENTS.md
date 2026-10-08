@@ -6,7 +6,112 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 ---
 
-## 2026-07-27 → ongoing (list B) — Metronomic library re-fetcher: two fixed lists at ~6/day (list A corrected+closed; list B correction applied, ongoing)
+## 2026-09-06 → ongoing — Metronome v2: UA cohort follows the eu-maps update manifest (22 listings) + two holdouts (OPEN; corrections re-applied on cadence)
+
+**What happened:** the metronome re-fetcher (v1 entry below) resumed on
+2026-09-06, the eu-maps 0.7.3 release day, against the seven pre-existing UA
+listings' 0.7.3 re-uploads (`yukina-ua-kyiv/-kharkiv/-lviv/-odesa/-dnipro/
+-zaporizhzhia/-kryvyi-rih`, version 0.2.0): ~6.8 fetches/day per listing in
+fixed hourly slots shared across every member, regardless of listing
+popularity. jerusalem and mfn-lasvegas (the catalog's last pre-1.4 listings)
+carried a ~3/day residual in the same slots from 2026-09-10.
+
+**The client follows upstream update sources, not the registry.** Two
+observations separate v2 from v1:
+
+- **eu-maps 0.8.1 (published 2026-10-04 21:56Z) did not stop it.** After a
+  ~29h silence (10-04 00Z → 10-05 05Z, before the release) the client resumed
+  at 10-05 06Z on the NEW versions — 0.2.1 for the seven and 0.1.1 for the
+  fifteen 0.7.3-cohort UA listings, which had never looped on their first
+  install — all 22 in lockstep at ~7/day each, while 0.2.0 traffic fell to
+  ~0. It reads the pack's update JSON (`KBP.json` etc.), so a release moves
+  the loop rather than breaking it. Hypothesis (unconfirmed): one client's
+  update path, not its install path, is broken — each future eu-maps release
+  may enrol whatever it updates.
+- **Deprecation did not kill the holdouts.** Deprecating jerusalem and
+  mfn-lasvegas (#12195, 2026-10-03) — the kill-switch that extinguished list B
+  — left their GitHub counters climbing ~4/day each (JER.zip 453 → 469,
+  LAS.zip 836 → 851, 10-03 05Z → 10-07 02Z). Registry counts are unaffected
+  while they stay deprecated (frozen grandfathered values), but the loop
+  traffic counts again if either is undeprecated for its 1.4 rebuild, so the
+  holdouts spec must stay open rather than close on a counter flatline.
+
+**Correction:** `history/loop-repair-specs/2026_10_03_metronome_fetch_ua_v2.json`
+(adoption model: organic traffic = peer pack-refresh adoption of the prior
+install base) and `2026_10_03_metronome_fetch_holdouts.json`, applied
+2026-10-03 (#12198, 1,830 fetches). The UA spec carries
+`daily_spurious_cap: 7` — the measured uniform loop rate; the peer-adoption
+allowance undershoots flagship organic demand, so excess beyond the loop rate
+stays credited (maintainer ruling, #12201: 434 re-credited, kyiv +150).
+Hourly lockstep slots measure the loop at ~7.5–8/day outside release-day
+waves, so 7 errs toward attributing less. The 0.8.1 extension targets 0.2.1
+and 0.1.1 from their first counted snapshot (2026-10-06) with
+`install_base: "adjusted"` (raw install bases would count the ~185 loop
+fetches each 0.2.0 carries as installs and widen the allowance meant to
+remove them), and ends the 0.2.0 targets at 2026-10-04 (target-level
+`incident_end`) — later 0.2.0 traffic is organic stragglers on a superseded
+version.
+
+**#12201 cap defect (repaired):** the cap was first applied by an uncommitted
+script that lowered the ledger's `daily`/`assets` views but not `timeline`,
+which snapshot generation and rebuilds read first. The 2026-09-07..10-02
+snapshots kept the pre-cap clamp, so the whole re-credit surfaced as one
+2026-10-03 jump in the by-day series (kyiv 0.2.0: 151), and every snapshot
+generated since stored raw above the real GitHub counter by the re-credit
+(kyiv 664 vs 514). `scripts/ops/repair-metronome-ua-cap-consistency.ts`
+(one-shot, idempotent) capped the timeline, restored raw to the live counters,
+and moved each day's re-credit onto its own snapshot (kyiv 10-03 by-day
+151 → 7). The cap now lives in the spec, so re-applies — including after an
+attribution-ledger rebuild — are capped natively; never cap by editing the
+ledger directly.
+
+**Residual effects:**
+
+- Loop days are corrected only once observed in a snapshot, so the latest
+  1–2 days of UA traffic are uncorrected until the next re-apply.
+- On a version's release day the peer-adoption allowance (6.7% of base) can
+  exceed the whole delta, absorbing that day's loop share (0.2.1 day 0:
+  only zaporizhzhia attributed).
+- The engine's snapshot clamp counts the registry's own pipeline fetches as
+  organic, so clamped UA snapshots sit ~2 above `raw − attributed`; the next
+  live snapshot can read ~2 lower (an `adjusted_decreased` audit warning).
+  Same behavior as every earlier loop spec, as is the clamp lowering snapshot
+  totals without touching `net_downloads` (net fields of clamped days go stale).
+
+**Running log** (append one line per re-apply or status change):
+
+- 2026-09-06 — onset (eu-maps 0.7.3 release day).
+- 2026-10-03 — #12195 holdouts deprecated; #12198 v2 corrections (+1,830);
+  #12201 cap at 7/day/listing (−434 re-credited; UA total ~1,282).
+- 2026-10-04 21:56Z — eu-maps 0.8.1 published; client silent 10-04 00Z → 10-05 05Z.
+- 2026-10-05 06Z — loop resumes on 0.2.1 ×7 + 0.1.1 ×15, all 22 UA listings.
+- 2026-10-07 — holdouts confirmed still fetching after deprecation (~4/day
+  each on the live counters; not counted while frozen).
+- 2026-10-08 — loop still running on all 22 UA listings: lockstep slots at
+  roughly 00–01, 03–04, 07, 16 and 22Z on 10-07; snapshot raw deltas 8–10
+  (10-07) and 6–8 (10-08) per 0.1.1 listing, 0.2.0 flat at 0.
+  Cap-consistency repair applied (timeline −434; 42 raw entries restored to
+  the live counters across 10-03..10-08; 182 adjusted entries re-credited
+  across 09-07..10-02 — kyiv 0.2.0 by-day 10-03: 151 → 7). UA spec extended
+  to the 0.8.1 versions and re-applied: **+354 fetches** across 59 day-deltas
+  (0.2.0 day 10-04: 49; 0.1.1 ×15 days 10-06..10-08: 291; 0.2.1: 14 —
+  zaporizhzhia 8, dnipro 2, odesa 2, kryvyi-rih 2). UA incident total ~1,636.
+  Holdouts spec not re-applied: its only pending day is 2 fetches on
+  jerusalem 2026-10-04 (the freeze window), which would also need its
+  grandfathered entry lowered.
+
+**Re-application rules:** re-apply both specs every few days while open
+(`repair-loop-inflated-downloads --spec … --apply`, then
+`reconcile-attributed-downloads -- --no-refresh-history` in the same change —
+refreshing today's snapshot right after an apply would stamp it before that
+day's T12:00Z deltas and understate its raw) and after any attribution-ledger
+rebuild. Close the UA spec only once all 22 UA versions show no lockstep
+slots for a week; there is no registry-side kill-switch for healthy listings
+whose updates come from the author's manifest.
+
+---
+
+## 2026-07-27 → 2026-09-09 — Metronomic library re-fetcher: two fixed lists at ~6/day (both lists corrected and closed; v2 above)
 
 **What happened:** a single automated client fetches a fixed library of
 listings roughly every 4 hours (~6/day per listing), with day-level wobbles
@@ -16,7 +121,7 @@ signature, at 8x the scale. Two lists, same 2026-07-27/28 onset:
 - **List A (closed):** kaicardenas0618's nine Peru maps + waterloo. Ran to
   2026-08-19, all ten stopping in lockstep. **1,052 spurious fetches**
   attributed.
-- **List B (ongoing):** 25 listings — small US metros (dayton-oh, daytonatti,
+- **List B (closed):** 25 listings — small US metros (dayton-oh, daytonatti,
   akron-oh, toledo-oh, louisville, nashville, providence, sacramento, albany,
   buffalo-ny, syracuse-ny, anchorage-ak, charleston-sc, wilmington-nc,
   piedmont-triad, connecticut-usa, colorado-ski-country, willamette-valley,
