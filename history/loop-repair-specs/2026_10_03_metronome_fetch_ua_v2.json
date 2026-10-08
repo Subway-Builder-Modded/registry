@@ -5,51 +5,213 @@
   "baseline_end": "2026-09-05",
   "incident_start": "2026-09-06",
   "incident_end": null,
+  "daily_spurious_cap": 7,
   "peers": [],
-  "note": "Metronome v2, UA cohort: synchronized re-download loop against the seven pre-existing UA listings' 0.7.3 reuploads, onset 2026-09-06 (the eu-maps 0.7.3 release day), ~6.8/day per listing in fixed slots regardless of listing popularity (zaporizhzhia/kryvyi-rih at 1.0-1.1/day organic run the same weekly totals as kharkiv/lviv/odesa at ~2/day; kyiv = the same uniform floor plus its own ~6/day organic, matching its v0.1.0-era rate). The v0.2.0 traffic is modeled as a loop-inflated ADOPTION release: legitimate traffic = organic update adoption of the 07-08 install base plus new organic demand, estimated from three clean yukina pack-refresh adoption curves (brno 0.4.1, asahikawa 0.2.2, bydgoszcz-torun 0.5.0 - max-fraction pooling errs toward attributing less). The retired 0.1.0 versions carry no incident-window traffic (assets retired at the reupload) and are not targeted; the spec is adoption-targets-only. Loop NOT yet extinguished (healthy live listings - no deprecation kill available); incident_end stays open and re-applies accrue until the client dies or is blocked. MANUAL CAP (2026-10-03, maintainer ruling): after application, per-day attributed fetches were capped at 7/listing (the measured uniform loop rate) for all seven adoption targets, re-crediting 434 fetches the peer-adoption allowance had over-attributed (kyiv +150; capital/peer ratio structure across CZ/SK/HU packs validates the uniform-loop model - kyiv:peers matches Praha:Brno at ~3x). Final attribution ~181-189/listing. IMPORTANT: after any attribution-ledger rebuild, re-apply this spec THEN re-apply the cap (scratchpad script cap-ua-attribution.js pattern: clamp this incident daily asset amounts to 7, window >= 2026-09-07). New accruing days naturally run at/below the cap.",
+  "note": "Metronome v2, UA cohort: synchronized re-download loop against the seven pre-existing UA listings' 0.7.3 reuploads, onset 2026-09-06 (the eu-maps 0.7.3 release day), ~6.8/day per listing in fixed slots regardless of listing popularity (zaporizhzhia/kryvyi-rih at 1.0-1.1/day organic run the same weekly totals as kharkiv/lviv/odesa at ~2/day; kyiv = the same uniform floor plus its own ~6/day organic, matching its v0.1.0-era rate). New-version traffic is modeled as loop-inflated ADOPTION releases: legitimate traffic = organic update adoption of the prior install base plus new organic demand, estimated from three clean yukina pack-refresh adoption curves (brno 0.4.1, asahikawa 0.2.2, bydgoszcz-torun 0.5.0 - max-fraction pooling errs toward attributing less). Retired/superseded versions are not targeted. CAP: daily_spurious_cap=7 is the measured uniform loop rate per listing (maintainer ruling 2026-10-03, #12201; hourly lockstep slots measure ~7.5-8/day outside release-day waves, so 7 errs toward attributing less). It was first applied by an uncommitted script that left the ledger timeline uncapped; repaired by scripts/ops/repair-metronome-ua-cap-consistency.ts, and the cap now lives here so every re-apply (including after an attribution-ledger rebuild) is capped natively. 0.8.1 EXTENSION (2026-10-07): eu-maps 0.8.1 (published 2026-10-04T21:56Z) did NOT stop the client - after a ~29h pause it resumed 2026-10-05T06Z on the new versions and now hits all 22 UA listings in lockstep (the fifteen 0.7.3-cohort listings first joined on their first update, 0.1.0 -> 0.1.1). 0.2.1 x7 and 0.1.1 x15 added as adoption targets from their first counted snapshot (2026-10-06); they measure their install base net of attribution (install_base=adjusted - raw would count the ~185 loop fetches each 0.2.0 carries as installs and widen the very allowance meant to remove them); the 0.2.0 targets end at 2026-10-04 (target incident_end), the last snapshot day carrying 0.2.0 loop slots - later 0.2.0 traffic is organic stragglers on a superseded version. The client follows the update manifest, so a release cannot kill it; incident_end stays open.",
   "targets": [],
   "adoption_targets": [
     {
       "listing_type": "map",
       "listing_id": "yukina-ua-kyiv",
       "version": "0.2.0",
-      "release_start": "2026-09-07"
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
     },
     {
       "listing_type": "map",
       "listing_id": "yukina-ua-kharkiv",
       "version": "0.2.0",
-      "release_start": "2026-09-07"
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
     },
     {
       "listing_type": "map",
       "listing_id": "yukina-ua-dnipro",
       "version": "0.2.0",
-      "release_start": "2026-09-07"
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
     },
     {
       "listing_type": "map",
       "listing_id": "yukina-ua-lviv",
       "version": "0.2.0",
-      "release_start": "2026-09-07"
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
     },
     {
       "listing_type": "map",
       "listing_id": "yukina-ua-odesa",
       "version": "0.2.0",
-      "release_start": "2026-09-07"
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
     },
     {
       "listing_type": "map",
       "listing_id": "yukina-ua-zaporizhzhia",
       "version": "0.2.0",
-      "release_start": "2026-09-07"
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
     },
     {
       "listing_type": "map",
       "listing_id": "yukina-ua-kryvyi-rih",
       "version": "0.2.0",
-      "release_start": "2026-09-07"
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kyiv",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kharkiv",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-dnipro",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-lviv",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-odesa",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-zaporizhzhia",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kryvyi-rih",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-cherkasy",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-chernihiv",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-chernivtsi",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-ivano-frankivsk",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-khmelnytskyi",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kremenchuk",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kropyvnytskyi",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-mykolaiv-kherson",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-poltava",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-rivne-lutsk",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-sumy",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-ternopil",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-uzhhorod-mukachevo",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-vinnytsia",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-zhytomyr",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
     }
   ],
   "adoption_peers": [
