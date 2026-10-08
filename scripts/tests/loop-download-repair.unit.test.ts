@@ -271,6 +271,31 @@ test("computeCumulativeListingRawBefore sums all versions at the last prior snap
   assert.equal(computeCumulativeListingRawBefore(snapshots, "map", "missing", "2026-08-06"), null);
 });
 
+test("computeCumulativeListingRawBefore can measure the base net of attribution", () => {
+  // target-y 1.0.0 at Aug 5: raw 50, adjusted 20 (30 loop fetches attributed).
+  const snapshots = [
+    {
+      dateKey: "2026-08-05",
+      data: {
+        maps: {
+          downloads: { "target-y": { "1.0.0": 20 } },
+          raw_downloads: { "target-y": { "1.0.0": 50 } },
+        },
+      },
+    },
+  ];
+  assert.equal(computeCumulativeListingRawBefore(snapshots, "map", "target-y", "2026-08-06"), 50);
+  assert.equal(computeCumulativeListingRawBefore(snapshots, "map", "target-y", "2026-08-06", "adjusted"), 20);
+  assert.throws(
+    () => normalizeLoopRepairSpec({
+      ...SPEC,
+      adoption_targets: [{ ...ADOPTION_TARGET, install_base: "net" }],
+      adoption_peers: [ADOPTION_PEER],
+    }),
+    /install_base to be 'raw' or 'adjusted'/,
+  );
+});
+
 test("computeAdoptionFractionCurve includes the release-day delta and normalizes by base", () => {
   const curve = computeAdoptionFractionCurve(buildAdoptionSnapshots(), [ADOPTION_PEER]);
   // Peer deltas 5, 10, 8, 0 over base 100.
@@ -316,6 +341,60 @@ test("computeSnapshotClampPlan anchors adoption targets at zero via missingAncho
   ]);
   // Without missingAnchorValue the superseded-path semantics hold: no anchor → no plan.
   assert.deepEqual(computeSnapshotClampPlan(series, { start: "2026-08-06", end: null }, days), []);
+});
+
+test("normalizeLoopRepairSpec validates daily_spurious_cap", () => {
+  assert.equal(normalizeLoopRepairSpec(SPEC).daily_spurious_cap, null);
+  assert.equal(normalizeLoopRepairSpec({ ...SPEC, daily_spurious_cap: 7 }).daily_spurious_cap, 7);
+  for (const bad of [0, -1, 6.5, "7"]) {
+    assert.throws(
+      () => normalizeLoopRepairSpec({ ...SPEC, daily_spurious_cap: bad }),
+      /daily_spurious_cap to be a positive integer/,
+    );
+  }
+});
+
+test("computeDaySpuriousEstimates bounds each day at daily_spurious_cap", () => {
+  const series = extractTargetSeries(buildSnapshots(), TARGET);
+  const days = computeDaySpuriousEstimates(series, { ...SPEC, daily_spurious_cap: 30 }, TARGET, BASELINE_ONLY);
+  // Excess 80/day over the 20/day allowance; the cap keeps 50/day credited as organic.
+  assert.deepEqual(days.map((day) => day.spurious), [30, 30]);
+  assert.deepEqual(days.map((day) => day.organicAllowance), [20, 20]);
+});
+
+test("computeAdoptionDaySpuriousEstimates bounds each day at the cap", () => {
+  const snapshots = buildAdoptionSnapshots();
+  const curve = computeAdoptionFractionCurve(snapshots, [ADOPTION_PEER]);
+  const series = extractTargetSeries(snapshots, {
+    listing_type: "map",
+    listing_id: "target-y",
+    version: "2.0.0",
+  });
+  // Uncapped excess 27, 15, 6 (see the uncapped test above).
+  const days = computeAdoptionDaySpuriousEstimates(series, ADOPTION_TARGET, curve, 50, null, 10);
+  assert.deepEqual(days.map((day) => day.spurious), [10, 10, 6]);
+});
+
+test("computeSnapshotClampPlan credits excess beyond the cap as organic growth", () => {
+  const series = extractTargetSeries(buildSnapshots(), TARGET);
+  const days = computeDaySpuriousEstimates(series, { ...SPEC, daily_spurious_cap: 30 }, TARGET, BASELINE_ONLY);
+  // Anchor 1120; organic growth = rawDelta − capped spurious = 100 − 30 = 70/day.
+  assert.deepEqual(computeSnapshotClampPlan(series, SPEC_WINDOW, days), [
+    { dateKey: "2026-08-07", correctedValue: 1190 },
+    { dateKey: "2026-08-08", correctedValue: 1260 },
+  ]);
+});
+
+test("normalizeLoopRepairSpec validates a per-target adoption incident_end", () => {
+  const withEnd = (incidentEnd: string) => ({
+    ...SPEC,
+    adoption_targets: [{ ...ADOPTION_TARGET, incident_end: incidentEnd }],
+    adoption_peers: [ADOPTION_PEER],
+  });
+  assert.equal(normalizeLoopRepairSpec(withEnd("2026-08-07")).adoption_targets![0]!.incident_end, "2026-08-07");
+  assert.throws(() => normalizeLoopRepairSpec(withEnd("2026-08-05")), /incident_end must not be before/);
+  const withoutEnd = normalizeLoopRepairSpec({ ...SPEC, adoption_targets: [ADOPTION_TARGET], adoption_peers: [ADOPTION_PEER] });
+  assert.equal(withoutEnd.adoption_targets![0]!.incident_end, undefined);
 });
 
 test("normalizeLoopRepairSpec requires adoption_peers when adoption_targets is set", () => {

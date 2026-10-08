@@ -48,7 +48,9 @@ import { resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 // regenerate the analytics CSVs from the clamped snapshots. Once the causing bug is
 // fixed and its release has saturated, set spec.incident_end to close the window.
 // After any attribution-ledger rebuild, re-apply this spec like the ones in
-// history/manual-attribution-specs/ (ops/README.md).
+// history/manual-attribution-specs/ (ops/README.md). Any cap on per-day
+// attribution belongs in spec.daily_spurious_cap, never in a post-hoc ledger edit:
+// the ledger's daily, assets and timeline views must move together.
 
 interface CliArgs {
   repoRoot: string;
@@ -101,7 +103,7 @@ function loadSnapshots(repoRoot: string): SnapshotEntry[] {
 
 // Resolves a target's release asset key the same way the manual-attribution path
 // does (scripts/ops/create-manual-download-attribution.ts).
-function createAssetKeyResolver(repoRoot: string): (target: LoopRepairTarget) => string {
+export function createAssetKeyResolver(repoRoot: string): (target: LoopRepairTarget) => string {
   const mapsPath = resolve(repoRoot, "maps", "integrity.json");
   const modsPath = resolve(repoRoot, "mods", "integrity-cache.json");
 
@@ -244,6 +246,9 @@ async function run(): Promise<void> {
       ? "[loop-repair] no peers configured; baseline-window allowance applies to all incident days"
       : `[loop-repair] superseded-peer rate=${peerRate.toFixed(2)}/day (pooled from ${spec.peers!.length} peers)`,
   );
+  if (spec.daily_spurious_cap != null) {
+    console.log(`[loop-repair] attribution capped at ${spec.daily_spurious_cap}/target/day (spec.daily_spurious_cap)`);
+  }
 
   for (const target of spec.targets) {
     const label = `${target.listing_type}:${target.listing_id}@${target.version}`;
@@ -294,22 +299,37 @@ async function run(): Promise<void> {
         adoption.listing_type,
         adoption.listing_id,
         adoption.release_start,
+        adoption.install_base ?? "raw",
       );
       if (base === null || base <= 0) {
         throw new Error(`No install base measurable for adoption target ${label} before ${adoption.release_start}.`);
       }
+      // A target-level end only ever shortens the spec's window.
+      const incidentEnd = [adoption.incident_end, spec.incident_end]
+        .filter((value): value is string => Boolean(value))
+        .sort()[0] ?? null;
       const series = extractTargetSeries(snapshots, target);
-      const days = computeAdoptionDaySpuriousEstimates(series, adoption, curve, base, spec.incident_end);
+      const days = computeAdoptionDaySpuriousEstimates(
+        series,
+        adoption,
+        curve,
+        base,
+        incidentEnd,
+        spec.daily_spurious_cap ?? null,
+      );
       workItems.push({
         target,
         clampPlan: computeSnapshotClampPlan(
           series,
-          { start: adoption.release_start, end: spec.incident_end ?? null, missingAnchorValue: 0 },
+          { start: adoption.release_start, end: incidentEnd, missingAnchorValue: 0 },
           days,
         ),
       });
 
-      console.log(`[loop-repair] ${label} adoption target base=${base} release_start=${adoption.release_start}`);
+      console.log(
+        `[loop-repair] ${label} adoption target base=${base}${adoption.install_base === "adjusted" ? " (adjusted)" : ""}`
+          + ` release_start=${adoption.release_start}${incidentEnd ? ` incident_end=${incidentEnd}` : ""}`,
+      );
       collectDays(target, days);
     }
   }
