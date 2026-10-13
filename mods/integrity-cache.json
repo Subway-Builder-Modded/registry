@@ -4,7 +4,7 @@
     "advanced-analytics": {
       "target-1.1.0": {
         "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -18,7 +18,7 @@
             "tag": "target-1.1.0"
           },
           "fingerprint": "rules:v6:github:stefanorigano/advanced_analytics:target-1.1.0:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
+          "checked_at": "2026-10-13T19:20:31.992Z",
           "released_at": "2026-03-02T23:15:42.000Z"
         }
       },
@@ -2601,7 +2601,7 @@
       },
       "Stable": {
         "fingerprint": "rules:v6:github:luu8358/conceptrains:Stable:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2615,7 +2615,7 @@
             "tag": "Stable"
           },
           "fingerprint": "rules:v6:github:luu8358/conceptrains:Stable:no-zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
+          "checked_at": "2026-10-13T19:20:31.992Z",
           "released_at": "2026-09-16T01:20:07.000Z"
         }
       }
@@ -2733,7 +2733,7 @@
     "dantrains-abridged": {
       "v1.0": {
         "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.0:dantrains-abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2747,13 +2747,13 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.0:dantrains-abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
+          "checked_at": "2026-10-13T19:20:31.992Z",
           "released_at": "2026-07-18T05:05:08.000Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.1:danTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -2767,7 +2767,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:danield1909/dantrains-abridged:v1.1:danTrains-Abridged.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
+          "checked_at": "2026-10-13T19:20:31.992Z",
           "released_at": "2026-07-19T04:42:34.000Z"
         }
       },
@@ -3702,25 +3702,44 @@
         },
         "manifest_asset_updated_at": "2026-10-09T09:55:44Z"
       },
-      "1.1": {
-        "fingerprint": "rules:v6:github:haeffound/idfm-pack:1.1:IDFM-Pack-1.1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+      "1.0.4": {
+        "fingerprint": "rules:v6:github:haeffound/idfm-pack:1.0.4:IDFM-Pack-1.0.4.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
-          "is_complete": false,
-          "errors": [
-            "non-semver release tag '1.1'"
-          ],
-          "required_checks": {},
-          "matched_files": {},
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "release_manifest_asset": true,
+            "zip_manifest_json": true,
+            "security_scan_passed": true,
+            "manifest_version_matches_tag": true
+          },
+          "matched_files": {
+            "release_manifest_asset": "manifest.json",
+            "zip_manifest_json": "manifest.json",
+            "security_scan_passed": "passed",
+            "manifest_version_matches_tag": "manifest.json"
+          },
+          "release_size": 0,
+          "game_version": ">=1.7.10",
           "source": {
             "update_type": "github",
             "repo": "haeffound/idfm-pack",
-            "tag": "1.1"
+            "tag": "1.0.4",
+            "asset_name": "IDFM-Pack-1.0.4.zip",
+            "download_url": "https://github.com/Haeffound/IDFM-Pack/releases/download/1.0.4/IDFM-Pack-1.0.4.zip"
           },
-          "fingerprint": "rules:v6:github:haeffound/idfm-pack:1.1:IDFM-Pack-1.1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
-          "released_at": "2026-10-12T10:22:22.000Z"
-        }
+          "fingerprint": "rules:v6:github:haeffound/idfm-pack:1.0.4:IDFM-Pack-1.0.4.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
+          "checked_at": "2026-10-13T19:20:31.992Z",
+          "released_at": "2026-10-13T17:03:21.000Z"
+        },
+        "asset_sizes": {
+          "IDFM-Pack-1.0.4.zip": 4705
+        },
+        "asset_updated_at": {
+          "IDFM-Pack-1.0.4.zip": "2026-10-13T17:02:12Z"
+        },
+        "manifest_asset_updated_at": "2026-10-13T17:02:13Z"
       }
     },
     "imb11-moveit": {},
@@ -6548,7 +6567,7 @@
       },
       "v1.0.5s": {
         "fingerprint": "rules:v6:github:maxcheng95/mtr-trains-for-subway-builder:v1.0.5s:mtr-trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -6562,7 +6581,7 @@
             "tag": "v1.0.5s"
           },
           "fingerprint": "rules:v6:github:maxcheng95/mtr-trains-for-subway-builder:v1.0.5s:mtr-trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
+          "checked_at": "2026-10-13T19:20:31.992Z",
           "released_at": "2026-10-11T11:25:16.000Z"
         }
       }
@@ -8493,7 +8512,7 @@
       },
       "v1.0.4s": {
         "fingerprint": "rules:v6:github:maxcheng95/taiwanese-trains-for-subway-builder:v1.0.4s:taiwan-trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -8507,7 +8526,7 @@
             "tag": "v1.0.4s"
           },
           "fingerprint": "rules:v6:github:maxcheng95/taiwanese-trains-for-subway-builder:v1.0.4s:taiwan-trains.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
+          "checked_at": "2026-10-13T19:20:31.992Z",
           "released_at": "2026-10-11T11:26:34.000Z"
         }
       }
@@ -10827,7 +10846,7 @@
       },
       "v1.0": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -10841,13 +10860,13 @@
             "tag": "v1.0"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.0:Valdotoriums_Trains_1_0.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
+          "checked_at": "2026-10-13T19:20:31.992Z",
           "released_at": "2026-03-01T14:52:46.000Z"
         }
       },
       "v1.1": {
         "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-        "last_checked_at": "2026-10-13T16:01:23.065Z",
+        "last_checked_at": "2026-10-13T19:20:31.992Z",
         "result": {
           "is_complete": false,
           "errors": [
@@ -10861,7 +10880,7 @@
             "tag": "v1.1"
           },
           "fingerprint": "rules:v6:github:valdotorium/valdotoriums_trains:v1.1:Valdotoriums_Trains_1_1.zip:security-rules:748749739a1d0dbdfebfe0098fc89acb84119154155eebdbd0a5b8a649904c2f",
-          "checked_at": "2026-10-13T16:01:23.065Z",
+          "checked_at": "2026-10-13T19:20:31.992Z",
           "released_at": "2026-03-08T08:01:18.000Z"
         }
       }
