@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-14T20:01:20.538Z",
+  "generated_at": "2026-10-14T23:17:39.184Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -24812,14 +24812,16 @@
     },
     "rio-metropolitan": {
       "has_complete_version": true,
-      "latest_semver_version": "v2.2.0",
-      "latest_semver_complete": true,
+      "latest_semver_version": "v2.2.1",
+      "latest_semver_complete": false,
       "complete_versions": [
         "v2.2.0",
         "v2.0.0"
       ],
-      "incomplete_versions": [],
-      "last_updated": 1789685329,
+      "incomplete_versions": [
+        "v2.2.1"
+      ],
+      "last_updated": 1792010892,
       "versions": {
         "v2.0.0": {
           "is_complete": true,
@@ -24924,6 +24926,22 @@
           "fingerprint": "rules:v6:github:jguylherme/rio_metro:v2.2.0:RIO.zip",
           "checked_at": "2026-09-17T22:53:19.456Z",
           "released_at": "2026-09-17T22:48:49.000Z"
+        },
+        "v2.2.1": {
+          "is_complete": false,
+          "errors": [
+            "asset 'RIO.zip': zip asset 'RIO.zip' could not be fetched"
+          ],
+          "required_checks": {},
+          "matched_files": {},
+          "source": {
+            "update_type": "github",
+            "repo": "jguylherme/rio_metro",
+            "tag": "v2.2.1"
+          },
+          "fingerprint": "rules:v6:github:jguylherme/rio_metro:v2.2.1:RIO.zip",
+          "checked_at": "2026-10-14T23:17:39.184Z",
+          "released_at": "2026-10-14T20:48:12.000Z"
         }
       }
     },
