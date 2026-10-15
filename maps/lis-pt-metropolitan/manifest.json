@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "lis-pt-metropolitan",
+  "name": "Lisboa",
+  "author": "0rokska8",
+  "github_id": 192199482,
+  "description": "**Lisboa Metropolitan Area (AML) — 18 municipalities, 2.87M inhabitants.**\n\n*(Vibecoded with Claude, and shamelessly inspired by [bquelhas's Porto map](https://github.com/bquelhas/subwaybuilder-map-opo) — the AMP map came first and showed what a Portuguese pipeline should look like: INE BGRI21 for residents, COS for jobs, a captive multiplier per municipality. Thank you.)*\n\n**Demand Model**\n\n* 103,831 O/D pairs from INE BGRI 2021 (census subsection level)\n* 1.90M simulated passengers — 66.3% population coverage, 2.23M including special demand\n* Commuters between every pair of municipalities fitted to the Censos 2021 counts (661,391 people; Lisboa↔Sintra is the heaviest at 60,207) — and 149k crossing the Tejo, as INE counts them\n* Jobs placed by DGT COS2025 (Série 2) land cover over 884k Overture building footprints — the Série 2 legend separates housing from workplaces, so employment stays off the bedrooms\n* Realistic urban drive-times (distance buckets + density penalty)\n* Captive boost for low car-ownership areas (Lisboa ×1.9, Amadora ×1.45, Odivelas ×1.35, Almada ×1.3)\n\n**The Tejo**\n\n* Nine of the eighteen municipalities are on the south bank\n* Cacilhas to Cais do Sodré is 2 km in a straight line and 7.5 km by road\n* Cross-river trips are routed via the 25 de Abril or the Vasco da Gama and charged an 8-minute queueing penalty, so a river crossing is worth building without being the only thing worth building\n\n**Points of Interest**\n\n* 82 curated points, each anchored to a named OpenStreetMap feature\n* Humberto Delgado Airport, Port of Lisboa, cruise terminal, Lisnave, Autoeuropa\n* Hospitals (Santa Maria, São José, Garcia de Orta, Amadora-Sintra, Fernando Fonseca) and universities (Cidade Universitária, IST, NOVA, ISCTE, Católica)\n* Staff, daily attendance and visitors are counted separately, so a shopping centre doesn't out-employ a business district\n\n**Coverage**\n\n* Full detail to zoom 15 across the AML, 6,230 km²\n* Railway station buildings removed from the collision set — you shouldn't have to buy and bulldoze Gare do Oriente to run a train into it",
+  "tags": [
+    "south-europe",
+    "airports",
+    "entertainment",
+    "hospitals",
+    "parks",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp",
+    "gallery/screenshot5.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/0rokska8/subwaybuilder-map-lis",
+  "update": {
+    "type": "github",
+    "repo": "0rokska8/subwaybuilder-map-lis"
+  },
+  "city_code": "LISB",
+  "country": "PT",
+  "population": 2229950,
+  "residents_total": 2229950,
+  "points_count": 25195,
+  "population_count": 103831,
+  "initial_view_state": {
+    "latitude": 38.7223,
+    "longitude": -9.1393,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "INE BGRI21 + INE Censos 2021 commuting table (0012340) + DGT COS2025 + OpenStreetMap + Overture",
+  "source_quality": "low-quality",
+  "level_of_detail": "low-detail",
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  },
+  "location": "south-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "hospitals",
+    "parks",
+    "universities"
+  ],
+  "file_sizes": {},
+  "included_cities": [
+    "Sintra",
+    "Cascais",
+    "Amadora",
+    "Odivelas",
+    "Oeiras",
+    "Loures",
+    "Almada",
+    "Seixal",
+    "Setúbal",
+    "Barreiro",
+    "Vila Franca de Xira",
+    "Mafra",
+    "Moita",
+    "Montijo",
+    "Palmela",
+    "Sesimbra",
+    "Alcochete"
+  ]
+}
