@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-19T00:01:19.805Z",
+  "generated_at": "2026-10-19T04:01:21.733Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -18913,20 +18913,19 @@
       }
     },
     "mfn-madisonwi": {
-      "has_complete_version": false,
-      "latest_semver_version": "3.0.0",
-      "latest_semver_complete": false,
-      "complete_versions": [],
-      "incomplete_versions": [
+      "has_complete_version": true,
+      "latest_semver_version": "4.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "4.0.0",
         "3.0.0"
       ],
-      "last_updated": 1773451171,
+      "incomplete_versions": [],
+      "last_updated": 1792372122,
       "versions": {
         "3.0.0": {
-          "is_complete": false,
-          "errors": [
-            "listing_deprecated"
-          ],
+          "is_complete": true,
+          "errors": [],
           "required_checks": {
             "config_json": true,
             "demand_data": true,
@@ -18969,6 +18968,59 @@
           "fingerprint": "rules:v6:github:crumpetime/sb-maps-msn:3.0.0:MSN.zip",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-03-14T01:19:31.000Z"
+        },
+        "4.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "MSN.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 101.02,
+          "file_sizes": {
+            "MSN.pmtiles": 48.8,
+            "MSN_foundations.pmtiles": 22.38,
+            "buildings_index.bin": 59.76,
+            "config.json": 0,
+            "demand_data.json": 8.58,
+            "manifest.json": 0,
+            "ocean_foundations.geojson": 83.31,
+            "roads.geojson": 14.4,
+            "runways_taxiways.geojson": 0.32
+          },
+          "game_version": ">=1.7.0",
+          "source": {
+            "update_type": "github",
+            "repo": "crumpetime/sb-maps-msn",
+            "tag": "4.0.0",
+            "asset_name": "MSN.zip",
+            "download_url": "https://github.com/crumpetime/sb-maps-msn/releases/download/4.0.0/MSN.zip"
+          },
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-msn:4.0.0:MSN.zip",
+          "checked_at": "2026-10-19T04:01:21.733Z",
+          "released_at": "2026-10-19T01:08:42.000Z"
         }
       }
     },
