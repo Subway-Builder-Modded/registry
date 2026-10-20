@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "ulaanbaatar",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "none",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "adm4",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "The map's reference population uses 2025 statistics from the National Statistics Office of Mongolia (NSO). Residential demand was allocated geographically using OpenStreetMap building footprints and settlement data, with approximate building-size and area-weighting assumptions rather than individual dwelling-level census records.\n\nEmployment locations and job numbers were estimated using population-derived assumptions and workplace-related OpenStreetMap features, including commercial, industrial, institutional and public-service buildings. These are modelled estimates rather than officially recorded employee counts by workplace.\n\nOrigin–destination commuting flows were generated synthetically from the estimated residential and workplace distributions. The map contains 2,151 demand locations and 9,184 commuting groups representing approximately 623,492 modelled commuters. These figures are simulation outputs, not observed employment counts or commuting flows.\n\nThe playable map boundaries do not precisely correspond to administrative statistical boundaries, so the geographic distribution of demand is approximate. Dedicated passenger-demand categories for airports, schools, universities, hospitals and tourism were not separately modelled.\n\nThe map therefore combines official demographic reference data with OpenStreetMap geographic information and estimated employment and commuting behaviour. It is designed for simulation, and its demand figures should not be interpreted as official transport forecasts.",
+  "sources": [
+    "https://data.1212.mn/pxweb/en/NSO/NSO__Regional%20development__Population%20and%20household/DT_NSO_0300_004V5.px/",
+    "https://www.openstreetmap.org/copyright"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "turnerawill12345-a11y",
+    "reviewed_by": null,
+    "date": "2026-10-20"
+  }
+}
