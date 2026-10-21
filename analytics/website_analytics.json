@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "zone_tag": "436c0657e9f4ae2256e5ffb96122273a",
-  "generated_at": "2026-10-21T19:01:31.419Z",
+  "generated_at": "2026-10-21T19:35:42.184Z",
   "valid_paths": [
     "/",
     "/404.html",
@@ -949,6 +949,7 @@
     "/registry/maps/cairo",
     "/registry/maps/cairo/map",
     "/registry/maps/cairo/versions",
+    "/registry/maps/cairo/versions/2.0.1",
     "/registry/maps/cairo/versions/2.1.0",
     "/registry/maps/cairo/versions/2.2.1",
     "/registry/maps/calais-dunkerque",
@@ -1492,6 +1493,7 @@
     "/registry/maps/sydney/versions/1.2.0",
     "/registry/maps/tampa-bay",
     "/registry/maps/tampa-bay/versions",
+    "/registry/maps/tampa-bay/versions/1.1.0",
     "/registry/maps/tampa-bay/versions/1.3.2",
     "/registry/maps/tampa-bay/versions/1.3.3",
     "/registry/maps/tampa-bay/versions/1.3.4",
@@ -1970,6 +1972,7 @@
     "/registry/maps/yukina-sk-kosice-presov/versions/0.1.0",
     "/registry/maps/yukina-sk-nitra/versions",
     "/registry/maps/yukina-sk-nitra/versions/0.1.0",
+    "/registry/maps/yukina-sk-nitra/versions/0.1.1",
     "/registry/maps/yukina-sk-poprad-spisska-nova-ves/versions/0.1.0",
     "/registry/maps/yukina-sk-trencin",
     "/registry/maps/yukina-sk-zilina",
@@ -2472,8 +2475,8 @@
     "latest_hour": "2026-10-21T19:00:00.000Z",
     "total_days": 188,
     "total_hours": 3483,
-    "latest_day_visits": 81,
-    "latest_hour_visits": 2
+    "latest_day_visits": 118,
+    "latest_hour_visits": 39
   },
   "time_series": {
     "by_day": [
@@ -3227,7 +3230,7 @@
       },
       {
         "date": "2026-10-21",
-        "visits": 81
+        "visits": 118
       }
     ],
     "by_hour": [
@@ -17161,7 +17164,7 @@
       },
       {
         "hour": "2026-10-21T19:00:00.000Z",
-        "visits": 2
+        "visits": 39
       }
     ]
   },
@@ -43250,19 +43253,22 @@
       }
     },
     "2026-10-21": {
-      "captured_at": "2026-10-21T19:01:28.451Z",
+      "captured_at": "2026-10-21T19:35:39.872Z",
       "window_start": "2026-10-21T00:00:00.000Z",
       "window_end": "2026-10-21T20:00:00.000Z",
       "totals": {
-        "visits": 81
+        "visits": 118
       },
       "pages": {
-        "/": 33,
-        "/railyard": 6,
-        "/railyard/docs": 1,
+        "/": 45,
+        "/depot": 1,
+        "/railyard": 9,
+        "/railyard/docs": 2,
         "/railyard/docs/v0.2/importing-local-assets": 2,
         "/railyard/docs/v0.2/installing-railyard": 2,
         "/railyard/docs/v0.2/troubleshooting-railyard": 1,
+        "/railyard/updates": 2,
+        "/railyard/updates/v0.1.2": 1,
         "/registry": 2,
         "/registry/authors": 1,
         "/registry/authors/ahkimn/subwaybuilder-jp-maps": 1,
@@ -43271,31 +43277,42 @@
         "/registry/authors/stefanorigano": 2,
         "/registry/docs": 1,
         "/registry/docs/data-quality/quality-floor": 1,
+        "/registry/docs/data-quality/scoring-rubric": 2,
+        "/registry/maps": 1,
         "/registry/maps/amsterdam/versions/1.0.0": 1,
         "/registry/maps/baltimore-dc-corridor/versions/1.2.1": 1,
         "/registry/maps/berlin-val": 1,
+        "/registry/maps/cairo/versions/2.0.1": 1,
         "/registry/maps/chuncheon/versions/0.3.1": 1,
         "/registry/maps/guangzhou/versions/1.0.0": 1,
         "/registry/maps/gwangju-4": 1,
         "/registry/maps/monterrey/versions/1.2.0": 1,
+        "/registry/maps/oklahoma-city": 1,
         "/registry/maps/puebla/versions": 1,
         "/registry/maps/singapore-val": 1,
         "/registry/maps/singapore-val/versions/1.1.0": 1,
         "/registry/maps/spokane/versions/2.1.0": 1,
+        "/registry/maps/tampa-bay/versions/1.1.0": 1,
         "/registry/maps/toulouse": 1,
         "/registry/maps/valencia": 1,
         "/registry/maps/yukina-fukui": 1,
+        "/registry/maps/yukina-kumamoto/versions/0.2.0": 1,
         "/registry/maps/yukina-lt-panevezys/versions/0.3.0": 1,
         "/registry/maps/yukina-pl-warszawa": 1,
         "/registry/maps/yukina-pl-wroclaw": 1,
+        "/registry/maps/yukina-sk-nitra/versions/0.1.1": 1,
         "/registry/maps/yukina-yamaguchi/versions/0.1.2": 1,
-        "/registry/mods": 1,
+        "/registry/mods": 3,
         "/registry/mods/demand-developer": 1,
         "/registry/mods/idfmpack": 1,
         "/registry/mods/improved-schematics": 1,
         "/registry/mods/intercity-hsr-trains": 1,
+        "/registry/mods/lrt-trains": 2,
+        "/registry/mods/noah-great-society": 2,
         "/registry/mods/resizable-ui": 1,
         "/registry/mods/simple-trains/versions": 1,
+        "/registry/mods/transit-overlay": 1,
+        "/registry/mods/upzoned-transit": 2,
         "/registry/world-map": 1,
         "/template-mod": 1,
         "/website/updates": 1
@@ -43303,39 +43320,43 @@
       "countries": {
         "AU": 5,
         "BR": 2,
-        "DE": 7,
-        "FR": 1,
+        "DE": 10,
+        "FR": 2,
+        "GB": 2,
         "HU": 1,
+        "IL": 1,
         "IT": 1,
-        "MX": 1,
+        "MX": 2,
         "PL": 3,
         "SE": 2,
-        "SG": 3,
+        "SG": 4,
+        "SI": 4,
+        "SK": 1,
         "TW": 1,
-        "US": 56
+        "US": 79
       },
       "browsers": {
-        "BingBot": 5,
-        "Chrome": 21,
-        "ChromeMobile": 3,
+        "BingBot": 6,
+        "Chrome": 27,
+        "ChromeMobile": 5,
         "Edge": 1,
-        "Firefox": 3,
-        "GoogleBot": 22,
-        "Opera": 1,
+        "Firefox": 8,
+        "GoogleBot": 34,
+        "Opera": 2,
         "Safari": 2,
-        "Unknown": 25
+        "Unknown": 35
       },
       "operating_systems": {
-        "Android": 24,
+        "Android": 34,
         "Linux": 5,
-        "MacOSX": 7,
-        "Unknown": 31,
-        "Windows": 15,
-        "iOS": 1
+        "MacOSX": 8,
+        "Unknown": 45,
+        "Windows": 26,
+        "iOS": 2
       },
       "devices": {
-        "desktop": 58,
-        "mobile": 25
+        "desktop": 84,
+        "mobile": 36
       }
     }
   }
