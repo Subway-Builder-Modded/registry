@@ -48,7 +48,9 @@ import { resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 // regenerate the analytics CSVs from the clamped snapshots. Once the causing bug is
 // fixed and its release has saturated, set spec.incident_end to close the window.
 // After any attribution-ledger rebuild, re-apply this spec like the ones in
-// history/manual-attribution-specs/ (ops/README.md).
+// history/manual-attribution-specs/ (ops/README.md). Any cap on per-day
+// attribution belongs in spec.daily_spurious_cap, never in a post-hoc ledger edit:
+// the ledger's daily, assets and timeline views must move together.
 
 interface CliArgs {
   repoRoot: string;
@@ -101,7 +103,7 @@ function loadSnapshots(repoRoot: string): SnapshotEntry[] {
 
 // Resolves a target's release asset key the same way the manual-attribution path
 // does (scripts/ops/create-manual-download-attribution.ts).
-function createAssetKeyResolver(repoRoot: string): (target: LoopRepairTarget) => string {
+export function createAssetKeyResolver(repoRoot: string): (target: LoopRepairTarget) => string {
   const mapsPath = resolve(repoRoot, "maps", "integrity.json");
   const modsPath = resolve(repoRoot, "mods", "integrity-cache.json");
 
@@ -212,27 +214,49 @@ async function run(): Promise<void> {
   const newDeltas: DownloadAttributionDelta[] = [];
   interface WorkItem {
     target: LoopRepairTarget;
+    // Fetches newly attributed to this target by this run.
+    added: number;
     clampPlan: ReturnType<typeof computeSnapshotClampPlan>;
   }
   const workItems: WorkItem[] = [];
   let totalNewSpurious = 0;
 
-  const collectDays = (target: LoopRepairTarget, days: DaySpuriousEstimate[]): void => {
-    const assetKey = resolveAssetKey(target);
-    for (const day of days) {
-      const deltaId = loopRepairDeltaId(spec.incident, target, day.dateKey);
-      const alreadyApplied = Boolean(attributionLedger.applied_delta_ids?.[deltaId]);
-      const status = alreadyApplied ? "already-applied" : day.spurious > 0 ? "new" : "no-excess";
-      console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} allowance=${day.organicAllowance} spurious=${day.spurious} (${status})`);
-      if (alreadyApplied || day.spurious === 0) continue;
+  // The amount a previous run actually attributed for one delta (each delta is
+  // the only entry for its asset at its day stamp).
+  const appliedAmount = (assetKey: string, dateKey: string): number => {
+    const stamp = `${dateKey}T12:00:00.000Z`;
+    return attributionLedger.timeline[stamp]?.assets[assetKey]
+      ?? attributionLedger.daily[dateKey.replaceAll("-", "_")]?.assets[assetKey]
+      ?? 0;
+  };
 
-      const delta = createDownloadAttributionDelta(spec.source, deltaId, `${day.dateKey}T12:00:00.000Z`);
-      for (let i = 0; i < day.spurious; i += 1) {
-        recordDownloadAttributionFetchByAssetKey(delta, assetKey);
+  // Records new day-deltas and returns the days the snapshot clamp should use:
+  // already-applied days are pinned to the amount the ledger holds, so a re-run
+  // stays idempotent even when the estimate has drifted since (an adjusted
+  // install base lowered by an earlier clamp, peer curves gaining data).
+  const collectDays = (target: LoopRepairTarget, days: DaySpuriousEstimate[]): { days: DaySpuriousEstimate[]; added: number } => {
+    const assetKey = resolveAssetKey(target);
+    let added = 0;
+    const pinned = days.map((day) => {
+      const deltaId = loopRepairDeltaId(spec.incident, target, day.dateKey);
+      if (attributionLedger.applied_delta_ids?.[deltaId]) {
+        const applied = appliedAmount(assetKey, day.dateKey);
+        console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} allowance=${day.organicAllowance} spurious=${day.spurious} (already-applied: ${applied})`);
+        return { ...day, spurious: applied };
       }
-      newDeltas.push(delta);
-      totalNewSpurious += day.spurious;
-    }
+      console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} allowance=${day.organicAllowance} spurious=${day.spurious} (${day.spurious > 0 ? "new" : "no-excess"})`);
+      if (day.spurious > 0) {
+        const delta = createDownloadAttributionDelta(spec.source, deltaId, `${day.dateKey}T12:00:00.000Z`);
+        for (let i = 0; i < day.spurious; i += 1) {
+          recordDownloadAttributionFetchByAssetKey(delta, assetKey);
+        }
+        newDeltas.push(delta);
+        totalNewSpurious += day.spurious;
+        added += day.spurious;
+      }
+      return day;
+    });
+    return { days: pinned, added };
   };
 
   const peerRate = computePeerSupersededRate(snapshots, spec);
@@ -244,6 +268,9 @@ async function run(): Promise<void> {
       ? "[loop-repair] no peers configured; baseline-window allowance applies to all incident days"
       : `[loop-repair] superseded-peer rate=${peerRate.toFixed(2)}/day (pooled from ${spec.peers!.length} peers)`,
   );
+  if (spec.daily_spurious_cap != null) {
+    console.log(`[loop-repair] attribution capped at ${spec.daily_spurious_cap}/target/day (spec.daily_spurious_cap)`);
+  }
 
   for (const target of spec.targets) {
     const label = `${target.listing_type}:${target.listing_id}@${target.version}`;
@@ -252,23 +279,23 @@ async function run(): Promise<void> {
     if (baseline === null) {
       throw new Error(`No baseline-window data for ${label}; refusing to estimate against an empty baseline.`);
     }
-    const days = computeDaySpuriousEstimates(series, spec, target, {
+    const estimates = computeDaySpuriousEstimates(series, spec, target, {
       baselineDailyRate: baseline,
       peerSupersededRate: peerRate,
     });
+    console.log(
+      `[loop-repair] ${label} baseline=${baseline.toFixed(2)}/day superseded_start=${target.superseded_start ?? spec.incident_start}`,
+    );
+    const { days, added } = collectDays(target, estimates);
     workItems.push({
       target,
+      added,
       clampPlan: computeSnapshotClampPlan(
         series,
         { start: spec.incident_start, end: spec.incident_end ?? null },
         days,
       ),
     });
-
-    console.log(
-      `[loop-repair] ${label} baseline=${baseline.toFixed(2)}/day superseded_start=${target.superseded_start ?? spec.incident_start}`,
-    );
-    collectDays(target, days);
   }
 
   // New-version (adoption) targets: allowance is the peer-adoption curve scaled to
@@ -294,23 +321,38 @@ async function run(): Promise<void> {
         adoption.listing_type,
         adoption.listing_id,
         adoption.release_start,
+        adoption.install_base ?? "raw",
       );
       if (base === null || base <= 0) {
         throw new Error(`No install base measurable for adoption target ${label} before ${adoption.release_start}.`);
       }
+      // A target-level end only ever shortens the spec's window.
+      const incidentEnd = [adoption.incident_end, spec.incident_end]
+        .filter((value): value is string => Boolean(value))
+        .sort()[0] ?? null;
       const series = extractTargetSeries(snapshots, target);
-      const days = computeAdoptionDaySpuriousEstimates(series, adoption, curve, base, spec.incident_end);
+      const estimates = computeAdoptionDaySpuriousEstimates(
+        series,
+        adoption,
+        curve,
+        base,
+        incidentEnd,
+        spec.daily_spurious_cap ?? null,
+      );
+      console.log(
+        `[loop-repair] ${label} adoption target base=${base}${adoption.install_base === "adjusted" ? " (adjusted)" : ""}`
+          + ` release_start=${adoption.release_start}${incidentEnd ? ` incident_end=${incidentEnd}` : ""}`,
+      );
+      const { days, added } = collectDays(target, estimates);
       workItems.push({
         target,
+        added,
         clampPlan: computeSnapshotClampPlan(
           series,
-          { start: adoption.release_start, end: spec.incident_end ?? null, missingAnchorValue: 0 },
+          { start: adoption.release_start, end: incidentEnd, missingAnchorValue: 0 },
           days,
         ),
       });
-
-      console.log(`[loop-repair] ${label} adoption target base=${base} release_start=${adoption.release_start}`);
-      collectDays(target, days);
     }
   }
 
@@ -321,28 +363,38 @@ async function run(): Promise<void> {
   }
 
   // 1. Attribution ledger: per-day deltas, idempotent via applied_delta_ids.
-  const merged = mergeDownloadAttributionDeltas(attributionLedger, newDeltas);
-  writeDownloadAttributionLedger(args.repoRoot, merged.ledger);
-  console.log(`[loop-repair] ledger: +${merged.addedFetches} fetches, applied=${merged.appliedDeltaIds.length}, skipped=${merged.skippedDeltaIds.length}`);
+  if (newDeltas.length > 0) {
+    const merged = mergeDownloadAttributionDeltas(attributionLedger, newDeltas);
+    writeDownloadAttributionLedger(args.repoRoot, merged.ledger);
+    console.log(`[loop-repair] ledger: +${merged.addedFetches} fetches, applied=${merged.appliedDeltaIds.length}, skipped=${merged.skippedDeltaIds.length}`);
+  } else {
+    console.log("[loop-repair] ledger: +0 fetches (unchanged)");
+  }
 
   // 2. Snapshot clamp + 3. bucket ceilings + 4. downloads.json, all min()-guarded.
+  // A target this run neither attributed nor clamped is left alone: its
+  // downloads.json value is already live (raw − attributed), and lowering it to
+  // the last snapshot's value would make the next hourly run book the gap as
+  // fresh downloads.
   const changedSnapshots = new Set<string>();
   const mapBuckets = loadDownloadVersionBucketLedger(args.repoRoot, "map");
   const modBuckets = loadDownloadVersionBucketLedger(args.repoRoot, "mod");
   let bucketsChanged = { map: false, mod: false };
 
-  for (const { target, clampPlan: plan } of workItems) {
+  for (const { target, added, clampPlan: plan } of workItems) {
     const planByDate = new Map(plan.map((entry) => [entry.dateKey, entry.correctedValue]));
+    let clamped = false;
     for (const snapshot of snapshots) {
       const correctedValue = planByDate.get(snapshot.dateKey);
       if (correctedValue === undefined) continue;
       if (clampSnapshotValue(snapshot, target, correctedValue) > 0) {
         changedSnapshots.add(snapshot.fileName);
+        clamped = true;
       }
     }
 
     const latestCorrected = plan[plan.length - 1]?.correctedValue;
-    if (latestCorrected === undefined) continue;
+    if (latestCorrected === undefined || (added === 0 && !clamped)) continue;
     const bucketLedger = target.listing_type === "map" ? mapBuckets : modBuckets;
     if (lowerVersionBucketCeiling(bucketLedger, target, latestCorrected, nowIso)) {
       bucketsChanged[target.listing_type] = true;

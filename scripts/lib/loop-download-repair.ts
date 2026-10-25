@@ -47,6 +47,14 @@ export interface LoopRepairAdoptionEntry {
   listing_id: string;
   version: string;
   release_start: string;
+  // Last loop day for this target when it precedes spec.incident_end (inclusive),
+  // e.g. the client moved on to a successor version. Adoption targets only.
+  incident_end?: string | null;
+  // "adjusted" measures the install base net of attribution instead of from raw
+  // counters. Use when the prior versions were themselves loop-inflated and
+  // corrected: raw would count the loop's own fetches as installs and widen the
+  // very allowance meant to remove them. Adoption targets only; default "raw".
+  install_base?: "raw" | "adjusted";
   note?: string;
 }
 
@@ -74,6 +82,11 @@ export interface LoopRepairSpec {
   adoption_peers?: LoopRepairAdoptionEntry[];
   // Set once the causing bug is fixed to stop attributing new days (inclusive).
   incident_end?: string | null;
+  // Upper bound on fetches attributed per target per day: the loop's measured
+  // per-listing rate. The allowance models can undershoot a target's real organic
+  // demand (e.g. a flagship measured against small-pack adoption peers); excess
+  // beyond the loop rate is then organic traffic and must stay credited.
+  daily_spurious_cap?: number | null;
   note?: string;
 }
 
@@ -168,11 +181,21 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
     if (listingType !== "map" && listingType !== "mod") {
       throw new Error(`Expected ${label}.listing_type to be 'map' or 'mod'.`);
     }
+    const releaseStart = requireDateKey(entry.release_start, `${label}.release_start`);
+    const incidentEnd = entry.incident_end == null ? null : requireDateKey(entry.incident_end, `${label}.incident_end`);
+    if (incidentEnd && incidentEnd < releaseStart) {
+      throw new Error(`${label}.incident_end must not be before ${label}.release_start.`);
+    }
+    if (entry.install_base != null && entry.install_base !== "raw" && entry.install_base !== "adjusted") {
+      throw new Error(`Expected ${label}.install_base to be 'raw' or 'adjusted'.`);
+    }
     return {
       listing_type: listingType,
       listing_id: requireNonEmptyString(entry.listing_id, `${label}.listing_id`),
       version: requireNonEmptyString(entry.version, `${label}.version`),
-      release_start: requireDateKey(entry.release_start, `${label}.release_start`),
+      release_start: releaseStart,
+      ...(incidentEnd ? { incident_end: incidentEnd } : {}),
+      ...(entry.install_base === "adjusted" ? { install_base: "adjusted" as const } : {}),
       note: typeof entry.note === "string" && entry.note.trim() !== "" ? entry.note.trim() : undefined,
     };
   };
@@ -184,6 +207,14 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
     : value.adoption_peers.map((entry, index) => normalizeAdoptionEntry(entry, `adoption_peers[${index}]`));
   if (adoptionTargets.length > 0 && adoptionPeers.length === 0) {
     throw new Error("spec.adoption_targets requires spec.adoption_peers.");
+  }
+  if (
+    value.daily_spurious_cap != null
+    && (typeof value.daily_spurious_cap !== "number"
+      || !Number.isInteger(value.daily_spurious_cap)
+      || value.daily_spurious_cap <= 0)
+  ) {
+    throw new Error("Expected spec.daily_spurious_cap to be a positive integer.");
   }
 
   const spec: LoopRepairSpec = {
@@ -199,6 +230,7 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
     incident_end: value.incident_end == null
       ? null
       : requireDateKey(value.incident_end, "spec.incident_end"),
+    daily_spurious_cap: typeof value.daily_spurious_cap === "number" ? value.daily_spurious_cap : null,
     note: typeof value.note === "string" && value.note.trim() !== "" ? value.note.trim() : undefined,
   };
 
@@ -319,6 +351,12 @@ export function computePeerSupersededRate(
   return count === 0 ? null : total / count;
 }
 
+// Excess over the organic allowance, bounded by the spec's per-day loop-rate cap.
+function capSpurious(excess: number, dailySpuriousCap: number | null | undefined): number {
+  const spurious = Math.max(0, excess);
+  return dailySpuriousCap == null ? spurious : Math.min(spurious, dailySpuriousCap);
+}
+
 export interface OrganicAllowanceRates {
   baselineDailyRate: number;
   // Pooled superseded-peer rate; null when no peers are configured (all incident
@@ -353,7 +391,7 @@ export function computeDaySpuriousEstimates(
         dateKey: delta.dateKey,
         rawDelta: delta.rawDelta,
         organicAllowance,
-        spurious: Math.max(0, delta.rawDelta - organicAllowance),
+        spurious: capSpurious(delta.rawDelta - organicAllowance, spec.daily_spurious_cap),
       };
     });
 }
@@ -378,17 +416,20 @@ function computeAdoptionDayDeltas(series: SnapshotDayValue[], releaseStart: stri
 }
 
 // computeCumulativeListingRawBefore measures a listing's install base as the sum of
-// every version's raw counter at the last snapshot before dateKey.
+// every version's raw counter at the last snapshot before dateKey ("adjusted"
+// basis: the adjusted counters, net of attribution).
 export function computeCumulativeListingRawBefore(
   snapshots: Array<{ dateKey: string; data: SnapshotFileLike }>,
   listingType: LoopRepairListingType,
   listingId: string,
   dateKey: string,
+  basis: "raw" | "adjusted" = "raw",
 ): number | null {
   const snapshot = [...snapshots].reverse().find((entry) => entry.dateKey < dateKey);
   if (!snapshot) return null;
   const section = listingType === "map" ? snapshot.data.maps : snapshot.data.mods;
-  const byVersion = (section?.raw_downloads ?? section?.downloads)?.[listingId];
+  const counts = basis === "adjusted" ? section?.downloads : section?.raw_downloads ?? section?.downloads;
+  const byVersion = counts?.[listingId];
   if (!isObject(byVersion)) return null;
   let total = 0;
   for (const value of Object.values(byVersion)) {
@@ -427,13 +468,15 @@ export function computeAdoptionFractionCurve(
 // computeAdoptionDaySpuriousEstimates estimates a new version's daily excess over
 // the peer-adoption allowance: curve[day-since-release] × the target's install base,
 // rounded UP. Days beyond the curve reuse its last fraction (peer releases predate
-// the targets', so this only matters if peer data runs out).
+// the targets', so this only matters if peer data runs out). dailySpuriousCap is
+// the spec's daily_spurious_cap.
 export function computeAdoptionDaySpuriousEstimates(
   series: SnapshotDayValue[],
   target: LoopRepairAdoptionEntry,
   curve: number[],
   targetBase: number,
   incidentEnd: string | null | undefined,
+  dailySpuriousCap: number | null = null,
 ): DaySpuriousEstimate[] {
   if (curve.length === 0) {
     throw new Error("Adoption fraction curve is empty; check spec.adoption_peers.");
@@ -447,7 +490,7 @@ export function computeAdoptionDaySpuriousEstimates(
         dateKey: delta.dateKey,
         rawDelta: delta.rawDelta,
         organicAllowance,
-        spurious: Math.max(0, delta.rawDelta - organicAllowance),
+        spurious: capSpurious(delta.rawDelta - organicAllowance, dailySpuriousCap),
       };
     });
 }
@@ -476,11 +519,12 @@ export interface SnapshotClampWindow {
 }
 
 // computeSnapshotClampPlan rewrites the window's snapshot trajectory to the
-// organic estimate: anchored at the last pre-window adjusted value, growing by
-// min(rawDelta, organicAllowance) per day. Values are corrected with
-// min(recorded, corrected), so the plan is idempotent and never raises history.
-// Mirrors ops/backfill-charleston-snapshot-clamp.ts; without it a bucket rebuild
-// from history would resurrect the inflated count as a `history-max:` floor.
+// organic estimate: anchored at the last pre-window adjusted value, growing by the
+// raw delta minus that day's spurious estimate (= min(rawDelta, organicAllowance)
+// when uncapped). Values are corrected with min(recorded, corrected), so the plan
+// is idempotent and never raises history. Mirrors
+// ops/backfill-charleston-snapshot-clamp.ts; without it a bucket rebuild from
+// history would resurrect the inflated count as a `history-max:` floor.
 export function computeSnapshotClampPlan(
   series: SnapshotDayValue[],
   window: SnapshotClampWindow,
@@ -494,7 +538,7 @@ export function computeSnapshotClampPlan(
 
   const organicByDate = new Map<string, number>();
   for (const day of days) {
-    organicByDate.set(day.dateKey, Math.min(day.rawDelta, day.organicAllowance));
+    organicByDate.set(day.dateKey, day.rawDelta - day.spurious);
   }
   const rawDeltaByDate = new Map<string, number>();
   for (const delta of computeRawDayDeltas(series)) {
