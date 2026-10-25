@@ -1,6 +1,12 @@
 # scripts/ops
 
-Manual operational tooling — nothing here runs in scheduled automation.
+Manual operational tooling — nothing here runs in scheduled automation, with one
+exception: the daily metronome-guard workflow re-applies every open
+`history/loop-repair-specs/` spec that opts in with `"auto_apply": true` through
+`repair-loop-inflated-downloads.ts`, then reports listings riding a known loop
+that no spec targets (`scripts/downloads/detect-metronome.ts`). Opt a spec in only
+once its model is vetted and its targets are live (not deprecated).
+
 Invoke via the package scripts in `scripts/package.json` (names unchanged from
 when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-history`.
 

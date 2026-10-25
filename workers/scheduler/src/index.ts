@@ -51,6 +51,11 @@ export default {
 			if (hour === 4) {
 				workflows.push("cache-download-history.yml");
 			}
+
+			// After the 04:00 snapshot has landed.
+			if (hour === 6) {
+				workflows.push("metronome-guard.yml");
+			}
 		}
 
 		const results = await Promise.allSettled(
