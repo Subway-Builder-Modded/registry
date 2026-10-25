@@ -103,6 +103,23 @@ ledger directly.
   total 4,007. Holdouts spec not re-applied: its only pending day is 2
   fetches on jerusalem 2026-10-04 (the freeze window), which would also need
   its grandfathered entry lowered.
+- 2026-10-25 — riders corrected (`rider_targets` in the UA spec, on the seven
+  originals' lockstep clock): sydney 1.2.0/2.1.0, la-metro-trainpack
+  1.0.3/1.0.4, noah-great-society 1.0.3/1.0.4, dantrains-abridged v1.4.0,
+  basedgoat-trains v0.6.3, amba v0.3.3/v0.3.4. **+657 fetches**; open windows
+  (la-metro, noah 1.0.4; amba v0.3.4) accrue daily via the guard. Every
+  rider joined right after the client updated it, and most dropped out at the
+  client's 10-04 restart. Medium-confidence riders (unrusted-cities-pack,
+  taiwan-trains, mtr-trains) and transit-overlay are under review;
+  japanese-trains (+3.9/cycle, beyond one fetch) needs a closer look.
+
+**Riders:** the client also re-fetches listings outside the UA packs.
+detect-metronome flags any listing tracking the loop's hours beyond its own
+hour-of-day baseline (amba and transit-overlay at ~+1/cycle; mods at
++0.3–0.8), each one starting right after the client updated it. Rider targets
+attribute per_cycle × the loop's lockstep hours per snapshot day (measured
+rate, rounded down) instead of an allowance model, because a popular rider's
+organic traffic would drown one.
 
 **Re-application rules:** re-apply both specs every few days while open
 (`repair-loop-inflated-downloads --spec … --apply`, then
@@ -167,6 +184,32 @@ with ≥90% ±1 agreement across listings) — the run-length screen alone misse
 16 of the 35 members. Yukina pack-update waves false-positive on correlation
 sweeps (event-shaped, synchronized by republish) — check the series shape
 before concluding.
+
+**Riders (found and corrected 2026-10-25):** the day-delta sweep could only
+see small listings. A rider review (detect-metronome, then per-listing
+evidence) found 27 more listing-versions the same client re-fetched in list
+B's lockstep hours, hidden by their organic traffic or joining only after an
+update. Each rider showed a significant excess per loop hour over the same-day
+neighbouring hours, nothing under ±2–5h placebo shifts, and one version whose
+daily growth tracked the loop's slot count. Validated on known members (list
+A t≈17, stopping on its recorded 08-18; mfn-lasvegas t≈44).
+
+- **Whole loop, ~1 fetch/cycle:** charleston-huntington-wv, warsaw-val, sydney
+  (t 49–58). charleston and warsaw-val were since deprecated, so their frozen
+  grandfathered counts were lowered too.
+- **~1/cycle for three weeks:** greatertwincities, greater-chicagoland, beijing,
+  guangzhou, chongqing, shenzhen, shanghai. Each moved to its new version for
+  2–9 days after an update (v2.0.1 08-04; v1.4.1 08-10; sb-chinese-maps v1.8.0
+  08-15), then stopped (08-13 → 08-16).
+- **After the eu-maps 0.6.6 update (08-24):** 10 yukina-cz maps at ~1.9/cycle
+  until v1 wound down (09-04).
+
+Corrected by `2026_10_25_metronome_fetch_v1_riders.json` with rider targets:
+per snapshot day, per_cycle × list B's lockstep hours, rounded down and capped
+by the version's raw growth. **+1,955 fetches.** Medium-confidence riders (32
+JP yukina maps, yukina-cz brno/praha, 5 yukina-lt maps, v1-era mods) are under
+review and not corrected. Known gap: the loop began 2026-07-25 15Z, two days
+before list A/B's `incident_start`, so their first ~9 slots stay uncorrected.
 
 ---
 
