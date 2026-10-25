@@ -1,0 +1,249 @@
+name: Metronome Guard
+
+# Daily guard against client re-download loops ("metronomes"; KNOWN_INCIDENTS.md
+# metronome entries):
+#  1. Re-applies every open loop-repair spec opted in with `auto_apply: true`
+#     (history/loop-repair-specs/), so a vetted incident stays corrected
+#     without a manual run. The next hourly run re-derives downloads.json from
+#     raw − attributed through the lowered bucket ceilings.
+#  2. Runs detect-metronome and keeps one tracking issue (label
+#     `metronome-watch`) current: listings riding a known loop that no spec
+#     targets, loops that moved to a version their spec does not target, and
+#     newly discovered lockstep cohorts for review. Nothing is attributed that a
+#     maintainer has not put in a spec.
+
+on:
+  schedule:
+    # Fallback: fires if the Cloudflare Worker (workers/scheduler) misses the
+    # 06:00 UTC slot (after the 04:00 cache-download-history snapshot).
+    - cron: "40 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+# Shares the hourly downloads workflow's group: both write downloads.json and
+# the version buckets, and an hourly PR computed before this run merged would
+# restore the ceilings this run lowers.
+concurrency:
+  group: regenerate-downloads-hourly
+  cancel-in-progress: false
+
+jobs:
+  should-run:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+    outputs:
+      skip: ${{ steps.check.outputs.skip }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CUTOFF_EPOCH=$(( $(date -u +%s) - 720 * 60 ))
+          RECENT=$(gh api \
+            "repos/${{ github.repository }}/actions/workflows/metronome-guard.yml/runs?per_page=10&exclude_pull_requests=true" \
+            --jq '[.workflow_runs[] | select(
+              .event == "workflow_dispatch" and
+              (.status == "in_progress" or .status == "queued" or .conclusion == "success")
+            ) | .created_at] | first // ""')
+          if [ -n "${RECENT}" ] && \
+             [ "$(date -u -d "${RECENT}" +%s)" -ge "${CUTOFF_EPOCH}" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping: Worker dispatch found at ${RECENT}."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  guard:
+    needs: [should-run]
+    if: "!cancelled() && (needs.should-run.result == 'skipped' || needs.should-run.outputs.skip != 'true')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: scripts/pnpm-lock.yaml
+
+      - name: Install script dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: scripts
+
+      - name: Re-apply auto-apply loop-repair specs
+        id: apply
+        run: |
+          mkdir -p tmp/metronome-guard
+          : > tmp/metronome-guard/apply.log
+          mapfile -t SPECS < <(pnpm --silent --dir scripts run detect-metronome -- --list-auto-apply)
+          for spec in "${SPECS[@]}"; do
+            [ -n "$spec" ] || continue
+            echo "::group::${spec}"
+            pnpm --dir scripts run repair-loop-inflated-downloads -- --spec "${spec}" --apply | tee -a tmp/metronome-guard/apply.log
+            echo "::endgroup::"
+          done
+          ATTRIBUTED=$(grep -oE 'ledger: \+[0-9]+' tmp/metronome-guard/apply.log | grep -oE '[0-9]+' | awk '{ s += $1 } END { print s + 0 }')
+          echo "specs=${#SPECS[@]}" >> "$GITHUB_OUTPUT"
+          echo "attributed=${ATTRIBUTED}" >> "$GITHUB_OUTPUT"
+          echo "Re-applied ${#SPECS[@]} spec(s): +${ATTRIBUTED} fetches attributed."
+
+      # Same rule as a manual apply: when the re-apply lowered anything, re-derive
+      # downloads.json from live counters (raw − attributed) in the same change,
+      # so it never lands at the stale snapshot-time value the engine wrote —
+      # the next hourly run would otherwise book the gap as fresh downloads.
+      - name: Reconcile attributed downloads
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if git diff --quiet -- history maps mods; then
+            echo "Re-apply changed nothing; skipping reconcile."
+          else
+            pnpm --dir scripts run reconcile-attributed-downloads -- --no-refresh-history
+          fi
+
+      - name: Validate change scope
+        run: |
+          UNEXPECTED=$(git diff --name-only | grep -vE '^(history/registry-download-attribution\.json|history/snapshot_[0-9_]+\.json|(maps|mods)/(downloads|download-version-buckets|repo-liveness)\.json)$' || true)
+          if [ -n "${UNEXPECTED}" ]; then
+            echo "Unexpected changes from the loop-repair re-apply / reconcile:"
+            echo "${UNEXPECTED}"
+            exit 1
+          fi
+
+      - name: Detect metronomes
+        id: detect
+        run: pnpm --dir scripts run detect-metronome
+
+      - name: Stage repair changes
+        id: commit_changes
+        run: |
+          if git diff --quiet -- history maps mods; then
+            echo "No new loop-repair attribution; skipping PR."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "committed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create or update bot PR
+        id: create_pr
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        continue-on-error: true
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: re-apply open loop-repair specs (+${{ steps.apply.outputs.attributed }})"
+          branch: bot/metronome-guard
+          delete-branch: true
+          add-paths: |
+            history/registry-download-attribution.json
+            history/snapshot_*.json
+            maps/downloads.json
+            maps/download-version-buckets.json
+            mods/downloads.json
+            mods/download-version-buckets.json
+            maps/repo-liveness.json
+            mods/repo-liveness.json
+          title: "chore: re-apply open loop-repair specs (+${{ steps.apply.outputs.attributed }})"
+          body: |
+            Automated daily re-apply of the open loop-repair specs opted in with `auto_apply: true` (metronome-guard workflow): +${{ steps.apply.outputs.attributed }} fetches attributed across ${{ steps.apply.outputs.specs }} spec(s). The next hourly run re-derives downloads.json from raw − attributed.
+
+      - name: Mint bot token
+        id: bot-token
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        uses: ./.github/actions/mint-bot-token
+        with:
+          app-id: ${{ vars.REGISTRY_BOT_APP_ID }}
+          private-key: ${{ secrets.REGISTRY_BOT_PRIVATE_KEY }}
+
+      - name: Finalize bot PR automation
+        id: bot_pr
+        if: ${{ steps.commit_changes.outputs.committed == 'true' }}
+        uses: ./.github/actions/bot-pr-automation
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_token: ${{ steps.bot-token.outputs.token }}
+          repo: ${{ github.repository }}
+          bot_branch: bot/metronome-guard
+          pr_number: ${{ steps.create_pr.outputs.pull-request-number }}
+          pr_url: ${{ steps.create_pr.outputs.pull-request-url }}
+          pr_head_sha: ${{ steps.create_pr.outputs.pull-request-head-sha }}
+
+      # One tracking issue, deduped by a body marker. The body always carries
+      # the latest report; a comment (and reopen) is posted only when listings
+      # appear that the previous report did not flag, so a standing loop does
+      # not re-notify daily. Closing is left to a maintainer.
+      - name: Update metronome-watch issue
+        uses: actions/github-script@v7
+        env:
+          ATTRIBUTED: ${{ steps.apply.outputs.attributed }}
+          REPAIR_PR_URL: ${{ steps.bot_pr.outputs.pr_url }}
+        with:
+          script: |
+            const fs = require("fs");
+            const report = JSON.parse(fs.readFileSync("tmp/metronome-guard/report.json", "utf-8"));
+            const markdown = fs.readFileSync("tmp/metronome-guard/report.md", "utf-8");
+            const label = "metronome-watch";
+            const marker = "<!-- metronome-watch -->";
+            try {
+              await github.rest.issues.getLabel({ ...context.repo, name: label });
+            } catch {
+              await github.rest.issues.createLabel({
+                ...context.repo,
+                name: label,
+                color: "5319e7",
+                description: "Automated metronome (client re-download loop) report",
+              });
+            }
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              ...context.repo, state: "all", labels: label, per_page: 100,
+            });
+            const issue = issues
+              .filter((candidate) => candidate.body && candidate.body.includes(marker))
+              .sort((a, b) => b.number - a.number)[0];
+            const flagged = report.flagged;
+            const previous = issue?.body?.match(/<!-- metronome-flagged: (.*?) -->/)?.[1]?.split(",").filter(Boolean) ?? [];
+            const added = flagged.filter((key) => !previous.includes(key));
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const repair = Number(process.env.ATTRIBUTED || 0) > 0
+              ? `Today's auto-apply attributed +${process.env.ATTRIBUTED} fetches${process.env.REPAIR_PR_URL ? ` (${process.env.REPAIR_PR_URL})` : ""}.`
+              : "Today's auto-apply attributed nothing new.";
+            const body = [
+              marker,
+              `<!-- metronome-flagged: ${flagged.join(",")} -->`,
+              `_Updated daily by [metronome-guard](${runUrl}). ${repair}_`,
+              "",
+              flagged.length > 0
+                ? `**${flagged.length} listing(s) need a maintainer decision:** extend or write a loop-repair spec (\`history/loop-repair-specs/\`), or dismiss here. Nothing is attributed until a spec covers them.`
+                : "**Nothing needs action.** Every listing riding a known loop is targeted, and no new lockstep cohort qualifies.",
+              "",
+              markdown,
+            ].join("\n");
+            if (!issue) {
+              if (flagged.length === 0) return;
+              const created = await github.rest.issues.create({
+                ...context.repo, title: "Metronome watch: client re-download loops", labels: [label], body,
+              });
+              core.notice(`Opened metronome-watch issue #${created.data.number}`);
+              return;
+            }
+            await github.rest.issues.update({ ...context.repo, issue_number: issue.number, body });
+            if (added.length > 0) {
+              if (issue.state === "closed") {
+                await github.rest.issues.update({ ...context.repo, issue_number: issue.number, state: "open" });
+              }
+              await github.rest.issues.createComment({
+                ...context.repo, issue_number: issue.number,
+                body: `Newly flagged: ${added.map((key) => "`" + key + "`").join(", ")}. See the updated report above.`,
+              });
+              core.notice(`Flagged ${added.length} new listing(s) on #${issue.number}`);
+            }
