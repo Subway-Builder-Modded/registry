@@ -14,12 +14,16 @@ import {
   loadDownloadVersionBucketLedger,
   writeDownloadVersionBucketLedger,
 } from "../lib/download-version-buckets.js";
+import { loadHourlySeries } from "../lib/hourly-downloads.js";
+import { trackKnownLoop } from "../lib/metronome-detection.js";
 import {
   computeAdoptionDaySpuriousEstimates,
   computeAdoptionFractionCurve,
   computeBaselineDailyRate,
   computeCumulativeListingRawBefore,
   computeDaySpuriousEstimates,
+  computeRiderDaySpuriousEstimates,
+  countSlotsBySnapshotDay,
   computePeerSupersededRate,
   computeSnapshotClampPlan,
   extractTargetSeries,
@@ -200,6 +204,28 @@ function lowerDownloadsJsonValue(
   return true;
 }
 
+// UTC hour buckets in [startMs, endMs).
+function hourBuckets(startMs: number, endMs: number): string[] {
+  const hours: string[] = [];
+  for (let ms = startMs; ms < endMs; ms += 3_600_000) hours.push(`${new Date(ms).toISOString().slice(0, 13)}:00Z`);
+  return hours;
+}
+
+// A deprecated/deleted listing's counts are frozen in grandfathered-downloads.json
+// and re-merged over pipeline output, so lowering downloads.json alone would be
+// undone (ops/README.md). Lowers the frozen value by what this run attributed.
+function lowerGrandfatheredValue(repoRoot: string, target: LoopRepairTarget, added: number): boolean {
+  const path = resolve(repoRoot, target.listing_type === "map" ? "maps" : "mods", "grandfathered-downloads.json");
+  if (added <= 0 || !existsSync(path)) return false;
+  const grandfathered = JSON.parse(readFileSync(path, "utf-8")) as Record<string, Record<string, number>>;
+  const current = grandfathered[target.listing_id]?.[target.version];
+  if (typeof current !== "number") return false;
+  grandfathered[target.listing_id]![target.version] = Math.max(0, current - added);
+  writeFileSync(path, `${JSON.stringify(grandfathered, null, 2)}\n`, "utf-8");
+  console.log(`[loop-repair] grandfathered ${target.listing_id}@${target.version}: ${current} → ${Math.max(0, current - added)}`);
+  return true;
+}
+
 async function run(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
   const spec: LoopRepairSpec = normalizeLoopRepairSpec(readJsonFile<unknown>(args.specPath));
@@ -356,6 +382,51 @@ async function run(): Promise<void> {
     }
   }
 
+  // Rider targets: attribution follows the core loop's own clock — the
+  // lockstep hours of spec.rider_loop.core in the hourly series, counted per
+  // snapshot day.
+  const riderTargets = spec.rider_targets ?? [];
+  if (riderTargets.length > 0) {
+    const firstStart = riderTargets.map((rider) => rider.start).sort()[0]!;
+    // Snapshot D covers the day ending at D's 04:00Z cutoff.
+    const startMs = Date.parse(`${firstStart}T04:00:00Z`) - 86_400_000;
+    const lastDay = [snapshots[snapshots.length - 1]!.dateKey, spec.incident_end ?? null]
+      .filter((value): value is string => Boolean(value))
+      .sort()[0]!;
+    const hours = hourBuckets(startMs, Date.parse(`${lastDay}T04:00:00Z`));
+    const coreKeys = spec.rider_loop!.core.map((entry) => `${entry.listing_type}:${entry.listing_id}`);
+    const loop = trackKnownLoop(loadHourlySeries(args.repoRoot, hours), hours, coreKeys);
+    const slotsByDay = countSlotsBySnapshotDay(loop.lockstepHours);
+    console.log(
+      `[loop-repair] rider loop: ${coreKeys.length} core listings, ${loop.lockstepHours.length} lockstep hours ${hours[0]} → ${hours[hours.length - 1]}`,
+    );
+    for (const rider of riderTargets) {
+      const target: LoopRepairTarget = {
+        listing_type: rider.listing_type,
+        listing_id: rider.listing_id,
+        version: rider.version,
+      };
+      const riderEnd = [rider.end, spec.incident_end]
+        .filter((value): value is string => Boolean(value))
+        .sort()[0] ?? null;
+      const series = extractTargetSeries(snapshots, target);
+      const estimates = computeRiderDaySpuriousEstimates(series, rider, slotsByDay, spec.incident_end);
+      console.log(
+        `[loop-repair] ${target.listing_type}:${target.listing_id}@${target.version} rider ${rider.per_cycle}/cycle ${rider.start} → ${riderEnd ?? "open"}`,
+      );
+      const { days, added } = collectDays(target, estimates);
+      workItems.push({
+        target,
+        added,
+        clampPlan: computeSnapshotClampPlan(
+          series,
+          { start: rider.start, end: riderEnd, missingAnchorValue: 0 },
+          days,
+        ),
+      });
+    }
+  }
+
   console.log(`[loop-repair] new attribution: ${totalNewSpurious} fetches across ${newDeltas.length} day-deltas`);
   if (!args.apply) {
     console.log("[loop-repair] preview only; pass --apply to update the ledger, snapshots, buckets, and downloads.json");
@@ -404,6 +475,7 @@ async function run(): Promise<void> {
     // true value through, self-healing any downloads that arrived since the last
     // snapshot.
     lowerDownloadsJsonValue(args.repoRoot, target, latestCorrected);
+    lowerGrandfatheredValue(args.repoRoot, target, added);
   }
 
   const historyDir = resolve(args.repoRoot, "history");

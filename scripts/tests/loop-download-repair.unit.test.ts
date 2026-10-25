@@ -7,11 +7,14 @@ import {
   computeCumulativeListingRawBefore,
   computeDaySpuriousEstimates,
   computePeerSupersededRate,
+  computeRiderDaySpuriousEstimates,
   computeSnapshotClampPlan,
+  countSlotsBySnapshotDay,
   extractTargetSeries,
   loopRepairDeltaId,
   normalizeLoopRepairSpec,
   type LoopRepairAdoptionEntry,
+  type LoopRepairRiderTarget,
   type LoopRepairSpec,
   type LoopRepairTarget,
   type SnapshotFileLike,
@@ -410,3 +413,43 @@ test("normalizeLoopRepairSpec requires adoption_peers when adoption_targets is s
   assert.equal(normalized.adoption_targets!.length, 1);
   assert.equal(normalized.adoption_peers![0]!.release_start, "2026-08-05");
 });
+
+// --- Rider (loop-clock) model ---
+
+const RIDER: LoopRepairRiderTarget = {
+  listing_type: "map",
+  listing_id: "paris-ile-de-france",
+  version: "v1.0.0",
+  start: "2026-08-07",
+  end: null,
+  per_cycle: 0.95,
+};
+
+test("normalizeLoopRepairSpec validates rider targets and requires a rider loop", () => {
+  const withRiders = { ...SPEC, targets: [], rider_loop: { core: [{ listing_type: "map", listing_id: "core-a" }] }, rider_targets: [RIDER] };
+  const normalized = normalizeLoopRepairSpec(withRiders);
+  assert.equal(normalized.rider_targets![0]!.per_cycle, 0.95);
+  assert.equal(normalized.rider_loop!.core[0]!.listing_id, "core-a");
+  assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_loop: undefined }), /rider_targets requires spec.rider_loop/);
+  assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, per_cycle: 0 }] }), /per_cycle/);
+  assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, end: "2026-08-01" }] }), /end must not be before/);
+});
+
+test("countSlotsBySnapshotDay assigns hours at/after the 04:00Z cutoff to the next snapshot", () => {
+  const slots = countSlotsBySnapshotDay(["2026-08-07T03:00Z", "2026-08-07T04:00Z", "2026-08-07T23:00Z", "2026-08-08T02:00Z"]);
+  assert.deepEqual([...slots.entries()].sort(), [["2026-08-07", 1], ["2026-08-08", 3]]);
+});
+
+test("computeRiderDaySpuriousEstimates floors per_cycle × slots and caps at raw growth", () => {
+  const series = extractTargetSeries(buildSnapshots(), TARGET);
+  const slots = new Map([["2026-08-07", 6], ["2026-08-08", 200]]);
+  const days = computeRiderDaySpuriousEstimates(series, RIDER, slots, null);
+  // Aug 7: floor(0.95 × 6) = 5; Aug 8: floor(0.95 × 200) = 190, capped at the raw delta 100.
+  assert.deepEqual(days.map((day) => [day.dateKey, day.spurious]), [["2026-08-07", 5], ["2026-08-08", 100]]);
+  // A closed window stops attributing.
+  const closed = computeRiderDaySpuriousEstimates(series, { ...RIDER, end: "2026-08-07" }, slots, null);
+  assert.deepEqual(closed.map((day) => day.dateKey), ["2026-08-07"]);
+  // No slots that day, nothing attributed.
+  assert.equal(computeRiderDaySpuriousEstimates(series, RIDER, new Map(), null)[0]!.spurious, 0);
+});
+

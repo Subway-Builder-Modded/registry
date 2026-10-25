@@ -2,18 +2,13 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { getFlagValue, hasFlag } from "../lib/cli.js";
-import {
-  getHourlyShardMonth,
-  getHourlyShardRelativePath,
-  parseHourlyDownloadsCsv,
-} from "../lib/hourly-downloads.js";
+import { loadHourlySeries } from "../lib/hourly-downloads.js";
 import { isObject } from "../lib/json-utils.js";
 import {
   detectLockstepCohorts,
   trackKnownLoop,
   windowHours,
   type CohortMemberStats,
-  type HourlySeries,
   type LockstepCohort,
 } from "../lib/metronome-detection.js";
 import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
@@ -41,8 +36,11 @@ interface OpenSpec {
   path: string;
   incident: string;
   autoApply: boolean;
-  // "map:listing-id" → versions targeted for the current window.
+  // "map:listing-id" → versions targeted for the current window (riders too).
   versionsByListing: Map<string, Set<string>>;
+  // The listings whose shared hours define the loop: rider_loop.core when the
+  // spec has one (the engine's clock), otherwise its non-rider targets.
+  coreKeys: string[];
 }
 
 type VersionCounts = Record<string, Record<string, number>>;
@@ -64,40 +62,35 @@ function loadOpenSpecs(repoRoot: string, windowStart: string): OpenSpec[] {
     const incidentEnd = typeof raw.incident_end === "string" ? raw.incident_end : null;
     if (incidentEnd && incidentEnd < windowStart) continue;
     const versionsByListing = new Map<string, Set<string>>();
-    for (const list of [raw.targets, raw.adoption_targets]) {
+    for (const list of [raw.targets, raw.adoption_targets, raw.rider_targets]) {
       if (!Array.isArray(list)) continue;
       for (const target of list) {
         if (!isObject(target) || typeof target.listing_id !== "string" || typeof target.version !== "string") continue;
         const key = `${target.listing_type === "mod" ? "mod" : "map"}:${target.listing_id}`;
         if (!versionsByListing.has(key)) versionsByListing.set(key, new Set());
-        const targetEnd = typeof target.incident_end === "string" ? target.incident_end : null;
+        // Adoption targets end at incident_end, rider targets at end.
+        const targetEnd = typeof target.incident_end === "string" ? target.incident_end
+          : typeof target.end === "string" ? target.end : null;
         if (!targetEnd || targetEnd >= windowStart) versionsByListing.get(key)!.add(target.version);
       }
     }
+    const riderKeys = new Set(
+      (Array.isArray(raw.rider_targets) ? raw.rider_targets : [])
+        .filter(isObject)
+        .map((target) => `${target.listing_type === "mod" ? "mod" : "map"}:${String(target.listing_id)}`),
+    );
+    const riderCore = isObject(raw.rider_loop) && Array.isArray(raw.rider_loop.core)
+      ? raw.rider_loop.core.filter(isObject).map((entry) => `${entry.listing_type === "mod" ? "mod" : "map"}:${String(entry.listing_id)}`)
+      : [];
     specs.push({
       path: `${SPEC_DIR}/${fileName}`,
       incident: typeof raw.incident === "string" ? raw.incident : fileName,
       autoApply: raw.auto_apply === true,
       versionsByListing,
+      coreKeys: riderCore.length > 0 ? riderCore : [...versionsByListing.keys()].filter((key) => !riderKeys.has(key)),
     });
   }
   return specs;
-}
-
-function loadHourlySeries(repoRoot: string, hours: string[]): HourlySeries {
-  const wanted = new Set(hours);
-  const series: HourlySeries = new Map();
-  for (const month of new Set(hours.map(getHourlyShardMonth))) {
-    const path = resolve(repoRoot, getHourlyShardRelativePath(month));
-    if (!existsSync(path)) continue;
-    for (const row of parseHourlyDownloadsCsv(readFileSync(path, "utf-8"))) {
-      if (!wanted.has(row.bucket_utc)) continue;
-      const key = `${row.listing_type}:${row.id}`;
-      if (!series.has(key)) series.set(key, new Map());
-      series.get(key)!.set(row.bucket_utc, row.downloads);
-    }
-  }
-  return series;
 }
 
 // Snapshots are dated by their ~04:00Z generation day, so the snapshots dated
@@ -207,11 +200,11 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
   const snapshots = loadSnapshotWindow(repoRoot, startDate, endDate);
 
   const knownLoops = specs.map((spec) => {
-    const cohort = describeCohort(trackKnownLoop(series, hours, spec.versionsByListing.keys()), snapshots, specs, startDate);
+    const cohort = describeCohort(trackKnownLoop(series, hours, spec.coreKeys), snapshots, specs, startDate);
     // Riders and version moves only mean something while the loop is running.
     const flagged = cohort.classification !== "metronome" ? [] : cohort.members.filter((member) =>
       (member.role === "rider" && member.status === "uncovered") || member.status === "untargeted-version");
-    const frozen = [...spec.versionsByListing.keys()].every((key) => isDeprecated(repoRoot, key));
+    const frozen = spec.coreKeys.every((key) => isDeprecated(repoRoot, key));
     return {
       spec: spec.path,
       incident: spec.incident,
