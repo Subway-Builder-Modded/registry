@@ -58,6 +58,33 @@ export interface LoopRepairAdoptionEntry {
   note?: string;
 }
 
+// A listing the same broken client re-fetches alongside the spec's core loop
+// (a "rider", found by detect-metronome): popular enough that an allowance
+// model would drown in its organic traffic, so attribution follows the loop's
+// own clock instead — per snapshot day, per_cycle × that day's lockstep hours
+// of the core loop, rounded down and capped by the version's raw growth. One
+// entry per (version, window): the client re-fetches the version it last
+// updated to, so a listing whose update restarts the loop gets one entry per
+// version.
+export interface LoopRepairRiderTarget {
+  listing_type: LoopRepairListingType;
+  listing_id: string;
+  version: string;
+  // First and last snapshot days of the rider's participation (inclusive).
+  start: string;
+  end?: string | null;
+  // Measured fetches per loop cycle: the rider's mean excess per lockstep hour
+  // over the same-day neighbouring hours, rounded down.
+  per_cycle: number;
+  note?: string;
+}
+
+// The listings whose shared hours define the loop's clock for rider_targets.
+export interface LoopRepairRiderLoop {
+  core: Array<{ listing_type: LoopRepairListingType; listing_id: string }>;
+  note?: string;
+}
+
 export interface LoopRepairSpec {
   // Short slug identifying the incident; embedded in every delta id.
   incident: string;
@@ -87,6 +114,10 @@ export interface LoopRepairSpec {
   // demand (e.g. a flagship measured against small-pack adoption peers); excess
   // beyond the loop rate is then organic traffic and must stay credited.
   daily_spurious_cap?: number | null;
+  rider_loop?: LoopRepairRiderLoop | null;
+  // Riders are bounded by their own measured rate; daily_spurious_cap (a ruling
+  // about the core targets' organic demand) does not apply to them.
+  rider_targets?: LoopRepairRiderTarget[];
   note?: string;
 }
 
@@ -132,8 +163,9 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
     throw new Error("Expected spec.targets to be an array.");
   }
   const hasAdoptionTargets = Array.isArray(value.adoption_targets) && value.adoption_targets.length > 0;
-  if (value.targets.length === 0 && !hasAdoptionTargets) {
-    throw new Error("Expected spec.targets to be non-empty when the spec has no adoption_targets.");
+  const hasRiderTargets = Array.isArray(value.rider_targets) && value.rider_targets.length > 0;
+  if (value.targets.length === 0 && !hasAdoptionTargets && !hasRiderTargets) {
+    throw new Error("Expected spec.targets to be non-empty when the spec has no adoption_targets or rider_targets.");
   }
 
   const targets: LoopRepairTarget[] = value.targets.map((entry, index) => {
@@ -217,6 +249,54 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
     throw new Error("Expected spec.daily_spurious_cap to be a positive integer.");
   }
 
+  const requireListingType = (raw: unknown, label: string): LoopRepairListingType => {
+    const listingType = requireNonEmptyString(raw, label);
+    if (listingType !== "map" && listingType !== "mod") {
+      throw new Error(`Expected ${label} to be 'map' or 'mod'.`);
+    }
+    return listingType;
+  };
+  const riderTargets: LoopRepairRiderTarget[] = !Array.isArray(value.rider_targets)
+    ? []
+    : value.rider_targets.map((entry, index) => {
+      const label = `rider_targets[${index}]`;
+      if (!isObject(entry)) throw new Error(`Expected ${label} to be an object.`);
+      const start = requireDateKey(entry.start, `${label}.start`);
+      const end = entry.end == null ? null : requireDateKey(entry.end, `${label}.end`);
+      if (end && end < start) throw new Error(`${label}.end must not be before ${label}.start.`);
+      if (typeof entry.per_cycle !== "number" || !(entry.per_cycle > 0) || entry.per_cycle > 5) {
+        throw new Error(`Expected ${label}.per_cycle to be a number in (0, 5].`);
+      }
+      return {
+        listing_type: requireListingType(entry.listing_type, `${label}.listing_type`),
+        listing_id: requireNonEmptyString(entry.listing_id, `${label}.listing_id`),
+        version: requireNonEmptyString(entry.version, `${label}.version`),
+        start,
+        end,
+        per_cycle: entry.per_cycle,
+        note: typeof entry.note === "string" && entry.note.trim() !== "" ? entry.note.trim() : undefined,
+      };
+    });
+  let riderLoop: LoopRepairRiderLoop | null = null;
+  if (value.rider_loop != null) {
+    if (!isObject(value.rider_loop) || !Array.isArray(value.rider_loop.core) || value.rider_loop.core.length === 0) {
+      throw new Error("Expected spec.rider_loop.core to be a non-empty array.");
+    }
+    riderLoop = {
+      core: value.rider_loop.core.map((entry, index) => {
+        if (!isObject(entry)) throw new Error(`Expected rider_loop.core[${index}] to be an object.`);
+        return {
+          listing_type: requireListingType(entry.listing_type, `rider_loop.core[${index}].listing_type`),
+          listing_id: requireNonEmptyString(entry.listing_id, `rider_loop.core[${index}].listing_id`),
+        };
+      }),
+      note: typeof value.rider_loop.note === "string" && value.rider_loop.note.trim() !== "" ? value.rider_loop.note.trim() : undefined,
+    };
+  }
+  if (riderTargets.length > 0 && !riderLoop) {
+    throw new Error("spec.rider_targets requires spec.rider_loop.");
+  }
+
   const spec: LoopRepairSpec = {
     incident: requireNonEmptyString(value.incident, "spec.incident"),
     source: requireNonEmptyString(value.source, "spec.source"),
@@ -231,6 +311,8 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
       ? null
       : requireDateKey(value.incident_end, "spec.incident_end"),
     daily_spurious_cap: typeof value.daily_spurious_cap === "number" ? value.daily_spurious_cap : null,
+    rider_loop: riderLoop,
+    rider_targets: riderTargets,
     note: typeof value.note === "string" && value.note.trim() !== "" ? value.note.trim() : undefined,
   };
 
@@ -492,6 +574,39 @@ export function computeAdoptionDaySpuriousEstimates(
         organicAllowance,
         spurious: capSpurious(delta.rawDelta - organicAllowance, dailySpuriousCap),
       };
+    });
+}
+
+// Lockstep hours ("YYYY-MM-DDTHH:00Z") per snapshot day: snapshot D covers the
+// day ending at its ~04:00Z cutoff, so an hour at or after the cutoff hour
+// belongs to the next day's snapshot.
+export function countSlotsBySnapshotDay(lockstepHours: string[], cutoffHourUtc = 4): Map<string, number> {
+  const counts = new Map<string, number>();
+  for (const hour of lockstepHours) {
+    const ms = Date.parse(`${hour.slice(0, 13)}:00:00Z`);
+    const day = new Date(Number(hour.slice(11, 13)) >= cutoffHourUtc ? ms + 86_400_000 : ms).toISOString().slice(0, 10);
+    counts.set(day, (counts.get(day) ?? 0) + 1);
+  }
+  return counts;
+}
+
+// computeRiderDaySpuriousEstimates attributes, for each snapshot day in the
+// rider's window, floor(per_cycle × the core loop's lockstep hours that day),
+// never more than the version's raw growth that day. Days before the version
+// existed count from zero, like an adoption target.
+export function computeRiderDaySpuriousEstimates(
+  series: SnapshotDayValue[],
+  rider: LoopRepairRiderTarget,
+  slotsByDay: Map<string, number>,
+  incidentEnd: string | null | undefined,
+): DaySpuriousEstimate[] {
+  const end = [rider.end, incidentEnd].filter((value): value is string => Boolean(value)).sort()[0] ?? null;
+  return computeAdoptionDayDeltas(series, rider.start)
+    .filter((delta) => !end || delta.dateKey <= end)
+    .map((delta) => {
+      const loopFetches = Math.floor(rider.per_cycle * (slotsByDay.get(delta.dateKey) ?? 0) + 1e-9);
+      const spurious = Math.min(delta.rawDelta, loopFetches);
+      return { dateKey: delta.dateKey, rawDelta: delta.rawDelta, organicAllowance: delta.rawDelta - spurious, spurious };
     });
 }
 

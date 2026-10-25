@@ -27,14 +27,20 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   `history/loop-repair-specs/`; like manual-attribution specs, **re-apply after any
   attribution-ledger rebuild**. See KNOWN_INCIDENTS.md 2026-08 French-city entry.
   If a repair target has an entry in `maps|mods/grandfathered-downloads.json`,
-  **lower that entry too**: the deprecate/delete freeze takes the max of
+  that entry must be lowered too (the engine now does this by the amount it
+  attributes): the deprecate/delete freeze takes the max of
   ledger, committed, and existing grandfathered values, so a stale high
   grandfathered count silently resurrects the inflated total if the listing is
   later deprecated or deleted (or otherwise leaves pipeline output).
   Spec knobs: `daily_spurious_cap` bounds attribution per target per day at
   the measured loop rate; adoption targets accept a target-level
   `incident_end` (the loop moved off that version) and
-  `install_base: "adjusted"` (prior versions were themselves loop-inflated).
+  `install_base: "adjusted"` (prior versions were themselves loop-inflated);
+  `rider_targets` (with `rider_loop.core`) correct listings riding a known
+  loop on the loop's own clock — per_cycle × the core's lockstep hours per
+  snapshot day from the hourly series, capped by the version's raw growth.
+  A target with a `grandfathered-downloads.json` entry has it lowered by what
+  the run attributed.
   **Never cap or trim attribution by editing the ledger directly** — its
   `daily`, `assets` and `timeline` views must move together, and snapshots
   read `timeline` (see KNOWN_INCIDENTS.md metronome v2 entry).
