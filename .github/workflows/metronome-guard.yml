@@ -210,7 +210,10 @@ jobs:
             const issue = issues
               .filter((candidate) => candidate.body && candidate.body.includes(marker))
               .sort((a, b) => b.number - a.number)[0];
-            const flagged = report.flagged;
+            // Stale open rider targets notify like flagged listings (marker
+            // entries "stale:<target>"), so a rider leaving the loop is raised once.
+            const stale = report.staleRiders ?? [];
+            const flagged = [...report.flagged, ...stale.map((target) => `stale:${target}`)];
             const previous = issue?.body?.match(/<!-- metronome-flagged: (.*?) -->/)?.[1]?.split(",").filter(Boolean) ?? [];
             const added = flagged.filter((key) => !previous.includes(key));
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
@@ -222,9 +225,12 @@ jobs:
               `<!-- metronome-flagged: ${flagged.join(",")} -->`,
               `_Updated daily by [metronome-guard](${runUrl}). ${repair}_`,
               "",
-              flagged.length > 0
-                ? `**${flagged.length} listing(s) need a maintainer decision:** extend or write a loop-repair spec (\`history/loop-repair-specs/\`), or dismiss here. Nothing is attributed until a spec covers them.`
-                : "**Nothing needs action.** Every listing riding a known loop is targeted, and no new lockstep cohort qualifies.",
+              report.flagged.length > 0
+                ? `**${report.flagged.length} listing(s) need a maintainer decision:** extend or write a loop-repair spec (\`history/loop-repair-specs/\`), or dismiss here. Nothing is attributed until a spec covers them.`
+                : "**No uncovered listings.** Every listing riding a known loop is targeted, and no new lockstep cohort qualifies.",
+              ...(stale.length > 0
+                ? ["", `**${stale.length} open rider target(s) look stale** (no longer riding at their spec rate): set \`end\` in the spec once confirmed — until then they are still attributed daily. ${stale.map((target) => `\`${target}\``).join(", ")}`]
+                : []),
               "",
               markdown,
             ].join("\n");

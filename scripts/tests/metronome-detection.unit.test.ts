@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   classifyDailyLockstep,
   detectLockstepCohorts,
+  measureLocalExcess,
   trackKnownLoop,
   windowHours,
   type HourlySeries,
@@ -123,4 +124,24 @@ test("trackKnownLoop ignores busy targets when deriving lockstep hours", () => {
   assert.equal(loop.lockstepHours.length, 14 * LOOP_SLOTS.length);
   const onlyBusy = trackKnownLoop(series, HOURS, ["map:busy-target"]);
   assert.equal(onlyBusy.lockstepHours.length, 0);
+});
+
+test("measureLocalExcess reads a rider's fetches per loop cycle and drops to zero once it leaves", () => {
+  const series = buildSeries();
+  const loop = trackKnownLoop(series, HOURS, ["map:loop-a", "map:loop-b", "map:loop-c"]);
+  // busy-rider gets exactly one loop fetch per cycle on top of ~25% organic hours.
+  const riding = measureLocalExcess(series.get("mod:busy-rider"), HOURS, loop.lockstepHours);
+  assert.equal(riding.samples, 14 * LOOP_SLOTS.length);
+  assert.ok(Math.abs(riding.mean - 1) < 0.25, `mean ${riding.mean}`);
+  assert.ok(riding.standardError > 0);
+  // Pure organic traffic has no excess in loop hours.
+  const organic = measureLocalExcess(series.get("map:organic-1"), HOURS, loop.lockstepHours);
+  assert.ok(Math.abs(organic.mean) < 0.15, `mean ${organic.mean}`);
+  // A rider that left the loop: its lockstep-hour fetches stop.
+  const left = new Map([...series.get("mod:busy-rider")!].map(([hour, downloads]) =>
+    [hour, LOOP_SLOTS.includes(Number(hour.slice(11, 13))) ? Math.max(0, downloads - 1) : downloads]));
+  assert.ok(Math.abs(measureLocalExcess(left, HOURS, loop.lockstepHours).mean) < 0.25);
+  // An unknown listing or no lockstep hours measures nothing.
+  assert.deepEqual(measureLocalExcess(undefined, HOURS, loop.lockstepHours).mean, 0);
+  assert.deepEqual(measureLocalExcess(series.get("mod:busy-rider"), HOURS, []), { mean: 0, standardError: 0, samples: 0 });
 });

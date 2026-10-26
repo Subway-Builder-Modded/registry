@@ -119,7 +119,14 @@ hour-of-day baseline (amba and transit-overlay at ~+1/cycle; mods at
 +0.3–0.8), each one starting right after the client updated it. Rider targets
 attribute per_cycle × the loop's lockstep hours per snapshot day (measured
 rate, rounded down) instead of an allowance model, because a popular rider's
-organic traffic would drown one.
+organic traffic would drown one. October joiners (added 2026-10-26, open
+targets): unrusted-cities-pack 1.0.3 from its 10-10 update (0.7/cycle, t 9.8),
+and taiwan-trains v1.0.4 (10-14) and mtr-trains v1.0.5 (10-15) with no update
+— the same 10-12 → 10-15 re-enrolment wave as la-metro-trainpack,
+noah-great-society and amba (0.7 / 0.65, t 11.1 / 9.3; placebo flat, nothing
+before). **+115 fetches** through 10-26, then ~8–10/day via the guard. Open
+rider targets keep attributing per_cycle × slots until `end` is set, so the
+guard also reports any whose last-7-day excess falls below 40% of its rate.
 
 **Re-application rules:** re-apply both specs every few days while open
 (`repair-loop-inflated-downloads --spec … --apply`, then

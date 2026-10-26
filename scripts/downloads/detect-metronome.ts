@@ -6,6 +6,7 @@ import { loadHourlySeries } from "../lib/hourly-downloads.js";
 import { isObject } from "../lib/json-utils.js";
 import {
   detectLockstepCohorts,
+  measureLocalExcess,
   trackKnownLoop,
   windowHours,
   type CohortMemberStats,
@@ -19,6 +20,9 @@ import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/s
 //     are derived from the listings the spec targets. Flagged: listings riding
 //     those hours that no open spec covers, and targeted listings whose
 //     downloads moved to a version the spec does not target (eu-maps 0.8.1).
+//   Stale riders — open rider targets (no `end`) of a loop that is still
+//     running whose last-7-day excess fell well below their `per_cycle`: the
+//     engine keeps attributing per_cycle × slots until a maintainer sets `end`.
 //   Candidates — lockstep cohorts discovered from scratch that share no
 //     listing with an open spec. Long pack-release waves can qualify, so each
 //     is annotated with how many members released a version in the window.
@@ -31,6 +35,11 @@ import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/s
 const SPEC_DIR = "history/loop-repair-specs";
 const DEFAULT_OUT_DIR = "tmp/metronome-guard";
 const DEFAULT_WINDOW_DAYS = 14;
+// Stale-rider check: recent loop hours measured, the share of the spec rate
+// below which a rider counts as gone, and the loop hours needed to judge.
+const STALE_RIDER_DAYS = 7;
+const STALE_RIDER_SHARE = 0.4;
+const STALE_RIDER_MIN_SAMPLES = 10;
 
 interface OpenSpec {
   path: string;
@@ -41,6 +50,15 @@ interface OpenSpec {
   // The listings whose shared hours define the loop: rider_loop.core when the
   // spec has one (the engine's clock), otherwise its non-rider targets.
   coreKeys: string[];
+  // Rider targets with no `end` — attributed every day the loop runs.
+  openRiders: OpenRider[];
+}
+
+interface OpenRider {
+  key: string;
+  version: string;
+  start: string;
+  perCycle: number;
 }
 
 type VersionCounts = Record<string, Record<string, number>>;
@@ -79,6 +97,15 @@ function loadOpenSpecs(repoRoot: string, windowStart: string): OpenSpec[] {
         .filter(isObject)
         .map((target) => `${target.listing_type === "mod" ? "mod" : "map"}:${String(target.listing_id)}`),
     );
+    const openRiders = (Array.isArray(raw.rider_targets) ? raw.rider_targets : [])
+      .filter(isObject)
+      .filter((target) => target.end == null && typeof target.per_cycle === "number" && typeof target.start === "string")
+      .map((target) => ({
+        key: `${target.listing_type === "mod" ? "mod" : "map"}:${String(target.listing_id)}`,
+        version: String(target.version),
+        start: target.start as string,
+        perCycle: target.per_cycle as number,
+      }));
     const riderCore = isObject(raw.rider_loop) && Array.isArray(raw.rider_loop.core)
       ? raw.rider_loop.core.filter(isObject).map((entry) => `${entry.listing_type === "mod" ? "mod" : "map"}:${String(entry.listing_id)}`)
       : [];
@@ -88,6 +115,7 @@ function loadOpenSpecs(repoRoot: string, windowStart: string): OpenSpec[] {
       autoApply: raw.auto_apply === true,
       versionsByListing,
       coreKeys: riderCore.length > 0 ? riderCore : [...versionsByListing.keys()].filter((key) => !riderKeys.has(key)),
+      openRiders,
     });
   }
   return specs;
@@ -192,6 +220,45 @@ function isDeprecated(repoRoot: string, key: string): boolean {
   return isObject(manifest.deprecation);
 }
 
+interface RiderCheck {
+  target: string;
+  perCycle: number;
+  recentExcess: number;
+  standardError: number;
+  samples: number;
+  status: "riding" | "stale" | "too-new";
+}
+
+// Each open rider's excess over the loop's lockstep hours in the last
+// STALE_RIDER_DAYS days, against its spec rate. A rider that joined inside that
+// stretch is not judged yet.
+function checkOpenRiders(
+  spec: OpenSpec,
+  series: ReturnType<typeof loadHourlySeries>,
+  hours: string[],
+  lockstepHours: string[],
+  endDate: string,
+): RiderCheck[] {
+  const recentHours = windowHours(endDate, STALE_RIDER_DAYS);
+  const recentStart = recentHours[0]!.slice(0, 10);
+  const recentSet = new Set(recentHours);
+  const recentLockstep = lockstepHours.filter((hour) => recentSet.has(hour));
+  return spec.openRiders.map((rider) => {
+    const excess = measureLocalExcess(series.get(rider.key), hours, recentLockstep);
+    const status: RiderCheck["status"] = rider.start > recentStart || excess.samples < STALE_RIDER_MIN_SAMPLES
+      ? "too-new"
+      : excess.mean < STALE_RIDER_SHARE * rider.perCycle ? "stale" : "riding";
+    return {
+      target: `${rider.key}@${rider.version}`,
+      perCycle: rider.perCycle,
+      recentExcess: excess.mean,
+      standardError: excess.standardError,
+      samples: excess.samples,
+      status,
+    };
+  });
+}
+
 function buildReport(repoRoot: string, endDate: string, days: number) {
   const hours = windowHours(endDate, days);
   const startDate = hours[0]!.slice(0, 10);
@@ -200,11 +267,16 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
   const snapshots = loadSnapshotWindow(repoRoot, startDate, endDate);
 
   const knownLoops = specs.map((spec) => {
-    const cohort = describeCohort(trackKnownLoop(series, hours, spec.coreKeys), snapshots, specs, startDate);
+    const tracked = trackKnownLoop(series, hours, spec.coreKeys);
+    const cohort = describeCohort(tracked, snapshots, specs, startDate);
     // Riders and version moves only mean something while the loop is running.
     const flagged = cohort.classification !== "metronome" ? [] : cohort.members.filter((member) =>
       (member.role === "rider" && member.status === "uncovered") || member.status === "untargeted-version");
     const frozen = spec.coreKeys.every((key) => isDeprecated(repoRoot, key));
+    // A quiet loop has no slots, so its open riders attribute nothing.
+    const riderChecks = cohort.classification === "metronome"
+      ? checkOpenRiders(spec, series, hours, tracked.lockstepHours, endDate)
+      : [];
     return {
       spec: spec.path,
       incident: spec.incident,
@@ -212,6 +284,7 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
       state: cohort.classification === "metronome" ? "looping" as const : frozen ? "frozen" as const : "quiet" as const,
       ...cohort,
       flagged: flagged.map((member) => member.key),
+      riderChecks,
     };
   });
   const knownKeys = new Set(specs.flatMap((spec) => [...spec.versionsByListing.keys()]));
@@ -223,11 +296,14 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
   const flagged = new Set<string>();
   for (const loop of knownLoops) for (const key of loop.flagged) flagged.add(key);
   for (const candidate of candidates) for (const member of candidate.members) if (member.status === "uncovered") flagged.add(member.key);
+  const staleRiders = knownLoops.flatMap((loop) =>
+    loop.riderChecks.filter((check) => check.status === "stale").map((check) => check.target)).sort();
   return {
     window: { start: startDate, end: endDate, days },
     knownLoops,
     candidates,
     flagged: [...flagged].sort(),
+    staleRiders,
   };
 }
 
@@ -268,6 +344,20 @@ function renderMarkdown(report: Report): string {
     } else {
       lines.push("Every listing riding this loop is targeted.", "");
     }
+    if (loop.riderChecks.length > 0) {
+      const stale = loop.riderChecks.filter((check) => check.status === "stale");
+      lines.push(
+        stale.length > 0
+          ? `**Stale rider target(s)** — excess over the last ${STALE_RIDER_DAYS} days is below ${100 * STALE_RIDER_SHARE}% of the spec rate; set \`end\` once confirmed, or the engine keeps attributing per_cycle × slots: ${stale.map((check) => `\`${check.target}\``).join(", ")}.`
+          : `Open rider targets are still riding at their spec rates (last ${STALE_RIDER_DAYS} days).`,
+        "",
+        "| Rider target | Spec rate | Last-7-day excess per loop hour | Loop hours | Status |",
+        "|---|---|---|---|---|",
+        ...loop.riderChecks.map((check) =>
+          `| \`${check.target}\` | ${check.perCycle} | ${check.recentExcess >= 0 ? "+" : ""}${check.recentExcess.toFixed(2)} ± ${check.standardError.toFixed(2)} | ${check.samples} | ${check.status} |`),
+        "",
+      );
+    }
   }
   lines.push("## New candidates (review — long pack-release waves can qualify)", "");
   if (report.candidates.length === 0) lines.push("None.", "");
@@ -304,10 +394,11 @@ async function run(): Promise<void> {
   writeFileSync(resolve(outDir, "report.md"), renderMarkdown(report), "utf-8");
 
   console.log(
-    `[detect-metronome] ${report.window.start}..${report.window.end}: ${report.knownLoops.length} known loop(s) (${report.knownLoops.filter((loop) => loop.state === "looping").length} looping), ${report.candidates.length} candidate(s), ${report.flagged.length} flagged listing(s)`,
+    `[detect-metronome] ${report.window.start}..${report.window.end}: ${report.knownLoops.length} known loop(s) (${report.knownLoops.filter((loop) => loop.state === "looping").length} looping), ${report.candidates.length} candidate(s), ${report.flagged.length} flagged listing(s), ${report.staleRiders.length} stale rider target(s)`,
   );
   for (const key of report.flagged) console.log(`  flagged: ${key}`);
-  appendGitHubOutput([`flagged_count=${report.flagged.length}`, `report_dir=${outDir}`]);
+  for (const target of report.staleRiders) console.log(`  stale rider: ${target}`);
+  appendGitHubOutput([`flagged_count=${report.flagged.length}`, `stale_rider_count=${report.staleRiders.length}`, `report_dir=${outDir}`]);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {
