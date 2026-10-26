@@ -212,6 +212,13 @@ A t≈17, stopping on its recorded 08-18; mfn-lasvegas t≈44).
   08-27 until v1 wound down (09-04). 1.2–1.5/cycle (t 3.3–14, placebo flat;
   none before 08-15). The ~4-cycle 0.2.0 join (08-15) is left out (t < 2.5,
   ~3/map). 0.2.1 assets via `asset_source` (eu-maps 0.6.5). **+220 fetches.**
+- **v1-era mods (added 2026-10-26):** each joined after its own update until
+  v1 wound down — basedgoat-trains v0.6.1 (08-19 → 08-20) and v0.6.2
+  (08-23 → 09-04; t 16.3, excess vs slots r 0.96); dantrains-abridged
+  v1.3.0/v1.3.1 (08-23 → 09-04; 1.9/cycle listing-level, t 11.7, split 0.7 /
+  1.2 since the superseded v1.3.0 kept tracking the slots); penguin-approved-
+  rolling-stock v1.1.0 (08-19, new listing) and v1.2.0 (08-24; t 4.0 / 6.9).
+  basedgoat and dantrains rode v2 the same way (UA spec). **+161 fetches.**
 - **One jp-maps release cycle (08-06 → 08-13, added 2026-10-26):** 32 yukina
   JP maps at 0.9–2.15/cycle (local t 5.6–13.3) on the version the 08-05/06
   release shipped, until the 08-14 release superseded it. Small maps went from
@@ -223,8 +230,8 @@ A t≈17, stopping on its recorded 08-18; mfn-lasvegas t≈44).
 Corrected by `2026_10_25_metronome_fetch_v1_riders.json` with rider targets:
 per snapshot day, per_cycle × list B's lockstep hours, rounded down and capped
 by the version's raw growth. **+1,955 fetches** (+2,011 with the JP maps,
-+156 with brno/praha, +220 with LT). Medium-confidence riders still under
-review and not corrected: v1-era mods. Known gap: the loop began 2026-07-25 15Z, two days
++156 with brno/praha, +220 with LT, +161 with the mods). All medium-tier v1
+riders are now corrected. Known gap: the loop began 2026-07-25 15Z, two days
 before list A/B's `incident_start`, so their first ~9 slots stay uncorrected.
 
 ---
