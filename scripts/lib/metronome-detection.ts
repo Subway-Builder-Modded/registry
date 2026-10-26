@@ -288,6 +288,45 @@ function buildCohort(
   };
 }
 
+export interface LocalExcess {
+  mean: number;
+  standardError: number;
+  samples: number;
+}
+
+// Mean downloads per lockstep hour above the same day's neighbouring
+// off-lockstep hours (±2–3h, at least two of them) — the local measure
+// loop-repair rider rates (`per_cycle`) are set from, so a rider's current
+// excess compares directly with its spec rate. `hours` must be consecutive.
+export function measureLocalExcess(
+  listingSeries: Map<string, number> | undefined,
+  hours: string[],
+  lockstepHours: Iterable<string>,
+): LocalExcess {
+  const hourIndex = new Map(hours.map((hour, index) => [hour, index]));
+  const lockstep = new Set<number>();
+  for (const hour of lockstepHours) {
+    const index = hourIndex.get(hour);
+    if (index !== undefined) lockstep.add(index);
+  }
+  const value = (index: number) => listingSeries?.get(hours[index]!) ?? 0;
+  const diffs: number[] = [];
+  for (const index of [...lockstep].sort((a, b) => a - b)) {
+    const neighbours = [-3, -2, 2, 3]
+      .map((offset) => index + offset)
+      .filter((neighbour) => neighbour >= 0 && neighbour < hours.length && !lockstep.has(neighbour));
+    if (neighbours.length < 2) continue;
+    const baseline = neighbours.reduce((sum, neighbour) => sum + value(neighbour), 0) / neighbours.length;
+    diffs.push(value(index) - baseline);
+  }
+  if (diffs.length === 0) return { mean: 0, standardError: 0, samples: 0 };
+  const mean = diffs.reduce((sum, diff) => sum + diff, 0) / diffs.length;
+  const variance = diffs.length > 1
+    ? diffs.reduce((sum, diff) => sum + (diff - mean) ** 2, 0) / (diffs.length - 1)
+    : 0;
+  return { mean, standardError: Math.sqrt(variance / diffs.length), samples: diffs.length };
+}
+
 // Tracks an already-known loop (an open spec's targeted listings): its lockstep
 // hours come from the known members, so it needs no rediscovery, and any other
 // listing tracking those hours rides — the loop spreading to listings the spec

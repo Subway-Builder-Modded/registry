@@ -4,8 +4,10 @@ Manual operational tooling — nothing here runs in scheduled automation, with o
 exception: the daily metronome-guard workflow re-applies every open
 `history/loop-repair-specs/` spec that opts in with `"auto_apply": true` through
 `repair-loop-inflated-downloads.ts`, then reports listings riding a known loop
-that no spec targets (`scripts/downloads/detect-metronome.ts`). Opt a spec in only
-once its model is vetted and its targets are live (not deprecated).
+that no spec targets (`scripts/downloads/detect-metronome.ts`), plus open rider
+targets (no `end`) whose last-7-day excess fell below 40% of their `per_cycle` —
+set `end` on those once confirmed, or they keep being attributed. Opt a spec in
+only once its model is vetted and its targets are live (not deprecated).
 
 Invoke via the package scripts in `scripts/package.json` (names unchanged from
 when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-history`.
