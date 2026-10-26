@@ -189,7 +189,11 @@ function describeMember(member: CohortMemberStats, snapshots: SnapshotWindow, sp
   let status: MemberStatus = "uncovered";
   if (covering.length > 0) {
     // No measurable growth means nothing is landing on an untargeted version.
-    const targeted = version === null || covering.some((spec) => spec.versionsByListing.get(member.key)!.has(version));
+    // A version "*" rider target covers every version of the listing.
+    const targeted = version === null || covering.some((spec) => {
+      const versions = spec.versionsByListing.get(member.key)!;
+      return versions.has(version) || versions.has("*");
+    });
     status = targeted ? "covered" : "untargeted-version";
   }
   return { ...member, activeVersion: version, status, specs: covering.map((spec) => spec.incident) };

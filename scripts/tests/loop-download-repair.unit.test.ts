@@ -10,6 +10,7 @@ import {
   computeRiderDaySpuriousEstimates,
   computeSnapshotClampPlan,
   countSlotsBySnapshotDay,
+  expandRiderTargets,
   extractTargetSeries,
   loopRepairDeltaId,
   normalizeLoopRepairSpec,
@@ -442,6 +443,51 @@ test("normalizeLoopRepairSpec validates rider targets and requires a rider loop"
     () => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, asset_source: { repo: "x", tag: "" } }] }),
     /asset_source.tag/,
   );
+  const wildcard = normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, version: "*", versions_from: "2026-10-18" }] });
+  assert.equal(wildcard.rider_targets![0]!.versions_from, "2026-10-18");
+  assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, version: "*" }] }), /versions_from is required/);
+  assert.throws(
+    () => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, versions_from: "2026-10-18" }] }),
+    /versions_from is required with version "\*" and only allowed with it/,
+  );
+  assert.throws(
+    () => normalizeLoopRepairSpec({
+      ...withRiders,
+      rider_targets: [{ ...RIDER, version: "*", versions_from: "2026-10-18", asset_source: { repo: "x", tag: "y", asset_name: "z" } }],
+    }),
+    /cannot be combined/,
+  );
+});
+
+test("expandRiderTargets expands version \"*\" to each version first seen since versions_from", () => {
+  const snap = (dateKey: string, versions: Record<string, number>, field: "raw_downloads" | "downloads" = "raw_downloads") =>
+    ({ dateKey, data: { mods: { [field]: { "trains": versions } } } });
+  const snapshots = [
+    snap("2026-10-17", { "v4.2.1": 100 }),
+    snap("2026-10-18", { "v4.2.1": 103, "v4.3.0": 3 }),
+    snap("2026-10-19", { "v4.2.1": 105, "v4.3.0": 14, "v5.0.0": 19 }),
+    // A schema without raw_downloads still counts as seen.
+    snap("2026-10-21", { "v4.2.1": 105, "v4.3.0": 20, "v5.0.0": 40, "v5.0.1": 15 }, "downloads"),
+  ];
+  const explicit: LoopRepairRiderTarget = { listing_type: "mod", listing_id: "trains", version: "v4.2.1", start: "2026-09-25", end: "2026-10-04", per_cycle: 0.9 };
+  const wildcard: LoopRepairRiderTarget = { ...explicit, version: "*", versions_from: "2026-10-18", start: "2026-10-19", end: null };
+  const expanded = expandRiderTargets([explicit, wildcard], snapshots);
+  assert.deepEqual(expanded.map((rider) => [rider.version, rider.start, rider.end]), [
+    ["v4.2.1", "2026-09-25", "2026-10-04"],
+    // v4.3.0 was first seen before the rider's start: it starts at `start`.
+    ["v4.3.0", "2026-10-19", null],
+    ["v5.0.0", "2026-10-19", null],
+    ["v5.0.1", "2026-10-21", null],
+  ]);
+  assert.ok(expanded.every((rider) => !("versions_from" in rider)));
+  // Delta ids match an explicit entry for the same version.
+  assert.equal(
+    loopRepairDeltaId("inc", { listing_type: "mod", listing_id: "trains", version: expanded[3]!.version }, "2026-10-21"),
+    "manual-loop-repair:inc:trains@v5.0.1:2026-10-21",
+  );
+  // A closed wildcard drops versions first seen after its end.
+  const closed = expandRiderTargets([{ ...wildcard, end: "2026-10-20" }], snapshots);
+  assert.deepEqual(closed.map((rider) => rider.version), ["v4.3.0", "v5.0.0"]);
 });
 
 test("countSlotsBySnapshotDay assigns hours at/after the 04:00Z cutoff to the next snapshot", () => {

@@ -26,6 +26,7 @@ import {
   countSlotsBySnapshotDay,
   computePeerSupersededRate,
   computeSnapshotClampPlan,
+  expandRiderTargets,
   extractTargetSeries,
   loopRepairDeltaId,
   normalizeLoopRepairSpec,
@@ -404,7 +405,7 @@ async function run(): Promise<void> {
     console.log(
       `[loop-repair] rider loop: ${coreKeys.length} core listings, ${loop.lockstepHours.length} lockstep hours ${hours[0]} → ${hours[hours.length - 1]}`,
     );
-    for (const rider of riderTargets) {
+    for (const rider of expandRiderTargets(riderTargets, snapshots)) {
       const target: LoopRepairTarget = {
         listing_type: rider.listing_type,
         listing_id: rider.listing_id,
