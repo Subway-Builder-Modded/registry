@@ -260,8 +260,12 @@ async function run(): Promise<void> {
   // already-applied days are pinned to the amount the ledger holds, so a re-run
   // stays idempotent even when the estimate has drifted since (an adjusted
   // install base lowered by an earlier clamp, peer curves gaining data).
-  const collectDays = (target: LoopRepairTarget, days: DaySpuriousEstimate[]): { days: DaySpuriousEstimate[]; added: number } => {
-    const assetKey = resolveAssetKey(target);
+  const collectDays = (
+    target: LoopRepairTarget,
+    days: DaySpuriousEstimate[],
+    assetKeyOverride?: string,
+  ): { days: DaySpuriousEstimate[]; added: number } => {
+    const assetKey = assetKeyOverride ?? resolveAssetKey(target);
     let added = 0;
     const pinned = days.map((day) => {
       const deltaId = loopRepairDeltaId(spec.incident, target, day.dateKey);
@@ -414,7 +418,10 @@ async function run(): Promise<void> {
       console.log(
         `[loop-repair] ${target.listing_type}:${target.listing_id}@${target.version} rider ${rider.per_cycle}/cycle ${rider.start} → ${riderEnd ?? "open"}`,
       );
-      const { days, added } = collectDays(target, estimates);
+      const assetKey = rider.asset_source
+        ? toDownloadAttributionAssetKey(rider.asset_source.repo, rider.asset_source.tag, rider.asset_source.asset_name)
+        : undefined;
+      const { days, added } = collectDays(target, estimates, assetKey);
       workItems.push({
         target,
         added,
