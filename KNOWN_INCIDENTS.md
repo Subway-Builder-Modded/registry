@@ -206,6 +206,12 @@ A t≈17, stopping on its recorded 08-18; mfn-lasvegas t≈44).
   (loop-hour excess ~0 before 08-24, +10–22/day after, falling with the slot
   count): brno 2.0/cycle (t 12.0), praha 1.95/cycle (measured 2.35 ± 0.36,
   t 6.6, set at mean − SE for its noisier baseline). **+156 fetches.**
+- **yukina-lt ×5 (added 2026-10-26):** joined right after each update and
+  dropped out on the client's restart — 0.2.1 for ~9 cycles (08-19 → 08-20
+  17Z; small maps got 2–4 in every loop hour and ~0 between), and 0.3.0 from
+  08-27 until v1 wound down (09-04). 1.2–1.5/cycle (t 3.3–14, placebo flat;
+  none before 08-15). The ~4-cycle 0.2.0 join (08-15) is left out (t < 2.5,
+  ~3/map). 0.2.1 assets via `asset_source` (eu-maps 0.6.5). **+220 fetches.**
 - **One jp-maps release cycle (08-06 → 08-13, added 2026-10-26):** 32 yukina
   JP maps at 0.9–2.15/cycle (local t 5.6–13.3) on the version the 08-05/06
   release shipped, until the 08-14 release superseded it. Small maps went from
@@ -217,8 +223,8 @@ A t≈17, stopping on its recorded 08-18; mfn-lasvegas t≈44).
 Corrected by `2026_10_25_metronome_fetch_v1_riders.json` with rider targets:
 per snapshot day, per_cycle × list B's lockstep hours, rounded down and capped
 by the version's raw growth. **+1,955 fetches** (+2,011 with the JP maps,
-+156 with brno/praha). Medium-confidence riders still under review and not
-corrected: 5 yukina-lt maps, v1-era mods. Known gap: the loop began 2026-07-25 15Z, two days
++156 with brno/praha, +220 with LT). Medium-confidence riders still under
+review and not corrected: v1-era mods. Known gap: the loop began 2026-07-25 15Z, two days
 before list A/B's `incident_start`, so their first ~9 slots stay uncorrected.
 
 ---
