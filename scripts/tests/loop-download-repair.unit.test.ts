@@ -6,6 +6,7 @@ import {
   computeBaselineDailyRate,
   computeCumulativeListingRawBefore,
   computeDaySpuriousEstimates,
+  computeLedgerBound,
   computePeerSupersededRate,
   computeRiderDaySpuriousEstimates,
   computeSnapshotClampPlan,
@@ -508,3 +509,59 @@ test("computeRiderDaySpuriousEstimates floors per_cycle × slots and caps at raw
   assert.equal(computeRiderDaySpuriousEstimates(series, RIDER, new Map(), null)[0]!.spurious, 0);
 });
 
+
+test("computeLedgerBound subtracts the target's own deltas a snapshot had not counted yet", () => {
+  const target = { listing_type: "map" as const, listing_id: "shenzhen", version: "1.2.0" };
+  const snap = (dateKey: string, generatedAt: string, raw: number, attributed: number) => ({
+    dateKey,
+    data: {
+      generated_at: generatedAt,
+      maps: {
+        downloads: { shenzhen: { "1.2.0": raw - attributed } },
+        raw_downloads: { shenzhen: { "1.2.0": raw } },
+        attributed_downloads: { shenzhen: { "1.2.0": attributed } },
+      },
+    },
+  });
+  // 385 of an earlier incident's attribution already recorded; this target's own
+  // deltas (2 + 3) were applied on 10-25 at 23:12.
+  const snapshots = [
+    snap("2026-08-01", "2026-08-01T04:05:00Z", 900, 385),
+    snap("2026-08-02", "2026-08-02T04:05:00Z", 910, 385),
+    snap("2026-10-26", "2026-10-26T04:05:00Z", 954, 390),
+  ];
+  const own = [
+    { dateKey: "2026-08-01", amount: 2, appliedAt: "2026-10-25T23:12:00Z" },
+    { dateKey: "2026-08-02", amount: 3, appliedAt: "2026-10-25T23:12:00Z" },
+  ];
+  const bound = computeLedgerBound(snapshots, target, own);
+  // Generated before the deltas existed: all own deltas up to that day are missing.
+  assert.equal(bound.get("2026-08-01"), 900 - 385 - 2);
+  assert.equal(bound.get("2026-08-02"), 910 - 385 - 5);
+  // Generated after: its attribution already counts them.
+  assert.equal(bound.get("2026-10-26"), 954 - 390);
+  // A delta this run is adding (appliedAt null) is missing everywhere.
+  assert.equal(computeLedgerBound(snapshots, target, [{ dateKey: "2026-08-02", amount: 3, appliedAt: null }]).get("2026-10-26"), 954 - 390 - 3);
+  // Same-day deltas are stamped after the snapshot's cutoff, so never counted there.
+  assert.equal(computeLedgerBound([snap("2026-08-02", "2026-10-26T04:05:00Z", 910, 388)], target, own).get("2026-08-02"), 910 - 388 - 3);
+  // Without raw/attribution/generated_at the day stays unbounded.
+  assert.equal(computeLedgerBound([{ dateKey: "2026-08-01", data: { maps: { downloads: { shenzhen: { "1.2.0": 5 } } } } }], target, own).size, 0);
+});
+
+test("computeSnapshotClampPlan applies the ledger bound under the trajectory", () => {
+  const series = [
+    { dateKey: "2026-07-25", raw: 500, adjusted: 115 },
+    { dateKey: "2026-07-26", raw: 510, adjusted: 125 },
+    { dateKey: "2026-07-27", raw: 520, adjusted: 135 },
+  ];
+  const days = [
+    { dateKey: "2026-07-26", rawDelta: 10, organicAllowance: 7, spurious: 3 },
+    { dateKey: "2026-07-27", rawDelta: 10, organicAllowance: 7, spurious: 3 },
+  ];
+  // The trajectory (115 + 7 + 7) misses nothing here, but the recorded values sit
+  // above it only by the target's own deltas once the bound is applied.
+  const plain = computeSnapshotClampPlan(series, { start: "2026-07-26", end: null }, days);
+  assert.deepEqual(plain.map((entry) => entry.correctedValue), [122, 129]);
+  const bounded = computeSnapshotClampPlan(series, { start: "2026-07-26", end: null }, days, new Map([["2026-07-26", 120], ["2026-07-27", 140]]));
+  assert.deepEqual(bounded.map((entry) => entry.correctedValue), [120, 129]);
+});

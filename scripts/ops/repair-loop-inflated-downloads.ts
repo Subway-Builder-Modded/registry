@@ -25,6 +25,7 @@ import {
   computeRiderDaySpuriousEstimates,
   countSlotsBySnapshotDay,
   computePeerSupersededRate,
+  computeLedgerBound,
   computeSnapshotClampPlan,
   expandRiderTargets,
   extractTargetSeries,
@@ -33,6 +34,7 @@ import {
   type DaySpuriousEstimate,
   type LoopRepairSpec,
   type LoopRepairTarget,
+  type OwnLoopDelta,
   type SnapshotFileLike,
 } from "../lib/loop-download-repair.js";
 import { getFlagValue, hasFlag } from "../lib/cli.js";
@@ -265,14 +267,17 @@ async function run(): Promise<void> {
     target: LoopRepairTarget,
     days: DaySpuriousEstimate[],
     assetKeyOverride?: string,
-  ): { days: DaySpuriousEstimate[]; added: number } => {
+  ): { days: DaySpuriousEstimate[]; added: number; bound: Map<string, number> } => {
     const assetKey = assetKeyOverride ?? resolveAssetKey(target);
     let added = 0;
+    const ownDeltas: OwnLoopDelta[] = [];
     const pinned = days.map((day) => {
       const deltaId = loopRepairDeltaId(spec.incident, target, day.dateKey);
-      if (attributionLedger.applied_delta_ids?.[deltaId]) {
+      const appliedAt = attributionLedger.applied_delta_ids?.[deltaId];
+      if (appliedAt) {
         const applied = appliedAmount(assetKey, day.dateKey);
         console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} allowance=${day.organicAllowance} spurious=${day.spurious} (already-applied: ${applied})`);
+        if (applied > 0) ownDeltas.push({ dateKey: day.dateKey, amount: applied, appliedAt });
         return { ...day, spurious: applied };
       }
       console.log(`  ${day.dateKey} rawDelta=${day.rawDelta} allowance=${day.organicAllowance} spurious=${day.spurious} (${day.spurious > 0 ? "new" : "no-excess"})`);
@@ -284,10 +289,11 @@ async function run(): Promise<void> {
         newDeltas.push(delta);
         totalNewSpurious += day.spurious;
         added += day.spurious;
+        ownDeltas.push({ dateKey: day.dateKey, amount: day.spurious, appliedAt: null });
       }
       return day;
     });
-    return { days: pinned, added };
+    return { days: pinned, added, bound: computeLedgerBound(snapshots, target, ownDeltas) };
   };
 
   const peerRate = computePeerSupersededRate(snapshots, spec);
@@ -317,7 +323,7 @@ async function run(): Promise<void> {
     console.log(
       `[loop-repair] ${label} baseline=${baseline.toFixed(2)}/day superseded_start=${target.superseded_start ?? spec.incident_start}`,
     );
-    const { days, added } = collectDays(target, estimates);
+    const { days, added, bound } = collectDays(target, estimates);
     workItems.push({
       target,
       added,
@@ -325,6 +331,7 @@ async function run(): Promise<void> {
         series,
         { start: spec.incident_start, end: spec.incident_end ?? null },
         days,
+        bound,
       ),
     });
   }
@@ -374,7 +381,7 @@ async function run(): Promise<void> {
         `[loop-repair] ${label} adoption target base=${base}${adoption.install_base === "adjusted" ? " (adjusted)" : ""}`
           + ` release_start=${adoption.release_start}${incidentEnd ? ` incident_end=${incidentEnd}` : ""}`,
       );
-      const { days, added } = collectDays(target, estimates);
+      const { days, added, bound } = collectDays(target, estimates);
       workItems.push({
         target,
         added,
@@ -382,6 +389,7 @@ async function run(): Promise<void> {
           series,
           { start: adoption.release_start, end: incidentEnd, missingAnchorValue: 0 },
           days,
+          bound,
         ),
       });
     }
@@ -422,7 +430,7 @@ async function run(): Promise<void> {
       const assetKey = rider.asset_source
         ? toDownloadAttributionAssetKey(rider.asset_source.repo, rider.asset_source.tag, rider.asset_source.asset_name)
         : undefined;
-      const { days, added } = collectDays(target, estimates, assetKey);
+      const { days, added, bound } = collectDays(target, estimates, assetKey);
       workItems.push({
         target,
         added,
@@ -430,6 +438,7 @@ async function run(): Promise<void> {
           series,
           { start: rider.start, end: riderEnd, missingAnchorValue: 0 },
           days,
+          bound,
         ),
       });
     }
