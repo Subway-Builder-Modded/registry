@@ -69,7 +69,13 @@ export interface LoopRepairAdoptionEntry {
 export interface LoopRepairRiderTarget {
   listing_type: LoopRepairListingType;
   listing_id: string;
+  // "*" with versions_from: every version of the listing first seen in a
+  // snapshot on or after versions_from, each from the later of `start` and its
+  // first snapshot day — for a client that re-fetches every version it has
+  // seen since its last restart (japanese-trains), so new releases are covered
+  // without a spec edit. Expanded by expandRiderTargets.
   version: string;
+  versions_from?: string;
   // First and last snapshot days of the rider's participation (inclusive).
   start: string;
   end?: string | null;
@@ -271,10 +277,18 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
       if (typeof entry.per_cycle !== "number" || !(entry.per_cycle > 0) || entry.per_cycle > 5) {
         throw new Error(`Expected ${label}.per_cycle to be a number in (0, 5].`);
       }
+      const version = requireNonEmptyString(entry.version, `${label}.version`);
+      if ((version === "*") !== (entry.versions_from != null)) {
+        throw new Error(`${label}.versions_from is required with version "*" and only allowed with it.`);
+      }
+      if (version === "*" && entry.asset_source != null) {
+        throw new Error(`${label}.asset_source cannot be combined with version "*".`);
+      }
       return {
         listing_type: requireListingType(entry.listing_type, `${label}.listing_type`),
         listing_id: requireNonEmptyString(entry.listing_id, `${label}.listing_id`),
-        version: requireNonEmptyString(entry.version, `${label}.version`),
+        version,
+        ...(version === "*" ? { versions_from: requireDateKey(entry.versions_from, `${label}.versions_from`) } : {}),
         start,
         end,
         per_cycle: entry.per_cycle,
@@ -381,6 +395,38 @@ export function extractTargetSeries(
     series.push({ dateKey: snapshot.dateKey, raw, adjusted });
   }
   return series;
+}
+
+// expandRiderTargets resolves version "*" rider targets into one target per
+// version first seen (in either counter) on or after versions_from, ordered by
+// first snapshot day; explicit targets pass through. Each expanded target is an
+// ordinary rider for its version, so its delta ids match an explicit entry.
+export function expandRiderTargets(
+  riders: LoopRepairRiderTarget[],
+  snapshots: Array<{ dateKey: string; data: SnapshotFileLike }>,
+): LoopRepairRiderTarget[] {
+  return riders.flatMap((rider) => {
+    if (rider.version !== "*") return [rider];
+    const firstSeen = new Map<string, string>();
+    for (const snapshot of snapshots) {
+      const section = rider.listing_type === "map" ? snapshot.data.maps : snapshot.data.mods;
+      for (const field of ["raw_downloads", "downloads"] as const) {
+        const byVersion = isObject(section?.[field]) ? section![field]![rider.listing_id] : undefined;
+        if (!isObject(byVersion)) continue;
+        for (const version of Object.keys(byVersion)) {
+          if (!firstSeen.has(version)) firstSeen.set(version, snapshot.dateKey);
+        }
+      }
+    }
+    return [...firstSeen]
+      .filter(([, seen]) => seen >= rider.versions_from!)
+      .sort(([a, seenA], [b, seenB]) => seenA.localeCompare(seenB) || a.localeCompare(b))
+      .map(([version, seen]) => {
+        const { versions_from: _versionsFrom, ...base } = rider;
+        return { ...base, version, start: seen > rider.start ? seen : rider.start };
+      })
+      .filter((expanded) => !expanded.end || expanded.start <= expanded.end);
+  });
 }
 
 interface DayDelta {

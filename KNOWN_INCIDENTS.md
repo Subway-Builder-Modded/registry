@@ -127,6 +127,25 @@ noah-great-society and amba (0.7 / 0.65, t 11.1 / 9.3; placebo flat, nothing
 before). **+115 fetches** through 10-26, then ~8–10/day via the guard. Open
 rider targets keep attributing per_cycle × slots until `end` is set, so the
 guard also reports any whose last-7-day excess falls below 40% of its rate.
+transit-overlay v1.5.6 (added 2026-10-26, open) joined with its 10-07 update:
+0.89 ± 0.16 per loop hour (t 5.6, placebo flat; 0.00 ± 0.10 over 09-08 →
+10-04), 0.85/cycle — 3–6/day of its 19–71 daily downloads. **+76** through
+10-26.
+
+**japanese-trains — the client re-fetches every version it has seen**
+(added 2026-10-26; the earlier "anomalous +3.9/cycle"): from 09-18 to 10-04
+every version v3.0.0 → v4.2.0 grew by the same 3–5 on the same day (even
+versions superseded for weeks), all dropped to exactly 0 at the client's
+10-04 restart, and after it re-enrolled the listing with v5.0.0 (10-19) only
+versions released since then grow (4–5/day each). Superseded versions grow
+0.79–1.16 per loop slot (median 0.94) with ≤0.3/day organic → 0.9/cycle per
+version. Cross-check: the version model attributes 810 for 09-08 → 10-04,
+the listing-level hourly loop excess sums to 814.5 (+6.03 per loop hour,
+t 12.9; +0.02 during the pause). 13 closed targets (09-08 → 10-04) and one
+open `version: "*"` target (`versions_from` 10-18, from 10-19) that covers
+each new release as it appears. **+958** through 10-26, ~0.9 × slots ×
+versions/day after (≈35/day, growing with each release until the client
+restarts).
 
 **Re-application rules:** re-apply both specs every few days while open
 (`repair-loop-inflated-downloads --spec … --apply`, then

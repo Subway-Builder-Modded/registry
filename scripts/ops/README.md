@@ -41,6 +41,9 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   `rider_targets` (with `rider_loop.core`) correct listings riding a known
   loop on the loop's own clock — per_cycle × the core's lockstep hours per
   snapshot day from the hourly series, capped by the version's raw growth.
+  A rider target may name a retired version's release asset (`asset_source`),
+  or use `version: "*"` with `versions_from` to cover every version first seen
+  since that date (a client that re-fetches every version it has seen).
   A target with a `grandfathered-downloads.json` entry has it lowered by what
   the run attributed.
   **Never cap or trim attribution by editing the ledger directly** — its
