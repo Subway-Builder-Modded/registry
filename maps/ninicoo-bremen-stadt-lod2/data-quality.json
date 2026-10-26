@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "id": "ninicoo-bremen-stadt-lod2",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm3",
+    "workplace_resolution": "exact_footprints",
+    "workplace_intensity": "fine_types_calibrated",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "admin_polygon",
+    "resident_intensity": "uniform",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm3"
+  },
+  "notes": "Map: ninicoo-bremen-stadt-lod2 (BREM), release 1.1.5, publish PR https://github.com/Subway-Builder-Modded/registry/pull/12402. Residence: Zensus 2022 population count, 100 m grid, reference date 15 May 2022. The grid counts total population, not employed residents. Grid points are assigned to municipalities and calibrated using 2022 BA employed-resident ratios. Residential origins remain grid-based; no per-building dwelling-count allocation is claimed. The selected even-placement option is conservative: demand is represented at grid points, not known dwelling units. Census population in the map bounds is 965,312, distinct from 403,307 modelled commuters. A complete independent suppression audit of the 100 m cells has not been performed. Workplaces: official 2024 municipality-level Pendlerrechnung and 2022 Bundesagentur für Arbeit employment counts (Wohn-/Arbeitsort). The source refers to place of work, so the government-workplace option was selected; these are administrative employment/commuter statistics, not measurements at each building. Totals are allocated to generated job destinations. The saved destination input has 6,658 points and categories such as industrial, office, retail, commercial, agriculture and education, with numerical job weights. Exact footprint-area/density formulas and the complete generating script could not be recovered. The allocation stage can be reconstructed from the saved CSVs: destination_share = jobs_raw / sum(jobs_raw within municipality), and od_job_target = destination_share × municipality commuter destination total. Both relationships were verified across all 6,658 destination rows (maximum absolute numerical discrepancy below 1e-12). Candidate records include OSM IDs, workplace categories/subtypes and job weights. This establishes weighted point allocation, but not the original candidate-weight or footprint/density formulas. The selected placement option is the closest available category, not an exact description: the saved destination data are OSM-derived workplace candidate points with category/subtype job weights, scaled to municipality-level commuter destination totals. Official building footprints and the original candidate-weight generation script could not be verified, so the option should be read as an approximate classification, not a claim that this exact footprint or density method was used. No official per-building counts or calibrated cadastral footprints are claimed. Flows: Regionaldatenbank table 19321-Z-22, Einpendelverflechtungen nach Geschlecht, 30 June 2024, provides municipality-to-municipality pairs. The full-table option refers to the paired-area table, NOT unsuppressed completeness: source documentation suppresses flows below 10 and has missing values. Point-level flows are synthetic. All 44,954 final origin/destination/count groups match the generated 2024 point-pair input exactly and total 403,307. Final points match the saved repaired point set; final groups match the saved routed output. There are 21,234 final residential/job points. Every group has positive drivingSeconds and a drivingDistance value; repaired travel times were not independently recalculated. No additional passenger/student/leisure demand. Original end-to-end scripts are unavailable. Please review the hybrid calibration, suppression and workplace placement conservatively. Fine point density is not the source resolution for jobs/flows. Provenance: https://github.com/ninicoooooo/subway-builder-bremen-stadt/blob/main/DATA-PROVENANCE.md",
+  "sources": [
+    "Zensus 2022 population grid (100 m), Zensus2022_Bevoelkerungszahl_100m-Gitter.csv: https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Zensus2022/_publikationen.html Regionaldatenbank Deutschland, table 19321-Z-22, Pendlerrechnung der Länder, 30 June 2024: https://www.regionalstatistik.de/ https://www.statistikportal.de/de/veroeffentlichungen/pendlerrechnung BA: Gemeindedaten der sozialversicherungspflichtig Beschäftigten nach Wohn- und Arbeitsort, annual 2022: https://statistik.arbeitsagentur.de/DE/Navigation/Statistiken/Fachstatistiken/Beschaeftigung/Beschaeftigte/Beschaeftigte-Nav.html Processing notes and published output: https://github.com/ninicoooooo/subway-builder-bremen-stadt/blob/main/DATA-PROVENANCE.md https://github.com/ninicoooooo/subway-builder-bremen-stadt/releases/tag/v1.1.5"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "ninicoooooo",
+    "reviewed_by": null,
+    "date": "2026-10-26"
+  }
+}
