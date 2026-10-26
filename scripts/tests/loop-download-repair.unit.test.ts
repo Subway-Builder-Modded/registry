@@ -433,6 +433,15 @@ test("normalizeLoopRepairSpec validates rider targets and requires a rider loop"
   assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_loop: undefined }), /rider_targets requires spec.rider_loop/);
   assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, per_cycle: 0 }] }), /per_cycle/);
   assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, end: "2026-08-01" }] }), /end must not be before/);
+  const retired = normalizeLoopRepairSpec({
+    ...withRiders,
+    rider_targets: [{ ...RIDER, asset_source: { repo: "ahkimn/subwaybuilder-jp-maps", tag: "0.4.10", asset_name: "AKJ.zip" } }],
+  });
+  assert.equal(retired.rider_targets![0]!.asset_source!.tag, "0.4.10");
+  assert.throws(
+    () => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, asset_source: { repo: "x", tag: "" } }] }),
+    /asset_source.tag/,
+  );
 });
 
 test("countSlotsBySnapshotDay assigns hours at/after the 04:00Z cutoff to the next snapshot", () => {

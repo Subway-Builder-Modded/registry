@@ -76,6 +76,10 @@ export interface LoopRepairRiderTarget {
   // Measured fetches per loop cycle: the rider's mean excess per lockstep hour
   // over the same-day neighbouring hours, rounded down.
   per_cycle: number;
+  // The version's release asset when integrity no longer records it (a retired
+  // version, e.g. jp-maps only-latest retirement): taken from integrity history
+  // while the version was live.
+  asset_source?: { repo: string; tag: string; asset_name: string };
   note?: string;
 }
 
@@ -274,6 +278,17 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
         start,
         end,
         per_cycle: entry.per_cycle,
+        ...(entry.asset_source == null ? {} : {
+          asset_source: (() => {
+            const source = entry.asset_source;
+            if (!isObject(source)) throw new Error(`Expected ${label}.asset_source to be an object.`);
+            return {
+              repo: requireNonEmptyString(source.repo, `${label}.asset_source.repo`),
+              tag: requireNonEmptyString(source.tag, `${label}.asset_source.tag`),
+              asset_name: requireNonEmptyString(source.asset_name, `${label}.asset_source.asset_name`),
+            };
+          })(),
+        }),
         note: typeof entry.note === "string" && entry.note.trim() !== "" ? entry.note.trim() : undefined,
       };
     });
