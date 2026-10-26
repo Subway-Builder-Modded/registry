@@ -44,6 +44,9 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   A rider target may name a retired version's release asset (`asset_source`),
   or use `version: "*"` with `versions_from` to cover every version first seen
   since that date (a client that re-fetches every version it has seen).
+  Every snapshot clamp is also bounded by the ledger-consistent value (raw −
+  recorded attribution − the target's deltas that snapshot had not yet
+  counted), so other attribution inside a window is respected.
   A target with a `grandfathered-downloads.json` entry has it lowered by what
   the run attributed.
   **Never cap or trim attribution by editing the ledger directly** — its

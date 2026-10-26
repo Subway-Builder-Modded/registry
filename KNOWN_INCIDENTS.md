@@ -257,7 +257,16 @@ Corrected by `2026_10_25_metronome_fetch_v1_riders.json` with rider targets:
 per snapshot day, per_cycle × list B's lockstep hours, rounded down and capped
 by the version's raw growth. **+1,955 fetches** (+2,011 with the JP maps,
 +156 with brno/praha, +220 with LT, +161 with the mods). All medium-tier v1
-riders are now corrected. Known gap: the loop began 2026-07-25 15Z, two days
+riders are now corrected. **History fix (2026-10-26):** the rider clamps grew
+their corrected trajectory from raw growth less the rider's own estimate, so
+on versions already carrying list-B attribution (shanghai, beijing, shenzhen,
+guangzhou, chongqing ~−87; greater-chicagoland −69) the trajectory sat above
+the recorded history and the min-guard left it uncorrected — the
+2026-10-26 snapshot (derived from the ledger) then showed an artificial
+one-day drop. The engine now also bounds every clamp by the ledger-consistent
+value (raw − recorded attribution − the target's deltas that snapshot had not
+counted); re-applying all specs lowered 146 versions across 93 snapshots,
+most by 1–3 (in-window pipeline fetches, the former ±2 gap). Known gap: the loop began 2026-07-25 15Z, two days
 before list A/B's `incident_start`, so their first ~9 slots stay uncorrected.
 
 ---

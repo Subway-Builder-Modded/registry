@@ -360,9 +360,11 @@ export function normalizeLoopRepairSpec(value: unknown): LoopRepairSpec {
 interface SnapshotSectionLike {
   downloads?: Record<string, Record<string, unknown>>;
   raw_downloads?: Record<string, Record<string, unknown>>;
+  attributed_downloads?: Record<string, Record<string, unknown>>;
 }
 
 export interface SnapshotFileLike {
+  generated_at?: unknown;
   total_downloads?: unknown;
   maps?: SnapshotSectionLike;
   mods?: SnapshotSectionLike;
@@ -370,7 +372,7 @@ export interface SnapshotFileLike {
 
 function readVersionValue(
   section: SnapshotSectionLike | undefined,
-  field: "downloads" | "raw_downloads",
+  field: "downloads" | "raw_downloads" | "attributed_downloads",
   target: LoopRepairTarget,
 ): number | null {
   const byListing = section?.[field];
@@ -694,6 +696,46 @@ export interface SnapshotClampWindow {
   missingAnchorValue?: number;
 }
 
+export interface OwnLoopDelta {
+  dateKey: string;
+  amount: number;
+  // applied_delta_ids timestamp, or null for a delta this run is adding.
+  appliedAt: string | null;
+}
+
+// computeLedgerBound: per snapshot day, the value that snapshot would hold if
+// regenerated now — its recorded raw minus its recorded attribution, minus the
+// target's own loop-repair deltas it had not counted yet. A delta stamped
+// D T12:00Z counts from snapshot D+1 (04:00Z cutoff), and only in a snapshot
+// generated after the delta was applied. The clamp trajectory grows by raw
+// growth less the target's own estimate, so it misses any OTHER attribution in
+// the window — release-day pipeline fetches (±2), or an earlier incident's
+// deltas on the same version (the v1 riders on list-B versions, ~90) — and
+// leaves history above what a fresh snapshot shows. Days without raw,
+// attribution or generated_at are left unbounded.
+export function computeLedgerBound(
+  snapshots: Array<{ dateKey: string; data: SnapshotFileLike }>,
+  target: LoopRepairTarget,
+  ownDeltas: OwnLoopDelta[],
+): Map<string, number> {
+  const bound = new Map<string, number>();
+  for (const snapshot of snapshots) {
+    const section = target.listing_type === "map" ? snapshot.data.maps : snapshot.data.mods;
+    const raw = readVersionValue(section, "raw_downloads", target);
+    const attributed = readVersionValue(section, "attributed_downloads", target);
+    const generatedAt = typeof snapshot.data.generated_at === "string" ? snapshot.data.generated_at : null;
+    if (raw === null || attributed === null || generatedAt === null) continue;
+    let missing = 0;
+    for (const delta of ownDeltas) {
+      if (delta.dateKey > snapshot.dateKey) continue;
+      const counted = delta.dateKey < snapshot.dateKey && delta.appliedAt !== null && delta.appliedAt <= generatedAt;
+      if (!counted) missing += delta.amount;
+    }
+    bound.set(snapshot.dateKey, Math.max(0, raw - attributed - missing));
+  }
+  return bound;
+}
+
 // computeSnapshotClampPlan rewrites the window's snapshot trajectory to the
 // organic estimate: anchored at the last pre-window adjusted value, growing by the
 // raw delta minus that day's spurious estimate (= min(rawDelta, organicAllowance)
@@ -705,6 +747,9 @@ export function computeSnapshotClampPlan(
   series: SnapshotDayValue[],
   window: SnapshotClampWindow,
   days: DaySpuriousEstimate[],
+  // computeLedgerBound's per-day ceiling: the trajectory alone misses any other
+  // attribution inside the window.
+  ledgerBound?: Map<string, number>,
 ): SnapshotClampEntry[] {
   const anchorDay = [...series]
     .reverse()
@@ -734,7 +779,10 @@ export function computeSnapshotClampPlan(
       corrected += organicByDate.get(day.dateKey) ?? 0;
     }
     if (day.adjusted === null) continue;
-    plan.push({ dateKey: day.dateKey, correctedValue: Math.min(day.adjusted, corrected) });
+    plan.push({
+      dateKey: day.dateKey,
+      correctedValue: Math.min(day.adjusted, corrected, ledgerBound?.get(day.dateKey) ?? Number.POSITIVE_INFINITY),
+    });
   }
   return plan;
 }
