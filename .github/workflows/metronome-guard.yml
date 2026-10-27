@@ -120,9 +120,37 @@ jobs:
             exit 1
           fi
 
+      # The previous run's live-counter readings (holdouts), kept in a hidden
+      # marker on the metronome-watch issue, so detection can tell whether the
+      # frozen loop's counters are still growing.
+      - name: Load previous guard state
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+            fs.mkdirSync("tmp/metronome-guard", { recursive: true });
+            const issues = await github.paginate(github.rest.issues.listForRepo, {
+              ...context.repo, state: "all", labels: "metronome-watch", per_page: 100,
+            });
+            const issue = issues
+              .filter((candidate) => candidate.body && candidate.body.includes("<!-- metronome-watch -->"))
+              .sort((a, b) => b.number - a.number)[0];
+            const encoded = issue?.body?.match(/<!-- metronome-state: ([A-Za-z0-9+/=]+) -->/)?.[1];
+            let state = {};
+            if (encoded) {
+              try {
+                state = JSON.parse(Buffer.from(encoded, "base64").toString("utf-8"));
+              } catch (error) {
+                core.warning(`Ignoring unreadable metronome-state marker: ${error.message}`);
+              }
+            }
+            fs.writeFileSync("tmp/metronome-guard/previous-state.json", JSON.stringify(state));
+
       - name: Detect metronomes
         id: detect
-        run: pnpm --dir scripts run detect-metronome
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm --dir scripts run detect-metronome -- --previous-state tmp/metronome-guard/previous-state.json
 
       - name: Stage repair changes
         id: commit_changes
@@ -213,7 +241,10 @@ jobs:
             // Stale open rider targets notify like flagged listings (marker
             // entries "stale:<target>"), so a rider leaving the loop is raised once.
             const stale = report.staleRiders ?? [];
-            const flagged = [...report.flagged, ...stale.map((target) => `stale:${target}`)];
+            // A known loop going silent ("paused:<incident>" after 48 h, then
+            // "stopped:<incident>" after a week) notifies once per stage too.
+            const silenced = report.silenced ?? [];
+            const flagged = [...report.flagged, ...stale.map((target) => `stale:${target}`), ...silenced];
             const previous = issue?.body?.match(/<!-- metronome-flagged: (.*?) -->/)?.[1]?.split(",").filter(Boolean) ?? [];
             const added = flagged.filter((key) => !previous.includes(key));
             const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
@@ -223,6 +254,7 @@ jobs:
             const body = [
               marker,
               `<!-- metronome-flagged: ${flagged.join(",")} -->`,
+              `<!-- metronome-state: ${Buffer.from(JSON.stringify(report.state ?? {})).toString("base64")} -->`,
               `_Updated daily by [metronome-guard](${runUrl}). ${repair}_`,
               "",
               report.flagged.length > 0
@@ -230,6 +262,9 @@ jobs:
                 : "**No uncovered listings.** Every listing riding a known loop is targeted, and no new lockstep cohort qualifies.",
               ...(stale.length > 0
                 ? ["", `**${stale.length} open rider target(s) look stale** (no longer riding at their spec rate): set \`end\` in the spec once confirmed — until then they are still attributed daily. ${stale.map((target) => `\`${target}\``).join(", ")}`]
+                : []),
+              ...(silenced.length > 0
+                ? ["", `**Silent loop(s):** ${silenced.map((key) => `\`${key}\``).join(", ")} — the client may have restarted (\`paused\`, ≥ 48 h) or stopped (\`stopped\`, ≥ 7 days). Loop-clock specs attribute nothing on silent days; close a stopped spec (\`incident_end\`) once confirmed. See the loop's section below.`]
                 : []),
               "",
               markdown,

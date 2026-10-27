@@ -5,12 +5,18 @@ import { getFlagValue, hasFlag } from "../lib/cli.js";
 import { loadHourlySeries } from "../lib/hourly-downloads.js";
 import { isObject } from "../lib/json-utils.js";
 import {
+  classifyLoopSilence,
   detectLockstepCohorts,
   measureLocalExcess,
   trackKnownLoop,
+  updateCounterWatch,
   windowHours,
+  LOOP_PAUSED_HOURS,
+  LOOP_STOPPED_HOURS,
   type CohortMemberStats,
+  type CounterWatchState,
   type LockstepCohort,
+  type LoopSilence,
 } from "../lib/metronome-detection.js";
 import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/script-runtime.js";
 
@@ -23,13 +29,19 @@ import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/s
 //   Stale riders — open rider targets (no `end`) of a loop that is still
 //     running whose last-7-day excess fell well below their `per_cycle`: the
 //     engine keeps attributing per_cycle × slots until a maintainer sets `end`.
+//   Silence — a known loop with no lockstep hour for 48 h is "paused" (the
+//     client's restarts are ~30 h), for a week "stopped" (set incident_end). A
+//     frozen loop (all targets deprecated, invisible to the hourly series) is
+//     judged by its targets' live GitHub release counters instead, compared
+//     with the counters the previous run saw (--previous-state, kept by the
+//     workflow in the metronome-watch issue).
 //   Candidates — lockstep cohorts discovered from scratch that share no
 //     listing with an open spec. Long pack-release waves can qualify, so each
 //     is annotated with how many members released a version in the window.
 // A maintainer writes or extends a spec; specs opted in with
 // `auto_apply: true` are then re-applied daily by the same workflow.
 //
-//   pnpm --dir scripts run detect-metronome [-- --end YYYY-MM-DD] [--days 14]
+//   pnpm --dir scripts run detect-metronome [-- --end YYYY-MM-DD] [--days 14] [--previous-state <json>]
 //   pnpm --dir scripts run detect-metronome -- --list-auto-apply
 
 const SPEC_DIR = "history/loop-repair-specs";
@@ -265,6 +277,7 @@ function checkOpenRiders(
 
 function buildReport(repoRoot: string, endDate: string, days: number) {
   const hours = windowHours(endDate, days);
+  const windowEndMs = Date.parse(`${endDate}T00:00:00Z`);
   const startDate = hours[0]!.slice(0, 10);
   const specs = loadOpenSpecs(repoRoot, startDate);
   const series = loadHourlySeries(repoRoot, hours);
@@ -282,6 +295,10 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
       ? checkOpenRiders(spec, series, hours, tracked.lockstepHours, endDate)
       : [];
     return {
+      // Frozen loops are judged by their live counters (attachCounterWatch).
+      silence: frozen ? null : classifyLoopSilence(tracked.lockstepHours, windowEndMs),
+      counterWatch: null as CounterWatchReport | null,
+      targets: [...spec.versionsByListing].flatMap(([key, versions]) => [...versions].map((version) => ({ key, version }))),
       spec: spec.path,
       incident: spec.incident,
       autoApply: spec.autoApply,
@@ -308,10 +325,113 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
     candidates,
     flagged: [...flagged].sort(),
     staleRiders,
+    // "paused:<incident>" / "stopped:<incident>" — filled by finalizeSilence.
+    silenced: [] as string[],
+    state: { counters: {} as Record<string, CounterWatchState> },
   };
 }
 
 type Report = ReturnType<typeof buildReport>;
+
+interface CounterWatchReport {
+  targets: Array<{ target: string; count: number | null; growth: number | null }>;
+  lastGrowthAt: string;
+  silentHours: number;
+  silence: LoopSilence;
+  unchecked: boolean;
+  error?: string;
+}
+
+interface GuardState {
+  counters?: Record<string, CounterWatchState>;
+}
+
+interface IntegritySource {
+  repo?: string;
+  tag?: string;
+  asset_name?: string;
+}
+
+// A target version's release asset, from the integrity files the pipeline keeps
+// (deprecated listings keep their entries).
+function loadSourceResolver(repoRoot: string): (key: string, version: string) => IntegritySource | null {
+  const read = (relative: string) => {
+    const path = resolve(repoRoot, relative);
+    return existsSync(path)
+      ? (JSON.parse(readFileSync(path, "utf-8")) as { listings?: Record<string, { versions?: Record<string, { source?: IntegritySource }> }> }).listings ?? {}
+      : {};
+  };
+  const maps = read("maps/integrity.json");
+  const mods = read("mods/integrity-cache.json");
+  return (key, version) => {
+    const [type, id] = key.split(/:(.*)/s) as [string, string];
+    const source = (type === "mod" ? mods : maps)[id]?.versions?.[version]?.source;
+    return source?.repo && source.tag && source.asset_name ? source : null;
+  };
+}
+
+async function fetchReleaseAssetCount(source: IntegritySource, token: string | undefined): Promise<number | null> {
+  const response = await fetch(`https://api.github.com/repos/${source.repo}/releases/tags/${encodeURIComponent(source.tag!)}`, {
+    headers: {
+      Accept: "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      "User-Agent": "railyard-metronome-guard",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  if (!response.ok) throw new Error(`${source.repo}@${source.tag}: HTTP ${response.status}`);
+  const release = await response.json() as { assets?: Array<{ name: string; download_count: number }> };
+  const asset = release.assets?.find((candidate) => candidate.name.toLowerCase() === source.asset_name!.toLowerCase());
+  return asset ? asset.download_count : null;
+}
+
+// Frozen loops: read each target's live release counter and compare with the
+// previous run's (any growth = the client is still fetching).
+async function attachCounterWatch(report: Report, repoRoot: string, previous: GuardState, nowIso: string): Promise<void> {
+  const resolveSource = loadSourceResolver(repoRoot);
+  const token = process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN;
+  for (const loop of report.knownLoops) {
+    if (loop.state !== "frozen") continue;
+    const counts: Record<string, number | null> = {};
+    const errors: string[] = [];
+    for (const { key, version } of loop.targets) {
+      const label = `${key}@${version}`;
+      const source = resolveSource(key, version);
+      if (!source) {
+        counts[label] = null;
+        errors.push(`${label}: no release asset in integrity`);
+        continue;
+      }
+      try {
+        counts[label] = await fetchReleaseAssetCount(source, token);
+        if (counts[label] === null) errors.push(`${label}: asset ${source.asset_name} not found`);
+      } catch (error) {
+        counts[label] = null;
+        errors.push(error instanceof Error ? error.message : String(error));
+      }
+    }
+    const watch = updateCounterWatch(previous.counters?.[loop.incident], counts, nowIso);
+    report.state.counters[loop.incident] = watch.state;
+    loop.counterWatch = {
+      targets: Object.keys(counts).map((target) => ({ target, count: counts[target] ?? null, growth: watch.growth[target] ?? null })),
+      lastGrowthAt: watch.state.lastGrowthAt,
+      silentHours: watch.silentHours,
+      silence: watch.silence,
+      unchecked: watch.unchecked,
+      ...(errors.length > 0 ? { error: errors.join("; ") } : {}),
+    };
+  }
+}
+
+// The silence notification keys, once per stage.
+function finalizeSilence(report: Report): void {
+  report.silenced = report.knownLoops.flatMap((loop) => {
+    const silence = loop.counterWatch?.silence ?? loop.silence?.silence ?? "running";
+    return silence === "running" ? [] : [`${silence}:${loop.incident}`];
+  }).sort();
+}
+
+const hoursLabel = (hours: number) => (hours >= 48 ? `${(hours / 24).toFixed(1)} days` : `${hours} h`);
 
 function memberTable(members: ReportMember[]): string[] {
   return [
@@ -343,6 +463,32 @@ function renderMarkdown(report: Report): string {
       `Lockstep hours per day: \`${loop.dailyLockstepHours.join(" ")}\` — ${loop.reason}.${stateNote}`,
       "",
     );
+    if (loop.silence) {
+      const { lastLockstepHour, silentHours, silence } = loop.silence;
+      const last = lastLockstepHour === null
+        ? `No loop hour in the last ${report.window.days} days.`
+        : `Last loop hour: \`${lastLockstepHour}\` (${hoursLabel(silentHours!)} before the window end).`;
+      lines.push({
+        running: last,
+        paused: `**Silent for ${hoursLabel(silentHours!)}** (≥ ${LOOP_PAUSED_HOURS} h) — a client restart or the client stopping. ${last} Loop-clock specs attribute nothing on silent days; if it stays silent for ${LOOP_STOPPED_HOURS / 24} days, close the spec.`,
+        stopped: `**Stopped** — ${last} Set \`incident_end\` to ${lastLockstepHour ? `\`${snapshotDayOf(lastLockstepHour)}\`` : "the last loop day"} (and \`end\` on open rider targets) once confirmed.`,
+      }[silence], "");
+    }
+    if (loop.counterWatch) {
+      const watch = loop.counterWatch;
+      const rows = watch.targets.map((row) => `\`${row.target}\` ${row.count ?? "?"}${row.growth === null ? "" : ` (${row.growth >= 0 ? "+" : ""}${row.growth})`}`);
+      lines.push(
+        watch.unchecked
+          ? `Live release counters could not be read this run${watch.error ? ` (${watch.error})` : ""}; silence not aged.`
+          : `Live release counters (since the previous run): ${rows.join(", ")}. Last growth: \`${watch.lastGrowthAt}\`.${watch.error ? ` Errors: ${watch.error}.` : ""}`,
+        "",
+      );
+      if (watch.silence !== "running") {
+        lines.push(watch.silence === "stopped"
+          ? `**Stopped** — no counter growth for ${hoursLabel(watch.silentHours)}. Close the spec (\`incident_end\`) once confirmed.`
+          : `**No counter growth for ${hoursLabel(watch.silentHours)}** — the holdouts may have stopped being fetched.`, "");
+      }
+    }
     if (needsAction.length > 0) {
       lines.push("**Needs a spec change** (rides this loop but is not targeted):", "", ...memberTable(needsAction), "");
     } else {
@@ -379,6 +525,13 @@ function renderMarkdown(report: Report): string {
   return lines.join("\n");
 }
 
+// Snapshot D covers the day ending at D's 04:00Z cutoff.
+function snapshotDayOf(hour: string): string {
+  const ms = Date.parse(hour.replace("Z", ":00Z"));
+  const day = new Date(ms + (Number(hour.slice(11, 13)) >= 4 ? 86_400_000 : 0));
+  return day.toISOString().slice(0, 10);
+}
+
 async function run(): Promise<void> {
   const argv = process.argv.slice(2);
   const repoRoot = process.env.RAILYARD_REPO_ROOT ?? resolveRepoRoot(import.meta.dirname);
@@ -392,6 +545,12 @@ async function run(): Promise<void> {
   }
 
   const report = buildReport(repoRoot, endDate, days);
+  const previousPath = getFlagValue(argv, "previous-state")?.trim();
+  const previous: GuardState = previousPath && existsSync(resolve(repoRoot, previousPath))
+    ? JSON.parse(readFileSync(resolve(repoRoot, previousPath), "utf-8")) as GuardState
+    : {};
+  await attachCounterWatch(report, repoRoot, previous, new Date().toISOString());
+  finalizeSilence(report);
   const outDir = resolve(repoRoot, getFlagValue(argv, "out-dir")?.trim() || DEFAULT_OUT_DIR);
   mkdirSync(outDir, { recursive: true });
   writeFileSync(resolve(outDir, "report.json"), `${JSON.stringify(report, null, 2)}\n`, "utf-8");
@@ -402,7 +561,13 @@ async function run(): Promise<void> {
   );
   for (const key of report.flagged) console.log(`  flagged: ${key}`);
   for (const target of report.staleRiders) console.log(`  stale rider: ${target}`);
-  appendGitHubOutput([`flagged_count=${report.flagged.length}`, `stale_rider_count=${report.staleRiders.length}`, `report_dir=${outDir}`]);
+  for (const key of report.silenced) console.log(`  silent: ${key}`);
+  appendGitHubOutput([
+    `flagged_count=${report.flagged.length}`,
+    `stale_rider_count=${report.staleRiders.length}`,
+    `silenced_count=${report.silenced.length}`,
+    `report_dir=${outDir}`,
+  ]);
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? "").href) {

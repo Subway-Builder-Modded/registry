@@ -24,6 +24,7 @@ import {
   computeDaySpuriousEstimates,
   computeRiderDaySpuriousEstimates,
   countSlotsBySnapshotDay,
+  gateOnLoopSlots,
   computePeerSupersededRate,
   computeLedgerBound,
   computeSnapshotClampPlan,
@@ -309,6 +310,41 @@ async function run(): Promise<void> {
     console.log(`[loop-repair] attribution capped at ${spec.daily_spurious_cap}/target/day (spec.daily_spurious_cap)`);
   }
 
+  // Loop clock (rider_loop specs): the core loop's lockstep hours in the hourly
+  // series, counted per snapshot day. Riders attribute per_cycle × slots; every
+  // other target attributes nothing on a day the loop never fired.
+  let loopClock: { start: string; slotsByDay: Map<string, number> } | null = null;
+  if (spec.rider_loop) {
+    const riderStarts = (spec.rider_targets ?? []).map((rider) => rider.start);
+    const otherStarts = [
+      ...(spec.adoption_targets ?? []).map((adoption) => adoption.release_start),
+      ...(spec.targets.length > 0 ? [spec.incident_start] : []),
+    ];
+    const clockStart = (riderStarts.length > 0 ? riderStarts : otherStarts).sort()[0]!;
+    // Snapshot D covers the day ending at D's 04:00Z cutoff.
+    const startMs = Date.parse(`${clockStart}T04:00:00Z`) - 86_400_000;
+    const lastDay = [snapshots[snapshots.length - 1]!.dateKey, spec.incident_end ?? null]
+      .filter((value): value is string => Boolean(value))
+      .sort()[0]!;
+    const hours = hourBuckets(startMs, Date.parse(`${lastDay}T04:00:00Z`));
+    const coreKeys = spec.rider_loop.core.map((entry) => `${entry.listing_type}:${entry.listing_id}`);
+    const loop = trackKnownLoop(loadHourlySeries(args.repoRoot, hours), hours, coreKeys);
+    loopClock = { start: clockStart, slotsByDay: countSlotsBySnapshotDay(loop.lockstepHours) };
+    console.log(
+      `[loop-repair] loop clock: ${coreKeys.length} core listings, ${loop.lockstepHours.length} lockstep hours ${hours[0]} → ${hours[hours.length - 1]}`,
+    );
+  }
+  const gateSilentDays = (target: LoopRepairTarget, estimates: DaySpuriousEstimate[]): DaySpuriousEstimate[] => {
+    if (!loopClock) return estimates;
+    const { days, silentDays } = gateOnLoopSlots(estimates, loopClock.slotsByDay, loopClock.start);
+    // Applied days keep their ledger amounts (collectDays), so only new ones change.
+    const gatedNew = silentDays.filter((dateKey) => !attributionLedger.applied_delta_ids?.[loopRepairDeltaId(spec.incident, target, dateKey)]);
+    if (gatedNew.length > 0) {
+      console.log(`[loop-repair] ${target.listing_type}:${target.listing_id}@${target.version}: loop silent on ${gatedNew.join(", ")} — nothing attributed`);
+    }
+    return days;
+  };
+
   for (const target of spec.targets) {
     const label = `${target.listing_type}:${target.listing_id}@${target.version}`;
     const series = extractTargetSeries(snapshots, target);
@@ -316,10 +352,10 @@ async function run(): Promise<void> {
     if (baseline === null) {
       throw new Error(`No baseline-window data for ${label}; refusing to estimate against an empty baseline.`);
     }
-    const estimates = computeDaySpuriousEstimates(series, spec, target, {
+    const estimates = gateSilentDays(target, computeDaySpuriousEstimates(series, spec, target, {
       baselineDailyRate: baseline,
       peerSupersededRate: peerRate,
-    });
+    }));
     console.log(
       `[loop-repair] ${label} baseline=${baseline.toFixed(2)}/day superseded_start=${target.superseded_start ?? spec.incident_start}`,
     );
@@ -369,14 +405,14 @@ async function run(): Promise<void> {
         .filter((value): value is string => Boolean(value))
         .sort()[0] ?? null;
       const series = extractTargetSeries(snapshots, target);
-      const estimates = computeAdoptionDaySpuriousEstimates(
+      const estimates = gateSilentDays(target, computeAdoptionDaySpuriousEstimates(
         series,
         adoption,
         curve,
         base,
         incidentEnd,
         spec.daily_spurious_cap ?? null,
-      );
+      ));
       console.log(
         `[loop-repair] ${label} adoption target base=${base}${adoption.install_base === "adjusted" ? " (adjusted)" : ""}`
           + ` release_start=${adoption.release_start}${incidentEnd ? ` incident_end=${incidentEnd}` : ""}`,
@@ -395,24 +431,10 @@ async function run(): Promise<void> {
     }
   }
 
-  // Rider targets: attribution follows the core loop's own clock — the
-  // lockstep hours of spec.rider_loop.core in the hourly series, counted per
-  // snapshot day.
+  // Rider targets: attribution follows the loop clock.
   const riderTargets = spec.rider_targets ?? [];
   if (riderTargets.length > 0) {
-    const firstStart = riderTargets.map((rider) => rider.start).sort()[0]!;
-    // Snapshot D covers the day ending at D's 04:00Z cutoff.
-    const startMs = Date.parse(`${firstStart}T04:00:00Z`) - 86_400_000;
-    const lastDay = [snapshots[snapshots.length - 1]!.dateKey, spec.incident_end ?? null]
-      .filter((value): value is string => Boolean(value))
-      .sort()[0]!;
-    const hours = hourBuckets(startMs, Date.parse(`${lastDay}T04:00:00Z`));
-    const coreKeys = spec.rider_loop!.core.map((entry) => `${entry.listing_type}:${entry.listing_id}`);
-    const loop = trackKnownLoop(loadHourlySeries(args.repoRoot, hours), hours, coreKeys);
-    const slotsByDay = countSlotsBySnapshotDay(loop.lockstepHours);
-    console.log(
-      `[loop-repair] rider loop: ${coreKeys.length} core listings, ${loop.lockstepHours.length} lockstep hours ${hours[0]} → ${hours[hours.length - 1]}`,
-    );
+    const slotsByDay = loopClock!.slotsByDay;
     for (const rider of expandRiderTargets(riderTargets, snapshots)) {
       const target: LoopRepairTarget = {
         listing_type: rider.listing_type,

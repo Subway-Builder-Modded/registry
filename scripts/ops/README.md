@@ -6,8 +6,13 @@ exception: the daily metronome-guard workflow re-applies every open
 `repair-loop-inflated-downloads.ts`, then reports listings riding a known loop
 that no spec targets (`scripts/downloads/detect-metronome.ts`), plus open rider
 targets (no `end`) whose last-7-day excess fell below 40% of their `per_cycle` —
-set `end` on those once confirmed, or they keep being attributed. Opt a spec in
-only once its model is vetted and its targets are live (not deprecated).
+set `end` on those once confirmed, or they keep being attributed. It also
+reports a known loop gone silent — `paused` after 48 h without a loop hour,
+`stopped` after 7 days (close the spec then) — and, for a frozen loop (all
+targets deprecated), whether its targets' live release counters still grow.
+In a spec with a loop clock (`rider_loop`), nothing is attributed for a
+snapshot day on which the loop never fired. Opt a spec in only once its model
+is vetted and its targets are live (not deprecated).
 
 Invoke via the package scripts in `scripts/package.json` (names unchanged from
 when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-history`.
