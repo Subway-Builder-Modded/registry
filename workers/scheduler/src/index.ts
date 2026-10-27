@@ -48,13 +48,10 @@ export default {
 				workflows.push("regenerate-registry-analytics.yml");
 			}
 
+			// metronome-guard.yml follows on its own (workflow_run) once this
+			// snapshot run completes.
 			if (hour === 4) {
 				workflows.push("cache-download-history.yml");
-			}
-
-			// After the 04:00 snapshot has landed.
-			if (hour === 6) {
-				workflows.push("metronome-guard.yml");
 			}
 		}
 
