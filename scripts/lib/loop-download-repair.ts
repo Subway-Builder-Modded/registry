@@ -653,6 +653,26 @@ export function countSlotsBySnapshotDay(lockstepHours: string[], cutoffHourUtc =
   return counts;
 }
 
+// gateOnLoopSlots: in a spec with a loop clock (rider_loop), a snapshot day on
+// which the core loop never fired is a day the client was silent (a restart, or
+// for good), so nothing that day is the loop's — the allowance models would
+// otherwise keep booking any organic growth above their allowance. Days from
+// clockStart on are gated (earlier days have no hourly clock); already-applied
+// days are pinned to the ledger by the caller, so only new days change.
+export function gateOnLoopSlots(
+  days: DaySpuriousEstimate[],
+  slotsByDay: Map<string, number>,
+  clockStart: string,
+): { days: DaySpuriousEstimate[]; silentDays: string[] } {
+  const silentDays: string[] = [];
+  const gated = days.map((day) => {
+    if (day.dateKey < clockStart || day.spurious === 0 || (slotsByDay.get(day.dateKey) ?? 0) > 0) return day;
+    silentDays.push(day.dateKey);
+    return { ...day, organicAllowance: day.rawDelta, spurious: 0 };
+  });
+  return { days: gated, silentDays };
+}
+
 // computeRiderDaySpuriousEstimates attributes, for each snapshot day in the
 // rider's window, floor(per_cycle × the core loop's lockstep hours that day),
 // never more than the version's raw growth that day. Days before the version

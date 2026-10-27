@@ -400,3 +400,75 @@ export function detectLockstepCohorts(
   const coreKeys = new Set(cores.flatMap((core) => [...core]));
   return cores.map((core) => buildCohort(series, window, core, coreKeys, params));
 }
+
+// --- Silence: has the broken client stopped? ---
+
+export type LoopSilence = "running" | "paused" | "stopped";
+
+// The client's restarts are short (2026-10-04: ~30 h offline, then it came back
+// and re-enrolled every listing), so two days without a loop hour is a pause
+// worth a look and a week is a stop.
+export const LOOP_PAUSED_HOURS = 48;
+export const LOOP_STOPPED_HOURS = 168;
+
+function silenceFor(silentHours: number | null): LoopSilence {
+  if (silentHours === null || silentHours >= LOOP_STOPPED_HOURS) return "stopped";
+  return silentHours >= LOOP_PAUSED_HOURS ? "paused" : "running";
+}
+
+// How long a known loop has gone without a lockstep hour at the window end. No
+// lockstep hour in the whole window counts as stopped.
+export function classifyLoopSilence(
+  lockstepHours: string[],
+  windowEndMs: number,
+): { lastLockstepHour: string | null; silentHours: number | null; silence: LoopSilence } {
+  const last = [...lockstepHours].sort().at(-1) ?? null;
+  // An hour bucket covers [HH:00, HH:00 + 1h).
+  const silentHours = last === null ? null : Math.max(0, Math.floor((windowEndMs - Date.parse(last.replace("Z", ":00Z")) - 3_600_000) / 3_600_000));
+  return { lastLockstepHour: last, silentHours, silence: silenceFor(silentHours) };
+}
+
+// Deprecated targets (the holdouts) are frozen out of the hourly series, so a
+// loop that keeps fetching them shows only on the live release counters. The
+// guard keeps the last counters it saw; any growth means the client is still
+// fetching. Counts missing this run (an API error) keep their previous value.
+export interface CounterWatchState {
+  counts: Record<string, number>;
+  lastGrowthAt: string;
+  checkedAt: string;
+}
+
+export function updateCounterWatch(
+  previous: CounterWatchState | undefined,
+  counts: Record<string, number | null>,
+  nowIso: string,
+): { state: CounterWatchState; growth: Record<string, number | null>; silentHours: number; silence: LoopSilence; unchecked: boolean } {
+  // Nothing could be read this run: keep the state and do not age the silence.
+  if (Object.values(counts).every((count) => count === null)) {
+    const state = previous ?? { counts: {}, lastGrowthAt: nowIso, checkedAt: nowIso };
+    const growth = Object.fromEntries(Object.keys(counts).map((key) => [key, null]));
+    return { state, growth, silentHours: 0, silence: "running", unchecked: true };
+  }
+  const merged: Record<string, number> = { ...(previous?.counts ?? {}) };
+  const growth: Record<string, number | null> = {};
+  let grew = previous === undefined;
+  for (const [key, count] of Object.entries(counts)) {
+    if (count === null) {
+      growth[key] = null;
+      continue;
+    }
+    const before = previous?.counts[key];
+    growth[key] = before === undefined ? null : count - before;
+    if (before === undefined || count > before) grew = true;
+    merged[key] = count;
+  }
+  const lastGrowthAt = grew ? nowIso : previous!.lastGrowthAt;
+  const silentHours = Math.max(0, Math.floor((Date.parse(nowIso) - Date.parse(lastGrowthAt)) / 3_600_000));
+  return {
+    state: { counts: merged, lastGrowthAt, checkedAt: nowIso },
+    growth,
+    silentHours,
+    silence: silenceFor(silentHours),
+    unchecked: false,
+  };
+}

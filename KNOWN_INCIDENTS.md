@@ -113,6 +113,16 @@ ledger directly.
   client's 10-04 restart. Medium-confidence riders (unrusted-cities-pack,
   taiwan-trains, mtr-trains) and transit-overlay are under review;
   japanese-trains (+3.9/cycle, beyond one fetch) needs a closer look.
+- 2026-10-26 — remaining riders corrected (October joiners, transit-overlay,
+  japanese-trains — see Riders below); guard's first scheduled run re-applied
+  +164 and self-merged (#13909); history re-clamped with the ledger bound.
+- 2026-10-27 — **client silent since 2026-10-25 23:00Z** (last loop hour; only
+  single-listing organic activity through 10-27 01:00Z), no eu-maps release —
+  a restart (10-04's lasted ~30 h) or a stop. The guard now gates loop-clock
+  attribution on silent days (nothing booked for a snapshot day with no loop
+  hour), notifies `paused:` after 48 h and `stopped:` after 7 days, and
+  watches the holdouts' live release counters. If `stopped:` fires, set
+  `incident_end` to the last loop day (2026-10-26) and `end` on open riders.
 
 **Riders:** the client also re-fetches listings outside the UA packs.
 detect-metronome flags any listing tracking the loop's hours beyond its own

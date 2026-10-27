@@ -13,6 +13,7 @@ import {
   countSlotsBySnapshotDay,
   expandRiderTargets,
   extractTargetSeries,
+  gateOnLoopSlots,
   loopRepairDeltaId,
   normalizeLoopRepairSpec,
   type LoopRepairAdoptionEntry,
@@ -564,4 +565,19 @@ test("computeSnapshotClampPlan applies the ledger bound under the trajectory", (
   assert.deepEqual(plain.map((entry) => entry.correctedValue), [122, 129]);
   const bounded = computeSnapshotClampPlan(series, { start: "2026-07-26", end: null }, days, new Map([["2026-07-26", 120], ["2026-07-27", 140]]));
   assert.deepEqual(bounded.map((entry) => entry.correctedValue), [120, 129]);
+});
+
+test("gateOnLoopSlots zeroes estimates on days the loop clock never fired", () => {
+  const days = [
+    { dateKey: "2026-09-01", rawDelta: 9, organicAllowance: 2, spurious: 7 },
+    { dateKey: "2026-10-26", rawDelta: 9, organicAllowance: 2, spurious: 7 },
+    { dateKey: "2026-10-27", rawDelta: 3, organicAllowance: 1, spurious: 2 },
+    { dateKey: "2026-10-28", rawDelta: 1, organicAllowance: 1, spurious: 0 },
+  ];
+  const slots = new Map([["2026-10-26", 5]]);
+  const { days: gated, silentDays } = gateOnLoopSlots(days, slots, "2026-09-08");
+  // Before the clock (no hourly data) and loop days pass through; a silent day books nothing.
+  assert.deepEqual(gated.map((day) => day.spurious), [7, 7, 0, 0]);
+  assert.equal(gated[2]!.organicAllowance, 3);
+  assert.deepEqual(silentDays, ["2026-10-27"]);
 });

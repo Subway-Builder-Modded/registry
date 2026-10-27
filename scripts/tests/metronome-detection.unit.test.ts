@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   classifyDailyLockstep,
+  classifyLoopSilence,
+  updateCounterWatch,
   detectLockstepCohorts,
   measureLocalExcess,
   trackKnownLoop,
@@ -144,4 +146,38 @@ test("measureLocalExcess reads a rider's fetches per loop cycle and drops to zer
   // An unknown listing or no lockstep hours measures nothing.
   assert.deepEqual(measureLocalExcess(undefined, HOURS, loop.lockstepHours).mean, 0);
   assert.deepEqual(measureLocalExcess(series.get("mod:busy-rider"), HOURS, []), { mean: 0, standardError: 0, samples: 0 });
+});
+
+test("classifyLoopSilence: running, paused after 48 h, stopped after a week or with no loop hour", () => {
+  const end = Date.parse("2026-10-27T00:00:00Z");
+  assert.deepEqual(classifyLoopSilence(["2026-10-25T20:00Z", "2026-10-26T21:00Z"], end), {
+    lastLockstepHour: "2026-10-26T21:00Z", silentHours: 2, silence: "running",
+  });
+  assert.equal(classifyLoopSilence(["2026-10-24T23:00Z"], end).silence, "paused");
+  assert.equal(classifyLoopSilence(["2026-10-24T23:00Z"], end).silentHours, 48);
+  assert.equal(classifyLoopSilence(["2026-10-19T23:00Z"], end).silence, "stopped");
+  assert.deepEqual(classifyLoopSilence([], end), { lastLockstepHour: null, silentHours: null, silence: "stopped" });
+});
+
+test("updateCounterWatch tracks growth across runs and ages silence only when counters were read", () => {
+  const first = updateCounterWatch(undefined, { "map:jer@v1": 540, "map:las@1": 926 }, "2026-10-27T06:00:00Z");
+  assert.equal(first.silence, "running");
+  assert.deepEqual(first.growth, { "map:jer@v1": null, "map:las@1": null });
+  // Growth on one counter keeps the loop alive.
+  const grew = updateCounterWatch(first.state, { "map:jer@v1": 544, "map:las@1": 926 }, "2026-10-28T06:00:00Z");
+  assert.deepEqual(grew.growth, { "map:jer@v1": 4, "map:las@1": 0 });
+  assert.equal(grew.state.lastGrowthAt, "2026-10-28T06:00:00Z");
+  // Flat for two days: paused; a week: stopped.
+  const flat = updateCounterWatch(grew.state, { "map:jer@v1": 544, "map:las@1": 926 }, "2026-10-30T06:00:00Z");
+  assert.equal(flat.silence, "paused");
+  assert.equal(updateCounterWatch(flat.state, { "map:jer@v1": 544, "map:las@1": 926 }, "2026-11-04T06:00:00Z").silence, "stopped");
+  // A run that cannot read any counter keeps the state and does not age the silence.
+  const down = updateCounterWatch(flat.state, { "map:jer@v1": null, "map:las@1": null }, "2026-11-04T06:00:00Z");
+  assert.equal(down.unchecked, true);
+  assert.equal(down.silence, "running");
+  assert.deepEqual(down.state, flat.state);
+  // A partial read keeps the missing counter's previous value.
+  const partial = updateCounterWatch(flat.state, { "map:jer@v1": 545, "map:las@1": null }, "2026-10-31T06:00:00Z");
+  assert.equal(partial.state.counts["map:las@1"], 926);
+  assert.equal(partial.silence, "running");
 });
