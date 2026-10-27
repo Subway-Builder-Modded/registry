@@ -13,9 +13,14 @@ name: Metronome Guard
 #     maintainer has not put in a spec.
 
 on:
+  # Primary: right after the daily snapshot lands. The Worker dispatches
+  # cache-download-history at 04:00 UTC (its GitHub-schedule fallback otherwise);
+  # should-run lets through only a run that actually cached a snapshot.
+  workflow_run:
+    workflows: ["Cache Download History"]
+    types: [completed]
   schedule:
-    # Fallback: fires if the Cloudflare Worker (workers/scheduler) misses the
-    # 06:00 UTC slot (after the 04:00 cache-download-history snapshot).
+    # Fallback: runs only if no guard run has completed its job in the last 12 h.
     - cron: "40 6 * * *"
   workflow_dispatch:
 
@@ -33,7 +38,7 @@ concurrency:
 
 jobs:
   should-run:
-    if: github.event_name == 'schedule'
+    if: github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       actions: read
@@ -43,18 +48,39 @@ jobs:
       - id: check
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          EVENT: ${{ github.event_name }}
+          SNAPSHOT_RUN_ID: ${{ github.event.workflow_run.id }}
+          SNAPSHOT_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
         run: |
+          if [ "${EVENT}" = "workflow_run" ]; then
+            # The snapshot workflow's own fallback run skips its job when the
+            # Worker's 04:00 dispatch already cached the day's snapshot.
+            CACHED=$(gh api "repos/${{ github.repository }}/actions/runs/${SNAPSHOT_RUN_ID}/jobs" \
+              --jq '[.jobs[] | select(.name == "cache-history" and .conclusion == "success")] | length')
+            if [ "${SNAPSHOT_CONCLUSION}" = "success" ] && [ "${CACHED}" -gt 0 ]; then
+              echo "skip=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              echo "Skipping: snapshot run ${SNAPSHOT_RUN_ID} cached no snapshot (${SNAPSHOT_CONCLUSION})."
+            fi
+            exit 0
+          fi
+          # Schedule fallback: skip when a guard job ran (or is running) in the
+          # last 12 h — after a snapshot or by hand.
           CUTOFF_EPOCH=$(( $(date -u +%s) - 720 * 60 ))
-          RECENT=$(gh api \
+          RECENT=""
+          for RUN in $(gh api \
             "repos/${{ github.repository }}/actions/workflows/metronome-guard.yml/runs?per_page=10&exclude_pull_requests=true" \
-            --jq '[.workflow_runs[] | select(
-              .event == "workflow_dispatch" and
-              (.status == "in_progress" or .status == "queued" or .conclusion == "success")
-            ) | .created_at] | first // ""')
-          if [ -n "${RECENT}" ] && \
-             [ "$(date -u -d "${RECENT}" +%s)" -ge "${CUTOFF_EPOCH}" ]; then
+            --jq '.workflow_runs[] | select(.event != "schedule") | "\(.id),\(.created_at)"'); do
+            CREATED="${RUN#*,}"
+            [ "$(date -u -d "${CREATED}" +%s)" -ge "${CUTOFF_EPOCH}" ] || continue
+            RAN=$(gh api "repos/${{ github.repository }}/actions/runs/${RUN%%,*}/jobs" \
+              --jq '[.jobs[] | select(.name == "guard" and (.conclusion == "success" or .status == "in_progress" or .status == "queued"))] | length')
+            if [ "${RAN}" -gt 0 ]; then RECENT="${CREATED}"; break; fi
+          done
+          if [ -n "${RECENT}" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "Skipping: Worker dispatch found at ${RECENT}."
+            echo "Skipping: guard already ran at ${RECENT}."
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
