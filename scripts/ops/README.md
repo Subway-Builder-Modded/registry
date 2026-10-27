@@ -52,10 +52,6 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   **Never cap or trim attribution by editing the ledger directly** — its
   `daily`, `assets` and `timeline` views must move together, and snapshots
   read `timeline` (see KNOWN_INCIDENTS.md metronome v2 entry).
-- `repair-metronome-ua-cap-consistency.ts` — one-shot, idempotent repair of
-  the 2026-10-03 UA cap that left the ledger timeline uncapped (KNOWN_INCIDENTS.md
-  metronome v2 entry). Run before any re-apply of the UA spec; delete once
-  applied on main.
 - `backfill-charleston-snapshot-clamp.ts` — one-shot snapshot re-interpolation
   for the charleston-huntington-wv faulty-client inflation (KNOWN_INCIDENTS.md,
   2026-07 entry). Retained because **any snapshot rebuild from git

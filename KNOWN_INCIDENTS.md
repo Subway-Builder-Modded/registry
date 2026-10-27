@@ -59,7 +59,8 @@ snapshots kept the pre-cap clamp, so the whole re-credit surfaced as one
 2026-10-03 jump in the by-day series (kyiv 0.2.0: 151), and every snapshot
 generated since stored raw above the real GitHub counter by the re-credit
 (kyiv 664 vs 514). `scripts/ops/repair-metronome-ua-cap-consistency.ts`
-(one-shot, idempotent) capped the timeline, restored raw to the live counters,
+(one-shot, idempotent; applied in #12557, removed after — see git history)
+capped the timeline, restored raw to the live counters,
 and moved each day's re-credit onto its own snapshot (kyiv 10-03 by-day
 151 → 7). The cap now lives in the spec, so re-applies — including after an
 attribution-ledger rebuild — are capped natively; never cap by editing the
