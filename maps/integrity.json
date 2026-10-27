@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-10-27T16:00:59.206Z",
+  "generated_at": "2026-10-27T20:01:31.323Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -18206,6 +18206,69 @@
           "fingerprint": "rules:v6:sha256:a730bd7290fa1b8605a3861d03902fdf00ff0a1ac2b1add49963ace3ba0c1147",
           "checked_at": "2026-07-16T05:30:06.678Z",
           "released_at": "2026-07-16T00:00:00.000Z"
+        }
+      }
+    },
+    "merida": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1790121600,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "MID.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 71.55,
+          "file_sizes": {
+            "MID.pmtiles": 37.44,
+            "buildings_index.bin.gz": 30.25,
+            "config.json": 0,
+            "demand_data.json": 3.32,
+            "ocean_depth_index.json.gz": 5.35,
+            "roads.geojson": 10.47,
+            "runways_taxiways.geojson": 0.15
+          },
+          "game_version": ">=1.4.0",
+          "source": {
+            "update_type": "custom",
+            "repo": "meszier83/subway-builder-mexico-maps",
+            "tag": "mid-v1.0.0",
+            "asset_name": "MID.zip",
+            "download_url": "https://github.com/Meszier83/subway-builder-mexico-maps/releases/download/mid-v1.0.0/MID.zip"
+          },
+          "fingerprint": "rules:v6:sha256:8e669eba65d266244881f730de61b521f2685d2331223bd67cb47e27910a1579",
+          "checked_at": "2026-10-27T20:01:31.323Z",
+          "released_at": "2026-09-23T00:00:00.000Z"
         }
       }
     },
