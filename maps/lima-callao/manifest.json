@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "lima-callao",
+  "name": "Lima",
+  "author": "drakersan1",
+  "github_id": 291434309,
+  "description": "# Lima (LIM) v1.0.0\n\nLima and Callao, Peru: about 10 million people, block-level residents and jobs, Callao included, with the airport, the port, big malls and the main universities as their own demand points.\n\n## Coverage\nLima Metropolitana and the Constitutional Province of Callao. Bounding box (west, south, east, north):\n-77.19873, -12.50437, -76.66195, -11.71828\n\n## Population summary\n- Commuters (sum of all commuter groups): 5,672,630\n- Residents of Lima and Callao represented before keeping workers only: 9,561,150\n- Jobs: 5,672,630 (workers plus university students and staff)\n\n## Map statistics\n- Demand points: 4,631\n- Commuter groups: 251,931\n\n## Special demand\n- Airport: 1 point(s), 40,156 jobs (ids start with AIR_)\n- Universities: 8 point(s), 199,383 students and staff (ids start with UNI_)\n- Large malls and the port are their own demand points (ordinary workplaces).\n\n## Methodology\nResidents come from block-level population counts (IMP, 2021; Callao from the IMP \"densidad bruta\" layer). Jobs come from the INEI business census (CENEC) by block, with implausible values rebuilt from the number of establishments, and 30% of jobs treated as informal and spread like residents. Lima is scaled to 4.9 million jobs; Callao's jobs are estimated from its residents using Lima's jobs-per-resident ratio. Residents and jobs are summed in 500 m cells and commuter flows come from a doubly constrained gravity model calibrated to an average straight-line commute of 8 km. Large single employers (malls, the port, the airport) and universities are added as their own demand points: university points use ids starting with UNI_ and the airport uses AIR_, so the game gives them student and airport schedules. University students and staff are added on top of the 4.9 million workers. In the file, the residents and jobs of each demand point count commuters only (workers), which is how the registry checks them.\n\n## Data sources\n- OpenStreetMap contributors (ODbL)\n- Overture Maps Foundation (buildings, roads, places)\n- INEI: business census (CENEC)\n- IMP (Instituto Metropolitano de Planificacion): block-level population, 2021\n- University head counts: Wikipedia, SUNEDU (via Gestion); malls, port and other employer figures are estimates\n\n## License\nContains data from OpenStreetMap (ODbL) and Overture Maps Foundation; see their licenses before reusing the data.\n\n## Credits\nMap and demand data by drakersan.",
+  "tags": [
+    "south-america",
+    "airports",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/drakersan1/sb-lima",
+  "update": {
+    "type": "github",
+    "repo": "drakersan1/sb-lima"
+  },
+  "city_code": "LMC",
+  "country": "PE",
+  "population": 5672630,
+  "residents_total": 5672630,
+  "points_count": 4631,
+  "population_count": 251931,
+  "initial_view_state": {
+    "latitude": -12.0464,
+    "longitude": -77.0428,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "OSM, Overture, INEI, IMP",
+  "source_quality": "low-quality",
+  "level_of_detail": "low-detail",
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  },
+  "location": "south-america",
+  "special_demand": [
+    "airports",
+    "universities"
+  ],
+  "file_sizes": {}
+}
