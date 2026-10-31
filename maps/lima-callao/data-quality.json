@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "id": "lima-callao",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm5",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "total_population",
+    "resident_granularity": "adm5",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Residents: IMP block-level population layers (Densidad_Urbana_Mz2021 for Lima, Densidad_bruta_Callao for Callao). Jobs: INEI business census (CENEC) by block, published by IMP. Blocks with implausible job counts (far more jobs than establishments allow) were rebuilt from establishment counts, and 30% of jobs are treated as informal and spread in proportion to residents. Lima is scaled to 4.9 million jobs; Callao's jobs are estimated from its residents using Lima's jobs-per-resident ratio. Workers are residents scaled by the same ratio. The airport, port terminals, large malls and the main universities are added as their own demand points using public estimates. Everything is summed in 500 m cells. Commute flows come from a doubly constrained gravity model calibrated to an average straight-line commute of 8 km; no origin-destination data was used. Driving times assume road distance of 1.35 times straight-line distance at an assumed speed. Basemap, buildings and roads come from OpenStreetMap and Overture and are not used for demand. Data vintages follow what IMP publishes for each layer. The residents shown in the game are employed commuters only; they are derived from IMP's total-population counts by applying one uniform workers-per-resident ratio to every block, not from a measured count of employed residents.",
+  "sources": [
+    "https://services5.arcgis.com/bHvzrGGxW8wP6Utm/ArcGIS/rest/services/CENEC/FeatureServer/0",
+    "https://services5.arcgis.com/bHvzrGGxW8wP6Utm/ArcGIS/rest/services"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "drakersan1",
+    "reviewed_by": null,
+    "date": "2026-10-26"
+  }
+}
