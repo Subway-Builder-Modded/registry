@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "amba",
+  "answers": {
+    "workplace_count": "size_bands",
+    "workplace_granularity": "adm5",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm4",
+    "resident_resolution": "admin_polygon",
+    "resident_intensity": "uniform",
+    "od_metric": "synthetic_measured_marginals",
+    "od_granularity": null
+  },
+  "notes": "For v0.3.3, trip origins use employed residents (“Ocupado”) from INDEC Census 2022 Redatam at census-radio level. The AMBA\n   selection contains 18,018 radios and 7,794,695 employed residents. Formal work destinations use 2022 CEP XXI/SIPA\n   establishment records derived from employment registrations. The published worker counts are bands, not exact establishment\n   counts; the map assigns capacities of 5, 29.5, 124.5, 349.5 and 500 to the bands 1–9, 10–49, 50–199, 200–499 and 500+,\n   respectively. The resulting 4,127,148 formal job capacity is therefore an estimate anchored to official bands. Coordinates\n   are rounded to 0.001° in the source. Some geocoded addresses are approximate, and some mobile workers may be recorded at\n   central offices.\n  \n   Each establishment is assigned to its nearest census radio and then an adaptive display cluster; its rounded source\n   coordinate is not exported directly. A distance-constrained gravity and transport model balances formal flows against\n   employed-resident origins and the estimated workplace capacities. There is no observed origin–destination matrix. The\n   remaining 3,667,547 employed residents are represented as local residual employment at residential origins because this\n   workplace source does not locate their jobs.\n  \n   In CABA, official cadastral parcel polygons and the 2022–2024 land-use survey identify active residential parcels. Reported\n   floors supply relative weights for a display anchor within each census radio; 3,564 of 3,820 CABA radios receive an anchor.\n   Unmatched CABA radios and radios elsewhere retain their census representative point. These parcels do not provide resident\n   counts, and the 6,000 exported demand points are display clusters rather than the grain of the published statistics. OSM\n   geography and Overture building footprints are used for the map, not to invent resident or job totals. Visible park and\n   airport polygons do not add passenger or leisure demand. The residence-placement answer \"Spread evenly across each area\" is the conservative form category for census-radio representative points outside CABA and parcel-weighted display anchors in CABA; it does not imply that individual residents were uniformly distributed to buildings.",
+  "sources": [
+    "https://redatam.indec.gob.ar/",
+    "https://geonode.indec.gob.ar/geoserver/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=geonode:radios_censales2&outputFormat=application/json",
+    "https://datos.gob.ar/dataset/produccion-distribucion-geografica-establecimientos-productivos",
+    "https://cdn.produccion.gob.ar/cdn-cep/establecimientos-productivos/Metodologia_establecimiento_productivos.pdf",
+    "https://data.buenosaires.gob.ar/es/dataset/parcelas",
+    "https://data.buenosaires.gob.ar/es/dataset/relevamiento-usos-suelo"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "hernang87",
+    "reviewed_by": null,
+    "date": "2026-10-26"
+  }
+}
