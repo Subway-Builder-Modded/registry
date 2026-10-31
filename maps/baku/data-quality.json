@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "baku",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "none",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "adm4",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Residential demand was generated using official population statistics for the beginning of 2026, published by the State Statistical Committee of the Republic of Azerbaijan. The figures cover Baku's administrative districts, Sumqayit and Absheron district.\n\nPopulation was distributed geographically using OpenStreetMap building footprints, mapped settlement locations, building types, approximate building sizes and floors, and spatial allocation assumptions. The official administrative boundaries do not exactly match the playable map extent, so the resulting spatial distribution is an estimate rather than a precise census of the mapped area.\n\nEmployment locations were estimated using population-derived assumptions and OpenStreetMap building characteristics, including commercial, industrial and other workplace-related building categories. Additional geographic weighting was applied to major employment centres. No observed workplace employment counts were used.\n\nOrigin–destination commuting flows were generated synthetically from the estimated residential and workplace distributions. The map contains 1,394 demand locations and 76,351 synthetic commuting groups representing approximately 1.35 million simulated commuters. These figures are model outputs, not observed employment totals or commuting flows.\n\nThe map therefore uses official demographic data for its population reference, supplemented by OpenStreetMap geographic data and estimated employment and commuting behaviour. No separate airport, hospital, university or tourism passenger-demand categories have been modelled.",
+  "sources": [
+    "https://stat.gov.az/source/demoqraphy/ap/en/2_6en.xls",
+    "https://stat.gov.az/source/demoqraphy/ap/?lang=en",
+    "https://www.openstreetmap.org/copyright"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "turnerawill12345-a11y",
+    "reviewed_by": null,
+    "date": "2026-10-20"
+  }
+}
