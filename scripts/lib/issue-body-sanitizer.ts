@@ -13,25 +13,34 @@
  * headings are left untouched, so parsing is unchanged for well-formed bodies.
  */
 
+import YAML from "yaml";
+
 const H3_LINE = /^###(?!#)[ \t]*(.*?)[ \t]*$/;
 
+function collectFieldLabels(node: unknown, labels: Set<string>): void {
+  if (Array.isArray(node)) {
+    for (const item of node) collectFieldLabels(item, labels);
+    return;
+  }
+  if (node === null || typeof node !== "object") return;
+  const attributes = (node as Record<string, unknown>).attributes;
+  if (attributes !== null && typeof attributes === "object") {
+    const label = (attributes as Record<string, unknown>).label;
+    if (typeof label === "string" && label.trim() !== "") labels.add(label.trim());
+  }
+  for (const value of Object.values(node)) collectFieldLabels(value, labels);
+}
+
 /**
- * Extracts the field labels from an issue-template YAML by scanning `label:`
- * lines. Deliberately regex-based so the sanitizer stays dependency-free; the
- * registry's templates only use plain single-line string labels.
+ * Extracts the field labels (`attributes.label`, the text GitHub renders as each
+ * field's `### ` heading) from an issue-template YAML. Parsed as YAML, not
+ * scanned line by line: the generated templates fold long double-quoted labels
+ * across lines (generate-map-templates.ts, lineWidth 92), and a missed label
+ * demotes a real field heading and merges its answer into the previous field.
  */
 export function extractTemplateLabels(templateYaml: string): Set<string> {
   const labels = new Set<string>();
-  for (const match of templateYaml.matchAll(/^[ \t]*["']?label["']?:[ \t]*(.+?)[ \t]*$/gm)) {
-    let label = match[1];
-    if (
-      (label.startsWith('"') && label.endsWith('"') && label.length >= 2) ||
-      (label.startsWith("'") && label.endsWith("'") && label.length >= 2)
-    ) {
-      label = label.slice(1, -1);
-    }
-    if (label.length > 0) labels.add(label);
-  }
+  collectFieldLabels(YAML.parse(templateYaml), labels);
   return labels;
 }
 

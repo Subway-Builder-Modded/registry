@@ -1,0 +1,529 @@
+{
+  "incident": "metronome-fetch-2026-09-ua",
+  "source": "manual-correction/metronome-fetch-2026-09",
+  "baseline_start": "2026-07-09",
+  "baseline_end": "2026-09-05",
+  "incident_start": "2026-09-06",
+  "incident_end": null,
+  "daily_spurious_cap": 7,
+  "auto_apply": true,
+  "peers": [],
+  "note": "Metronome v2, UA cohort: synchronized re-download loop against the seven pre-existing UA listings' 0.7.3 reuploads, onset 2026-09-06 (the eu-maps 0.7.3 release day), ~6.8/day per listing in fixed slots regardless of listing popularity (zaporizhzhia/kryvyi-rih at 1.0-1.1/day organic run the same weekly totals as kharkiv/lviv/odesa at ~2/day; kyiv = the same uniform floor plus its own ~6/day organic, matching its v0.1.0-era rate). New-version traffic is modeled as loop-inflated ADOPTION releases: legitimate traffic = organic update adoption of the prior install base plus new organic demand, estimated from three clean yukina pack-refresh adoption curves (brno 0.4.1, asahikawa 0.2.2, bydgoszcz-torun 0.5.0 - max-fraction pooling errs toward attributing less). Retired/superseded versions are not targeted. CAP: daily_spurious_cap=7 is the measured uniform loop rate per listing (maintainer ruling 2026-10-03, #12201; hourly lockstep slots measure ~7.5-8/day outside release-day waves, so 7 errs toward attributing less). It was first applied by an uncommitted script that left the ledger timeline uncapped; repaired by scripts/ops/repair-metronome-ua-cap-consistency.ts, and the cap now lives here so every re-apply (including after an attribution-ledger rebuild) is capped natively. 0.8.1 EXTENSION (2026-10-07): eu-maps 0.8.1 (published 2026-10-04T21:56Z) did NOT stop the client - after a ~29h pause it resumed 2026-10-05T06Z on the new versions and now hits all 22 UA listings in lockstep (the fifteen 0.7.3-cohort listings first joined on their first update, 0.1.0 -> 0.1.1). 0.2.1 x7 and 0.1.1 x15 added as adoption targets from their first counted snapshot (2026-10-06); they measure their install base net of attribution (install_base=adjusted - raw would count the ~185 loop fetches each 0.2.0 carries as installs and widen the very allowance meant to remove them); the 0.2.0 targets end at 2026-10-04 (target incident_end), the last snapshot day carrying 0.2.0 loop slots - later 0.2.0 traffic is organic stragglers on a superseded version. The client follows the update manifest, so a release cannot kill it; incident_end stays open. RIDERS (2026-10-25): listings the same client re-fetches in the UA loop's hours (detect-metronome; reviewed in KNOWN_INCIDENTS.md) are corrected by rider_targets on the loop's own clock (per_cycle x the seven originals' lockstep hours per snapshot day, capped by the version's raw growth). Riders join when the client updates them and drop out when it restarts (2026-10-04); open windows are re-applied daily by the metronome guard.",
+  "targets": [],
+  "adoption_targets": [
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kyiv",
+      "version": "0.2.0",
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kharkiv",
+      "version": "0.2.0",
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-dnipro",
+      "version": "0.2.0",
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-lviv",
+      "version": "0.2.0",
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-odesa",
+      "version": "0.2.0",
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-zaporizhzhia",
+      "version": "0.2.0",
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kryvyi-rih",
+      "version": "0.2.0",
+      "release_start": "2026-09-07",
+      "incident_end": "2026-10-04"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kyiv",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kharkiv",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-dnipro",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-lviv",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-odesa",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-zaporizhzhia",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kryvyi-rih",
+      "version": "0.2.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-cherkasy",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-chernihiv",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-chernivtsi",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-ivano-frankivsk",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-khmelnytskyi",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kremenchuk",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-kropyvnytskyi",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-mykolaiv-kherson",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-poltava",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-rivne-lutsk",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-sumy",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-ternopil",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-uzhhorod-mukachevo",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-vinnytsia",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-ua-zhytomyr",
+      "version": "0.1.1",
+      "release_start": "2026-10-06",
+      "install_base": "adjusted"
+    }
+  ],
+  "adoption_peers": [
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-brno",
+      "version": "0.4.1",
+      "release_start": "2026-07-26",
+      "note": "clean pack-refresh adoption curve; prior-version base ~425"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-asahikawa",
+      "version": "0.2.2",
+      "release_start": "2026-08-14",
+      "note": "clean pack-refresh adoption curve; prior-version base ~239"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-bydgoszcz-torun",
+      "version": "0.5.0",
+      "release_start": "2026-08-15",
+      "note": "clean pack-refresh adoption curve; prior-version base ~222"
+    }
+  ],
+  "rider_loop": {
+    "core": [
+      {
+        "listing_type": "map",
+        "listing_id": "yukina-ua-kyiv"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "yukina-ua-kharkiv"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "yukina-ua-lviv"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "yukina-ua-odesa"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "yukina-ua-dnipro"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "yukina-ua-zaporizhzhia"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "yukina-ua-kryvyi-rih"
+      }
+    ],
+    "note": "the seven original UA listings loop continuously from 2026-09-06 and define the v2 loop's lockstep hours"
+  },
+  "rider_targets": [
+    {
+      "listing_type": "map",
+      "listing_id": "sydney",
+      "version": "1.2.0",
+      "start": "2026-09-08",
+      "end": "2026-09-12",
+      "note": "measured 0.53±0.09 fetches per loop hour over 33 lockstep hours (local t 6.1); v1 participation continuing under the v2 client clock",
+      "per_cycle": 0.5
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "sydney",
+      "version": "2.1.0",
+      "start": "2026-09-19",
+      "end": "2026-10-04",
+      "note": "measured 2.23±0.20 fetches per loop hour over 73 lockstep hours (local t 11.3); joined with its 2.1.0 update (09-19); stopped at the client's 10-04 restart",
+      "per_cycle": 2.2
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "la-metro-trainpack",
+      "version": "1.0.3",
+      "start": "2026-09-15",
+      "end": "2026-10-04",
+      "per_cycle": 0.75,
+      "note": "measured 0.78±0.05 fetches per loop hour over 91 lockstep hours (local t 14.2)"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "la-metro-trainpack",
+      "version": "1.0.4",
+      "start": "2026-10-15",
+      "end": null,
+      "note": "measured 0.62±0.07 fetches per loop hour over 55 lockstep hours (local t 8.6); re-joined with its 1.0.4 update (10-15)",
+      "per_cycle": 0.6
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "noah-great-society",
+      "version": "1.0.3",
+      "start": "2026-09-15",
+      "end": "2026-10-04",
+      "per_cycle": 0.75,
+      "note": "measured 0.77±0.06 fetches per loop hour over 91 lockstep hours (local t 13.6)"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "noah-great-society",
+      "version": "1.0.4",
+      "start": "2026-10-15",
+      "end": null,
+      "note": "measured 0.58±0.08 fetches per loop hour over 55 lockstep hours (local t 7.4); re-joined with its 1.0.4 update (10-14)",
+      "per_cycle": 0.55
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "dantrains-abridged",
+      "version": "v1.4.0",
+      "start": "2026-09-08",
+      "end": "2026-10-04",
+      "per_cycle": 0.7,
+      "note": "measured 0.72±0.07 fetches per loop hour over 135 lockstep hours (local t 9.8)"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "basedgoat-trains",
+      "version": "v0.6.3",
+      "start": "2026-09-17",
+      "end": "2026-10-04",
+      "note": "measured 0.78±0.06 fetches per loop hour over 82 lockstep hours (local t 12.3); joined with its v0.6.3 update (09-17)",
+      "per_cycle": 0.75
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "amba",
+      "version": "v0.3.3",
+      "start": "2026-09-26",
+      "end": "2026-10-04",
+      "note": "measured 2.51±0.21 fetches per loop hour over 39 lockstep hours (local t 11.9); joined with its v0.3.3 update (09-26)",
+      "per_cycle": 2.5
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "amba",
+      "version": "v0.3.4",
+      "start": "2026-10-12",
+      "end": null,
+      "note": "measured 1.29±0.16 fetches per loop hour over 67 lockstep hours (local t 7.9); re-joined with its v0.3.4 update (10-11)",
+      "per_cycle": 1.25
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "unrusted-cities-pack",
+      "version": "1.0.3",
+      "start": "2026-10-10",
+      "end": null,
+      "per_cycle": 0.7,
+      "note": "measured 0.70±0.07 fetches per loop hour over 81 lockstep hours (local t 9.8; placebo ±2–5h within ±0.07; before 09-08 → 09-17 +0.02); joined the loop with the 1.0.3 update (10-10)"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "taiwan-trains",
+      "version": "v1.0.4",
+      "start": "2026-10-14",
+      "end": null,
+      "per_cycle": 0.7,
+      "note": "measured 0.72±0.06 fetches per loop hour over 64 lockstep hours (local t 11.1; placebo within ±0.06; before 09-27 → 10-13 −0.03); joined the loop 10-14 with no update, in the client's 10-12 → 10-15 re-enrolment wave (la-metro-trainpack, noah-great-society, amba)"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "mtr-trains",
+      "version": "v1.0.5",
+      "start": "2026-10-15",
+      "end": null,
+      "per_cycle": 0.65,
+      "note": "measured 0.65±0.07 fetches per loop hour over 60 lockstep hours (local t 9.3; placebo within ±0.10; before 09-24 → 10-14 +0.00); joined the loop 10-15 with no update, in the client's 10-12 → 10-15 re-enrolment wave"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v3.0.0",
+      "start": "2026-09-08",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "measured 6.03±0.47 fetches per loop hour listing-wide over 135 lockstep hours (local t 12.9; placebo ±2–5h within ±0.46; 0.02 during the 10-05 → 10-18 pause); re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v3.0.1",
+      "start": "2026-09-08",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "3.1.0",
+      "start": "2026-09-11",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v3.1.1",
+      "start": "2026-09-13",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v3.2.0",
+      "start": "2026-09-16",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v4.0.0",
+      "start": "2026-09-16",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v4.0.1",
+      "start": "2026-09-17",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v4.0.2",
+      "start": "2026-09-19",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v4.0.3",
+      "start": "2026-09-19",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v4.1.0",
+      "start": "2026-09-21",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v4.1.1",
+      "start": "2026-09-22",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v4.2.0",
+      "start": "2026-09-24",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "v4.2.1",
+      "start": "2026-09-25",
+      "end": "2026-10-04",
+      "per_cycle": 0.9,
+      "note": "re-fetched once per loop cycle alongside every other version the client had seen since its start (superseded versions grew 0.79–1.16 per loop slot, median 0.94, vs ≤0.3/day during the 10-05 → 10-18 pause); dropped out at the client's 10-04 restart"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "japanese-trains",
+      "version": "*",
+      "versions_from": "2026-10-18",
+      "start": "2026-10-19",
+      "end": null,
+      "per_cycle": 0.9,
+      "note": "every version released since the client re-enrolled japanese-trains with v5.0.0 (10-19; v4.3.0 from 10-18 onward), each re-fetched once per loop cycle — older versions stay at 0; new releases are covered as they appear"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "transit-overlay",
+      "version": "v1.5.6",
+      "start": "2026-10-07",
+      "end": null,
+      "per_cycle": 0.85,
+      "note": "measured 0.89±0.16 fetches per loop hour over 97 lockstep hours (local t 5.6; placebo ±2–5h within ±0.28; 09-08 → 10-04 0.00±0.10 over 135 loop hours; both halves +0.89); joined the loop with the v1.5.6 update (10-07), after the client's 10-05 restart"
+    }
+  ]
+}

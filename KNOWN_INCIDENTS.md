@@ -6,7 +6,173 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 ---
 
-## 2026-07-27 → ongoing (list B) — Metronomic library re-fetcher: two fixed lists at ~6/day (list A corrected+closed; list B correction applied, ongoing)
+## 2026-09-06 → ongoing — Metronome v2: UA cohort follows the eu-maps update manifest (22 listings) + two holdouts (OPEN; corrections re-applied on cadence)
+
+**What happened:** the metronome re-fetcher (v1 entry below) resumed on
+2026-09-06, the eu-maps 0.7.3 release day, against the seven pre-existing UA
+listings' 0.7.3 re-uploads (`yukina-ua-kyiv/-kharkiv/-lviv/-odesa/-dnipro/
+-zaporizhzhia/-kryvyi-rih`, version 0.2.0): ~6.8 fetches/day per listing in
+fixed hourly slots shared across every member, regardless of listing
+popularity. jerusalem and mfn-lasvegas (the catalog's last pre-1.4 listings)
+carried a ~3/day residual in the same slots from 2026-09-10.
+
+**The client follows upstream update sources, not the registry.** Two
+observations separate v2 from v1:
+
+- **eu-maps 0.8.1 (published 2026-10-04 21:56Z) did not stop it.** After a
+  ~29h silence (10-04 00Z → 10-05 05Z, before the release) the client resumed
+  at 10-05 06Z on the NEW versions — 0.2.1 for the seven and 0.1.1 for the
+  fifteen 0.7.3-cohort UA listings, which had never looped on their first
+  install — all 22 in lockstep at ~7/day each, while 0.2.0 traffic fell to
+  ~0. It reads the pack's update JSON (`KBP.json` etc.), so a release moves
+  the loop rather than breaking it. Hypothesis (unconfirmed): one client's
+  update path, not its install path, is broken — each future eu-maps release
+  may enrol whatever it updates.
+- **Deprecation did not kill the holdouts.** Deprecating jerusalem and
+  mfn-lasvegas (#12195, 2026-10-03) — the kill-switch that extinguished list B
+  — left their GitHub counters climbing ~4/day each (JER.zip 453 → 469,
+  LAS.zip 836 → 851, 10-03 05Z → 10-07 02Z). Registry counts are unaffected
+  while they stay deprecated (frozen grandfathered values), but the loop
+  traffic counts again if either is undeprecated for its 1.4 rebuild, so the
+  holdouts spec must stay open rather than close on a counter flatline.
+
+**Correction:** `history/loop-repair-specs/2026_10_03_metronome_fetch_ua_v2.json`
+(adoption model: organic traffic = peer pack-refresh adoption of the prior
+install base) and `2026_10_03_metronome_fetch_holdouts.json`, applied
+2026-10-03 (#12198, 1,830 fetches). The UA spec carries
+`daily_spurious_cap: 7` — the measured uniform loop rate; the peer-adoption
+allowance undershoots flagship organic demand, so excess beyond the loop rate
+stays credited (maintainer ruling, #12201: 434 re-credited, kyiv +150).
+Hourly lockstep slots measure the loop at ~7.5–8/day outside release-day
+waves, so 7 errs toward attributing less. The 0.8.1 extension targets 0.2.1
+and 0.1.1 from their first counted snapshot (2026-10-06) with
+`install_base: "adjusted"` (raw install bases would count the ~185 loop
+fetches each 0.2.0 carries as installs and widen the allowance meant to
+remove them), and ends the 0.2.0 targets at 2026-10-04 (target-level
+`incident_end`) — later 0.2.0 traffic is organic stragglers on a superseded
+version.
+
+**#12201 cap defect (repaired):** the cap was first applied by an uncommitted
+script that lowered the ledger's `daily`/`assets` views but not `timeline`,
+which snapshot generation and rebuilds read first. The 2026-09-07..10-02
+snapshots kept the pre-cap clamp, so the whole re-credit surfaced as one
+2026-10-03 jump in the by-day series (kyiv 0.2.0: 151), and every snapshot
+generated since stored raw above the real GitHub counter by the re-credit
+(kyiv 664 vs 514). `scripts/ops/repair-metronome-ua-cap-consistency.ts`
+(one-shot, idempotent; applied in #12557, removed after — see git history)
+capped the timeline, restored raw to the live counters,
+and moved each day's re-credit onto its own snapshot (kyiv 10-03 by-day
+151 → 7). The cap now lives in the spec, so re-applies — including after an
+attribution-ledger rebuild — are capped natively; never cap by editing the
+ledger directly.
+
+**Residual effects:**
+
+- Loop days are corrected only once observed in a snapshot, so the latest
+  1–2 days of UA traffic are uncorrected until the next re-apply.
+- On a version's release day the peer-adoption allowance (6.7% of base) can
+  exceed the whole delta, absorbing that day's loop share (0.2.1 day 0:
+  only zaporizhzhia attributed).
+- The engine's snapshot clamp counts the registry's own pipeline fetches as
+  organic, so clamped UA snapshots sit ~2 above `raw − attributed`; the next
+  live snapshot can read ~2 lower (an `adjusted_decreased` audit warning).
+  Same behavior as every earlier loop spec, as is the clamp lowering snapshot
+  totals without touching `net_downloads` (net fields of clamped days go stale).
+
+**Running log** (append one line per re-apply or status change):
+
+- 2026-09-06 — onset (eu-maps 0.7.3 release day).
+- 2026-10-03 — #12195 holdouts deprecated; #12198 v2 corrections (+1,830);
+  #12201 cap at 7/day/listing (−434 re-credited; UA total ~1,282).
+- 2026-10-04 21:56Z — eu-maps 0.8.1 published; client silent 10-04 00Z → 10-05 05Z.
+- 2026-10-05 06Z — loop resumes on 0.2.1 ×7 + 0.1.1 ×15, all 22 UA listings.
+- 2026-10-07 — holdouts confirmed still fetching after deprecation (~4/day
+  each on the live counters; not counted while frozen).
+- 2026-10-08 — loop still running on all 22 UA listings: lockstep slots at
+  roughly 00–01, 03–04, 07, 16 and 22Z on 10-07; snapshot raw deltas 8–10
+  (10-07) and 6–8 (10-08) per 0.1.1 listing, 0.2.0 flat at 0. Repair and
+  0.8.1 extension prepared (#12557) but not merged.
+- 2026-10-25 — loop unchanged: 2–6 lockstep slots every day 10-08 → 10-25,
+  ~7.9/day per 0.1.1 listing; no eu-maps release since 0.8.1. Holdouts still
+  ~3.8/day each (JER.zip 537, LAS.zip 920; frozen, not counted).
+  Cap-consistency repair applied (timeline −434; 161 raw entries restored to
+  the live counters across 10-03..10-25; 182 adjusted entries re-credited
+  across 09-07..10-02 — kyiv 0.2.0 by-day 10-03: 151 → 7). UA spec extended
+  to the 0.8.1 versions and re-applied: **+2,725 fetches** across 430
+  day-deltas (0.2.0 day 10-04: 49; 0.2.1 ×7: 716; 0.1.1 ×15: 1,960). The cap
+  bound 138 of those days (measured loop ~7.9/day vs cap 7). UA incident
+  total 4,007. Holdouts spec not re-applied: its only pending day is 2
+  fetches on jerusalem 2026-10-04 (the freeze window), which would also need
+  its grandfathered entry lowered.
+- 2026-10-25 — riders corrected (`rider_targets` in the UA spec, on the seven
+  originals' lockstep clock): sydney 1.2.0/2.1.0, la-metro-trainpack
+  1.0.3/1.0.4, noah-great-society 1.0.3/1.0.4, dantrains-abridged v1.4.0,
+  basedgoat-trains v0.6.3, amba v0.3.3/v0.3.4. **+657 fetches**; open windows
+  (la-metro, noah 1.0.4; amba v0.3.4) accrue daily via the guard. Every
+  rider joined right after the client updated it, and most dropped out at the
+  client's 10-04 restart. Medium-confidence riders (unrusted-cities-pack,
+  taiwan-trains, mtr-trains) and transit-overlay are under review;
+  japanese-trains (+3.9/cycle, beyond one fetch) needs a closer look.
+- 2026-10-26 — remaining riders corrected (October joiners, transit-overlay,
+  japanese-trains — see Riders below); guard's first scheduled run re-applied
+  +164 and self-merged (#13909); history re-clamped with the ledger bound.
+- 2026-10-27 — **client silent since 2026-10-25 23:00Z** (last loop hour; only
+  single-listing organic activity through 10-27 01:00Z), no eu-maps release —
+  a restart (10-04's lasted ~30 h) or a stop. The guard now gates loop-clock
+  attribution on silent days (nothing booked for a snapshot day with no loop
+  hour), notifies `paused:` after 48 h and `stopped:` after 7 days, and
+  watches the holdouts' live release counters. If `stopped:` fires, set
+  `incident_end` to the last loop day (2026-10-26) and `end` on open riders.
+
+**Riders:** the client also re-fetches listings outside the UA packs.
+detect-metronome flags any listing tracking the loop's hours beyond its own
+hour-of-day baseline (amba and transit-overlay at ~+1/cycle; mods at
++0.3–0.8), each one starting right after the client updated it. Rider targets
+attribute per_cycle × the loop's lockstep hours per snapshot day (measured
+rate, rounded down) instead of an allowance model, because a popular rider's
+organic traffic would drown one. October joiners (added 2026-10-26, open
+targets): unrusted-cities-pack 1.0.3 from its 10-10 update (0.7/cycle, t 9.8),
+and taiwan-trains v1.0.4 (10-14) and mtr-trains v1.0.5 (10-15) with no update
+— the same 10-12 → 10-15 re-enrolment wave as la-metro-trainpack,
+noah-great-society and amba (0.7 / 0.65, t 11.1 / 9.3; placebo flat, nothing
+before). **+115 fetches** through 10-26, then ~8–10/day via the guard. Open
+rider targets keep attributing per_cycle × slots until `end` is set, so the
+guard also reports any whose last-7-day excess falls below 40% of its rate.
+transit-overlay v1.5.6 (added 2026-10-26, open) joined with its 10-07 update:
+0.89 ± 0.16 per loop hour (t 5.6, placebo flat; 0.00 ± 0.10 over 09-08 →
+10-04), 0.85/cycle — 3–6/day of its 19–71 daily downloads. **+76** through
+10-26.
+
+**japanese-trains — the client re-fetches every version it has seen**
+(added 2026-10-26; the earlier "anomalous +3.9/cycle"): from 09-18 to 10-04
+every version v3.0.0 → v4.2.0 grew by the same 3–5 on the same day (even
+versions superseded for weeks), all dropped to exactly 0 at the client's
+10-04 restart, and after it re-enrolled the listing with v5.0.0 (10-19) only
+versions released since then grow (4–5/day each). Superseded versions grow
+0.79–1.16 per loop slot (median 0.94) with ≤0.3/day organic → 0.9/cycle per
+version. Cross-check: the version model attributes 810 for 09-08 → 10-04,
+the listing-level hourly loop excess sums to 814.5 (+6.03 per loop hour,
+t 12.9; +0.02 during the pause). 13 closed targets (09-08 → 10-04) and one
+open `version: "*"` target (`versions_from` 10-18, from 10-19) that covers
+each new release as it appears. **+958** through 10-26, ~0.9 × slots ×
+versions/day after (≈35/day, growing with each release until the client
+restarts).
+
+**Re-application rules:** re-apply both specs every few days while open
+(`repair-loop-inflated-downloads --spec … --apply`, then
+`reconcile-attributed-downloads -- --no-refresh-history` in the same change —
+refreshing today's snapshot right after an apply would stamp it before that
+day's T12:00Z deltas and understate its raw) and after any attribution-ledger
+rebuild. Close the UA spec only once all 22 UA versions show no lockstep
+slots for a week; there is no registry-side kill-switch for healthy listings
+whose updates come from the author's manifest. The UA spec is opted into the daily
+metronome guard (`auto_apply: true`; metronome-guard workflow), which re-applies
+it and reports listings riding the loop that it does not target. The holdouts
+spec is not: its targets are deprecated and grandfathered.
+
+---
+
+## 2026-07-27 → 2026-09-09 — Metronomic library re-fetcher: two fixed lists at ~6/day (both lists corrected and closed; v2 above)
 
 **What happened:** a single automated client fetches a fixed library of
 listings roughly every 4 hours (~6/day per listing), with day-level wobbles
@@ -16,7 +182,7 @@ signature, at 8x the scale. Two lists, same 2026-07-27/28 onset:
 - **List A (closed):** kaicardenas0618's nine Peru maps + waterloo. Ran to
   2026-08-19, all ten stopping in lockstep. **1,052 spurious fetches**
   attributed.
-- **List B (ongoing):** 25 listings — small US metros (dayton-oh, daytonatti,
+- **List B (closed):** 25 listings — small US metros (dayton-oh, daytonatti,
   akron-oh, toledo-oh, louisville, nashville, providence, sacramento, albany,
   buffalo-ny, syracuse-ny, anchorage-ak, charleston-sc, wilmington-nc,
   piedmont-triad, connecticut-usa, colorado-ski-country, willamette-valley,
@@ -55,6 +221,64 @@ with ≥90% ±1 agreement across listings) — the run-length screen alone misse
 16 of the 35 members. Yukina pack-update waves false-positive on correlation
 sweeps (event-shaped, synchronized by republish) — check the series shape
 before concluding.
+
+**Riders (found and corrected 2026-10-25):** the day-delta sweep could only
+see small listings. A rider review (detect-metronome, then per-listing
+evidence) found 27 more listing-versions the same client re-fetched in list
+B's lockstep hours, hidden by their organic traffic or joining only after an
+update. Each rider showed a significant excess per loop hour over the same-day
+neighbouring hours, nothing under ±2–5h placebo shifts, and one version whose
+daily growth tracked the loop's slot count. Validated on known members (list
+A t≈17, stopping on its recorded 08-18; mfn-lasvegas t≈44).
+
+- **Whole loop, ~1 fetch/cycle:** charleston-huntington-wv, warsaw-val, sydney
+  (t 49–58). charleston and warsaw-val were since deprecated, so their frozen
+  grandfathered counts were lowered too.
+- **~1/cycle for three weeks:** greatertwincities, greater-chicagoland, beijing,
+  guangzhou, chongqing, shenzhen, shanghai. Each moved to its new version for
+  2–9 days after an update (v2.0.1 08-04; v1.4.1 08-10; sb-chinese-maps v1.8.0
+  08-15), then stopped (08-13 → 08-16).
+- **After the eu-maps 0.6.6 update (08-24):** 10 yukina-cz maps at ~1.9/cycle
+  until v1 wound down (09-04). brno and praha (added 2026-10-26) did the same
+  (loop-hour excess ~0 before 08-24, +10–22/day after, falling with the slot
+  count): brno 2.0/cycle (t 12.0), praha 1.95/cycle (measured 2.35 ± 0.36,
+  t 6.6, set at mean − SE for its noisier baseline). **+156 fetches.**
+- **yukina-lt ×5 (added 2026-10-26):** joined right after each update and
+  dropped out on the client's restart — 0.2.1 for ~9 cycles (08-19 → 08-20
+  17Z; small maps got 2–4 in every loop hour and ~0 between), and 0.3.0 from
+  08-27 until v1 wound down (09-04). 1.2–1.5/cycle (t 3.3–14, placebo flat;
+  none before 08-15). The ~4-cycle 0.2.0 join (08-15) is left out (t < 2.5,
+  ~3/map). 0.2.1 assets via `asset_source` (eu-maps 0.6.5). **+220 fetches.**
+- **v1-era mods (added 2026-10-26):** each joined after its own update until
+  v1 wound down — basedgoat-trains v0.6.1 (08-19 → 08-20) and v0.6.2
+  (08-23 → 09-04; t 16.3, excess vs slots r 0.96); dantrains-abridged
+  v1.3.0/v1.3.1 (08-23 → 09-04; 1.9/cycle listing-level, t 11.7, split 0.7 /
+  1.2 since the superseded v1.3.0 kept tracking the slots); penguin-approved-
+  rolling-stock v1.1.0 (08-19, new listing) and v1.2.0 (08-24; t 4.0 / 6.9).
+  basedgoat and dantrains rode v2 the same way (UA spec). **+161 fetches.**
+- **One jp-maps release cycle (08-06 → 08-13, added 2026-10-26):** 32 yukina
+  JP maps at 0.9–2.15/cycle (local t 5.6–13.3) on the version the 08-05/06
+  release shipped, until the 08-14 release superseded it. Small maps went from
+  0–2/day to 11–15/day for exactly those 8 days. yukina-tokyo excluded (t 2.0).
+  The versions were since retired (only-latest), so the targets name their
+  release assets via `asset_source` (integrity as of 08-08). **+2,011
+  fetches** (38–92 per map).
+
+Corrected by `2026_10_25_metronome_fetch_v1_riders.json` with rider targets:
+per snapshot day, per_cycle × list B's lockstep hours, rounded down and capped
+by the version's raw growth. **+1,955 fetches** (+2,011 with the JP maps,
++156 with brno/praha, +220 with LT, +161 with the mods). All medium-tier v1
+riders are now corrected. **History fix (2026-10-26):** the rider clamps grew
+their corrected trajectory from raw growth less the rider's own estimate, so
+on versions already carrying list-B attribution (shanghai, beijing, shenzhen,
+guangzhou, chongqing ~−87; greater-chicagoland −69) the trajectory sat above
+the recorded history and the min-guard left it uncorrected — the
+2026-10-26 snapshot (derived from the ledger) then showed an artificial
+one-day drop. The engine now also bounds every clamp by the ledger-consistent
+value (raw − recorded attribution − the target's deltas that snapshot had not
+counted); re-applying all specs lowered 146 versions across 93 snapshots,
+most by 1–3 (in-window pipeline fetches, the former ±2 gap). Known gap: the loop began 2026-07-25 15Z, two days
+before list A/B's `incident_start`, so their first ~9 slots stay uncorrected.
 
 ---
 

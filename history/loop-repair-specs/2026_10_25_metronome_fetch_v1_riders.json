@@ -1,0 +1,996 @@
+{
+  "incident": "metronome-fetch-2026-07-riders",
+  "source": "manual-correction/metronome-fetch-2026-07",
+  "baseline_start": "2026-06-25",
+  "baseline_end": "2026-07-24",
+  "incident_start": "2026-07-26",
+  "incident_end": "2026-09-09",
+  "peers": [],
+  "note": "Metronome v1 riders: listings the same client re-fetched in list B's lockstep hours that the 2026-08-31 correlation sweep missed - popular enough that organic traffic hid them, or joining only after an update. Found by detect-metronome and reviewed 2026-10-25 (KNOWN_INCIDENTS.md metronome v1 entry): each rider's excess per loop hour over the same-day neighbouring hours was significant (local t 7-58), absent under +/-2-5h placebo shifts, and carried by one version whose daily growth tracked the loop's slot count. Attribution follows the loop's own clock (rider_targets): per snapshot day, per_cycle x list B's lockstep hours, rounded down and capped by the version's raw growth; per_cycle is the measured excess rounded down to 0.05 (mean - SE for windows under 30 slots). One entry per (version, window): riders re-fetched the version they last updated to. Baseline fields are unused by rider targets. Closed: v1 died 2026-09-06/09.",
+  "targets": [],
+  "rider_loop": {
+    "core": [
+      {
+        "listing_type": "map",
+        "listing_id": "akron-oh"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "albany"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "anchorage-ak"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "buffalo-ny"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "charleston-sc"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "colorado-ski-country"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "connecticut-usa"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "dayton-oh"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "daytonatti"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "jerusalem"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "johor-bahru"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "louisville"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "mfn-madisonwi"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "mfn-msy"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "mfn-northwestar"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "mfn-rdu"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "nashville"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "piedmont-triad"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "providence"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "pulau-pinang"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "sacramento"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "syracuse-ny"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "toledo-oh"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "willamette-valley"
+      },
+      {
+        "listing_type": "map",
+        "listing_id": "wilmington-nc"
+      }
+    ],
+    "note": "list B's 25 targets define the v1 loop's lockstep hours"
+  },
+  "rider_targets": [
+    {
+      "listing_type": "map",
+      "listing_id": "charleston-huntington-wv",
+      "version": "1.0.0",
+      "start": "2026-07-26",
+      "end": "2026-09-07",
+      "note": "measured 0.94±0.02 fetches per loop hour over 214 lockstep hours (local t 58.4); deprecated 2026-09-09: frozen count lowered alongside",
+      "per_cycle": 0.9
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "warsaw-val",
+      "version": "1.0.0",
+      "start": "2026-07-26",
+      "end": "2026-09-07",
+      "note": "measured 0.98±0.02 fetches per loop hour over 214 lockstep hours (local t 52.8); deprecated 2026-09-11: frozen count lowered alongside",
+      "per_cycle": 0.95
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "sydney",
+      "version": "1.2.0",
+      "start": "2026-07-26",
+      "end": "2026-09-07",
+      "per_cycle": 0.95,
+      "note": "measured 0.96±0.02 fetches per loop hour over 214 lockstep hours (local t 48.9)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "greatertwincities",
+      "version": "v1.0.0",
+      "start": "2026-07-26",
+      "end": "2026-08-03",
+      "per_cycle": 0.95,
+      "note": "measured 1.00±0.02 fetches per loop hour over 47 lockstep hours (local t 39.9)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "greatertwincities",
+      "version": "v2.0.1",
+      "start": "2026-08-05",
+      "end": "2026-08-13",
+      "note": "measured 2.02±0.08 fetches per loop hour over 51 lockstep hours (local t 24.7); loop moved to v2.0.1 the day after its 08-04 release",
+      "per_cycle": 2
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "greater-chicagoland",
+      "version": "v1.3.0",
+      "start": "2026-07-26",
+      "end": "2026-08-10",
+      "per_cycle": 0.95,
+      "note": "measured 0.99±0.09 fetches per loop hour over 85 lockstep hours (local t 11.5)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "greater-chicagoland",
+      "version": "v1.4.1",
+      "start": "2026-08-11",
+      "end": "2026-08-14",
+      "note": "measured 1.44±0.31 fetches per loop hour over 24 lockstep hours (local t 4.7); loop moved to v1.4.1 after its 08-10 release",
+      "per_cycle": 1.1
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "beijing",
+      "version": "1.1.0",
+      "start": "2026-07-26",
+      "end": "2026-08-14",
+      "per_cycle": 0.9,
+      "note": "measured 0.92±0.09 fetches per loop hour over 109 lockstep hours (local t 10.1)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "beijing",
+      "version": "1.2.0",
+      "start": "2026-08-15",
+      "end": "2026-08-16",
+      "note": "measured 1.53±0.58 fetches per loop hour over 12 lockstep hours (local t 2.6); sb-chinese-maps v1.8.0 (08-15): loop moved to the new version for two days, then stopped",
+      "per_cycle": 0.9
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "guangzhou",
+      "version": "1.3.0",
+      "start": "2026-07-26",
+      "end": "2026-08-14",
+      "per_cycle": 0.85,
+      "note": "measured 0.90±0.10 fetches per loop hour over 109 lockstep hours (local t 9.3)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "guangzhou",
+      "version": "1.4.0",
+      "start": "2026-08-15",
+      "end": "2026-08-16",
+      "note": "measured 1.48±0.43 fetches per loop hour over 12 lockstep hours (local t 3.4); sb-chinese-maps v1.8.0 (08-15): loop moved to the new version for two days, then stopped",
+      "per_cycle": 1
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "chongqing",
+      "version": "1.1.0",
+      "start": "2026-07-26",
+      "end": "2026-08-14",
+      "per_cycle": 0.85,
+      "note": "measured 0.90±0.08 fetches per loop hour over 109 lockstep hours (local t 10.8)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "chongqing",
+      "version": "1.2.0",
+      "start": "2026-08-15",
+      "end": "2026-08-16",
+      "note": "measured 1.20±0.44 fetches per loop hour over 12 lockstep hours (local t 2.7); sb-chinese-maps v1.8.0 (08-15): loop moved to the new version for two days, then stopped",
+      "per_cycle": 0.75
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "shenzhen",
+      "version": "1.2.0",
+      "start": "2026-07-26",
+      "end": "2026-08-14",
+      "per_cycle": 0.85,
+      "note": "measured 0.88±0.10 fetches per loop hour over 109 lockstep hours (local t 8.6)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "shenzhen",
+      "version": "1.3.0",
+      "start": "2026-08-15",
+      "end": "2026-08-16",
+      "note": "measured 1.84±0.59 fetches per loop hour over 12 lockstep hours (local t 3.1); sb-chinese-maps v1.8.0 (08-15): loop moved to the new version for two days, then stopped",
+      "per_cycle": 1.25
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "shanghai",
+      "version": "1.2.0",
+      "start": "2026-07-26",
+      "end": "2026-08-14",
+      "per_cycle": 0.9,
+      "note": "measured 0.95±0.11 fetches per loop hour over 109 lockstep hours (local t 8.9)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "shanghai",
+      "version": "1.3.0",
+      "start": "2026-08-15",
+      "end": "2026-08-16",
+      "note": "measured 1.39±0.46 fetches per loop hour over 12 lockstep hours (local t 3.0); sb-chinese-maps v1.8.0 (08-15): loop moved to the new version for two days, then stopped",
+      "per_cycle": 0.9
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-liberec-jablonec",
+      "version": "0.3.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.86±0.09 fetches per loop hour over 42 lockstep hours (local t 21.6); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.85
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-ceske-budejovice",
+      "version": "0.3.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.94±0.10 fetches per loop hour over 42 lockstep hours (local t 20.3); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.9
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-zlin",
+      "version": "0.2.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.83±0.08 fetches per loop hour over 42 lockstep hours (local t 22.0); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.8
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-plzen",
+      "version": "0.4.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.86±0.09 fetches per loop hour over 42 lockstep hours (local t 20.2); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.85
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-olomouc",
+      "version": "0.4.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.99±0.10 fetches per loop hour over 42 lockstep hours (local t 19.9); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.95
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-ostrava",
+      "version": "0.4.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.91±0.12 fetches per loop hour over 42 lockstep hours (local t 15.9); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.9
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-jihlava",
+      "version": "0.2.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.87±0.08 fetches per loop hour over 42 lockstep hours (local t 22.5); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.85
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-karlovy-vary",
+      "version": "0.2.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.89±0.09 fetches per loop hour over 42 lockstep hours (local t 21.6); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.85
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-ustecko-chomutov",
+      "version": "0.4.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 1.78±0.10 fetches per loop hour over 42 lockstep hours (local t 18.2); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 1.75
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-hradec-pardubice",
+      "version": "0.4.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "note": "measured 2.04±0.14 fetches per loop hour over 42 lockstep hours (local t 14.6); joined the loop with the eu-maps 0.6.6 update (08-24)",
+      "per_cycle": 2
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-brno",
+      "version": "0.4.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "per_cycle": 2,
+      "note": "measured 2.02±0.17 fetches per loop hour over 42 lockstep hours (local t 12.0; placebo ±2–5h within ±0.27; none before 08-24, +0.07); joined the loop with the eu-maps 0.6.6 update (08-24)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-cz-praha",
+      "version": "0.4.2",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "per_cycle": 1.95,
+      "note": "measured 2.35±0.36 fetches per loop hour over 42 lockstep hours (local t 6.6; placebo ±2–5h within ±0.62); set at mean − SE for the noisier organic baseline; joined the loop with the eu-maps 0.6.6 update (08-24)"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-vilnius",
+      "version": "0.2.1",
+      "start": "2026-08-20",
+      "end": "2026-08-21",
+      "per_cycle": 1.2,
+      "note": "measured 1.72±0.52 fetches per loop hour over 12 lockstep hours (local t 3.3); joined the loop with the 0.2.1 update (08-19) and dropped out 08-20 17Z; asset from integrity as of 08-22 (retired since)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-eu-maps",
+        "tag": "0.6.5",
+        "asset_name": "VNO.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-kaunas",
+      "version": "0.2.1",
+      "start": "2026-08-20",
+      "end": "2026-08-21",
+      "per_cycle": 1.4,
+      "note": "measured 1.71±0.28 fetches per loop hour over 12 lockstep hours (local t 6.1); joined the loop with the 0.2.1 update (08-19) and dropped out 08-20 17Z; asset from integrity as of 08-22 (retired since)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-eu-maps",
+        "tag": "0.6.5",
+        "asset_name": "KUN.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-klaipeda",
+      "version": "0.2.1",
+      "start": "2026-08-20",
+      "end": "2026-08-21",
+      "per_cycle": 1.35,
+      "note": "measured 1.71±0.35 fetches per loop hour over 12 lockstep hours (local t 4.9); joined the loop with the 0.2.1 update (08-19) and dropped out 08-20 17Z; asset from integrity as of 08-22 (retired since)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-eu-maps",
+        "tag": "0.6.5",
+        "asset_name": "PLQ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-siauliai",
+      "version": "0.2.1",
+      "start": "2026-08-20",
+      "end": "2026-08-21",
+      "per_cycle": 1.3,
+      "note": "measured 1.67±0.34 fetches per loop hour over 12 lockstep hours (local t 4.9); joined the loop with the 0.2.1 update (08-19) and dropped out 08-20 17Z; asset from integrity as of 08-22 (retired since)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-eu-maps",
+        "tag": "0.6.5",
+        "asset_name": "SQQ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-panevezys",
+      "version": "0.2.1",
+      "start": "2026-08-20",
+      "end": "2026-08-21",
+      "per_cycle": 1.4,
+      "note": "measured 1.76±0.35 fetches per loop hour over 12 lockstep hours (local t 5.0); joined the loop with the 0.2.1 update (08-19) and dropped out 08-20 17Z; asset from integrity as of 08-22 (retired since)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-eu-maps",
+        "tag": "0.6.5",
+        "asset_name": "PNV.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-vilnius",
+      "version": "0.3.0",
+      "start": "2026-08-27",
+      "end": "2026-09-04",
+      "per_cycle": 1.4,
+      "note": "measured 1.67±0.25 fetches per loop hour over 24 lockstep hours (local t 6.8); joined the loop with the 0.3.0 update (08-27) until v1 wound down"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-kaunas",
+      "version": "0.3.0",
+      "start": "2026-08-27",
+      "end": "2026-09-04",
+      "per_cycle": 1.5,
+      "note": "measured 1.68±0.14 fetches per loop hour over 24 lockstep hours (local t 11.7); joined the loop with the 0.3.0 update (08-27) until v1 wound down"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-klaipeda",
+      "version": "0.3.0",
+      "start": "2026-08-27",
+      "end": "2026-09-04",
+      "per_cycle": 1.35,
+      "note": "measured 1.52±0.13 fetches per loop hour over 24 lockstep hours (local t 11.6); joined the loop with the 0.3.0 update (08-27) until v1 wound down"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-siauliai",
+      "version": "0.3.0",
+      "start": "2026-08-27",
+      "end": "2026-09-04",
+      "per_cycle": 1.4,
+      "note": "measured 1.56±0.11 fetches per loop hour over 24 lockstep hours (local t 13.7); joined the loop with the 0.3.0 update (08-27) until v1 wound down"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-lt-panevezys",
+      "version": "0.3.0",
+      "start": "2026-08-27",
+      "end": "2026-09-04",
+      "per_cycle": 1.4,
+      "note": "measured 1.56±0.11 fetches per loop hour over 24 lockstep hours (local t 13.7); joined the loop with the 0.3.0 update (08-27) until v1 wound down"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "basedgoat-trains",
+      "version": "v0.6.1",
+      "start": "2026-08-19",
+      "end": "2026-08-20",
+      "per_cycle": 1.2,
+      "note": "measured 1.51±0.28 fetches per loop hour over 12 lockstep hours (local t 5.4; placebo ±2–5h within ±0.33); joined the loop with the v0.6.1 update (08-19) for ~2 days"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "basedgoat-trains",
+      "version": "v0.6.2",
+      "start": "2026-08-23",
+      "end": "2026-09-04",
+      "per_cycle": 0.95,
+      "note": "measured 0.98±0.06 fetches per loop hour over 48 lockstep hours (local t 16.3; placebo within ±0.14; daily excess vs slot count r 0.96); joined the loop after the v0.6.2 update (08-22) until v1 wound down"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "dantrains-abridged",
+      "version": "v1.3.0",
+      "start": "2026-08-23",
+      "end": "2026-09-04",
+      "per_cycle": 0.7,
+      "note": "listing-level 1.90±0.16 fetches per loop hour over 48 lockstep hours (local t 11.7; placebo within ±0.66; daily excess vs slot count r 0.92), split between versions: v1.3.0 kept growing with the slot count after v1.3.1 superseded it (≈0.7 per slot), v1.3.1 takes the rest (1.2)"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "dantrains-abridged",
+      "version": "v1.3.1",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "per_cycle": 1.2,
+      "note": "listing-level 1.97±0.18 fetches per loop hour over 42 lockstep hours (local t 11.2), less the 0.7 on v1.3.0; joined the loop with the v1.3.0/v1.3.1 updates (08-22/23) until v1 wound down"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "penguin-approved-rolling-stock",
+      "version": "v1.1.0",
+      "start": "2026-08-19",
+      "end": "2026-08-23",
+      "per_cycle": 0.45,
+      "note": "measured 0.49±0.12 fetches per loop hour over 30 lockstep hours (local t 4.0; placebo within ±0.15); joined the loop with the v1.1.0 update (08-19)"
+    },
+    {
+      "listing_type": "mod",
+      "listing_id": "penguin-approved-rolling-stock",
+      "version": "v1.2.0",
+      "start": "2026-08-24",
+      "end": "2026-09-04",
+      "per_cycle": 0.8,
+      "note": "measured 0.81±0.12 fetches per loop hour over 42 lockstep hours (local t 6.9; placebo within ±0.30; daily excess vs slot count r 0.51); moved to v1.2.0 with its update (08-24) until v1 wound down"
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-asahikawa",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.75,
+      "note": "measured 1.76±0.16 fetches per loop hour over 46 lockstep hours (local t 11.2); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "AKJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-fukuoka",
+      "version": "0.6.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.7,
+      "note": "measured 1.73±0.22 fetches per loop hour over 46 lockstep hours (local t 8.0); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "FUK.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-hakodate",
+      "version": "0.5.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.75,
+      "note": "measured 1.76±0.16 fetches per loop hour over 46 lockstep hours (local t 11.2); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "HKD.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-hiroshima-kure",
+      "version": "0.6.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.95,
+      "note": "measured 1.96±0.23 fetches per loop hour over 46 lockstep hours (local t 8.5); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "HIJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-kagoshima-kirishima",
+      "version": "0.5.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.75,
+      "note": "measured 1.77±0.16 fetches per loop hour over 46 lockstep hours (local t 11.4); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "KOJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-keihanshin",
+      "version": "0.1.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 2.15,
+      "note": "measured 2.20±0.29 fetches per loop hour over 46 lockstep hours (local t 7.6); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.9",
+        "asset_name": "KHS.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-kitakyushu-shimonoseki",
+      "version": "0.6.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.6,
+      "note": "measured 1.61±0.15 fetches per loop hour over 46 lockstep hours (local t 10.4); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "KKJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-kobe-akashi",
+      "version": "0.5.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.5,
+      "note": "measured 1.55±0.18 fetches per loop hour over 46 lockstep hours (local t 8.6); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "UKB.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-kochi",
+      "version": "0.6.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.55,
+      "note": "measured 1.60±0.14 fetches per loop hour over 46 lockstep hours (local t 11.7); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "KCZ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-kumamoto",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.55,
+      "note": "measured 1.55±0.14 fetches per loop hour over 46 lockstep hours (local t 11.3); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "KMJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-kyoto",
+      "version": "0.6.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.75,
+      "note": "measured 1.75±0.27 fetches per loop hour over 46 lockstep hours (local t 6.5); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "UKY.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-matsuyama",
+      "version": "0.6.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.55,
+      "note": "measured 1.57±0.14 fetches per loop hour over 46 lockstep hours (local t 11.1); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "MYJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-morioka",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.5,
+      "note": "measured 1.53±0.15 fetches per loop hour over 46 lockstep hours (local t 10.4); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "HNA.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-nagasaki",
+      "version": "0.3.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.5,
+      "note": "measured 1.54±0.16 fetches per loop hour over 46 lockstep hours (local t 9.8); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "NGS.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-nagoya",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.65,
+      "note": "measured 1.70±0.25 fetches per loop hour over 46 lockstep hours (local t 6.8); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.9",
+        "asset_name": "NGO.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-nakadoori",
+      "version": "0.2.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.45,
+      "note": "measured 1.49±0.14 fetches per loop hour over 46 lockstep hours (local t 10.3); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "FKS.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-nakaumi",
+      "version": "0.4.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.4,
+      "note": "measured 1.45±0.14 fetches per loop hour over 46 lockstep hours (local t 10.6); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "IZO.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-nemuro",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.3,
+      "note": "measured 1.32±0.10 fetches per loop hour over 46 lockstep hours (local t 13.3); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "SHB.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-niigata",
+      "version": "0.5.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.4,
+      "note": "measured 1.42±0.17 fetches per loop hour over 46 lockstep hours (local t 8.5); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "KIJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-northern-kyushu",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.6,
+      "note": "measured 1.62±0.19 fetches per loop hour over 46 lockstep hours (local t 8.7); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.9",
+        "asset_name": "FOKK.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-okayama",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.1,
+      "note": "measured 1.14±0.15 fetches per loop hour over 46 lockstep hours (local t 7.8); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "OKJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-okinawa",
+      "version": "0.6.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.45,
+      "note": "measured 1.49±0.22 fetches per loop hour over 46 lockstep hours (local t 6.8); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "OKA.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-osaka",
+      "version": "0.3.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.7,
+      "note": "measured 1.71±0.30 fetches per loop hour over 46 lockstep hours (local t 5.6); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.9",
+        "asset_name": "ITM.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-sapporo-chitose",
+      "version": "0.6.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.25,
+      "note": "measured 1.29±0.19 fetches per loop hour over 46 lockstep hours (local t 6.7); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "SPK.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-sendai",
+      "version": "0.5.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.15,
+      "note": "measured 1.17±0.17 fetches per loop hour over 46 lockstep hours (local t 6.8); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "SDJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-shizuoka-hamamatsu",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.15,
+      "note": "measured 1.17±0.18 fetches per loop hour over 46 lockstep hours (local t 6.6); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "FSZ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-takamatsu",
+      "version": "0.3.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.1,
+      "note": "measured 1.13±0.14 fetches per loop hour over 46 lockstep hours (local t 8.1); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "TAK.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-tottori",
+      "version": "0.2.1",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.1,
+      "note": "measured 1.12±0.15 fetches per loop hour over 46 lockstep hours (local t 7.7); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "TTJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-toyama",
+      "version": "0.3.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.05,
+      "note": "measured 1.07±0.17 fetches per loop hour over 46 lockstep hours (local t 6.5); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "TOY.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-tsugaru",
+      "version": "0.2.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1.1,
+      "note": "measured 1.14±0.13 fetches per loop hour over 46 lockstep hours (local t 8.5); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "AOJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-wakkanai",
+      "version": "0.2.3",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 0.9,
+      "note": "measured 0.92±0.09 fetches per loop hour over 46 lockstep hours (local t 10.1); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "WKJ.zip"
+      }
+    },
+    {
+      "listing_type": "map",
+      "listing_id": "yukina-yamagata",
+      "version": "0.5.2",
+      "start": "2026-08-06",
+      "end": "2026-08-13",
+      "per_cycle": 1,
+      "note": "measured 1.04±0.13 fetches per loop hour over 46 lockstep hours (local t 7.8); JP pack release 08-05/06: loop on the new version 08-06 → 08-13 (release-day spikes on 08-14/08-20 not attributed)",
+      "asset_source": {
+        "repo": "ahkimn/subwaybuilder-jp-maps",
+        "tag": "0.4.10",
+        "asset_name": "GAJ.zip"
+      }
+    }
+  ]
+}

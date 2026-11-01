@@ -6,12 +6,18 @@ import {
   computeBaselineDailyRate,
   computeCumulativeListingRawBefore,
   computeDaySpuriousEstimates,
+  computeLedgerBound,
   computePeerSupersededRate,
+  computeRiderDaySpuriousEstimates,
   computeSnapshotClampPlan,
+  countSlotsBySnapshotDay,
+  expandRiderTargets,
   extractTargetSeries,
+  gateOnLoopSlots,
   loopRepairDeltaId,
   normalizeLoopRepairSpec,
   type LoopRepairAdoptionEntry,
+  type LoopRepairRiderTarget,
   type LoopRepairSpec,
   type LoopRepairTarget,
   type SnapshotFileLike,
@@ -271,6 +277,31 @@ test("computeCumulativeListingRawBefore sums all versions at the last prior snap
   assert.equal(computeCumulativeListingRawBefore(snapshots, "map", "missing", "2026-08-06"), null);
 });
 
+test("computeCumulativeListingRawBefore can measure the base net of attribution", () => {
+  // target-y 1.0.0 at Aug 5: raw 50, adjusted 20 (30 loop fetches attributed).
+  const snapshots = [
+    {
+      dateKey: "2026-08-05",
+      data: {
+        maps: {
+          downloads: { "target-y": { "1.0.0": 20 } },
+          raw_downloads: { "target-y": { "1.0.0": 50 } },
+        },
+      },
+    },
+  ];
+  assert.equal(computeCumulativeListingRawBefore(snapshots, "map", "target-y", "2026-08-06"), 50);
+  assert.equal(computeCumulativeListingRawBefore(snapshots, "map", "target-y", "2026-08-06", "adjusted"), 20);
+  assert.throws(
+    () => normalizeLoopRepairSpec({
+      ...SPEC,
+      adoption_targets: [{ ...ADOPTION_TARGET, install_base: "net" }],
+      adoption_peers: [ADOPTION_PEER],
+    }),
+    /install_base to be 'raw' or 'adjusted'/,
+  );
+});
+
 test("computeAdoptionFractionCurve includes the release-day delta and normalizes by base", () => {
   const curve = computeAdoptionFractionCurve(buildAdoptionSnapshots(), [ADOPTION_PEER]);
   // Peer deltas 5, 10, 8, 0 over base 100.
@@ -318,6 +349,60 @@ test("computeSnapshotClampPlan anchors adoption targets at zero via missingAncho
   assert.deepEqual(computeSnapshotClampPlan(series, { start: "2026-08-06", end: null }, days), []);
 });
 
+test("normalizeLoopRepairSpec validates daily_spurious_cap", () => {
+  assert.equal(normalizeLoopRepairSpec(SPEC).daily_spurious_cap, null);
+  assert.equal(normalizeLoopRepairSpec({ ...SPEC, daily_spurious_cap: 7 }).daily_spurious_cap, 7);
+  for (const bad of [0, -1, 6.5, "7"]) {
+    assert.throws(
+      () => normalizeLoopRepairSpec({ ...SPEC, daily_spurious_cap: bad }),
+      /daily_spurious_cap to be a positive integer/,
+    );
+  }
+});
+
+test("computeDaySpuriousEstimates bounds each day at daily_spurious_cap", () => {
+  const series = extractTargetSeries(buildSnapshots(), TARGET);
+  const days = computeDaySpuriousEstimates(series, { ...SPEC, daily_spurious_cap: 30 }, TARGET, BASELINE_ONLY);
+  // Excess 80/day over the 20/day allowance; the cap keeps 50/day credited as organic.
+  assert.deepEqual(days.map((day) => day.spurious), [30, 30]);
+  assert.deepEqual(days.map((day) => day.organicAllowance), [20, 20]);
+});
+
+test("computeAdoptionDaySpuriousEstimates bounds each day at the cap", () => {
+  const snapshots = buildAdoptionSnapshots();
+  const curve = computeAdoptionFractionCurve(snapshots, [ADOPTION_PEER]);
+  const series = extractTargetSeries(snapshots, {
+    listing_type: "map",
+    listing_id: "target-y",
+    version: "2.0.0",
+  });
+  // Uncapped excess 27, 15, 6 (see the uncapped test above).
+  const days = computeAdoptionDaySpuriousEstimates(series, ADOPTION_TARGET, curve, 50, null, 10);
+  assert.deepEqual(days.map((day) => day.spurious), [10, 10, 6]);
+});
+
+test("computeSnapshotClampPlan credits excess beyond the cap as organic growth", () => {
+  const series = extractTargetSeries(buildSnapshots(), TARGET);
+  const days = computeDaySpuriousEstimates(series, { ...SPEC, daily_spurious_cap: 30 }, TARGET, BASELINE_ONLY);
+  // Anchor 1120; organic growth = rawDelta − capped spurious = 100 − 30 = 70/day.
+  assert.deepEqual(computeSnapshotClampPlan(series, SPEC_WINDOW, days), [
+    { dateKey: "2026-08-07", correctedValue: 1190 },
+    { dateKey: "2026-08-08", correctedValue: 1260 },
+  ]);
+});
+
+test("normalizeLoopRepairSpec validates a per-target adoption incident_end", () => {
+  const withEnd = (incidentEnd: string) => ({
+    ...SPEC,
+    adoption_targets: [{ ...ADOPTION_TARGET, incident_end: incidentEnd }],
+    adoption_peers: [ADOPTION_PEER],
+  });
+  assert.equal(normalizeLoopRepairSpec(withEnd("2026-08-07")).adoption_targets![0]!.incident_end, "2026-08-07");
+  assert.throws(() => normalizeLoopRepairSpec(withEnd("2026-08-05")), /incident_end must not be before/);
+  const withoutEnd = normalizeLoopRepairSpec({ ...SPEC, adoption_targets: [ADOPTION_TARGET], adoption_peers: [ADOPTION_PEER] });
+  assert.equal(withoutEnd.adoption_targets![0]!.incident_end, undefined);
+});
+
 test("normalizeLoopRepairSpec requires adoption_peers when adoption_targets is set", () => {
   assert.throws(
     () => normalizeLoopRepairSpec({ ...SPEC, adoption_targets: [ADOPTION_TARGET] }),
@@ -330,4 +415,169 @@ test("normalizeLoopRepairSpec requires adoption_peers when adoption_targets is s
   });
   assert.equal(normalized.adoption_targets!.length, 1);
   assert.equal(normalized.adoption_peers![0]!.release_start, "2026-08-05");
+});
+
+// --- Rider (loop-clock) model ---
+
+const RIDER: LoopRepairRiderTarget = {
+  listing_type: "map",
+  listing_id: "paris-ile-de-france",
+  version: "v1.0.0",
+  start: "2026-08-07",
+  end: null,
+  per_cycle: 0.95,
+};
+
+test("normalizeLoopRepairSpec validates rider targets and requires a rider loop", () => {
+  const withRiders = { ...SPEC, targets: [], rider_loop: { core: [{ listing_type: "map", listing_id: "core-a" }] }, rider_targets: [RIDER] };
+  const normalized = normalizeLoopRepairSpec(withRiders);
+  assert.equal(normalized.rider_targets![0]!.per_cycle, 0.95);
+  assert.equal(normalized.rider_loop!.core[0]!.listing_id, "core-a");
+  assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_loop: undefined }), /rider_targets requires spec.rider_loop/);
+  assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, per_cycle: 0 }] }), /per_cycle/);
+  assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, end: "2026-08-01" }] }), /end must not be before/);
+  const retired = normalizeLoopRepairSpec({
+    ...withRiders,
+    rider_targets: [{ ...RIDER, asset_source: { repo: "ahkimn/subwaybuilder-jp-maps", tag: "0.4.10", asset_name: "AKJ.zip" } }],
+  });
+  assert.equal(retired.rider_targets![0]!.asset_source!.tag, "0.4.10");
+  assert.throws(
+    () => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, asset_source: { repo: "x", tag: "" } }] }),
+    /asset_source.tag/,
+  );
+  const wildcard = normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, version: "*", versions_from: "2026-10-18" }] });
+  assert.equal(wildcard.rider_targets![0]!.versions_from, "2026-10-18");
+  assert.throws(() => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, version: "*" }] }), /versions_from is required/);
+  assert.throws(
+    () => normalizeLoopRepairSpec({ ...withRiders, rider_targets: [{ ...RIDER, versions_from: "2026-10-18" }] }),
+    /versions_from is required with version "\*" and only allowed with it/,
+  );
+  assert.throws(
+    () => normalizeLoopRepairSpec({
+      ...withRiders,
+      rider_targets: [{ ...RIDER, version: "*", versions_from: "2026-10-18", asset_source: { repo: "x", tag: "y", asset_name: "z" } }],
+    }),
+    /cannot be combined/,
+  );
+});
+
+test("expandRiderTargets expands version \"*\" to each version first seen since versions_from", () => {
+  const snap = (dateKey: string, versions: Record<string, number>, field: "raw_downloads" | "downloads" = "raw_downloads") =>
+    ({ dateKey, data: { mods: { [field]: { "trains": versions } } } });
+  const snapshots = [
+    snap("2026-10-17", { "v4.2.1": 100 }),
+    snap("2026-10-18", { "v4.2.1": 103, "v4.3.0": 3 }),
+    snap("2026-10-19", { "v4.2.1": 105, "v4.3.0": 14, "v5.0.0": 19 }),
+    // A schema without raw_downloads still counts as seen.
+    snap("2026-10-21", { "v4.2.1": 105, "v4.3.0": 20, "v5.0.0": 40, "v5.0.1": 15 }, "downloads"),
+  ];
+  const explicit: LoopRepairRiderTarget = { listing_type: "mod", listing_id: "trains", version: "v4.2.1", start: "2026-09-25", end: "2026-10-04", per_cycle: 0.9 };
+  const wildcard: LoopRepairRiderTarget = { ...explicit, version: "*", versions_from: "2026-10-18", start: "2026-10-19", end: null };
+  const expanded = expandRiderTargets([explicit, wildcard], snapshots);
+  assert.deepEqual(expanded.map((rider) => [rider.version, rider.start, rider.end]), [
+    ["v4.2.1", "2026-09-25", "2026-10-04"],
+    // v4.3.0 was first seen before the rider's start: it starts at `start`.
+    ["v4.3.0", "2026-10-19", null],
+    ["v5.0.0", "2026-10-19", null],
+    ["v5.0.1", "2026-10-21", null],
+  ]);
+  assert.ok(expanded.every((rider) => !("versions_from" in rider)));
+  // Delta ids match an explicit entry for the same version.
+  assert.equal(
+    loopRepairDeltaId("inc", { listing_type: "mod", listing_id: "trains", version: expanded[3]!.version }, "2026-10-21"),
+    "manual-loop-repair:inc:trains@v5.0.1:2026-10-21",
+  );
+  // A closed wildcard drops versions first seen after its end.
+  const closed = expandRiderTargets([{ ...wildcard, end: "2026-10-20" }], snapshots);
+  assert.deepEqual(closed.map((rider) => rider.version), ["v4.3.0", "v5.0.0"]);
+});
+
+test("countSlotsBySnapshotDay assigns hours at/after the 04:00Z cutoff to the next snapshot", () => {
+  const slots = countSlotsBySnapshotDay(["2026-08-07T03:00Z", "2026-08-07T04:00Z", "2026-08-07T23:00Z", "2026-08-08T02:00Z"]);
+  assert.deepEqual([...slots.entries()].sort(), [["2026-08-07", 1], ["2026-08-08", 3]]);
+});
+
+test("computeRiderDaySpuriousEstimates floors per_cycle × slots and caps at raw growth", () => {
+  const series = extractTargetSeries(buildSnapshots(), TARGET);
+  const slots = new Map([["2026-08-07", 6], ["2026-08-08", 200]]);
+  const days = computeRiderDaySpuriousEstimates(series, RIDER, slots, null);
+  // Aug 7: floor(0.95 × 6) = 5; Aug 8: floor(0.95 × 200) = 190, capped at the raw delta 100.
+  assert.deepEqual(days.map((day) => [day.dateKey, day.spurious]), [["2026-08-07", 5], ["2026-08-08", 100]]);
+  // A closed window stops attributing.
+  const closed = computeRiderDaySpuriousEstimates(series, { ...RIDER, end: "2026-08-07" }, slots, null);
+  assert.deepEqual(closed.map((day) => day.dateKey), ["2026-08-07"]);
+  // No slots that day, nothing attributed.
+  assert.equal(computeRiderDaySpuriousEstimates(series, RIDER, new Map(), null)[0]!.spurious, 0);
+});
+
+
+test("computeLedgerBound subtracts the target's own deltas a snapshot had not counted yet", () => {
+  const target = { listing_type: "map" as const, listing_id: "shenzhen", version: "1.2.0" };
+  const snap = (dateKey: string, generatedAt: string, raw: number, attributed: number) => ({
+    dateKey,
+    data: {
+      generated_at: generatedAt,
+      maps: {
+        downloads: { shenzhen: { "1.2.0": raw - attributed } },
+        raw_downloads: { shenzhen: { "1.2.0": raw } },
+        attributed_downloads: { shenzhen: { "1.2.0": attributed } },
+      },
+    },
+  });
+  // 385 of an earlier incident's attribution already recorded; this target's own
+  // deltas (2 + 3) were applied on 10-25 at 23:12.
+  const snapshots = [
+    snap("2026-08-01", "2026-08-01T04:05:00Z", 900, 385),
+    snap("2026-08-02", "2026-08-02T04:05:00Z", 910, 385),
+    snap("2026-10-26", "2026-10-26T04:05:00Z", 954, 390),
+  ];
+  const own = [
+    { dateKey: "2026-08-01", amount: 2, appliedAt: "2026-10-25T23:12:00Z" },
+    { dateKey: "2026-08-02", amount: 3, appliedAt: "2026-10-25T23:12:00Z" },
+  ];
+  const bound = computeLedgerBound(snapshots, target, own);
+  // Generated before the deltas existed: all own deltas up to that day are missing.
+  assert.equal(bound.get("2026-08-01"), 900 - 385 - 2);
+  assert.equal(bound.get("2026-08-02"), 910 - 385 - 5);
+  // Generated after: its attribution already counts them.
+  assert.equal(bound.get("2026-10-26"), 954 - 390);
+  // A delta this run is adding (appliedAt null) is missing everywhere.
+  assert.equal(computeLedgerBound(snapshots, target, [{ dateKey: "2026-08-02", amount: 3, appliedAt: null }]).get("2026-10-26"), 954 - 390 - 3);
+  // Same-day deltas are stamped after the snapshot's cutoff, so never counted there.
+  assert.equal(computeLedgerBound([snap("2026-08-02", "2026-10-26T04:05:00Z", 910, 388)], target, own).get("2026-08-02"), 910 - 388 - 3);
+  // Without raw/attribution/generated_at the day stays unbounded.
+  assert.equal(computeLedgerBound([{ dateKey: "2026-08-01", data: { maps: { downloads: { shenzhen: { "1.2.0": 5 } } } } }], target, own).size, 0);
+});
+
+test("computeSnapshotClampPlan applies the ledger bound under the trajectory", () => {
+  const series = [
+    { dateKey: "2026-07-25", raw: 500, adjusted: 115 },
+    { dateKey: "2026-07-26", raw: 510, adjusted: 125 },
+    { dateKey: "2026-07-27", raw: 520, adjusted: 135 },
+  ];
+  const days = [
+    { dateKey: "2026-07-26", rawDelta: 10, organicAllowance: 7, spurious: 3 },
+    { dateKey: "2026-07-27", rawDelta: 10, organicAllowance: 7, spurious: 3 },
+  ];
+  // The trajectory (115 + 7 + 7) misses nothing here, but the recorded values sit
+  // above it only by the target's own deltas once the bound is applied.
+  const plain = computeSnapshotClampPlan(series, { start: "2026-07-26", end: null }, days);
+  assert.deepEqual(plain.map((entry) => entry.correctedValue), [122, 129]);
+  const bounded = computeSnapshotClampPlan(series, { start: "2026-07-26", end: null }, days, new Map([["2026-07-26", 120], ["2026-07-27", 140]]));
+  assert.deepEqual(bounded.map((entry) => entry.correctedValue), [120, 129]);
+});
+
+test("gateOnLoopSlots zeroes estimates on days the loop clock never fired", () => {
+  const days = [
+    { dateKey: "2026-09-01", rawDelta: 9, organicAllowance: 2, spurious: 7 },
+    { dateKey: "2026-10-26", rawDelta: 9, organicAllowance: 2, spurious: 7 },
+    { dateKey: "2026-10-27", rawDelta: 3, organicAllowance: 1, spurious: 2 },
+    { dateKey: "2026-10-28", rawDelta: 1, organicAllowance: 1, spurious: 0 },
+  ];
+  const slots = new Map([["2026-10-26", 5]]);
+  const { days: gated, silentDays } = gateOnLoopSlots(days, slots, "2026-09-08");
+  // Before the clock (no hourly data) and loop days pass through; a silent day books nothing.
+  assert.deepEqual(gated.map((day) => day.spurious), [7, 7, 0, 0]);
+  assert.equal(gated[2]!.organicAllowance, 3);
+  assert.deepEqual(silentDays, ["2026-10-27"]);
 });

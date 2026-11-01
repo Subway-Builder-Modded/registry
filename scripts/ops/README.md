@@ -1,6 +1,19 @@
 # scripts/ops
 
-Manual operational tooling — nothing here runs in scheduled automation.
+Manual operational tooling — nothing here runs in scheduled automation, with one
+exception: the daily metronome-guard workflow re-applies every open
+`history/loop-repair-specs/` spec that opts in with `"auto_apply": true` through
+`repair-loop-inflated-downloads.ts`, then reports listings riding a known loop
+that no spec targets (`scripts/downloads/detect-metronome.ts`), plus open rider
+targets (no `end`) whose last-7-day excess fell below 40% of their `per_cycle` —
+set `end` on those once confirmed, or they keep being attributed. It also
+reports a known loop gone silent — `paused` after 48 h without a loop hour,
+`stopped` after 7 days (close the spec then) — and, for a frozen loop (all
+targets deprecated), whether its targets' live release counters still grow.
+In a spec with a loop clock (`rider_loop`), nothing is attributed for a
+snapshot day on which the loop never fired. Opt a spec in only once its model
+is vetted and its targets are live (not deprecated).
+
 Invoke via the package scripts in `scripts/package.json` (names unchanged from
 when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-history`.
 
@@ -21,10 +34,29 @@ when these lived at the top level), e.g. `pnpm --dir scripts run audit-download-
   `history/loop-repair-specs/`; like manual-attribution specs, **re-apply after any
   attribution-ledger rebuild**. See KNOWN_INCIDENTS.md 2026-08 French-city entry.
   If a repair target has an entry in `maps|mods/grandfathered-downloads.json`,
-  **lower that entry too**: the deprecate/delete freeze takes the max of
+  that entry must be lowered too (the engine now does this by the amount it
+  attributes): the deprecate/delete freeze takes the max of
   ledger, committed, and existing grandfathered values, so a stale high
   grandfathered count silently resurrects the inflated total if the listing is
   later deprecated or deleted (or otherwise leaves pipeline output).
+  Spec knobs: `daily_spurious_cap` bounds attribution per target per day at
+  the measured loop rate; adoption targets accept a target-level
+  `incident_end` (the loop moved off that version) and
+  `install_base: "adjusted"` (prior versions were themselves loop-inflated);
+  `rider_targets` (with `rider_loop.core`) correct listings riding a known
+  loop on the loop's own clock — per_cycle × the core's lockstep hours per
+  snapshot day from the hourly series, capped by the version's raw growth.
+  A rider target may name a retired version's release asset (`asset_source`),
+  or use `version: "*"` with `versions_from` to cover every version first seen
+  since that date (a client that re-fetches every version it has seen).
+  Every snapshot clamp is also bounded by the ledger-consistent value (raw −
+  recorded attribution − the target's deltas that snapshot had not yet
+  counted), so other attribution inside a window is respected.
+  A target with a `grandfathered-downloads.json` entry has it lowered by what
+  the run attributed.
+  **Never cap or trim attribution by editing the ledger directly** — its
+  `daily`, `assets` and `timeline` views must move together, and snapshots
+  read `timeline` (see KNOWN_INCIDENTS.md metronome v2 entry).
 - `backfill-charleston-snapshot-clamp.ts` — one-shot snapshot re-interpolation
   for the charleston-huntington-wv faulty-client inflation (KNOWN_INCIDENTS.md,
   2026-07 entry). Retained because **any snapshot rebuild from git
