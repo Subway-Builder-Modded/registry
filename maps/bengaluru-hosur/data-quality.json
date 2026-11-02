@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "bengaluru-hosur",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "mesh_250",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "synthetic_measured_marginals",
+    "od_granularity": null
+  },
+  "notes": "Bengaluru + Hosur (BLR) Pipeline Methodology\n\nStudy Area & Extent: Spans Karnataka and Tamil Nadu from Hosur and SIPCOT Industrial Area (SE) across the Bengaluru urban core to Kempegowda International Airport (N). BBox: [12.70, 77.40, 13.25, 77.90].\n\nResidence Data: Built using the WorldPop 2020 UN-Adjusted 1 km India gridded population raster aggregated into a 1,000 m demand grid (3,375 active demand points, 13.98M population). Cross-checked against BBMP's 243 ward populations (9.69M core, 4.29M BMRDA + Hosur peri-urban), within +2.79% of regional census projections.\n\nWorkplace & Employment Synthesis: Total jobs normalized 1:1 to total residents (13.98M jobs) following built-in game city conventions (DET, PAR, TOK). Jobs were synthesized using 831,116 OpenStreetMap building footprints weighted by floor area and category (office: 0.08, commercial: 0.05, retail: 0.04, industrial: 0.03, institutional: 0.03 jobs/m²), multi-cell landuse polygons (ITPL, Electronic City, Peenya, IISc), airports (KIA, HAL, Yelahanka), and POIs.\n\nRoad Network & Commute Modeling: Directed car routing graph extracted from OSM highways and condensed via Giant Strongly Connected Component (SCC). Shortest-path matrices (3,375 × 3,375) were computed with a 1.8x congestion factor. Commuter groups (82,970 pops) were generated via a calibrated doubly-constrained gravity model (beta = 0.140), matching Bengaluru Comprehensive Mobility Plan (CMP) travel survey benchmarks: mean distance 12.46 km (target: 8.0–14.0 km) and mean duration 27.7 min (target: 25.0–45.0 min).\n\nGame Assets: Map tiles encoded in PMTiles v3 (zooms 5..15). 3D building collision and foundation depths encoded in the game's native SBIB v1 binary spatial index format.",
+  "sources": [
+    "https://data.worldpop.org/GIS/Population/Global_2000_2020_1km_UNadj/2020/IND/ind_ppp_2020_1km_Aggregated_UNadj.tif",
+    "https://download.geofabrik.de/asia/india/southern-zone-latest.osm.pbf",
+    "https://raw.githubusercontent.com/datameet/Municipal_Spatial_Data/master/Bangalore/BBMP.geojson",
+    "https://github.com/Vadapao26/subway-builder-blr"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "Vadapao26",
+    "reviewed_by": null,
+    "date": "2026-10-31"
+  }
+}
