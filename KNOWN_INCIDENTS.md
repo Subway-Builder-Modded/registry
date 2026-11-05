@@ -6,7 +6,7 @@ interpreting download counts and analytics. Append new incidents at the top.
 
 ---
 
-## 2026-09-06 → ongoing — Metronome v2: UA cohort follows the eu-maps update manifest (22 listings) + two holdouts (OPEN; corrections re-applied on cadence)
+## 2026-09-06 → 2026-10-29 — Metronome v2: UA cohort follows the eu-maps update manifest (22 listings) + two holdouts (UA spec closed 2026-11-05; holdouts still fetched, frozen)
 
 **What happened:** the metronome re-fetcher (v1 entry below) resumed on
 2026-09-06, the eu-maps 0.7.3 release day, against the seven pre-existing UA
@@ -123,6 +123,17 @@ ledger directly.
   hour), notifies `paused:` after 48 h and `stopped:` after 7 days, and
   watches the holdouts' live release counters. If `stopped:` fires, set
   `incident_end` to the last loop day (2026-10-26) and `end` on open riders.
+- 2026-11-05 — **UA spec closed**: `incident_end` 2026-10-29 and `end`
+  2026-10-29 on the eight open riders. The loop fired once more after 10-25,
+  at 2026-10-28T16:00Z on the seven originals only (none of the fifteen 0.1.1
+  listings, so possibly one person installing the seven big cities), booked
+  +6 on snapshot day 10-29 (#14121), then nothing; the guard reported
+  `stopped:` on 11-05. UA cohort 143–271/day before 10-26, 1–15/day since.
+  Re-applying the closed spec changes nothing (+0, no snapshot clamped). The
+  guard no longer re-applies it, reports it `closed` until 10-29 leaves its
+  window, and raises `resumed:` on a lockstep hour after the close. Holdouts
+  still fetched ~3/day each on the live counters (JER.zip 571, LAS.zip 955;
+  frozen, not counted), so they stay deprecated.
 
 **Riders:** the client also re-fetches listings outside the UA packs.
 detect-metronome flags any listing tracking the loop's hours beyond its own
@@ -168,7 +179,10 @@ slots for a week; there is no registry-side kill-switch for healthy listings
 whose updates come from the author's manifest. The UA spec is opted into the daily
 metronome guard (`auto_apply: true`; metronome-guard workflow), which re-applies
 it and reports listings riding the loop that it does not target. The holdouts
-spec is not: its targets are deprecated and grandfathered.
+spec is not: its targets are deprecated and grandfathered. Once a spec's
+`incident_end` has passed the guard stops re-applying it; if the client comes
+back (`resumed:` on the watch issue), move `incident_end` and the riders'
+`end` to reopen it.
 
 ---
 
