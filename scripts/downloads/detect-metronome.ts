@@ -7,6 +7,7 @@ import { isObject } from "../lib/json-utils.js";
 import {
   classifyLoopSilence,
   detectLockstepCohorts,
+  lockstepHoursAfter,
   measureLocalExcess,
   trackKnownLoop,
   updateCounterWatch,
@@ -35,6 +36,9 @@ import { appendGitHubOutput, resolveRepoRoot, runAndExitOnError } from "../lib/s
 //     judged by its targets' live GitHub release counters instead, compared
 //     with the counters the previous run saw (--previous-state, kept by the
 //     workflow in the metronome-watch issue).
+//   Closed — a spec stays listed until its incident_end leaves the window, but
+//     attributes nothing after the close, so it gets no silence stages; a
+//     lockstep hour after incident_end flags "resumed:<incident>" instead.
 //   Candidates — lockstep cohorts discovered from scratch that share no
 //     listing with an open spec. Long pack-release waves can qualify, so each
 //     is annotated with how many members released a version in the window.
@@ -57,6 +61,8 @@ interface OpenSpec {
   path: string;
   incident: string;
   autoApply: boolean;
+  // Last loop day of a closed spec (inclusive); null while the spec is open.
+  incidentEnd: string | null;
   // "map:listing-id" → versions targeted for the current window (riders too).
   versionsByListing: Map<string, Set<string>>;
   // The listings whose shared hours define the loop: rider_loop.core when the
@@ -125,6 +131,7 @@ function loadOpenSpecs(repoRoot: string, windowStart: string): OpenSpec[] {
       path: `${SPEC_DIR}/${fileName}`,
       incident: typeof raw.incident === "string" ? raw.incident : fileName,
       autoApply: raw.auto_apply === true,
+      incidentEnd,
       versionsByListing,
       coreKeys: riderCore.length > 0 ? riderCore : [...versionsByListing.keys()].filter((key) => !riderKeys.has(key)),
       openRiders,
@@ -294,15 +301,24 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
     const riderChecks = cohort.classification === "metronome"
       ? checkOpenRiders(spec, series, hours, tracked.lockstepHours, endDate)
       : [];
+    // Closed before the window end (as --list-auto-apply reads it): no longer
+    // re-applied, and nothing attributed after the close.
+    const closed = spec.incidentEnd !== null && spec.incidentEnd < endDate;
+    const resumedHours = closed ? lockstepHoursAfter(tracked.lockstepHours, spec.incidentEnd!) : [];
+    const state = closed
+      ? (resumedHours.length > 0 ? "resumed" as const : "closed" as const)
+      : cohort.classification === "metronome" ? "looping" as const : frozen ? "frozen" as const : "quiet" as const;
     return {
       // Frozen loops are judged by their live counters (attachCounterWatch).
-      silence: frozen ? null : classifyLoopSilence(tracked.lockstepHours, windowEndMs),
+      silence: frozen || closed ? null : classifyLoopSilence(tracked.lockstepHours, windowEndMs),
       counterWatch: null as CounterWatchReport | null,
       targets: [...spec.versionsByListing].flatMap(([key, versions]) => [...versions].map((version) => ({ key, version }))),
       spec: spec.path,
       incident: spec.incident,
-      autoApply: spec.autoApply,
-      state: cohort.classification === "metronome" ? "looping" as const : frozen ? "frozen" as const : "quiet" as const,
+      autoApply: spec.autoApply && !closed,
+      incidentEnd: spec.incidentEnd,
+      resumedHours,
+      state,
       ...cohort,
       flagged: flagged.map((member) => member.key),
       riderChecks,
@@ -327,6 +343,8 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
     staleRiders,
     // "paused:<incident>" / "stopped:<incident>" — filled by finalizeSilence.
     silenced: [] as string[],
+    // "resumed:<incident>" — a closed spec's loop came back.
+    resumed: knownLoops.filter((loop) => loop.state === "resumed").map((loop) => `resumed:${loop.incident}`).sort(),
     state: { counters: {} as Record<string, CounterWatchState> },
   };
 }
@@ -456,9 +474,11 @@ function renderMarkdown(report: Report): string {
       looping: "",
       quiet: " If it stays quiet, consider setting `incident_end`.",
       frozen: " Every target is deprecated, so its counts are frozen and the hourly series cannot see the loop; check the live GitHub counters before closing.",
+      closed: ` Closed at \`incident_end\` ${loop.incidentEnd}: nothing is attributed after it, and the spec leaves this report once that day is out of the window.`,
+      resumed: ` **The client is back:** ${loop.resumedHours.length} lockstep hour(s) after \`incident_end\` ${loop.incidentEnd} (first \`${loop.resumedHours[0]}\`). A closed spec attributes nothing after its close; reopen it (move \`incident_end\` and the riders' \`end\`) to correct the new days.`,
     }[loop.state];
     lines.push(
-      `### \`${loop.incident}\` — ${{ looping: "still looping", quiet: "quiet", frozen: "frozen (all targets deprecated)" }[loop.state]}${loop.autoApply ? " (auto-applied daily)" : ""}`,
+      `### \`${loop.incident}\` — ${{ looping: "still looping", quiet: "quiet", frozen: "frozen (all targets deprecated)", closed: "closed", resumed: "resumed after its close" }[loop.state]}${loop.autoApply ? " (auto-applied daily)" : ""}`,
       "",
       `Lockstep hours per day: \`${loop.dailyLockstepHours.join(" ")}\` — ${loop.reason}.${stateNote}`,
       "",
@@ -562,10 +582,12 @@ async function run(): Promise<void> {
   for (const key of report.flagged) console.log(`  flagged: ${key}`);
   for (const target of report.staleRiders) console.log(`  stale rider: ${target}`);
   for (const key of report.silenced) console.log(`  silent: ${key}`);
+  for (const key of report.resumed) console.log(`  resumed: ${key}`);
   appendGitHubOutput([
     `flagged_count=${report.flagged.length}`,
     `stale_rider_count=${report.staleRiders.length}`,
     `silenced_count=${report.silenced.length}`,
+    `resumed_count=${report.resumed.length}`,
     `report_dir=${outDir}`,
   ]);
 }

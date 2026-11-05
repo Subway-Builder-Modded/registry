@@ -428,6 +428,15 @@ export function classifyLoopSilence(
   return { lastLockstepHour: last, silentHours, silence: silenceFor(silentHours) };
 }
 
+// Lockstep hours booked after a closed spec's incident_end. Snapshot D covers
+// the day ending at D's 04:00Z cutoff, so those are the hours from incident_end
+// 04:00Z on. The engine attributes nothing after the close, so any such hour
+// means the client is back.
+export function lockstepHoursAfter(lockstepHours: string[], incidentEnd: string): string[] {
+  const closeMs = Date.parse(`${incidentEnd}T04:00:00Z`);
+  return lockstepHours.filter((hour) => Date.parse(hour.replace("Z", ":00Z")) >= closeMs).sort();
+}
+
 // Deprecated targets (the holdouts) are frozen out of the hourly series, so a
 // loop that keeps fetching them shows only on the live release counters. The
 // guard keeps the last counters it saw; any growth means the client is still
