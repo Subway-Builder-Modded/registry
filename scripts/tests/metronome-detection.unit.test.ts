@@ -5,6 +5,7 @@ import {
   classifyLoopSilence,
   updateCounterWatch,
   detectLockstepCohorts,
+  lockstepHoursAfter,
   measureLocalExcess,
   trackKnownLoop,
   windowHours,
@@ -157,6 +158,13 @@ test("classifyLoopSilence: running, paused after 48 h, stopped after a week or w
   assert.equal(classifyLoopSilence(["2026-10-24T23:00Z"], end).silentHours, 48);
   assert.equal(classifyLoopSilence(["2026-10-19T23:00Z"], end).silence, "stopped");
   assert.deepEqual(classifyLoopSilence([], end), { lastLockstepHour: null, silentHours: null, silence: "stopped" });
+});
+
+test("lockstepHoursAfter keeps only hours booked after a closed spec's last day", () => {
+  // incident_end 2026-10-29: snapshot 10-29 covers 10-28 04:00Z → 10-29 04:00Z.
+  const hours = ["2026-10-29T05:00Z", "2026-10-28T16:00Z", "2026-10-29T03:00Z", "2026-10-29T04:00Z"];
+  assert.deepEqual(lockstepHoursAfter(hours, "2026-10-29"), ["2026-10-29T04:00Z", "2026-10-29T05:00Z"]);
+  assert.deepEqual(lockstepHoursAfter(["2026-10-28T16:00Z"], "2026-10-29"), []);
 });
 
 test("updateCounterWatch tracks growth across runs and ages silence only when counters were read", () => {
