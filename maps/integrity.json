@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-06T00:01:21.334Z",
+  "generated_at": "2026-11-06T05:58:22.349Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -4293,6 +4293,74 @@
           "fingerprint": "rules:v6:github:lexenygma/sb-brussels:v1.0.0:BRU.zip",
           "checked_at": "2026-08-01T10:12:05.258Z",
           "released_at": "2026-07-06T19:11:37.000Z"
+        }
+      }
+    },
+    "bucharest-ilfov": {
+      "has_complete_version": true,
+      "latest_semver_version": "v0.1.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "v0.1.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1793896655,
+      "versions": {
+        "v0.1.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "demand_pop_size": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json.gz",
+            "demand_point_spacing": "demand_data.json.gz",
+            "demand_phantom_points": "demand_data.json.gz",
+            "demand_residents_match": "demand_data.json.gz",
+            "demand_pop_size": "demand_data.json.gz",
+            "buildings_index": "buildings_index.bin.gz",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson.gz",
+            "runways_taxiways_geojson": "runways_taxiways.geojson.gz",
+            "city_pmtiles": "BUH.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 57.49,
+          "file_sizes": {
+            ".railyard_map/special_demand_points.json": 0.13,
+            ".railyard_map/special_demand_types.json": 0.03,
+            "BUH.pmtiles": 29.43,
+            "buildings_index.bin.gz": 22.3,
+            "config.json": 0,
+            "demand_data.json.gz": 3.08,
+            "ocean_depth_index.json.gz": 1.01,
+            "ocean_depth_index_contours.json.gz": 0.78,
+            "roads.geojson.gz": 2.22,
+            "runways_taxiways.geojson.gz": 0.06
+          },
+          "game_version": "<=1.7.2",
+          "source": {
+            "update_type": "github",
+            "repo": "naealexandru95-del/sb-bucharest-ilfov",
+            "tag": "v0.1.0",
+            "asset_name": "BUH-0.1.0.zip",
+            "download_url": "https://github.com/naealexandru95-del/sb-bucharest-ilfov/releases/download/v0.1.0/BUH-0.1.0.zip"
+          },
+          "fingerprint": "rules:v6:github:naealexandru95-del/sb-bucharest-ilfov:v0.1.0:BUH-0.1.0.zip",
+          "checked_at": "2026-11-06T05:58:22.349Z",
+          "released_at": "2026-11-05T16:37:35.000Z"
         }
       }
     },
@@ -17295,6 +17363,70 @@
           "fingerprint": "rules:v6:sha256:a5d12a33a0394c3167f249828010762b1fdd67717a9aeec1c02f3aadaf62537c",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-06-01T00:00:00.000Z"
+        }
+      }
+    },
+    "lima-callao": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1792796049,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "demand_pop_size": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "demand_pop_size": "demand_data.json",
+            "buildings_index": "buildings_index.bin",
+            "buildings_index_json": null,
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "LMC.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 190.17,
+          "file_sizes": {
+            "LMC.pmtiles": 55.15,
+            "buildings_index.bin": 270.1,
+            "config.json": 0,
+            "demand_data.json": 35.52,
+            "roads.geojson": 29.55,
+            "runways_taxiways.geojson": 0
+          },
+          "game_version": ">=1.7.0",
+          "source": {
+            "update_type": "github",
+            "repo": "drakersan1/sb-lima",
+            "tag": "1.0.0",
+            "asset_name": "lima-callao.zip",
+            "download_url": "https://github.com/drakersan1/sb-lima/releases/download/1.0.0/lima-callao.zip"
+          },
+          "fingerprint": "rules:v6:github:drakersan1/sb-lima:1.0.0:lima-callao.zip",
+          "checked_at": "2026-11-06T05:58:22.349Z",
+          "released_at": "2026-10-23T22:54:09.000Z"
         }
       }
     },
