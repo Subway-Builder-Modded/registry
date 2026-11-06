@@ -4,7 +4,13 @@ import type { ManifestType } from "./manifests.js";
 import type { CompiledSecurityRule, SecurityIssue } from "./mod-security.js";
 import { scanZipForSecurityIssues } from "./mod-security.js";
 import { isObject, toFiniteNumber, bytesToMebibytesRounded, getDemandPointRef } from "./json-utils.js";
-import { parseDemandDataPayload, parseDemandGridData } from "./map-demand-stats/extraction.js";
+import {
+  findOversizedPops,
+  formatOversizedPopExamples,
+  parseDemandDataPayload,
+  parseDemandGridData,
+} from "./map-demand-stats/extraction.js";
+import { EARTH_RADIUS_KM, ISOLATED_MAP_POINT_DISTANCE_KM, MAX_POP_SIZE } from "./map-constants.js";
 
 
 export interface IntegritySource {
@@ -154,9 +160,6 @@ interface DemandPointCoordinate {
   id: string;
   location: [number, number];
 }
-
-const ISOLATED_MAP_POINT_DISTANCE_KM = 100;
-const EARTH_RADIUS_KM = 6371.0088;
 
 function listTopLevelFileNames(zip: JSZip): Set<string> {
   const names = new Set<string>();
@@ -485,6 +488,22 @@ async function inspectMapZip(
         requiredChecks.demand_residents_match = false;
         matchedFiles.demand_residents_match = demandData;
         errors.push(`demand_data residents-match check failed: ${(error as Error).message}`);
+      }
+
+      // Pop size: no pop may be larger than a Light Rail train can board
+      try {
+        const oversizedPops = findOversizedPops(demandPayload);
+        requiredChecks.demand_pop_size = oversizedPops.length === 0;
+        matchedFiles.demand_pop_size = demandData;
+        if (oversizedPops.length > 0) {
+          errors.push(
+            `demand_data contains ${oversizedPops.length} pop(s) larger than ${MAX_POP_SIZE} (e.g. ${formatOversizedPopExamples(oversizedPops)})`,
+          );
+        }
+      } catch (error) {
+        requiredChecks.demand_pop_size = false;
+        matchedFiles.demand_pop_size = demandData;
+        errors.push(`demand_data pop-size check failed: ${(error as Error).message}`);
       }
     }
   }

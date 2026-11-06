@@ -2,6 +2,7 @@ import { gunzipSync } from "node:zlib";
 import JSZip from "jszip";
 import type { FeatureCollection, GeoJsonProperties, Polygon } from "geojson";
 import { generateGrid, type DemandData } from "../map-analytics-grid.js";
+import { MAX_POP_SIZE, RECOMMENDED_MAX_POP_SIZE } from "../map-constants.js";
 import {
   getDemandPointRef,
   isObject,
@@ -127,6 +128,43 @@ export function parseDemandDataPayload(payload: unknown): ParsedDemandDataPayloa
     residentsTotalByPoint,
     residentsTotalByPop,
   };
+}
+
+// findOversizedPops lists the population entries larger than maxSize, largest
+// first. It reads the same collection parseDemandDataPayload sums (pops_map, or
+// legacy pops), so both checks agree on which entries are pops.
+export function findOversizedPops(
+  payload: unknown,
+  maxSize: number = MAX_POP_SIZE,
+): Array<{ id: string; size: number }> {
+  if (!isObject(payload)) {
+    throw new Error("demand data payload must be an object");
+  }
+
+  const popsMap = (isObject(payload.pops_map) || Array.isArray(payload.pops_map))
+    ? payload.pops_map
+    : payload.pops;
+  if (!isObject(popsMap) && !Array.isArray(popsMap)) {
+    throw new Error("demand data missing collection field 'pops_map' (or legacy 'pops')");
+  }
+
+  const oversized: Array<{ id: string; size: number }> = [];
+  const popEntries = Array.isArray(popsMap)
+    ? popsMap.map((popValue, index) => [String(index), popValue] as const)
+    : Object.entries(popsMap);
+  for (const [popKey, popValue] of popEntries) {
+    if (!isObject(popValue)) continue;
+    if (typeof popValue.size !== "number" || !Number.isFinite(popValue.size)) continue;
+    if (popValue.size > maxSize) {
+      oversized.push({ id: getDemandPointRef(popValue, popKey), size: popValue.size });
+    }
+  }
+  return oversized.sort((a, b) => b.size - a.size);
+}
+
+export function formatOversizedPopExamples(oversized: Array<{ id: string; size: number }>): string {
+  const examples = oversized.slice(0, 3).map((pop) => `${pop.id}=${pop.size}`).join(", ");
+  return oversized.length > 3 ? `${examples} (+${oversized.length - 3} more)` : examples;
 }
 
 export function parseDemandGridData(payload: unknown): DemandData {
@@ -258,6 +296,7 @@ export async function extractDemandStatsFromZipBuffer(
 ): Promise<MapDemandExtractionResult> {
   const warnings = options.warnings;
   const requireResidentTotalsMatch = options.requireResidentTotalsMatch === true;
+  const requirePopSizeWithinCap = options.requirePopSizeWithinCap === true;
   let zip: JSZip;
   try {
     zip = await JSZip.loadAsync(zipBuffer);
@@ -332,6 +371,15 @@ export async function extractDemandStatsFromZipBuffer(
         warnings,
         listingId,
         `resident totals differ (points=${parsed.residentsTotalByPoint}, pops=${parsed.residentsTotalByPop}, delta=${delta}); using minimum=${parsed.stats.residents_total}`,
+      );
+    }
+  }
+
+  if (requirePopSizeWithinCap) {
+    const oversizedPops = findOversizedPops(payload);
+    if (oversizedPops.length > 0) {
+      throw new Error(
+        `listing=${listingId}: ${oversizedPops.length} pop(s) are larger than ${MAX_POP_SIZE}, the most a Light Rail train can board (e.g. ${formatOversizedPopExamples(oversizedPops)}); split them into pops of ${RECOMMENDED_MAX_POP_SIZE} or fewer`,
       );
     }
   }

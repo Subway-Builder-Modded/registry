@@ -223,6 +223,7 @@ async function validateMap(data: Record<string, string>): Promise<ValidationResu
         {
           token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
           requireResidentTotalsMatch: true,
+          requirePopSizeWithinCap: true,
         },
       );
       writeFileSync(

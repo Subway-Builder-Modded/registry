@@ -1,4 +1,5 @@
 import type { DemandData } from "./map-analytics-grid.js";
+import { KILOMETERS_PER_DEGREE } from "./map-constants.js";
 
 // This module is mostly for fun attempt at polycentrism metrics, and is not currently wired into the app. The main exported function computePolycentrismMetrics takes the same demand data as the grid metrics and produces a set of metrics about how polycentric the overall activity pattern is, based on spatial clustering of demand points. 
 // The core logic identifies local peaks in a smoothed potential surface derived from the demand points, then applies a series of gates to determine which peaks count as distinct centers based on their relative prominence, mass, and spacing. 
@@ -108,9 +109,7 @@ interface CenterGateConfig {
 const FIXED_POLYCENTRISM_BANDWIDTH_KM = 1.3;
 const GAUSSIAN_DISTANCE_MULTIPLIER = 3;
 const MAX_TOP_CENTERS = 8;
-const EARTH_RADIUS_KM = 6371.0088;
 const DEGREES_TO_RADIANS = Math.PI / 180;
-const KILOMETERS_PER_DEGREE = (Math.PI * EARTH_RADIUS_KM) / 180;
 // Secondary centres must retain enough local independence from stronger kept
 // peaks to survive the final prominence-based cull.
 const MIN_PROMINENCE_RATIO = 0.22;

@@ -214,6 +214,40 @@ test("publish validation rejects map demand data when point/pop resident totals 
   assert.match(output, /\*\*demand_data\*\*: listing=.*resident totals mismatch/);
 });
 
+test("publish validation rejects map demand data with pops above the Light Rail cap", async () => {
+  const zipUrl = await makeZipDataUrl({
+    points: [{ id: "p1", residents: 240 }, { id: "p2", residents: 15 }],
+    pops: [{ id: "pop-big", size: 240 }, { id: "pop-small", size: 15 }],
+  });
+  const customUpdateJson = {
+    schema_version: 1,
+    versions: [
+      {
+        version: "1.0.0",
+        game_version: "1.0.0",
+        date: "2026-03-12",
+        download: zipUrl,
+        sha256: "deadbeef",
+      },
+    ],
+  };
+  const customUpdateUrl = `data:application/json,${encodeURIComponent(JSON.stringify(customUpdateJson))}`;
+  const issue = basePublishMapIssue({
+    "update-type": "Custom URL",
+    "custom-update-url": customUpdateUrl,
+  });
+  delete issue["github-repo"];
+
+  const result = runScript("validate-publish", {
+    LISTING_TYPE: "map",
+    ISSUE_JSON: JSON.stringify(issue),
+  });
+
+  assert.notEqual(result.status, 0, "Validation should fail for pops above the Light Rail cap");
+  const output = readValidationError();
+  assert.match(output, /\*\*demand_data\*\*: listing=.*1 pop\(s\) are larger than 231.*pop-big=240/);
+});
+
 test("publish validation rejects city codes that clash with existing maps", () => {
   const issue = basePublishMapIssue({ "city-code": "ALB" });
   const result = runScript("validate-publish", {

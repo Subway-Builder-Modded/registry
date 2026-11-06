@@ -4,6 +4,7 @@ import JSZip from "jszip";
 import { inspectZipCompleteness, parseManifestGameDependency } from "../lib/integrity.js";
 import type { IntegrityVersionEntry } from "../lib/integrity.js";
 import type { CompiledSecurityRule } from "../lib/mod-security.js";
+import { MAX_POP_SIZE } from "../lib/map-constants.js";
 import {
   withBuildingsIndexPresenceIfMissing,
   withReleasedAtIfMissing,
@@ -51,17 +52,19 @@ async function makeZip(entries: Record<string, string>): Promise<Buffer> {
   return zip.generateAsync({ type: "nodebuffer" });
 }
 
-function makeDemandData(points: Array<{ id: string; location: [number, number] }>): string {
+// Each point holds one pop of `size` residents (default 1), so resident totals
+// always match and only the pop-size check reacts to `size`.
+function makeDemandData(points: Array<{ id: string; location: [number, number]; size?: number }>): string {
   return JSON.stringify({
     points: points.map((point) => ({
       id: point.id,
       location: point.location,
       jobs: 1,
-      residents: 1,
+      residents: point.size ?? 1,
     })),
     pops_map: points.map((point, index) => ({
       id: `pop-${index + 1}`,
-      size: 1,
+      size: point.size ?? 1,
     })),
     pops: points.map((point) => ({
       residenceId: point.id,
@@ -248,6 +251,48 @@ test("map integrity fails when a demand point is more than 100km from its neares
   assert.ok(result.errors.some((error) => error.includes("isolated point(s)")));
   assert.ok(result.errors.some((error) => error.includes(">100km")));
   assert.ok(result.errors.some((error) => error.includes("remote")));
+});
+
+test("map integrity fails when a pop is larger than the Light Rail cap", async () => {
+  const zipBuffer = await makeZip({
+    "config.json": "{\"code\":\"ABC\"}",
+    "demand_data.json": makeDemandData([
+      { id: "city-a", location: [0, 0], size: MAX_POP_SIZE + 1 },
+      { id: "city-b", location: [0.02, 0.02], size: 500 },
+      { id: "city-c", location: [0.04, 0.04] },
+    ]),
+    "buildings_index.json": "{}",
+    "roads.geojson": "{}",
+    "runways_taxiways.geojson": "{}",
+    "ABC.pmtiles": "stub",
+  });
+
+  const result = await inspectZipCompleteness("map", zipBuffer, { cityCode: "ABC" });
+  assert.equal(result.isComplete, false);
+  assert.equal(result.requiredChecks.demand_pop_size, false);
+  assert.equal(result.requiredChecks.demand_residents_match, true);
+  assert.equal(result.matchedFiles.demand_pop_size, "demand_data.json");
+  assert.ok(result.errors.some((error) => error.includes(`2 pop(s) larger than ${MAX_POP_SIZE}`)));
+  // Largest first.
+  assert.ok(result.errors.some((error) => error.includes(`pop-2=500, pop-1=${MAX_POP_SIZE + 1}`)));
+});
+
+test("map integrity accepts pops at exactly the Light Rail cap", async () => {
+  const zipBuffer = await makeZip({
+    "config.json": "{\"code\":\"ABC\"}",
+    "demand_data.json": makeDemandData([
+      { id: "city-a", location: [0, 0], size: MAX_POP_SIZE },
+      { id: "city-b", location: [0.02, 0.02] },
+    ]),
+    "buildings_index.json": "{}",
+    "roads.geojson": "{}",
+    "runways_taxiways.geojson": "{}",
+    "ABC.pmtiles": "stub",
+  });
+
+  const result = await inspectZipCompleteness("map", zipBuffer, { cityCode: "ABC" });
+  assert.equal(result.isComplete, true);
+  assert.equal(result.requiredChecks.demand_pop_size, true);
 });
 
 test("mod integrity requires both release manifest asset and top-level zip manifest", async () => {

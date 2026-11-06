@@ -1,6 +1,11 @@
 import type { AuthorAliasIndex } from "../author-aliases.js";
 import type { DiscordEmbed } from "../discord-webhook.js";
 import type { IntegrityAlert } from "../download-definitions.js";
+import {
+  ISOLATED_MAP_POINT_DISTANCE_KM,
+  MAX_POP_SIZE,
+  RECOMMENDED_MAX_POP_SIZE,
+} from "../map-constants.js";
 
 export const INTEGRITY_ALERT_EMBED_COLOR = 0xE8890C;
 
@@ -8,9 +13,10 @@ export const INTEGRITY_CHECK_FIX_HINTS: Record<string, string> = {
   // Map checks
   config_json: "Add a `config.json` file to the top level of your ZIP and publish a new release.",
   demand_data: "Add `demand_data.json` or `demand_data.json.gz` to the top level of your ZIP and publish a new release.",
-  demand_point_spacing: "Ensure every demand point in `demand_data.json` has at least one neighbor within 100 km, then publish a new release.",
+  demand_point_spacing: `Ensure every demand point in \`demand_data.json\` has at least one neighbor within ${ISOLATED_MAP_POINT_DISTANCE_KM} km, then publish a new release.`,
   demand_phantom_points: "Remove demand points with zero residents and zero jobs from `demand_data.json`, then publish a new release.",
   demand_residents_match: "Fix the resident total mismatch in `demand_data.json` (sum across `points` must equal sum across `populations`), then publish a new release.",
+  demand_pop_size: `Split every pop in \`demand_data.json\` larger than ${MAX_POP_SIZE} (the most a Light Rail train can board) into pops of ${RECOMMENDED_MAX_POP_SIZE} or fewer, as vanilla maps do, then publish a new release.`,
   buildings_index: "Add a buildings index (`buildings_index.json/.json.gz` or `.bin/.bin.gz`) to the top level of your ZIP and publish a new release.",
   roads_geojson: "Add `roads.geojson` or `roads.geojson.gz` to the top level of your ZIP and publish a new release.",
   runways_taxiways_geojson: "Add `runways_taxiways.geojson` or `runways_taxiways.geojson.gz` to the top level of your ZIP and publish a new release.",

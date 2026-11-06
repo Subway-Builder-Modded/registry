@@ -7,6 +7,7 @@ import { gzipSync } from "node:zlib";
 import JSZip from "jszip";
 import { generateGrid } from "../lib/map-analytics-grid.js";
 import { extractDemandStatsFromZipBuffer } from "../lib/map-demand-stats.js";
+import { MAX_POP_SIZE } from "../lib/map-constants.js";
 import { DEFAULT_INITIAL_VIEW_STATE, buildDemandPayload, makeZipBuffer } from "./map-demand-stats/helpers.js";
 
 function assertClose(actual: number, expected: number, tolerance = 0.05): void {
@@ -315,6 +316,20 @@ test("extractDemandStatsFromZipBuffer rejects mismatched residents totals when s
     extractDemandStatsFromZipBuffer("sample-map", zipBuffer, { requireResidentTotalsMatch: true }),
     /resident totals mismatch/,
   );
+});
+
+test("extractDemandStatsFromZipBuffer rejects pops above the Light Rail cap when strict mode is enabled", async () => {
+  const payload = buildDemandPayload([MAX_POP_SIZE + 1, 50], [MAX_POP_SIZE + 1, 50]);
+  const zipBuffer = await makeZipBuffer("demand_data.json", JSON.stringify(payload));
+
+  await assert.rejects(
+    extractDemandStatsFromZipBuffer("sample-map", zipBuffer, { requirePopSizeWithinCap: true }),
+    new RegExp(`1 pop\\(s\\) are larger than ${MAX_POP_SIZE}.*pop1=${MAX_POP_SIZE + 1}`),
+  );
+  // Without strict mode (demand-stats regeneration for existing listings) the
+  // same payload still extracts.
+  const extraction = await extractDemandStatsFromZipBuffer("sample-map", zipBuffer);
+  assert.equal(extraction.stats.residents_total, MAX_POP_SIZE + 51);
 });
 
 test("extractDemandStatsFromZipBuffer derives residents from popIds when residents is missing", async () => {
