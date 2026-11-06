@@ -52,7 +52,18 @@
     "parks",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/special_demand_points.json": 0.13,
+    ".railyard_map/special_demand_types.json": 0.03,
+    "BUH.pmtiles": 29.43,
+    "buildings_index.bin.gz": 22.3,
+    "config.json": 0,
+    "demand_data.json.gz": 3.08,
+    "ocean_depth_index.json.gz": 1.01,
+    "ocean_depth_index_contours.json.gz": 0.78,
+    "roads.geojson.gz": 2.22,
+    "runways_taxiways.geojson.gz": 0.06
+  },
   "included_cities": [
     "Voluntari",
     "Popești-Leordeni",
@@ -62,5 +73,83 @@
     "Otopeni",
     "Buftea",
     "Măgurele"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.26981541181579927,
+      "p25": 0.3043093249316834,
+      "p50": 0.34208558657753724,
+      "p75": 0.368697398187469,
+      "p90": 0.3865044894080317,
+      "mean": 0.33477269100667023
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.24272652468471465,
+      "p25": 0.28368696344725997,
+      "p50": 0.31245520184088743,
+      "p75": 0.35854958188666053,
+      "p90": 0.39374083303068325,
+      "mean": 0.318761798746086
+    },
+    "commuteDistanceKm": {
+      "p10": 3447,
+      "p25": 5644,
+      "p50": 8996,
+      "p75": 13019,
+      "p90": 17988,
+      "mean": 10144.147671568628
+    },
+    "residentCellDensity": {
+      "p10": 35,
+      "p25": 105,
+      "p50": 350,
+      "p75": 1260,
+      "p90": 4710,
+      "mean": 1510.7186948853616
+    },
+    "workerCellDensity": {
+      "p10": 35,
+      "p25": 70,
+      "p50": 245,
+      "p75": 1365,
+      "p90": 5040,
+      "mean": 2114.1245376078914
+    },
+    "detail": {
+      "radiusKm": 0.3269348880143304,
+      "expectedPointSpacingKm": 0.5597284837737232,
+      "normalizedRadius": 0.5840954989642758,
+      "activityPerPoint": 436.76260825267445,
+      "playableAreaKm2": 1572,
+      "playableAreaPerPointKm2": 0.40040753948038715,
+      "playableCatchmentRadiusKm": 0.3570065522075662,
+      "localityScore": 0.4577531412545027,
+      "deaggregationScore": 1,
+      "score": 0.6765745644454148
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.27139395411461464,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 26.094872466819844,
+            "latitude": 44.44530657244582,
+            "massShare": 1,
+            "assignedMass": 3429460,
+            "assignedPointCount": 3926,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1793896655
 }
