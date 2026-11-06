@@ -116,6 +116,7 @@ function countIntegrityVersions(entry: ListingIntegrityEntry | undefined): {
 const GRANDFATHERED_CHECK_KEYS: ReadonlySet<string> = new Set([
   "demand_phantom_points",
   "demand_residents_match",
+  "demand_pop_size",
 ]);
 
 function isGrandfatheredDowngrade(

@@ -97,6 +97,7 @@ async function extractDemandStatsFromResolvedSource(
   warnings: string[],
   options: {
     requireResidentTotalsMatch?: boolean;
+    requirePopSizeWithinCap?: boolean;
   } = {},
 ): Promise<DemandStats> {
   const zipBuffer = await fetchZipBuffer(
@@ -114,6 +115,7 @@ async function extractDemandStatsFromResolvedSource(
   const extraction = await extractDemandStatsFromZipBuffer(listingId, zipBuffer, {
     warnings,
     requireResidentTotalsMatch: options.requireResidentTotalsMatch,
+    requirePopSizeWithinCap: options.requirePopSizeWithinCap,
   });
   emitWarnings(warnings);
   return extraction.stats;
@@ -126,6 +128,7 @@ export async function resolveAndExtractDemandStatsForMapSource(
     fetchImpl?: typeof fetch;
     token?: string;
     requireResidentTotalsMatch?: boolean;
+    requirePopSizeWithinCap?: boolean;
     sourceUrl?: string;
     repoRoot?: string;
   } = {},
@@ -146,6 +149,7 @@ export async function resolveAndExtractDemandStatsForMapSource(
 
   return extractDemandStatsFromResolvedSource(listingId, resolvedSource, fetchImpl, warnings, {
     requireResidentTotalsMatch: options.requireResidentTotalsMatch,
+    requirePopSizeWithinCap: options.requirePopSizeWithinCap,
   });
 }
 
@@ -157,6 +161,7 @@ export async function resolveDemandStatsForMapUpdate(
     fetchImpl?: typeof fetch;
     token?: string;
     requireResidentTotalsMatch?: boolean;
+    requirePopSizeWithinCap?: boolean;
     sourceUrl?: string;
   },
 ): Promise<{
@@ -201,6 +206,7 @@ export async function resolveDemandStatsForMapUpdate(
 
   const stats = await extractDemandStatsFromResolvedSource(listingId, resolvedSource, fetchImpl, warnings, {
     requireResidentTotalsMatch: options.requireResidentTotalsMatch,
+    requirePopSizeWithinCap: options.requirePopSizeWithinCap,
   });
   return {
     stats,

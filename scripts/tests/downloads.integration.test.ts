@@ -9,6 +9,7 @@ import {
   createDownloadAttributionDelta,
   createEmptyDownloadAttributionLedger,
 } from "../lib/download-attribution.js";
+import { MAX_POP_SIZE } from "../lib/map-constants.js";
 
 function writeJson(path: string, value: unknown): void {
   writeFileSync(path, `${JSON.stringify(value, null, 2)}\n`, "utf-8");
@@ -123,6 +124,33 @@ async function makeMapZipWithPhantomPoint(cityCode: string, version = "1.0.0"): 
     ],
     pops: [
       { residenceId: "pt1", jobId: "pt1", drivingDistance: 1 },
+    ],
+  }));
+  zip.file("buildings_index.json", "{}");
+  zip.file("roads.geojson", "{}");
+  zip.file("runways_taxiways.geojson", "{}");
+  zip.file(`${cityCode}.pmtiles`, "stub");
+  return zip.generateAsync({ type: "nodebuffer" });
+}
+
+// Like makeMapZipWithPhantomPoint, but every point carries residents and jobs
+// and resident totals match; one pop is above MAX_POP_SIZE, so the zip fails
+// ONLY the grandfathered demand_pop_size check.
+async function makeMapZipWithOversizedPop(cityCode: string, version = "1.0.0"): Promise<Buffer> {
+  const zip = new JSZip();
+  zip.file("config.json", JSON.stringify({ code: cityCode, version }));
+  zip.file("demand_data.json", JSON.stringify({
+    points: [
+      { id: "pt1", location: [0, 0], jobs: 1, residents: MAX_POP_SIZE + 1 },
+      { id: "pt2", location: [0.01, 0.01], jobs: 1, residents: 1 },
+    ],
+    pops_map: [
+      { id: "pop1", size: MAX_POP_SIZE + 1 },
+      { id: "pop2", size: 1 },
+    ],
+    pops: [
+      { residenceId: "pt1", jobId: "pt2", drivingDistance: 1 },
+      { residenceId: "pt2", jobId: "pt1", drivingDistance: 1 },
     ],
   }));
   zip.file("buildings_index.json", "{}");
@@ -1915,6 +1943,110 @@ test("full mode grandfathers a previously-complete github version when fresh ins
     assert.equal(result.stats.complete_versions, 1);
     assert.equal(result.stats.incomplete_versions, 0);
     assert.equal(result.stats.filtered_versions, 0);
+  });
+});
+
+test("full mode grandfathers a previously-complete version failing only demand_pop_size but fails a new version", async () => {
+  await withTempRegistry(async ({ repoRoot, writeIndex, writeManifest }) => {
+    writeIndex("maps", ["popcap-map"]);
+    writeIndex("mods", []);
+    writeManifest("maps", "popcap-map", {
+      ...makeBaseMapManifest("popcap-map"),
+      update: { type: "github", repo: "owner/popcap" },
+    });
+
+    const previousVersionEntry = {
+      is_complete: true,
+      errors: [],
+      required_checks: {
+        config_json: true,
+        demand_data: true,
+        buildings_index: true,
+        roads_geojson: true,
+        runways_taxiways_geojson: true,
+        city_pmtiles: true,
+        config_version_matches_tag: true,
+      },
+      matched_files: {},
+      source: { update_type: "github", repo: "owner/popcap", tag: "v1.0.0" },
+      fingerprint: "fp-old",
+      checked_at: "2026-03-31T00:00:00.000Z",
+    };
+    writeJson(join(repoRoot, "maps", "integrity.json"), {
+      schema_version: 1,
+      generated_at: "2026-03-31T00:00:00.000Z",
+      listings: {
+        "popcap-map": {
+          has_complete_version: true,
+          latest_semver_version: "v1.0.0",
+          latest_semver_complete: true,
+          complete_versions: ["v1.0.0"],
+          incomplete_versions: [],
+          versions: { "v1.0.0": previousVersionEntry },
+        },
+      },
+    });
+    // No integrity-cache.json: forces the fresh-inspection path for both versions.
+
+    const oldZip = await makeMapZipWithOversizedPop("ABC", "1.0.0");
+    const newZip = await makeMapZipWithOversizedPop("ABC", "1.1.0");
+    const release = (tag: string, name: string) => ({
+      tagName: tag,
+      releaseAssets: {
+        nodes: [
+          {
+            id: `asset-node-${tag}`,
+            name,
+            downloadCount: 5,
+            downloadUrl: `https://downloads.example.com/${name}`,
+            size: 12345,
+            updatedAt: "2026-04-01T00:00:00Z",
+          },
+        ],
+        pageInfo: { hasNextPage: false, endCursor: null },
+      },
+    });
+    const fetchMock = makeFetchRouter([
+      {
+        match: (url) => url === "https://downloads.example.com/popcap-1.0.0.zip",
+        handle: () => new Response(new Uint8Array(oldZip)),
+      },
+      {
+        match: (url) => url === "https://downloads.example.com/popcap-1.1.0.zip",
+        handle: () => new Response(new Uint8Array(newZip)),
+      },
+      {
+        match: (url) => url === "https://api.github.com/graphql",
+        handle: () => jsonResponse({
+          data: {
+            repository: {
+              releases: {
+                nodes: [release("v1.1.0", "popcap-1.1.0.zip"), release("v1.0.0", "popcap-1.0.0.zip")],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          },
+        }),
+      },
+    ]);
+
+    const result = await generateDownloadsData({
+      repoRoot,
+      listingType: "map",
+      fetchImpl: fetchMock,
+      token: "test-token",
+    });
+
+    assert.ok(result.warnings.includes(
+      "listing=popcap-map version=v1.0.0: preserved previous is_complete=true (grandfathered checks: demand_pop_size)",
+    ));
+    const listing = result.integrity.listings["popcap-map"];
+    assert.deepEqual(listing?.versions["v1.0.0"], previousVersionEntry);
+    assert.deepEqual(listing?.complete_versions, ["v1.0.0"]);
+    // A version with no prior passing result gets no grandfathering.
+    assert.equal(listing?.versions["v1.1.0"]?.is_complete, false);
+    assert.equal(listing?.versions["v1.1.0"]?.required_checks.demand_pop_size, false);
+    assert.deepEqual(listing?.incomplete_versions, ["v1.1.0"]);
   });
 });
 

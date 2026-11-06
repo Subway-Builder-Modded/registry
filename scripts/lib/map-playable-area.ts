@@ -1,4 +1,5 @@
 import type { Feature, FeatureCollection, GeoJsonProperties, Polygon } from "geojson";
+import { KILOMETERS_PER_DEGREE } from "./map-constants.js";
 
 export interface PlayableAreaMetrics {
   playableAreaKm2: number;
@@ -48,8 +49,6 @@ interface PlayableAreaState {
 }
 
 const DEGREES_TO_RADIANS = Math.PI / 180;
-const EARTH_RADIUS_KM = 6371.0088;
-const KILOMETERS_PER_DEGREE = (Math.PI * EARTH_RADIUS_KM) / 180;
 const PLAYABLE_AREA_CELL_SIZES_KM = [4, 2, 1] as const;
 const NEIGHBOR_OFFSETS = [-1, 0, 1] as const;
 

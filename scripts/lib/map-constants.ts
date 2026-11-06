@@ -135,3 +135,21 @@ export const GRANDFATHERED_CITY_CODE_DUPLICATES: ReadonlyMap<string, ReadonlySet
 export function isOsmDataSource(value: string): boolean {
   return /osm/i.test(value);
 }
+
+// Demand-data limits. Publish validation (map-demand-stats extraction) and the
+// integrity checks (integrity.ts) both enforce these, and the integrity fix
+// hints quote them, so change them here only.
+
+// A pop larger than MAX_POP_SIZE can never board a Light Rail train, so it is a
+// hard cap (demand_pop_size). Vanilla maps keep every pop at or below
+// RECOMMENDED_MAX_POP_SIZE, which is what authors are asked to split down to.
+export const MAX_POP_SIZE = 231;
+export const RECOMMENDED_MAX_POP_SIZE = 200;
+
+// A demand point with no neighbor within this distance fails integrity
+// (demand_point_spacing).
+export const ISOLATED_MAP_POINT_DISTANCE_KM = 100;
+
+// Mean Earth radius, shared by the haversine and degree-to-kilometre helpers.
+export const EARTH_RADIUS_KM = 6371.0088;
+export const KILOMETERS_PER_DEGREE = (Math.PI * EARTH_RADIUS_KM) / 180;

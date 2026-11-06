@@ -104,6 +104,7 @@ async function buildMapManifestData(data: Record<string, unknown>): Promise<{
       {
         token: process.env.GH_DOWNLOADS_TOKEN ?? process.env.GITHUB_TOKEN,
         requireResidentTotalsMatch: true,
+        requirePopSizeWithinCap: true,
       },
     );
   }

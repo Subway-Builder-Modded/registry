@@ -12,6 +12,7 @@ export interface DemandStats {
 export interface ExtractDemandStatsOptions {
   warnings?: string[];
   requireResidentTotalsMatch?: boolean;
+  requirePopSizeWithinCap?: boolean;
 }
 
 export interface DemandStatsCacheGridEntry {
