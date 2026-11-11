@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-11T06:38:13.467Z",
+  "generated_at": "2026-11-11T08:00:31.138Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -19418,13 +19418,14 @@
     },
     "mfn-lasvegas": {
       "has_complete_version": false,
-      "latest_semver_version": "1.1.0",
+      "latest_semver_version": "2.0.0",
       "latest_semver_complete": false,
       "complete_versions": [],
       "incomplete_versions": [
-        "1.1.0"
+        "1.1.0",
+        "2.0.0"
       ],
-      "last_updated": 1774006444,
+      "last_updated": 1794379390,
       "versions": {
         "1.1.0": {
           "is_complete": false,
@@ -19472,6 +19473,65 @@
           "fingerprint": "rules:v6:github:crumpetime/sb-maps-las:1.1.0:LAS.zip",
           "checked_at": "2026-07-07T03:43:59.556Z",
           "released_at": "2026-03-20T11:34:04.000Z"
+        },
+        "2.0.0": {
+          "is_complete": false,
+          "errors": [
+            "listing_deprecated"
+          ],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "demand_pop_size": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "demand_pop_size": "demand_data.json",
+            "buildings_index": "buildings_index.json",
+            "buildings_index_json": "buildings_index.json",
+            "buildings_index_bin": "buildings_index.bin",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "LAS.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 168.04,
+          "file_sizes": {
+            "LAS.pmtiles": 61.61,
+            "LAS_foundations.pmtiles": 36.56,
+            "buildings_index.bin": 11,
+            "buildings_index.bin.gz": 32.22,
+            "buildings_index.json": 155.67,
+            "config.json": 0,
+            "demand_data.json": 12.7,
+            "ocean_depth_index.json.gz": 2.19,
+            "ocean_foundations.geojson": 29.67,
+            "roads.geojson": 25.89,
+            "runways_taxiways.geojson": 1.28
+          },
+          "game_version": ">=1.7.0",
+          "source": {
+            "update_type": "github",
+            "repo": "crumpetime/sb-maps-las",
+            "tag": "2.0.0",
+            "asset_name": "LAS.zip",
+            "download_url": "https://github.com/crumpetime/sb-maps-las/releases/download/2.0.0/LAS.zip"
+          },
+          "fingerprint": "rules:v6:github:crumpetime/sb-maps-las:2.0.0:LAS.zip",
+          "checked_at": "2026-11-11T08:00:31.138Z",
+          "released_at": "2026-11-11T06:43:10.000Z"
         }
       }
     },
