@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "singapore",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "adm4",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm4",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "full_matrix",
+    "od_granularity": "adm3"
+  },
+  "notes": "The relevant statistics are available at different administrative units:\n\n<table>\n  <tr>\n    <td><strong>Planning region</strong></td>\n    <td>There are 5 regions in Singapore. Median size: 136.41 km²</td>\n  </tr>\n  <tr>\n    <td><strong>Planning area</strong></td>\n    <td>There are 55 planning areas in Singapore. Planning areas have about 50,000 to 250,000 residents. Median size: 10.60 km²</td>\n  </tr>\n  <tr>\n    <td><strong>Subzone</strong></td>\n    <td>There are 332 subzones in Singapore. The average subzone has around 10,000 to 30,000 residents, but the largest has >100,000. Median size: 1.19 km²</td>\n  </tr>\n</table>\n\nThe map's population data is grounded on 3 main datasets, all from the 2025 General Household Survey:\n\n- **Employed** residents by **planning area** of **residence** _(base employed residence statistic)_.\n- Resident population by **subzone** of **residence** _(to refine employed residences)_.\n- **Employed** workers by **planning area of workplace**, broken out by **planning region of residence** _(for workplaces and O/D)_.\n\nLinks to the tables are in the same order in the Data Source Links section below.\n\n---\n\nPopulation statistics are first extrapolated to final working-population totals (including foreign workforce and excluding invalid resident employment). Employed residence counts are pushed down to the **subzone** level by splitting a planning area's employed residents proportionally to subzones based the subzone's number of residents.\n\nBuildings are obtained from Overture Maps and then filtered for demand-relevant buildings. Building types are coarsely classified based on OSM building types (via Overture) and [Singapore's Masterplan zoning](https://eservice.ura.gov.sg/maps/?service=MP), to: residential low/med/high, commercial, office, industrial low/med/high. Floorspace is estimated using a mix of building footprint + height, as well as the plot's max allowed floorspace serving as an upper bound. Residence and workplace statistics are then distributed down to these buildings, weighted by estimated floorspace and a set of manual coefficients. Special workforce demand is first injected before per-building distribution, with their workforce counts subtracted from subzonal totals to prevent double counting.\n\nPer-building demand points are then aggregated with a minimum 200 m spacing. Aggregated demand points with less than 50 people are merged into nearby points. Commute flows are assigned using a gravity model constrained by the O/D matrix for (workplace planning area ⟷ residence planning region).\n\nSpecial non-workforce demand is then finally added onto the existing demand data. Non-university/airport points are merged with existing points if necessary.\n\nMore comprehensive descriptions are available on the [repo's README](https://github.com/Zeepheru/subwaybuilder-singapore-map).",
+  "sources": [
+    "https://tablebuilder.singstat.gov.sg/table/CT/C020138",
+    "https://tablebuilder.singstat.gov.sg/table/CT/C020126",
+    "https://tablebuilder.singstat.gov.sg/table/CT/C020155"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "Zeepheru",
+    "reviewed_by": null,
+    "date": "2026-11-13"
+  }
+}
