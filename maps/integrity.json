@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-11-14T08:01:26.619Z",
+  "generated_at": "2026-11-14T11:34:39.483Z",
   "listings": {
     "aachen": {
       "has_complete_version": true,
@@ -28680,6 +28680,74 @@
           "fingerprint": "rules:v6:sha256:957b224e19411ded7c896089e4a0638d5ac06f6914c00cf1bdc112f9b88b4b07",
           "checked_at": "2026-08-20T02:47:42.427Z",
           "released_at": "2026-08-10T00:00:00.000Z"
+        }
+      }
+    },
+    "singapore": {
+      "has_complete_version": true,
+      "latest_semver_version": "1.0.0",
+      "latest_semver_complete": true,
+      "complete_versions": [
+        "1.0.0"
+      ],
+      "incomplete_versions": [],
+      "last_updated": 1794477389,
+      "versions": {
+        "1.0.0": {
+          "is_complete": true,
+          "errors": [],
+          "required_checks": {
+            "config_json": true,
+            "demand_data": true,
+            "demand_point_spacing": true,
+            "demand_phantom_points": true,
+            "demand_residents_match": true,
+            "demand_pop_size": true,
+            "buildings_index": true,
+            "roads_geojson": true,
+            "runways_taxiways_geojson": true,
+            "city_pmtiles": true,
+            "config_version_matches_tag": true
+          },
+          "matched_files": {
+            "config_json": "config.json",
+            "demand_data": "demand_data.json",
+            "demand_point_spacing": "demand_data.json",
+            "demand_phantom_points": "demand_data.json",
+            "demand_residents_match": "demand_data.json",
+            "demand_pop_size": "demand_data.json",
+            "buildings_index": "buildings_index.json.gz",
+            "buildings_index_json": "buildings_index.json.gz",
+            "buildings_index_bin": "buildings_index.bin.gz",
+            "roads_geojson": "roads.geojson",
+            "runways_taxiways_geojson": "runways_taxiways.geojson",
+            "city_pmtiles": "SG.pmtiles",
+            "config_version_matches_tag": "config.json"
+          },
+          "release_size": 44.57,
+          "file_sizes": {
+            "SG.pmtiles": 14.42,
+            "SG_foundations.pmtiles": 9.3,
+            "buildings_index.bin.gz": 9.34,
+            "buildings_index.json.gz": 6.33,
+            "config.json": 0,
+            "demand_data.json": 3.22,
+            "description.md": 0,
+            "ocean_depth_index.json.gz": 1.87,
+            "roads.geojson": 23.26,
+            "runways_taxiways.geojson": 1.56
+          },
+          "game_version": ">=1.7.0",
+          "source": {
+            "update_type": "github",
+            "repo": "zeepheru/subwaybuilder-singapore-map",
+            "tag": "1.0.0",
+            "asset_name": "SG.zip",
+            "download_url": "https://github.com/Zeepheru/subwaybuilder-singapore-map/releases/download/1.0.0/SG.zip"
+          },
+          "fingerprint": "rules:v6:github:zeepheru/subwaybuilder-singapore-map:1.0.0:SG.zip",
+          "checked_at": "2026-11-14T11:34:39.483Z",
+          "released_at": "2026-11-12T09:56:29.000Z"
         }
       }
     },
