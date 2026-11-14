@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "id": "saint-petersburg",
+  "name": "Санкт-Петербург (Saint Petersburg)",
+  "author": "SindieFox",
+  "github_id": 43078949,
+  "description": "Saint Petersburg and its agglomeration: 5,887 km² from Kronstadt and Peterhof in the west to Vsevolozhsk and Gatchina in the east, 6.84 million residents in the housing layer on a river delta that decides where you can dig.\n\nThis is my hometown, and I wanted the map to be as accurate as I could make it. Petersburg runs six metro lines and about seventy stations for five million people. Everyone here agrees that is too small; most of the network was planned in the 1980s and never built.\n\n![Map Coverage](https://raw.githubusercontent.com/SindieFox/subway-builder-saint-petersburg/main/gallery/preview.webp)\n\n## Coverage\n\n<table style=\"width: auto\">\n<tr><td><strong>Region</strong></td><td align=\"right\">Saint Petersburg and the inner ring of Leningrad oblast</td></tr>\n<tr><td><strong>Playable Area</strong></td><td align=\"right\">5,887 km² (73 × 81 km)</td></tr>\n<tr><td><strong>Municipalities</strong></td><td align=\"right\">283</td></tr>\n<tr><td><strong>Residents in housing layer</strong></td><td align=\"right\">6,839,575</td></tr>\n<tr><td><strong>Modelled workplaces in frame</strong></td><td align=\"right\">3,787,103</td></tr>\n<tr><td><strong>Demand points</strong></td><td align=\"right\">33,236</td></tr>\n<tr><td><strong>Demand links</strong></td><td align=\"right\">162,475</td></tr>\n<tr><td><strong>Game demand-link sum</strong></td><td align=\"right\">5,236,483</td></tr>\n<tr><td><strong>Median modelled road route</strong></td><td align=\"right\">16.4 min / 9.5 km at 35 km/h</td></tr>\n</table>\n\nAlso inside the frame: Kronstadt, Peterhof, Lomonosov, Sestroretsk, Zelenogorsk, Pushkin, Pavlovsk, Kolpino, Gatchina, Vsevolozhsk, Murino, Kudrovo, Sertolovo, Toksovo.\n\n## Data and methodology\n\nThe main population and workplace totals are anchored to official statistics. Local job placement and individual trips are modelled; the game demand-link sum is not a count of distinct residents or jobs.\n\nResidents and observed organisation employment come from the Rosstat municipal database and land on individual OSM footprints: by flat count where `building:flats` is tagged, by floor area and building type elsewhere, and for jobs through a 19-section OKVED profile weighted per building class. Modelled jobs fill the remainder to the 2024 labour resources balance by place of work: 3,417,900 in Saint Petersburg and 893,700 across the whole Leningrad oblast; the map covers only part of the oblast. The city employed-resident total is anchored to Petrostat’s 2025 labour force survey at 3,215,900, with district age structure preserving spatial variation. Ten mass-housing units are corrected for unregistered residents where apartment stock per registered resident exceeds 45 m², adding 121,638 people.\n\nCommuting is a doubly-constrained gravity model with Tanner deterrence. It balances employed residents against workplace totals, while the city–oblast flow ratio is calibrated to the 2020 census. The model no longer scales work trips to the full residential population. Around 48,303 employed residents of the oblast fragment are excluded as estimated journeys to jobs outside the frame. Of the 162,475 demand links, 129,257 run home to work and the rest lead to attraction points. Their combined size is 5,236,483: visits may be made by the same people who work, so this is a game demand measure, not 5.24 million workers or unique residents. Travel times are Dijkstra over the 877,210-node OSM drive network.\n\n| layer | check | result |\n|---|---|---|\n| Residents | per district against Petrostat | 5,689,116 modelled against 5,652,922 published |\n| Residents | persons per flat, 3,616 buildings with `building:flats` | 2.10 against a household size of ~2.1 |\n| Jobs | 2024 balance by place of work, city | 3,416,006 in frame against 3,417,900 published |\n| Employed residents | Petrostat 2025 labour force survey, city | 3,215,900 modelled and published |\n| Road routes | median modelled road speed | 35 km/h, against 33 in vanilla Paris |\n\nSources: Rosstat municipal database and 2024 labour resources balance, Petrostat’s 2025 labour force survey, the 2020 Russian census volume 10, OpenStreetMap, Overture Maps, GEBCO 2026 and Wikidata. Annual 2025 metro and bus boardings are used as external context, not as a direct multiplier for game demand. The full list with addresses and licences is in the map repository.\n\n## Special demand\n\n2,150 attraction points carrying 1,449,966 visits on the chosen day.\n\n| | points | daily |\n|---|---:|---:|\n| Schools | 1,177 | 673,602 |\n| Universities | 214 | 229,474 |\n| Parks | 244 | 109,590 |\n| Museums | 33 | 76,772 |\n| Hospitals | 135 | 68,492 |\n| Pulkovo airport | 1 | 60,123 |\n| Railway terminals | 5 | 58,630 |\n| Shopping centres | 11 | 52,053 |\n| Theatres and concert halls | 71 | 38,573 |\n| Other attractions | 259 | 82,657 |\n| **Total** | **2,150** | **1,449,966** |\n\nThe demand model has no time axis, so the map picks a day: a weekday in late September, with universities and schools in session, tourism still high and the dacha season over. Only the estimated external share of traffic at the five railway terminals is added, since journeys from Gatchina, Pushkin and Vsevolozhsk are already modelled inside the frame. Baltiysky is the second-busiest terminal in the city and runs suburban trains only.\n\n## Water\n\nThe Neva runs 24 m deep at Liteyny Bridge, the Winter Canal 2 m, and the dredged fairways of the Neva Bay cut 13 m channels through 3 m shallows. Those depths come off navigation charts, because GEBCO steps every 450 m or so and cannot see a river 400 m wide. A tunnel under the river and a tunnel under a canal cost differently here.\n\n## Buildings\n\nHeights come from the OSM `height` tag, or from `building:levels` at a measured 3.88 m per storey, or from the nearest neighbours that carry either. On 6,463 surveyed buildings held back from the model the mean error is 3.8 m, against 11.6 m if everything is flattened to one default. Volumes are stepped: 21,126 `building:part` polygons sit on their outlines, so St Isaac's is a dome at 18 m with a cross at 102 m.\n\n## Credits\n\nMap by **SindieFox**, built with [depot](https://github.com/Subway-Builder-Modded). Sources, licences and the full write-up are in the [map repository](https://github.com/SindieFox/subway-builder-saint-petersburg) ([на русском](https://github.com/SindieFox/subway-builder-saint-petersburg/blob/main/README.ru.md)).",
+  "tags": [
+    "east-europe",
+    "airports",
+    "entertainment",
+    "schools",
+    "universities"
+  ],
+  "gallery": [
+    "gallery/screenshot1.webp",
+    "gallery/screenshot2.webp",
+    "gallery/screenshot3.webp",
+    "gallery/screenshot4.webp",
+    "gallery/screenshot5.webp",
+    "gallery/screenshot6.webp",
+    "gallery/screenshot7.webp"
+  ],
+  "is_test": false,
+  "source": "https://github.com/SindieFox/subway-builder-saint-petersburg",
+  "update": {
+    "type": "github",
+    "repo": "SindieFox/subway-builder-saint-petersburg"
+  },
+  "city_code": "SPB",
+  "country": "RU",
+  "population": 5236483,
+  "residents_total": 5236483,
+  "points_count": 33236,
+  "population_count": 162475,
+  "initial_view_state": {
+    "latitude": 59.9386,
+    "longitude": 30.3141,
+    "zoom": 12,
+    "bearing": 0
+  },
+  "data_source": "Rosstat BD PMO | Rosstat 2024 labour balance | Petrostat LFS 2025 | VPN-2020 | OSM | GEBCO",
+  "source_quality": "low-quality",
+  "level_of_detail": "low-detail",
+  "data_quality": {
+    "tier": "unknown",
+    "rubric_version": 1
+  },
+  "location": "east-europe",
+  "special_demand": [
+    "airports",
+    "entertainment",
+    "schools",
+    "universities"
+  ],
+  "file_sizes": {},
+  "included_cities": [
+    "Kronstadt",
+    "Peterhof",
+    "Pushkin",
+    "Pavlovsk",
+    "Kolpino",
+    "Gatchina",
+    "Vsevolozhsk",
+    "Murino",
+    "Kudrovo",
+    "Sestroretsk",
+    "Zelenogorsk",
+    "Lomonosov",
+    "Sertolovo",
+    "Toksovo"
+  ]
+}
