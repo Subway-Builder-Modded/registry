@@ -437,6 +437,21 @@ export function lockstepHoursAfter(lockstepHours: string[], incidentEnd: string)
   return lockstepHours.filter((hour) => Date.parse(hour.replace("Z", ":00Z")) >= closeMs).sort();
 }
 
+// The loop's targets on deprecated core listings. A loop is judged by live
+// counters as soon as ANY core listing is deprecated, not only when all are:
+// deprecated listings are out of the hourly series, and a re-listed sibling
+// cannot stand in as the loop clock, since its organic traffic makes it a busy
+// target that trackKnownLoop leaves out of the core (mfn-lasvegas, re-listed
+// 2026-11-13, left the holdouts loop with no clock and a false "stopped").
+export function frozenLoopTargets<T extends { key: string }>(
+  targets: T[],
+  coreKeys: Iterable<string>,
+  isDeprecated: (key: string) => boolean,
+): T[] {
+  const frozen = new Set([...coreKeys].filter(isDeprecated));
+  return targets.filter((target) => frozen.has(target.key));
+}
+
 // Deprecated targets (the holdouts) are frozen out of the hourly series, so a
 // loop that keeps fetching them shows only on the live release counters. The
 // guard keeps the last counters it saw; any growth means the client is still

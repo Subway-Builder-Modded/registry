@@ -5,6 +5,7 @@ import {
   classifyLoopSilence,
   updateCounterWatch,
   detectLockstepCohorts,
+  frozenLoopTargets,
   lockstepHoursAfter,
   measureLocalExcess,
   trackKnownLoop,
@@ -188,4 +189,20 @@ test("updateCounterWatch tracks growth across runs and ages silence only when co
   const partial = updateCounterWatch(flat.state, { "map:jer@v1": 545, "map:las@1": null }, "2026-10-31T06:00:00Z");
   assert.equal(partial.state.counts["map:las@1"], 926);
   assert.equal(partial.silence, "running");
+});
+
+test("frozenLoopTargets: any deprecated core listing freezes the loop, and only its targets are watched", () => {
+  const targets = [
+    { key: "map:jerusalem", version: "v0.3.2" },
+    { key: "map:jerusalem", version: "v0.3.1" },
+    { key: "map:mfn-lasvegas", version: "1.1.0" },
+    { key: "map:rider", version: "1.0.0" },
+  ];
+  const core = ["map:jerusalem", "map:mfn-lasvegas"];
+  // Both holdouts deprecated: every core target is watched; riders never are.
+  assert.deepEqual(frozenLoopTargets(targets, core, (key) => key !== "map:rider"), targets.slice(0, 3));
+  // mfn-lasvegas re-listed: still frozen, watched on jerusalem alone.
+  assert.deepEqual(frozenLoopTargets(targets, core, (key) => key === "map:jerusalem"), targets.slice(0, 2));
+  // Nothing deprecated: the hourly series judges the loop.
+  assert.deepEqual(frozenLoopTargets(targets, core, () => false), []);
 });
