@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "reykjavik-reykjanes",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "none",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "employed_residents",
+    "resident_granularity": "adm4",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "**Reykjavík (Southwest Iceland) — Demand Data Methodology**\n\nThe map covers Reykjavík and the surrounding southwest Iceland region, including Kópavogur, Hafnarfjörður, Mosfellsbær, Reykjanesbær, Keflavík International Airport, Grindavík and the Blue Lagoon.\n\n**1. Residential demand**\n\nThe primary statistical source is Statistics Iceland's 2021 Population and Housing Census, specifically table CEN1403: *Employed persons by sex, age group and minor statistical area 2021*.\n\nThe dataset reports employed residents aged 16 years and over, by Minor Statistical Output Area (MSOA), for both sexes combined.\n\nOfficial census-area counts were linked to geographic boundaries and distributed across OpenStreetMap building footprints. Likely residential buildings were identified using building classifications and weighted by estimated residential capacity, including footprint size and assumptions about building floors. Buildings with unknown use were treated separately with reduced residential weights.\n\nResidential demand was spatially aggregated to reduce overlapping demand locations. Census areas crossing the playable map boundary were flagged to avoid incorrectly assigning their entire populations to the map.\n\n**2. Workplace demand**\n\nNo official workplace-level employment counts were used.\n\nWorkplace destinations were estimated from OpenStreetMap building footprints and land-use classifications, identifying likely employment locations such as commercial, office, retail and industrial buildings. Relative workplace capacity was estimated using building characteristics and modelling assumptions.\n\nEstimated workers were allocated between these destinations using a spatial commuting model. Nearby workplace destinations were consolidated to reduce overlapping demand bubbles and avoid multiple small destinations representing essentially the same building or site.\n\n**3. Origin–destination flows**\n\nCommuting flows were generated using an estimated spatial allocation model rather than an observed origin–destination commuting matrix.\n\nThe baseline commuting scenario assumed approximately 75% of the allocated employed-resident population would participate in a typical weekday commuting model. This is a modelling assumption, not a measured Icelandic commuting rate.\n\nJourney destinations were assigned using estimated workplace opportunities and geographic proximity. Origin and destination totals were checked for consistency.\n\nDriving distances and travel times are approximations and have not been calculated using verified road-network routing.\n\n**4. Special demand**\n\nAdditional simulated demand includes airports, schools, universities, hospitals, ferry terminals, parks, entertainment venues and tourist attractions.\n\nOfficial statistics informed selected venue estimates where available. These include Keflavík International Airport's 2025 passenger figures, school enrolment data from Statistics Iceland and published university enrolment information.\n\nFor Keflavík Airport, connecting passengers who do not enter Iceland were excluded from the local ground-access demand benchmark.\n\nOther special-demand estimates were developed using available mapped locations, venue characteristics and modelling assumptions. Where reliable visitor counts were unavailable, passenger demand was estimated rather than represented as measured.\n\n**5. Geographic sources and limitations**\n\nRoads, buildings, runways, land-use features and geographic labels were derived principally from OpenStreetMap. Official Statistics Iceland census boundaries were used to assign residential employment figures geographically.\n\nThe final model contains 141,661 simulated travellers, including commuting and special demand. This figure is a model output, not an observed daily passenger count or a direct census population total.\n\nThe principal limitations are the absence of observed workplace employment counts, measured origin–destination journeys and comprehensive special-site visitor counts. Residential origins are based on official 2021 statistics, but their allocation to individual buildings, workplace destinations and journey patterns are estimated.\n\nThe map is intended to provide geographically informed, playable passenger demand while maintaining a clear distinction between official statistical observations and modelling assumptions.",
+  "sources": [
+    "https://px.hagstofa.is/pxen/pxweb/en/Ibuar/Ibuar__manntal__2021__4_vinnumarkadur/CEN1403.px",
+    "https://www.statice.is/publications/news-archive/census/minor-statistical-output-areas-new-addition-to-the-icelandic-hierarchical-regional-classification/",
+    "https://gis.is/geoserver/Hagstofan/wfs",
+    "https://www.openstreetmap.org/copyright",
+    "https://www.kefairport.com/news/8-million-guests-in-2025",
+    "https://px.hagstofa.is/pxen/pxweb/en/Samfelag/Samfelag__skolamal__2_grunnskolastig__0_gsNemendur/SKO02102.px"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "turnerawill12345-a11y",
+    "reviewed_by": null,
+    "date": "2026-10-21"
+  }
+}
