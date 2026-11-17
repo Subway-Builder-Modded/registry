@@ -7,6 +7,7 @@ import { isObject } from "../lib/json-utils.js";
 import {
   classifyLoopSilence,
   detectLockstepCohorts,
+  frozenLoopTargets,
   lockstepHoursAfter,
   measureLocalExcess,
   trackKnownLoop,
@@ -296,7 +297,9 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
     // Riders and version moves only mean something while the loop is running.
     const flagged = cohort.classification !== "metronome" ? [] : cohort.members.filter((member) =>
       (member.role === "rider" && member.status === "uncovered") || member.status === "untargeted-version");
-    const frozen = spec.coreKeys.every((key) => isDeprecated(repoRoot, key));
+    const targets = [...spec.versionsByListing].flatMap(([key, versions]) => [...versions].map((version) => ({ key, version })));
+    const frozenTargets = frozenLoopTargets(targets, spec.coreKeys, (key) => isDeprecated(repoRoot, key));
+    const frozen = frozenTargets.length > 0;
     // A quiet loop has no slots, so its open riders attribute nothing.
     const riderChecks = cohort.classification === "metronome"
       ? checkOpenRiders(spec, series, hours, tracked.lockstepHours, endDate)
@@ -312,7 +315,9 @@ function buildReport(repoRoot: string, endDate: string, days: number) {
       // Frozen loops are judged by their live counters (attachCounterWatch).
       silence: frozen || closed ? null : classifyLoopSilence(tracked.lockstepHours, windowEndMs),
       counterWatch: null as CounterWatchReport | null,
-      targets: [...spec.versionsByListing].flatMap(([key, versions]) => [...versions].map((version) => ({ key, version }))),
+      frozenTargets,
+      frozenListings: new Set(frozenTargets.map((target) => target.key)).size,
+      coreListings: spec.coreKeys.length,
       spec: spec.path,
       incident: spec.incident,
       autoApply: spec.autoApply && !closed,
@@ -412,7 +417,7 @@ async function attachCounterWatch(report: Report, repoRoot: string, previous: Gu
     if (loop.state !== "frozen") continue;
     const counts: Record<string, number | null> = {};
     const errors: string[] = [];
-    for (const { key, version } of loop.targets) {
+    for (const { key, version } of loop.frozenTargets) {
       const label = `${key}@${version}`;
       const source = resolveSource(key, version);
       if (!source) {
@@ -473,12 +478,12 @@ function renderMarkdown(report: Report): string {
     const stateNote = {
       looping: "",
       quiet: " If it stays quiet, consider setting `incident_end`.",
-      frozen: " Every target is deprecated, so its counts are frozen and the hourly series cannot see the loop; check the live GitHub counters before closing.",
+      frozen: " Deprecated targets are out of the hourly series, so silence is judged by their live GitHub counters; check those before closing.",
       closed: ` Closed at \`incident_end\` ${loop.incidentEnd}: nothing is attributed after it, and the spec leaves this report once that day is out of the window.`,
       resumed: ` **The client is back:** ${loop.resumedHours.length} lockstep hour(s) after \`incident_end\` ${loop.incidentEnd} (first \`${loop.resumedHours[0]}\`). A closed spec attributes nothing after its close; reopen it (move \`incident_end\` and the riders' \`end\`) to correct the new days.`,
     }[loop.state];
     lines.push(
-      `### \`${loop.incident}\` — ${{ looping: "still looping", quiet: "quiet", frozen: "frozen (all targets deprecated)", closed: "closed", resumed: "resumed after its close" }[loop.state]}${loop.autoApply ? " (auto-applied daily)" : ""}`,
+      `### \`${loop.incident}\` — ${{ looping: "still looping", quiet: "quiet", frozen: `frozen (${loop.frozenListings} of ${loop.coreListings} target listings deprecated)`, closed: "closed", resumed: "resumed after its close" }[loop.state]}${loop.autoApply ? " (auto-applied daily)" : ""}`,
       "",
       `Lockstep hours per day: \`${loop.dailyLockstepHours.join(" ")}\` — ${loop.reason}.${stateNote}`,
       "",
