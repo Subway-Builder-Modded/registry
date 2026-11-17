@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "grand-tunis",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "none",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "adm1",
+    "resident_resolution": "ml_hybrid_footprints",
+    "resident_intensity": "binary_split",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Pipeline (scripts in https://github.com/m0etez/subway-builder-grand-tunis):\n\n1. Residents: WorldPop 2020 constrained 100 m population grid (total population), rescaled per governorate so totals match the 2024 census (RGPH 2024, INS Tunisie: Tunis 1,075,306; Ariana 668,552; Ben Arous 722,828; La Manouba 418,354). The only official areas are the governorates; the 100 m distribution comes from WorldPop's model. Commuting residents = 34% employment ratio (national employed population is 30.8% per RGPH 2024, Greater Tunis is above average) + 5% school trips.\n2. Jobs: no geocoded official employment data exists for Tunisia. Total jobs = employed residents. 75% are spread with weights from OpenStreetMap features (land-use areas with per-hectare densities, office/government/commercial building footprints x levels, shops, hospitals, schools, hotels, markets, airport terminal); 25% are population-proportional local jobs.\n3. Points: H3 res-9 cells (res-8 where activity is low), activity-weighted centroids.\n4. Flows: doubly-constrained gravity model, home-work exp(-0.16 d) and home-school exp(-0.7 d) on network-scaled distance; discretised into groups of 50. No commute-flow data is used.\n5. Special demand via depot add_points: Tunis-Carthage airport (12k/day), 10 university hubs (~121k student trips), Medina souks, malls, beaches, heritage sites, Radès stadium, La Goulette port, Bab Saâdoun hospitals.\n6. Driving times: local OSRM on the OSM network, x1.6 peak-hour congestion factor.\n\nPlacement notes (nearest dropdown options chosen, please reclassify if needed): jobs are placed on OSM building footprints by type (office/government/commercial/retail/industrial x levels) plus OSM land-use areas and POIs with assumed per-type densities. People are placed by WorldPop's constrained model (population only in settled cells derived from building footprints, weighted by covariates), not by per-building dwelling counts.\n\nData vintages: WorldPop 2020, RGPH 2024, OSM extract of 2026-11-16.",
+  "sources": [
+    "https://data.worldpop.org/GIS/Population/Global_2000_2020_Constrained/2020/BSGM/TUN/tun_ppp_2020_UNadj_constrained.tif",
+    "https://www.ins.tn/sites/default/files-ftp3/files/publication/pdf/DEMOGRAPHIE-FR.pdf",
+    "https://download.geofabrik.de/africa/tunisia.html",
+    "https://overturemaps.org"
+  ],
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "m0etez",
+    "reviewed_by": "rslurry",
+    "date": "2026-11-17"
+  }
+}
