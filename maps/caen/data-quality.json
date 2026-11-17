@@ -4,8 +4,8 @@
   "answers": {
     "workplace_count": "physical_measured",
     "workplace_granularity": "adm3",
-    "workplace_resolution": "mesh_250",
-    "workplace_intensity": "size_only",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "fine_types_calibrated",
     "resident_count": "total_population",
     "resident_granularity": "mesh_250",
     "resident_resolution": "mesh_250",
@@ -13,15 +13,16 @@
     "od_metric": "full_matrix",
     "od_granularity": "adm3"
   },
-  "notes": "Backfilled by the maintainer from the reviewed reunion answer set: the author declared this map runs the identical Filosofi+MOBPRO pipeline (MOBPRO 2021 place-of-work job totals per commune; Filosofi 2021 200m resident grid, nothing to place; full commune-to-commune O/D matrix; within-commune job placement resident-weighted onto 200m cells, scored mesh_250 x size_only per the reunion ruling). A map-update with revised answers supersedes this if the pipeline diverges.",
+  "notes": "Backfilled by the maintainer from the reviewed toulouse answer set (2026-11-17): the author declared (#15476) that this map now runs the same pipeline as toulouse — Filosofi 2021 200m resident grid, nothing to place; RP2022 commune-to-commune commute matrix, which fixes each commune's job total (place of work); SIRENE establishments, weighted by employee-count bracket and snapped to OpenStreetMap building footprints, deciding where those jobs land within each commune; 10km O-D floor. Scored as toulouse: physical_measured × adm3 × osm_footprints × fine_types_calibrated (paris ruling; OSM snap per muenchen). Supersedes the 2026-08-23 reunion-set backfill (resident-weighted job placement, medium 0.52). A map-update with revised answers supersedes this if the pipeline diverges.",
   "sources": [
-    "INSEE Filosofi 2021 (200m population grid)",
-    "INSEE MOBPRO 2021 (commune-to-commune home-to-work flows, place of work)"
+    "https://www.insee.fr/fr/statistiques/7655475 (Filosofi 2021)",
+    "https://www.insee.fr/fr/statistiques/8217790 (SIRENE)",
+    "https://www.insee.fr/fr/statistiques/8197189 (RP2022)"
   ],
   "provenance": {
     "method": "backfill",
     "submitted_by": "ahkimn",
     "reviewed_by": "ahkimn",
-    "date": "2026-08-23"
+    "date": "2026-11-17"
   }
 }
