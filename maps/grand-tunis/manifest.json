@@ -52,7 +52,19 @@
     "hospitals",
     "universities"
   ],
-  "file_sizes": {},
+  "file_sizes": {
+    ".railyard_map/special_demand_points.json": 0.1,
+    ".railyard_map/special_demand_types.json": 0.03,
+    "TUN.pmtiles": 28.41,
+    "TUN_foundations.pmtiles": 26.53,
+    "buildings_index.bin": 78.84,
+    "config.json": 0,
+    "demand_data.json": 3.76,
+    "driving_paths.json": 12.86,
+    "ocean_depth_index.json.gz": 0.67,
+    "roads.geojson": 15.87,
+    "runways_taxiways.geojson": 0.26
+  },
   "included_cities": [
     "Tunis",
     "Ariana",
@@ -61,5 +73,83 @@
     "La Marsa",
     "Carthage",
     "Hammam-Lif"
-  ]
+  ],
+  "grid_statistics": {
+    "residentWeightedNearestNeighborKm": {
+      "p10": 0.27173172062790757,
+      "p25": 0.3107565554626468,
+      "p50": 0.33792222593945276,
+      "p75": 0.35243476141862096,
+      "p90": 0.3607966953435174,
+      "mean": 0.3302779518862051
+    },
+    "workerWeightedNearestNeighborKm": {
+      "p10": 0.28775672450331885,
+      "p25": 0.32683293389620105,
+      "p50": 0.34919819679199726,
+      "p75": 0.3606253717297355,
+      "p90": 0.38461239598583585,
+      "mean": 0.34374930521113184
+    },
+    "commuteDistanceKm": {
+      "p10": 2216,
+      "p25": 4416,
+      "p50": 8147,
+      "p75": 13351,
+      "p90": 19097,
+      "mean": 9622.170734919659
+    },
+    "residentCellDensity": {
+      "p10": 100,
+      "p25": 250,
+      "p50": 850,
+      "p75": 2100,
+      "p90": 3500,
+      "mean": 1421.864776444929
+    },
+    "workerCellDensity": {
+      "p10": 50,
+      "p25": 150,
+      "p50": 500,
+      "p75": 1700,
+      "p90": 4050,
+      "mean": 1605.9040590405905
+    },
+    "detail": {
+      "radiusKm": 0.34351394724813544,
+      "expectedPointSpacingKm": 0.4836225819487569,
+      "normalizedRadius": 0.7102934396982585,
+      "activityPerPoint": 321.40924741760944,
+      "playableAreaKm2": 1268,
+      "playableAreaPerPointKm2": 0.3118544023610428,
+      "playableCatchmentRadiusKm": 0.3150656111375178,
+      "localityScore": 0.2506365331385073,
+      "deaggregationScore": 1,
+      "score": 0.5006361284790655
+    },
+    "polycentrism": {
+      "activity": {
+        "score": 0,
+        "continuousScore": 0.6953218529394974,
+        "detectedCenterCount": 1,
+        "effectiveCenterCount": 1,
+        "largestCenterShare": 1,
+        "bandwidthKm": 1.3,
+        "reliabilityScore": 1,
+        "supportLevel": "high",
+        "usedFallback": false,
+        "topCenters": [
+          {
+            "longitude": 10.188103961051345,
+            "latitude": 36.81010521789025,
+            "massShare": 1,
+            "assignedMass": 2613700,
+            "assignedPointCount": 4066,
+            "prominenceRatio": 1
+          }
+        ]
+      }
+    }
+  },
+  "last_updated": 1794842141
 }
