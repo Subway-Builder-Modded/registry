@@ -4,8 +4,8 @@
   "answers": {
     "workplace_count": "physical_measured",
     "workplace_granularity": "adm3",
-    "workplace_resolution": "mesh_250",
-    "workplace_intensity": "size_only",
+    "workplace_resolution": "osm_footprints",
+    "workplace_intensity": "fine_types_calibrated",
     "resident_count": "total_population",
     "resident_granularity": "mesh_250",
     "resident_resolution": "mesh_250",
@@ -13,15 +13,16 @@
     "od_metric": "full_matrix",
     "od_granularity": "adm3"
   },
-  "notes": "Backfilled by the maintainer from the reviewed reunion answer set: the author migrated this listing to the France pack repo (update merged 2026-08) and declared it runs the identical Filosofi+MOBPRO pipeline (MOBPRO 2021 place-of-work job totals per commune; Filosofi 2021 200m resident grid, nothing to place; full commune-to-commune O/D matrix; within-commune job placement resident-weighted onto 200m cells, scored mesh_250 x size_only per the reunion ruling). A map-update with revised answers supersedes this if the pipeline diverges.",
+  "notes": "Residential population: INSEE Filosofi 2021, 200m national grid (real census data, already fine-grained, no placement needed). Jobs: INSEE SIRENE establishment-level registry (real address per establishment, headcount reported as a size bracket rather than an exact count), snapped to the nearest real OpenStreetMap building footprint -- replaces the older population-weighted job estimate used on earlier France maps. Commuting flows: INSEE RP2022 individual mobility microdata, aggregated to a full commune-to-commune matrix, minimum 10km origin-destination distance enforced. Routes calculated via OSRM on the real road network. — Reviewer refinements (2026-11-17): scored against paris-ile-de-france (pierreggt, reviewed medium 0.59, 2026-08-23), which the author declares runs this same pipeline (Filosofi 200m residents; SIRENE establishments snapped to building footprints for within-commune job placement; full commune-to-commune census commute matrix; 10km O-D floor). workplace_count re-ruled physical_measured, not size_bands — each commune's job total is the place-of-work side of the RP2022 commute matrix, a measured count; SIRENE's employee-count brackets only decide where those jobs land inside the commune (paris ruling: the commute census fixes the total and SIRENE only decides the spatial distribution within it). workplace_granularity re-ruled adm3, not adm5 — the measured totals are per commune; an establishment address is a placement point, not a reporting unit. workplace_resolution re-ruled osm_footprints, not mesh_125_or_adm5 — establishments are snapped onto OpenStreetMap building footprints, so the final placement geometry is OSM (muenchen precedent; paris scored ml_hybrid_footprints because it snaps to Overture). workplace_intensity re-priced fine_types_calibrated, not measured_per_unit — employee-count bracket weights, held to the measured commune totals by construction (paris ruling). resident_resolution re-ruled mesh_250, not mesh_125_or_adm5 — Filosofi is a 200m grid (paris / reunion). Resident count, granularity and intensity CONFIRMED as filed. od_metric full_matrix at adm3 CONFIRMED — the 10km minimum O-D distance re-draws short commutes, so those pairs are not reproduced, but the measured matrix remains the source (paris carries the same floor and kept full_matrix). Alternatives on record: ml_hybrid_footprints (if the snap layer is Overture, as on paris) 0.592, same medium tier; size_bands count (if SIRENE bracket sums, not the RP2022 commune totals, set each commune's jobs) 0.490, medium. Upgrade path as for paris: snapping to IGN BD TOPO official footprints would lift R to exact_footprints and the map to high (0.637). FR floor (medium) met. Revised high 0.65 -> medium 0.58.",
   "sources": [
-    "INSEE Filosofi 2021 (200m population grid)",
-    "INSEE MOBPRO 2021 (commune-to-commune home-to-work flows, place of work)"
+    "https://www.insee.fr/fr/statistiques/7655475 (Filosofi 2021)",
+    "https://www.insee.fr/fr/statistiques/8217790 (SIRENE)",
+    "https://www.insee.fr/fr/statistiques/8197189 (RP2022)"
   ],
   "provenance": {
-    "method": "backfill",
-    "submitted_by": "ahkimn",
+    "method": "reviewed",
+    "submitted_by": "pierreggt",
     "reviewed_by": "ahkimn",
-    "date": "2026-08-23"
+    "date": "2026-11-17"
   }
 }
