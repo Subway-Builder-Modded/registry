@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "id": "baku",
+  "answers": {
+    "workplace_count": "estimated_proxy",
+    "workplace_granularity": "none",
+    "workplace_resolution": "ml_hybrid_footprints",
+    "workplace_intensity": "fine_types_generic",
+    "resident_count": "total_population",
+    "resident_granularity": "adm3",
+    "resident_resolution": "osm_footprints",
+    "resident_intensity": "fine_types_generic",
+    "od_metric": "none",
+    "od_granularity": null
+  },
+  "notes": "Residential demand was generated using official population statistics for the beginning of 2026, published by the State Statistical Committee of the Republic of Azerbaijan. The figures cover Baku's administrative districts, Sumqayit and Absheron district.\n\nPopulation was distributed geographically using OpenStreetMap building footprints, mapped settlement locations, building types, approximate building sizes and floors, and spatial allocation assumptions. The official administrative boundaries do not exactly match the playable map extent, so the resulting spatial distribution is an estimate rather than a precise census of the mapped area.\n\nEmployment locations were estimated using population-derived assumptions and OpenStreetMap building characteristics, including commercial, industrial and other workplace-related building categories. Additional geographic weighting was applied to major employment centres. No observed workplace employment counts were used.\n\nOrigin–destination commuting flows were generated synthetically from the estimated residential and workplace distributions. The map contains 1,394 demand locations and 76,351 synthetic commuting groups representing approximately 1.35 million simulated commuters. These figures are model outputs, not observed employment totals or commuting flows.\n\nThe map therefore uses official demographic data for its population reference, supplemented by OpenStreetMap geographic data and estimated employment and commuting behaviour. No separate airport, hospital, university or tourism passenger-demand categories have been modelled. — Reviewer refinements (2026-11-06): resident_granularity re-ruled adm3, not adm4 — the State Statistical Committee figures are per Baku raion plus Sumqayit and Absheron rayon (~190k people per unit); Baku's raions function as city districts but sit at ADM2 under Baku city in Azerbaijan's hierarchy, so per §2 rule 3 the middle grain is recorded with bounds (adm4 by function / adm2 by hierarchy), the vienna / tehran shape. resident_resolution re-ruled osm_footprints, not ml_hybrid_footprints — the notes describe OpenStreetMap building footprints and settlement locations only, with no ML or Overture layer. Workplace answers CONFIRMED as filed: job totals are population-derived with no observed workplace count, so workplace_granularity none and the pillar scores 0 (bengaluru-hosur reading). od_metric none CONFIRMED — the flows are an unconstrained synthetic model. Alternatives on record: keeping ml_hybrid_footprints 0.10; adm2 by hierarchy 0.07 — absent either way. First scored AZ map; sets the AZ floor. Revised absent 0.13 -> absent 0.09.",
+  "sources": [
+    "https://stat.gov.az/source/demoqraphy/ap/en/2_6en.xls",
+    "https://stat.gov.az/source/demoqraphy/ap/?lang=en",
+    "https://www.openstreetmap.org/copyright"
+  ],
+  "provenance": {
+    "method": "reviewed",
+    "submitted_by": "turnerawill12345-a11y",
+    "reviewed_by": "ahkimn",
+    "date": "2026-11-06"
+  }
+}
