@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "greater-seoul-area",
+  "answers": {
+    "workplace_count": "physical_measured",
+    "workplace_granularity": "mesh_250",
+    "workplace_resolution": "mesh_125_or_adm5",
+    "workplace_intensity": "measured_per_unit",
+    "resident_count": "total_population",
+    "resident_granularity": "mesh_250",
+    "resident_resolution": "mesh_125_or_adm5",
+    "resident_intensity": "measured_per_unit",
+    "od_metric": "structured_marginals",
+    "od_granularity": "adm5"
+  },
+  "notes": "Work trips used : Dec. 2025 pension data, and was calibrated to the 2025 census.\nHomes and jobs were placed using 2024 SGIS grids and building locations\nSchool trips were estimated from school locations and nearby population, with Seoul–KT data from Oct. 29–30, 2026 \nAirport trips use 2025 passenger counts",
+  "sources": [
+    "https://www.data.go.kr/data/15167424/fileData.do",
+    "https://m.korea.kr/briefing/policyBriefingView.do?newsId=156790558",
+    "https://www.data.go.kr/data/15141768/fileData.do",
+    "https://data.seoul.go.kr/dataList/OA-22300/F/1/datasetView.do"
+  ],
+  "provenance": {
+    "method": "self-reported",
+    "submitted_by": "wbdm0001",
+    "reviewed_by": null,
+    "date": "2026-11-25"
+  }
+}
